@@ -8,7 +8,9 @@ import {
   checkDefaultExclusion,
   compareBudget,
   gzipSize,
+  inlineCss,
   main,
+  measureCss,
   measureEntry,
   runBudgets,
   type SizeBudget,
@@ -88,6 +90,82 @@ describe("size harness", () => {
     );
   });
 
+  it("includes core runtime code in a source scenario measurement", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-scenario-"));
+    const modules = join(root, "node_modules");
+    const reactPackage = join(modules, "@cookiechimp/react");
+    const corePackage = join(modules, "@cookiechimp/core");
+    await mkdir(reactPackage, { recursive: true });
+    await mkdir(corePackage, { recursive: true });
+    await writeFile(
+      join(reactPackage, "package.json"),
+      JSON.stringify({ name: "@cookiechimp/react", exports: "./index.mjs" }),
+    );
+    await writeFile(
+      join(corePackage, "package.json"),
+      JSON.stringify({ name: "@cookiechimp/core", exports: "./index.mjs" }),
+    );
+    await writeFile(
+      join(corePackage, "index.mjs"),
+      "export const createConsent = () => 'CORE_RUNTIME_UNIQUE_31d76f';",
+    );
+    await writeFile(
+      join(reactPackage, "index.mjs"),
+      "import { createConsent } from '@cookiechimp/core'; export const ConsentProvider = () => createConsent();",
+    );
+    const entry = join(root, "scenario.ts");
+    await writeFile(
+      entry,
+      "import { ConsentProvider } from '@cookiechimp/react'; export const Scenario = ConsentProvider;",
+    );
+
+    const bundled = await bundleEntry(entry, "initial");
+    expect(
+      bundled?.measuredChunks.map(({ code }) => code).join("\n"),
+    ).toContain("CORE_RUNTIME_UNIQUE_31d76f");
+  });
+
+  it("inlines imported CSS and adds its gzip bytes to a scenario", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-css-"));
+    const tokens = join(root, "node_modules/@cookiechimp/tokens");
+    await mkdir(tokens, { recursive: true });
+    await writeFile(
+      join(tokens, "package.json"),
+      JSON.stringify({
+        name: "@cookiechimp/tokens",
+        exports: { "./css": "./tokens.css" },
+      }),
+    );
+    await writeFile(
+      join(tokens, "tokens.css"),
+      ":root{--unique-token:#123456}",
+    );
+    const styles = join(root, "styles.css");
+    await writeFile(
+      styles,
+      '@import "@cookiechimp/tokens/css";\n.banner{color:var(--unique-token)}',
+    );
+    const inlined = await inlineCss(styles);
+    expect(inlined).toContain("--unique-token:#123456");
+    expect(inlined).not.toContain("@import");
+    const entry = join(root, "scenario.mjs");
+    await writeFile(entry, "export const scenario = 'rendered';");
+    const jsBytes = await measureEntry(entry, "initial");
+    const result = (
+      await runBudgets(
+        [{ ...budget("scenario.mjs"), css: ["styles.css"] }],
+        root,
+      )
+    )[0];
+    expect(result?.bytes).toBe((jsBytes ?? 0) + (await measureCss([styles])));
+  });
+
+  it("reports informational rows without failing when they exceed a limit", async () => {
+    expect(
+      compareBudget({ ...budget("entry", 1), informational: true }, 1000),
+    ).toMatchObject({ status: "info", bytes: 1000 });
+  });
+
   it("leaves React external", async () => {
     const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
     const entry = join(root, "index.mjs");
@@ -103,12 +181,12 @@ describe("size harness", () => {
 
   it("keeps an allowlisted planned entry pending and enforces it once present", async () => {
     const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
-    const entry = "packages/react/dist/banner.mjs";
+    const entry = "packages/core/dist/tcf.mjs";
     const plannedBudget = { ...budget(entry), planned: true as const };
     expect((await runBudgets([plannedBudget], root))[0]?.status).toBe(
       "pending",
     );
-    await mkdir(join(root, "packages/react/dist"), { recursive: true });
+    await mkdir(join(root, "packages/core/dist"), { recursive: true });
     await writeFile(join(root, entry), "export const ready = true;");
     expect((await runBudgets([plannedBudget], root))[0]?.status).toBe("pass");
   });

@@ -1,7 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    "paths": {
+      "@cookiechimp/react": ["./packages/react/dist/index.d.ts"],
+      "@cookiechimp/react/banner": ["./packages/react/dist/banner.d.ts"],
+      "@cookiechimp/react/ui": ["./packages/react/dist/ui.d.ts"],
+      "react": ["./packages/react/node_modules/@types/react/index.d.ts"]
+    }
   },
   "include": ["scripts/**/*.ts"]
 }
