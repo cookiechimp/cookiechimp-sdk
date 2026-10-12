@@ -38,6 +38,17 @@ describe("Google presets", () => {
       expect.objectContaining({ analytics_storage: "denied" }),
     ]);
   });
+  it("keeps GTM from granting ad signals through the analytics category", () => {
+    const output = applyPresets({ categories: ["analytics", "marketing"] }, [
+      ga4({ measurementId: "G-X" }),
+      gtm({ containerId: "GTM-X", category: "analytics" }),
+      googleAds({ conversionId: "AW-X" }),
+    ]);
+    expect(output.consentMode.mapping?.analytics).toEqual([
+      "analytics_storage",
+    ]);
+    expect(gtm({ containerId: "GTM-X", category: "analytics" }).consentMode).toEqual({});
+  });
   it("merges services and mappings", () => {
     const output = applyPresets(
       {

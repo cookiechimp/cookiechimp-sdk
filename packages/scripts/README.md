@@ -20,4 +20,4 @@ Render each preset's `script.attributes` on a script element, then run `gateScri
 
 Call `preset.queue.install(window)` before application code can call `gtag`. It preserves early calls in the selected data layer. Pass `config.consentMode` to `installConsentMode` from `@cookiechimp/core/consent-mode`.
 
-GTM uses basic consent mode by default and is gated. With `consentMode: "advanced"`, GTM loads immediately and installing its queue first writes denied Consent Mode v2 defaults before the loader is inserted.
+GTM uses basic consent mode by default and is gated. With `consentMode: "advanced"`, GTM loads immediately and installing its queue first writes denied Consent Mode v2 defaults before the loader is inserted. GTM adds no Consent Mode mapping of its own: `analytics_storage` follows the analytics category and the ad signals follow the marketing category, whichever category gates the container.

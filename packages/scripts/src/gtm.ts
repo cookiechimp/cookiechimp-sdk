@@ -25,14 +25,9 @@ export function gtm({
     `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(containerId)}${query}`,
     ["https://www.googletagmanager.com/gtm.js?id=GTM-*"],
     ["googletagmanager.com", "*.googletagmanager.com"],
-    {
-      [category]: [
-        "analytics_storage",
-        "ad_storage",
-        "ad_user_data",
-        "ad_personalization",
-      ],
-    },
+    // GTM is a container: it adds no Consent Mode signals of its own, so each
+    // signal keeps following the category that owns it (analytics, marketing).
+    {},
     nonce,
     consentMode === "advanced",
     dataLayerName,
