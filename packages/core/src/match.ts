@@ -1,37 +1,9 @@
 import type { ConfigInput, NormalizedConfig } from "./config";
+import { prepareMatcher } from "./internal/blocker";
 
-const cache = new WeakMap<
-  object,
-  readonly [string, readonly RegExp[], readonly RegExp[], readonly RegExp[]][]
->();
+export { prepareMatcher } from "./internal/blocker";
 
-function wildcard(pattern: string, host = false): RegExp {
-  return new RegExp(
-    `^${pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replaceAll("*", ".*")}$`,
-    host ? "i" : "",
-  );
-}
-
-function compile(config: ConfigInput | NormalizedConfig) {
-  let result = cache.get(config);
-  if (!result) {
-    result = (config.services ?? []).map(
-      ({ id, scripts = [], cookies = [], domains = [] }) => [
-        id,
-        scripts.map((pattern) =>
-          pattern instanceof RegExp
-            ? new RegExp(pattern.source, pattern.flags)
-            : wildcard(pattern),
-        ),
-        cookies.map((pattern) => wildcard(pattern)),
-        domains.map((pattern) => wildcard(pattern, true)),
-      ],
-    );
-    cache.set(config, result);
-  }
-  return result;
-}
-
+/** Prepare a matcher so request interception never recompiles its patterns. */
 export interface ServiceMatch {
   url?: string;
   cookieName?: string;
@@ -43,16 +15,5 @@ export function matchService(
   config: ConfigInput | NormalizedConfig,
   target: ServiceMatch,
 ): string | null {
-  for (const [id, scripts, cookies, domains] of compile(config)) {
-    if (
-      (target.url &&
-        scripts.some((pattern) => pattern.test(target.url as string))) ||
-      (target.cookieName &&
-        cookies.some((pattern) => pattern.test(target.cookieName as string))) ||
-      (target.host &&
-        domains.some((pattern) => pattern.test(target.host as string)))
-    )
-      return id;
-  }
-  return null;
+  return prepareMatcher(config)(target);
 }

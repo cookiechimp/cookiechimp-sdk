@@ -167,6 +167,67 @@ describe("dynamic src interception", () => {
     expect(warn).toHaveBeenCalledOnce();
   });
 
+  it.each([
+    { id: "bad", category: "analytics", scripts: [123] },
+    { id: "bad", category: "analytics", domains: "x.com" },
+    { id: "bad", category: 5 },
+    { id: "bad", category: "analytics", cookies: [{}] },
+  ])("rejects malformed service fields in development", (service) => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect(() =>
+      blockDynamic(runtime(), {
+        config: { categories: ["analytics"], services: [service] } as never,
+      }),
+    ).toThrow("Invalid consent config for CookieChimp blocker");
+  });
+
+  it("fails closed for setters, setAttribute, and insertion when matching throws", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const onBlock = vi.fn();
+    const controller = blockDynamic(runtime(), {
+      config: {
+        categories: ["analytics"],
+        services: [
+          {
+            id: "demo",
+            category: "analytics",
+            domains: ["tracker.test"],
+          },
+        ],
+      },
+      onBlock,
+    });
+    controllers.push(controller);
+    const test = RegExp.prototype.test;
+    vi.spyOn(RegExp.prototype, "test").mockImplementation(function (
+      this: RegExp,
+      value,
+    ) {
+      if (this.source === "^tracker\\.test$")
+        throw new Error("poisoned matcher");
+      return test.call(this, value);
+    });
+    const frame = document.createElement("iframe");
+    const script = document.createElement("script");
+    const attribute = document.createElement("iframe");
+    const inserted = document.createElement("script");
+    frame.src = "https://tracker.test/frame";
+    script.src = "https://tracker.test/script";
+    attribute.setAttribute("src", "https://tracker.test/attribute");
+    inserted.setAttribute("src", "https://tracker.test/inserted");
+    document.body.appendChild(inserted);
+    for (const element of [frame, script, attribute, inserted]) {
+      expect(element.hasAttribute("src")).toBe(false);
+      expect(element.dataset.ccBlocked).toBe("true");
+    }
+    expect(controller.blocked()).toHaveLength(4);
+    expect(onBlock).toHaveBeenCalledTimes(4);
+    expect(
+      controller.blocked().every(({ service }) => service === undefined),
+    ).toBe(true);
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
   it("does not call the native src setter when src is set after insertion", () => {
     const nativeSetter = vi.spyOn(HTMLIFrameElement.prototype, "src", "set");
     install();

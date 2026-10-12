@@ -73,6 +73,70 @@ describe("network blocker", () => {
   });
 
   it.each([
+    { id: "bad", category: "analytics", scripts: [123] },
+    { id: "bad", category: "analytics", domains: "x.com" },
+    { id: "bad", category: 5 },
+    { id: "bad", category: "analytics", cookies: [{}] },
+    { id: "bad", category: "analytics", scripts: [""] },
+    { id: "bad", category: "analytics", domains: ["bad host"] },
+    { id: "bad", category: "analytics", cookies: [/(?:)/] },
+  ])("rejects malformed service fields in development", (service) => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect(() =>
+      blockNetwork(runtime(), {
+        config: { categories: ["analytics"], services: [service] } as never,
+        window,
+      }),
+    ).toThrow("Invalid consent config for CookieChimp blocker");
+  });
+
+  it("fails closed for every network API when matching throws", async () => {
+    const native = vi.spyOn(window, "fetch").mockResolvedValue(new Response());
+    const send = vi.spyOn(window.XMLHttpRequest.prototype, "send");
+    const beacon = vi.fn(() => true);
+    vi.spyOn(window.navigator, "sendBeacon").mockImplementation(beacon);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const onBlock = vi.fn();
+    const controller = blockNetwork(runtime(), {
+      config,
+      window,
+      onBlock,
+    });
+    controllers.push(controller);
+    const test = RegExp.prototype.test;
+    vi.spyOn(RegExp.prototype, "test").mockImplementation(function (
+      this: RegExp,
+      value,
+    ) {
+      if (this.source === "^tracker\\.test$")
+        throw new Error("poisoned matcher");
+      return test.call(this, value);
+    });
+    await expect(window.fetch("https://tracker.test/fetch")).rejects.toThrow(
+      ConsentBlockedError,
+    );
+    const xhr = new window.XMLHttpRequest();
+    const events: string[] = [];
+    for (const event of ["readystatechange", "error", "loadend"])
+      xhr.addEventListener(event, () => events.push(event));
+    xhr.open("GET", "https://tracker.test/xhr");
+    xhr.send();
+    expect(navigator.sendBeacon("https://tracker.test/beacon")).toBe(false);
+    expect(native).not.toHaveBeenCalled();
+    expect(send).not.toHaveBeenCalled();
+    expect(beacon).not.toHaveBeenCalled();
+    expect(xhr.readyState).toBe(4);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(events).toEqual(["readystatechange", "error", "loadend"]);
+    expect(controller.blocked()).toHaveLength(3);
+    expect(onBlock).toHaveBeenCalledTimes(3);
+    expect(
+      controller.blocked().every(({ service }) => service === undefined),
+    ).toBe(true);
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
+  it.each([
     "https://tracker.test/collect",
     new URL("https://tracker.test/collect"),
     new Request("https://tracker.test/collect"),
