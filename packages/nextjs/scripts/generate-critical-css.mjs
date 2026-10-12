@@ -22,7 +22,7 @@ async function inline(file) {
   return output + css.slice(offset);
 }
 
-const css = await inline(reactCss);
+const css = (await inline(reactCss)).replace(/\/\*[\s\S]*?\*\//g, "");
 const rules = css.match(/[^{}]+{[^{}]*}/g) ?? [];
 const tokens = rules
   .filter((rule) => /(?:^|,)\s*(?::root|\[data-cc-theme)/.test(rule))
@@ -36,7 +36,7 @@ const banner = rules
   .join("\n");
 const critical = `${tokens}\n${banner}`.replace(/\s+/g, " ").trim();
 if (
-  !critical.includes("--cc-banner-bg") ||
+  !/(?:^|\s):root\s*{[^}]*--cc-banner-bg:/.test(critical) ||
   !critical.includes("position: fixed")
 )
   throw new Error(
