@@ -4,14 +4,14 @@
     "scenario": "core",
     "entry": "packages/core/dist/index.mjs",
     "kind": "initial",
-    "limit": 7168
+    "limit": 4096
   },
   {
     "name": "core total",
     "scenario": "core",
     "entry": "packages/core/dist/index.mjs",
     "kind": "total",
-    "limit": 9216
+    "limit": 5120
   },
   {
     "name": "banner only",
@@ -41,9 +41,10 @@
     "name": "connected sync client",
     "scenario": "sync",
     "entry": "packages/core/dist/sync.mjs",
-    "planned": true,
     "kind": "extra",
-    "limit": 2048
+    "limit": 2048,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["mergeConfig", "categoriesHash", "matchService"]
   },
   {
     "name": "TCF/GPP module",

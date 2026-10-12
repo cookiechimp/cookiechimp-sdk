@@ -7,6 +7,26 @@ afterEach(() => {
 });
 
 describe("browser consent", () => {
+  function captureCookieWrite(run: () => void): string {
+    let written = "";
+    const prototype = Object.getPrototypeOf(document) as Document;
+    const descriptor = Object.getOwnPropertyDescriptor(prototype, "cookie");
+    Object.defineProperty(document, "cookie", {
+      configurable: true,
+      get: () => descriptor?.get?.call(document) ?? "",
+      set: (value: string) => {
+        written = value;
+        descriptor?.set?.call(document, value);
+      },
+    });
+    try {
+      run();
+      return written;
+    } finally {
+      Reflect.deleteProperty(document, "cookie");
+    }
+  }
+
   it("persists state across runtime instances and notifies subscribers", () => {
     const first = createConsent({ categories: { analytics: false } });
     const listener = vi.fn();
@@ -19,5 +39,49 @@ describe("browser consent", () => {
     expect(reloaded.get().consentId).toBe(first.get().consentId);
     expect(reloaded.has("analytics")).toBe(true);
     expect(reloaded.get().action).toBe("accept_all");
+  });
+
+  it("persists and restores a per-service decision", () => {
+    const config = {
+      categories: ["analytics"],
+      services: [{ id: "analytics-demo", category: "analytics" }],
+    } as const;
+    const first = createConsent(config);
+    first.set({ services: { "analytics-demo": true } });
+    expect(document.cookie).toContain("cc_consent=v1.");
+    const second = createConsent(config);
+    expect(second.hasService("analytics-demo")).toBe(true);
+    expect(second.get().services).toEqual({ "analytics-demo": true });
+  });
+
+  it("writes safe default cookie attributes on HTTP", () => {
+    const cookie = captureCookieWrite(() => {
+      createConsent({ categories: [] }).acceptAll();
+    });
+    expect(cookie).toContain("Path=/");
+    expect(cookie).toContain("SameSite=Lax");
+    expect(cookie).toContain("Max-Age=15552000");
+    expect(cookie).not.toContain("Secure");
+  });
+
+  it("writes configured domain, lifetime, and forced Secure attributes", () => {
+    const cookie = captureCookieWrite(() => {
+      createConsent({
+        categories: [],
+        cookie: { domain: ".example.com", maxAge: 60, secure: true },
+      }).acceptAll();
+    });
+    expect(cookie).toContain("Domain=.example.com");
+    expect(cookie).toContain("Max-Age=60");
+    expect(cookie).toContain("Secure");
+  });
+
+  it("writes Secure by default on HTTPS", () => {
+    vi.stubGlobal("location", { protocol: "https:" });
+    const cookie = captureCookieWrite(() => {
+      createConsent({ categories: [] }).acceptAll();
+    });
+    expect(cookie).toContain("Secure");
+    vi.unstubAllGlobals();
   });
 });
