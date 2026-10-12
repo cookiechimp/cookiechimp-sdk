@@ -148,7 +148,7 @@ describe("headless primitives", () => {
     );
     await act(() =>
       reopened
-        .querySelector<HTMLButtonElement>("[data-cc-part='preferences-save']")
+        .querySelector<HTMLButtonElement>(`[data-cc-part='${part}']`)
         ?.click(),
     );
     expect(consent.has("analytics")).toBe(true);
@@ -246,44 +246,53 @@ describe("headless primitives", () => {
   });
 
   it.each([
-    ["recall", true],
-    ["body", false],
-  ])("falls back to %s when Save closes the banner", async (_, withRecall) => {
-    const consent = createConsent({ categories: [], regulation: "gdpr" });
-    const host = document.body.appendChild(document.createElement("div"));
-    const root = createRoot(host);
-    await act(() =>
-      root.render(
-        <ConsentProvider consent={consent}>
-          <Controls />
-          {withRecall && (
-            <button type="button" data-cc-part="recall" data-cc-state="closed">
-              Recall
-            </button>
-          )}
-        </ConsentProvider>,
-      ),
-    );
-    const opener = host.querySelector<HTMLButtonElement>(
-      "[data-cc-part='banner-customize']",
-    )!;
-    opener.focus();
-    await act(() => opener.click());
-    await act(() =>
-      host
-        .querySelector<HTMLButtonElement>("[data-cc-part='preferences-save']")
-        ?.click(),
-    );
-    expect(host.querySelector("[data-cc-part='banner']")).toBeNull();
-    expect(host.querySelector("[data-cc-part='preferences']")).toBeNull();
-    expect(opener.isConnected).toBe(false);
-    expect(document.activeElement).toBe(
-      withRecall
-        ? host.querySelector("[data-cc-part='recall']")
-        : document.body,
-    );
-    await act(() => root.unmount());
-  });
+    ["Save", "preferences-save", "recall", true],
+    ["Save", "preferences-save", "body", false],
+    ["Accept all", "preferences-accept-all", "recall", true],
+    ["Accept all", "preferences-accept-all", "body", false],
+  ])(
+    "%s closing the banner falls back to %s (%s)",
+    async (_, part, _target, withRecall) => {
+      const consent = createConsent({ categories: [], regulation: "gdpr" });
+      const host = document.body.appendChild(document.createElement("div"));
+      const root = createRoot(host);
+      await act(() =>
+        root.render(
+          <ConsentProvider consent={consent}>
+            <Controls />
+            {withRecall && (
+              <button
+                type="button"
+                data-cc-part="recall"
+                data-cc-state="closed"
+              >
+                Recall
+              </button>
+            )}
+          </ConsentProvider>,
+        ),
+      );
+      const opener = host.querySelector<HTMLButtonElement>(
+        "[data-cc-part='banner-customize']",
+      )!;
+      opener.focus();
+      await act(() => opener.click());
+      await act(() =>
+        host
+          .querySelector<HTMLButtonElement>(`[data-cc-part='${part}']`)
+          ?.click(),
+      );
+      expect(host.querySelector("[data-cc-part='banner']")).toBeNull();
+      expect(host.querySelector("[data-cc-part='preferences']")).toBeNull();
+      expect(opener.isConnected).toBe(false);
+      expect(document.activeElement).toBe(
+        withRecall
+          ? host.querySelector("[data-cc-part='recall']")
+          : document.body,
+      );
+      await act(() => root.unmount());
+    },
+  );
 
   it("adds state to every rendered headless part", async () => {
     const consent = createConsent({
