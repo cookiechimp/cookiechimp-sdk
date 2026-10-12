@@ -122,3 +122,26 @@ test("dynamic iframe src set after insertion makes no request before consent", a
     "https://dynamic.cookiechimp.test/embed",
   );
 });
+
+test("network requests start only after consent", async ({ page }) => {
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).hostname === "dynamic.cookiechimp.test")
+      requests.push(request.url());
+  });
+  await page.route("https://dynamic.cookiechimp.test/**", (route) =>
+    route.abort(),
+  );
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-network",
+    "ready",
+  );
+  await page.getByRole("button", { name: "Send tracker requests" }).click();
+  await page.waitForTimeout(100);
+  expect(requests).toHaveLength(0);
+
+  await page.getByRole("button", { name: "Accept all cookies" }).click();
+  await page.getByRole("button", { name: "Send tracker requests" }).click();
+  await expect.poll(() => requests.length).toBe(3);
+});

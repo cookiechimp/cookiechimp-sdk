@@ -1,16 +1,11 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
+import type { BlockedInfo } from "./internal/blocked";
 import { acquire } from "./internal/patch";
 import { isHttpUrl } from "./internal/url";
 import { matchService } from "./match";
 
-export interface BlockedInfo {
-  url: string;
-  service: string;
-  category: string;
-  kind: "script" | "iframe";
-  ts: number;
-}
+export type { BlockedInfo } from "./internal/blocked";
 
 export interface DynamicOptions {
   config: Parameters<typeof normalizeConfig>[0] | NormalizedConfig;
@@ -103,10 +98,10 @@ export function blockDynamic(
       reported.add(el);
       const info: BlockedInfo = {
         url,
-        service: match.service ?? "declarative",
         category: match.category,
         kind: el instanceof win.HTMLScriptElement ? "script" : "iframe",
         ts: Date.now(),
+        ...(match.service ? { service: match.service } : {}),
       };
       reports.push(info);
       options.onBlock?.(info);

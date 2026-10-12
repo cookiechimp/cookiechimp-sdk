@@ -13,9 +13,18 @@
     "scenario": "dynamic",
     "entry": "packages/core/dist/dynamic.mjs",
     "kind": "extra",
-    "limit": 2560,
+    "limit": 2688,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["blockDynamic", "insertAdjacentHTML"]
+  },
+  {
+    "name": "network blocking",
+    "scenario": "network",
+    "entry": "packages/core/dist/network.mjs",
+    "kind": "extra",
+    "limit": 2304,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["blockNetwork", "ConsentBlockedError"]
   },
   {
     "name": "core initial",

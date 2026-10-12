@@ -20,6 +20,7 @@ describe("built core entry points", () => {
       const regions = readFileSync(resolve(dist, "regions.mjs"), "utf8");
       const gate = readFileSync(resolve(dist, "gate.mjs"), "utf8");
       const dynamic = readFileSync(resolve(dist, "dynamic.mjs"), "utf8");
+      const network = readFileSync(resolve(dist, "network.mjs"), "utf8");
 
       for (const identifier of [
         "mergeConfig",
@@ -36,10 +37,14 @@ describe("built core entry points", () => {
       expect(index).not.toContain("gateScripts");
       expect(index).not.toContain("data-cc-blocked");
       expect(index).not.toContain("blockDynamic");
+      expect(index).not.toContain("blockNetwork");
+      expect(index).not.toContain("ConsentBlockedError");
       expect(gate).toContain("gateScripts");
       expect(gate).toContain("data-cc-blocked");
       expect(dynamic).toContain("blockDynamic");
       expect(dynamic).toContain("insertAdjacentHTML");
+      expect(network).toContain("blockNetwork");
+      expect(network).toContain("ConsentBlockedError");
       for (const token of [
         "x-vercel-ip-country",
         "cf-ipcountry",
