@@ -165,7 +165,7 @@ export async function CookieChimpProvider({
   children,
 }: CookieChimpProviderProps) {
   const resolvedCookieName =
-    cookieName ?? config.cookie?.name ?? CONSENT_COOKIE_NAME;
+    config.cookie?.name ?? CONSENT_COOKIE_NAME;
   validate({ cookieName: resolvedCookieName, provider, languages });
   const languageConfig = languageOptions(languages);
   const requestHeaders = await headers();

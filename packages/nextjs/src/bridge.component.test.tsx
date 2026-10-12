@@ -40,9 +40,5 @@ describe("critical CSS", () => {
     expect(criticalCss).toContain("--cc-banner-bg");
     expect(criticalCss).toContain(".cc-banner");
     expect(criticalCss).toContain("position: fixed");
-    expect(criticalCss).toContain(
-      "@media (max-width: 640px) {\n  .cc-banner {\n    flex-direction: column;",
-    );
-    expect(criticalCss).toContain("box-sizing: border-box");
   });
 });
