@@ -3,7 +3,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { Banner, OptOut, Preferences } from "./headless";
-import { ConsentProvider } from "./index";
+import { ConsentProvider, usePreferences } from "./index";
 
 beforeAll(() => {
   (
@@ -32,6 +32,8 @@ function Controls() {
         <Preferences.Category id="necessary">Necessary</Preferences.Category>
         <Preferences.Category id="analytics">Analytics</Preferences.Category>
         <Preferences.Save>Save</Preferences.Save>
+        <Preferences.AcceptAll>Accept all</Preferences.AcceptAll>
+        <Preferences.RejectAll>Reject all</Preferences.RejectAll>
         <Preferences.Close>Close</Preferences.Close>
       </Preferences.Root>
     </>
@@ -39,6 +41,53 @@ function Controls() {
 }
 
 describe("headless primitives", () => {
+  it("initially focuses, traps, dismisses, and restores a modal banner", async () => {
+    const before = document.body.appendChild(document.createElement("button"));
+    before.focus();
+    const consent = createConsent({
+      categories: ["analytics"],
+      regulation: "gdpr",
+    });
+    const host = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(host);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <Controls />
+        </ConsentProvider>,
+      ),
+    );
+    const dialog = host.querySelector<HTMLElement>("[data-cc-part='banner']")!;
+    const buttons = dialog.querySelectorAll<HTMLButtonElement>("button");
+    expect(document.activeElement).toBe(buttons[0]);
+    buttons[buttons.length - 1]?.focus();
+    await act(() =>
+      dialog.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
+      ),
+    );
+    expect(document.activeElement).toBe(buttons[0]);
+    buttons[0]?.focus();
+    await act(() =>
+      dialog.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Tab",
+          shiftKey: true,
+          bubbles: true,
+        }),
+      ),
+    );
+    expect(document.activeElement).toBe(buttons[buttons.length - 1]);
+    await act(() =>
+      dialog.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+      ),
+    );
+    expect(host.querySelector("[data-cc-part='banner']")).toBeNull();
+    expect(document.activeElement).toBe(before);
+    await act(() => root.unmount());
+  });
+
   it("wires ARIA, traps focus, restores focus, and applies only saved staging", async () => {
     const consent = createConsent({
       categories: { analytics: false },
@@ -130,6 +179,143 @@ describe("headless primitives", () => {
     expect(toggle.disabled).toBe(true);
     expect(toggle.getAttribute("aria-checked")).toBe("true");
     expect(toggle.textContent).toContain("GPC honoured");
+    await act(() => root.unmount());
+  });
+
+  it("renders an honoured GPC opt-out outside CCPA", async () => {
+    const consent = createConsent({
+      categories: ["advertising"],
+      regulation: "gdpr",
+      gpc: true,
+    });
+    const host = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(host);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <OptOut.Root>
+            <OptOut.Toggle />
+          </OptOut.Root>
+        </ConsentProvider>,
+      ),
+    );
+    expect(
+      host
+        .querySelector("[data-cc-part='opt-out']")
+        ?.getAttribute("data-cc-state"),
+    ).toBe("on");
+    await act(() => root.unmount());
+  });
+
+  it("restores a custom preferences opener", async () => {
+    function Custom() {
+      const preferences = usePreferences();
+      return (
+        <>
+          <button type="button" onClick={preferences.show}>
+            Open
+          </button>
+          <Preferences.Root>
+            <Preferences.Title>Settings</Preferences.Title>
+            <Preferences.Description>Choices</Preferences.Description>
+            <Preferences.Close>Close</Preferences.Close>
+          </Preferences.Root>
+        </>
+      );
+    }
+    const consent = createConsent({ categories: [], regulation: "gdpr" });
+    const host = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(host);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <Custom />
+        </ConsentProvider>,
+      ),
+    );
+    const opener = host.querySelector("button")!;
+    opener.focus();
+    await act(() => opener.click());
+    await act(() =>
+      host
+        .querySelector<HTMLButtonElement>("[data-cc-part='preferences-close']")
+        ?.click(),
+    );
+    expect(document.activeElement).toBe(opener);
+    await act(() => root.unmount());
+  });
+
+  it("falls back to recall, then body, when the preferences opener unmounts", async () => {
+    for (const withRecall of [true, false]) {
+      const consent = createConsent({ categories: [], regulation: "gdpr" });
+      const host = document.body.appendChild(document.createElement("div"));
+      const root = createRoot(host);
+      await act(() =>
+        root.render(
+          <ConsentProvider consent={consent}>
+            <Controls />
+            {withRecall && (
+              <button
+                type="button"
+                data-cc-part="recall"
+                data-cc-state="closed"
+              >
+                Recall
+              </button>
+            )}
+          </ConsentProvider>,
+        ),
+      );
+      const opener = host.querySelector<HTMLButtonElement>(
+        "[data-cc-part='banner-customize']",
+      )!;
+      opener.focus();
+      await act(() => opener.click());
+      await act(() =>
+        host
+          .querySelector<HTMLButtonElement>(
+            "[data-cc-part='preferences-accept-all']",
+          )
+          ?.click(),
+      );
+      expect(document.activeElement).toBe(
+        withRecall
+          ? host.querySelector("[data-cc-part='recall']")
+          : document.body,
+      );
+      await act(() => root.unmount());
+      host.remove();
+      document.cookie = "cc_consent=; Max-Age=0; Path=/";
+    }
+  });
+
+  it("adds state to every rendered headless part", async () => {
+    const consent = createConsent({
+      categories: ["analytics"],
+      regulation: "ccpa",
+      gpc: true,
+    });
+    const host = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(host);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <Controls />
+          <OptOut.Root>
+            <OptOut.Toggle />
+          </OptOut.Root>
+        </ConsentProvider>,
+      ),
+    );
+    await act(() =>
+      host
+        .querySelector<HTMLButtonElement>("[data-cc-part='banner-customize']")
+        ?.click(),
+    );
+    const parts = host.querySelectorAll("[data-cc-part]");
+    expect(parts.length).toBeGreaterThan(0);
+    for (const part of parts)
+      expect(part.hasAttribute("data-cc-state")).toBe(true);
     await act(() => root.unmount());
   });
 });

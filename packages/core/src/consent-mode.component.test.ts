@@ -28,6 +28,34 @@ afterEach(() => {
 });
 
 describe("installConsentMode", () => {
+  it("uses a denied default without updating on a first visit", () => {
+    installConsentMode(runtime({}, true));
+    const entries = (
+      window as typeof window & { dataLayer: ArrayLike<unknown>[] }
+    ).dataLayer.map((entry) => Array.from(entry));
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject([
+      "consent",
+      "default",
+      {
+        ad_storage: "denied",
+        analytics_storage: "denied",
+        functionality_storage: "denied",
+        security_storage: "granted",
+      },
+    ]);
+  });
+
+  it("sends option grants only in an update after the denied default", () => {
+    installConsentMode(runtime({}, true), { categories: { analytics: true } });
+    const entries = (
+      window as typeof window & { dataLayer: ArrayLike<unknown>[] }
+    ).dataLayer.map((entry) => Array.from(entry));
+    expect(entries.map((entry) => entry[1])).toEqual(["default", "update"]);
+    expect(entries[0]?.[2]).toMatchObject({ analytics_storage: "denied" });
+    expect(entries[1]?.[2]).toMatchObject({ analytics_storage: "granted" });
+  });
+
   it("pushes default before a tag and updates on accept and reject", () => {
     const consent = runtime({ analytics: false });
     installConsentMode(consent);
