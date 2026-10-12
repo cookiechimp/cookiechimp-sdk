@@ -309,12 +309,22 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   const regionKey = region
     ? `${region.country}${region.region ? `-${region.region}` : ""}`
     : "";
+  if (
+    process.env.NODE_ENV !== "production" &&
+    region &&
+    config.regulation === undefined &&
+    config.resolveRegulation === undefined
+  )
+    console.warn(
+      "CookieChimp received a region without resolveRegulation; using configured overrides or fallbackRegulation",
+    );
   const regulation =
     (typeof normalized.regulation === "function"
       ? normalized.regulation(region)
       : normalized.regulation) ??
     normalized.regions[regionKey] ??
     (region ? normalized.regions[region.country] : undefined) ??
+    normalized.resolveRegulation?.(region, normalized.now) ??
     normalized.fallbackRegulation;
   const gpc = config.gpc ?? (readGpc() || config.initial?.gpc === true);
   const defaults = Object.fromEntries(

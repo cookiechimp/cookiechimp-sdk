@@ -13,11 +13,13 @@ License: MIT
 ## Region and regulation behavior
 
 Import `resolveRegion`, `regulationFor`, and the server header form of
-`readGpc` from `@cookiechimp/core/regions`. `resolveRegion(headers, options?)`
+`readGpc` from `@cookiechimp/core/regions`. `resolveRegion(headers, options)`
 accepts Web `Headers`, plain records, and
-Node-style incoming header records. It checks a configured custom country
-header first, followed by Vercel, Cloudflare, CloudFront, and generic
-`x-country-code` headers. Country and subdivision values are normalized to
+Node-style incoming header records. The `provider` option is required to trust
+geo headers and must be `"vercel"`, `"cloudflare"`, `"cloudfront"`, or
+`"custom"`. Only that provider's country and subdivision headers are read.
+Custom providers use `header` and optional `regionHeader` names. There is no
+generic geo header fallback. Country and subdivision values are normalized to
 uppercase. Unknown and malformed provider values are ignored.
 
 The default rules treat the EU and EEA, the UK, and Switzerland as GDPR.
@@ -30,18 +32,20 @@ result into the default entry as already-resolved context:
 import { createConsent } from "@cookiechimp/core";
 import { regulationFor, resolveRegion } from "@cookiechimp/core/regions";
 
-const region = resolveRegion(headers);
+const region = resolveRegion(headers, { provider: "vercel" });
 const consent = createConsent({
   categories: ["analytics", "advertising"],
   region,
-  regulation: regulationFor(region),
+  resolveRegulation: regulationFor,
   gpc: true,
 });
 ```
 
-`regulation` may also be a resolver function. Without it, `createConsent`
-uses `fallbackRegulation`, which defaults to `"gdpr"`, even when `region` is
-present. `regions` remains available for application-specific overrides.
+`regulation` may also be a resolver function. Prefer `resolveRegulation` when
+passing region context. Without either option, `createConsent` uses
+`fallbackRegulation`, which defaults to `"gdpr"`, and warns in development
+when a region was supplied. `regions` remains available for application-specific
+overrides.
 
 GDPR starts non-required categories disabled and requires a decision. CCPA
 starts them enabled and exposes an opt-out link. GPC disables the configured

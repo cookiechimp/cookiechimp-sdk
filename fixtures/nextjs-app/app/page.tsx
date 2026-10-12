@@ -10,7 +10,7 @@ import { ConsentRegion } from "../components/consent-region";
 
 export default async function Home() {
   const requestHeaders = await headers();
-  const region = resolveRegion(requestHeaders);
+  const region = resolveRegion(requestHeaders, { provider: "vercel" });
   const gpc = readGpc(requestHeaders);
   const initial = readConsentCookie((await cookies()).toString());
   return (

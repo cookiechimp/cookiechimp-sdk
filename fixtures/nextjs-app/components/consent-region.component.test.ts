@@ -1,3 +1,4 @@
+import { regulationFor } from "@cookiechimp/core/regions";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
@@ -52,5 +53,23 @@ describe("ConsentRegion", () => {
     await act(() => root.unmount());
     // biome-ignore lint/suspicious/noDocumentCookie: expire the fixture cookie between tests.
     document.cookie = "cc_consent=; Path=/; Max-Age=0";
+  });
+
+  it("resolves regulation from region when given an explicit resolver", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    const root = createRoot(container);
+    await act(() =>
+      root.render(
+        createElement(ConsentRegion, {
+          region: { country: "US", region: "CA" },
+          resolveRegulation: regulationFor,
+        }),
+      ),
+    );
+    expect(
+      container.querySelector("[data-testid='regulation']")?.textContent,
+    ).toBe("ccpa");
+    await act(() => root.unmount());
   });
 });

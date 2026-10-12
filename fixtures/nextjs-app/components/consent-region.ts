@@ -11,11 +11,13 @@ import { createElement, useState } from "react";
 export function ConsentRegion({
   region = null,
   regulation,
+  resolveRegulation,
   gpc = false,
   initial = null,
 }: {
   region?: Region | null;
   regulation?: Regulation;
+  resolveRegulation?: (region: Region | null, now?: number) => Regulation;
   gpc?: boolean;
   initial?: ConsentState | null;
 }) {
@@ -24,6 +26,7 @@ export function ConsentRegion({
       categories: ["analytics", "advertising"],
       region,
       regulation,
+      resolveRegulation,
       gpc,
       initial,
     }),

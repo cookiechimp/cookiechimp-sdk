@@ -9,6 +9,7 @@ import {
   readConsentCookie,
   VERSION,
 } from "./index";
+import { regulationFor } from "./regions";
 
 const state = (id = "abcdefghijklmnop"): ConsentState => ({
   schemaVersion: CONSENT_SCHEMA_VERSION,
@@ -124,15 +125,41 @@ describe("createConsent", () => {
     ).toBe("none");
   });
 
-  it("accepts regulation resolved outside the default entry", () => {
+  it("accepts a resolveRegulation option so region alone selects a rule", () => {
     const resolveRegulation = (region: { country: string } | null) =>
       region?.country === "US" ? ("ccpa" as const) : ("gdpr" as const);
     const region = { country: "US", region: "CA" };
     expect(
-      createConsent({ categories: [], region, regulation: resolveRegulation })
-        .regulation,
+      createConsent({ categories: [], region, resolveRegulation }).regulation,
     ).toBe("ccpa");
-    expect(createConsent({ categories: [], region }).regulation).toBe("gdpr");
+    expect(
+      createConsent({
+        categories: [],
+        region: { country: "US", region: "CA" },
+        resolveRegulation: regulationFor,
+      }).regulation,
+    ).toBe("ccpa");
+  });
+
+  it("warns in development and falls back when region has no resolver", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(
+      createConsent({
+        categories: [],
+        region: { country: "US", region: "CA" },
+        fallbackRegulation: "none",
+      }).regulation,
+    ).toBe("none");
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("without resolveRegulation"),
+    );
+  });
+
+  it("passes the injectable current time to the regulation resolver", () => {
+    const resolveRegulation = vi.fn(() => "none" as const);
+    const region = { country: "US", region: "OK" };
+    createConsent({ categories: [], region, resolveRegulation, now: 123 });
+    expect(resolveRegulation).toHaveBeenCalledWith(region, 123);
   });
 
   it("applies GPC once and preserves explicit decisions outside sale/share", () => {

@@ -42,6 +42,10 @@ export interface ConfigInput {
   categories?: CategoriesInput;
   services?: readonly ServiceConfig[];
   regulation?: Regulation | ((region: Region | null) => Regulation);
+  /** Resolve a supplied region, for example with `regulationFor` from ./regions. */
+  resolveRegulation?: (region: Region | null, now?: number) => Regulation;
+  /** Current UTC time in milliseconds, injectable for date-based regulation rules. */
+  now?: number;
   /** Country (`US`) or country-subdivision (`US-CA`) regulation overrides. */
   regions?: Readonly<Record<string, Regulation>>;
   fallbackRegulation?: Regulation;
@@ -70,6 +74,11 @@ export interface NormalizedConfig {
   readonly categories: readonly NormalizedCategoryConfig[];
   readonly services: readonly NormalizedServiceConfig[];
   readonly regulation?: Regulation | ((region: Region | null) => Regulation);
+  readonly resolveRegulation?: (
+    region: Region | null,
+    now?: number,
+  ) => Regulation;
+  readonly now?: number;
   readonly regions: Readonly<Record<string, Regulation>>;
   readonly fallbackRegulation: Regulation;
 }
@@ -252,6 +261,12 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
     ...(typeof input.regulation === "function" ||
     regulations.has(input.regulation ?? "")
       ? { regulation: input.regulation }
+      : {}),
+    ...(typeof input.resolveRegulation === "function"
+      ? { resolveRegulation: input.resolveRegulation }
+      : {}),
+    ...(typeof input.now === "number" && Number.isFinite(input.now)
+      ? { now: input.now }
       : {}),
     regions: Object.freeze(validRegions),
     fallbackRegulation: regulations.has(input.fallbackRegulation ?? "")
