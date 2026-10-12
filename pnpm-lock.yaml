@@ -73,6 +73,22 @@ importers:
         specifier: 5.0.4
         version: 5.0.4(@types/node@22.20.5)(happy-dom@21.0.1)(vite@8.3.4(@types/node@22.20.5)(yaml@2.9.1))
 
+  packages/tokens:
+    dependencies:
+      tailwindcss:
+        specifier: '>=3.0.0'
+        version: 4.3.3
+    devDependencies:
+      tsdown:
+        specifier: 0.23.1
+        version: 0.23.1(typescript@7.0.2)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.0.4
+        version: 5.0.4(@types/node@22.20.5)(happy-dom@21.0.1)(vite@8.3.4(@types/node@22.20.5)(yaml@2.9.1))
+
 packages:
 
   '@biomejs/biome@2.5.15':
@@ -1118,6 +1134,9 @@ packages:
       babel-plugin-macros:
         optional: true
 
+  tailwindcss@4.3.3:
+    resolution: {integrity: sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==}
+
   tinybench@6.2.2:
     resolution: {integrity: sha512-nIZ2N2dFpjBsg2hgitKu7mA+FvsIJuGJOwysRngmVRRmWgR/UyPjwJj8c/fT/dhm8EkHnF5EOogRf+0Z2qrimA==}
     engines: {node: '>=20.0.0'}
@@ -2138,6 +2157,8 @@ snapshots:
     dependencies:
       client-only: 0.0.1
       react: 19.3.0
+
+  tailwindcss@4.3.3: {}
 
   tinybench@6.2.2: {}
 
