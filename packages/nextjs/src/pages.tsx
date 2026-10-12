@@ -1,0 +1,185 @@
+"use client";
+
+import type { IncomingHttpHeaders } from "node:http";
+import {
+  CONSENT_COOKIE_NAME,
+  type ConsentConfig,
+  type ConsentState,
+  readConsentCookie,
+} from "@cookiechimp/core";
+import { resolveLanguage } from "@cookiechimp/core/language";
+import {
+  type Region,
+  type RegionHeaderOptions,
+  regulationFor,
+  resolveRegion,
+} from "@cookiechimp/core/regions";
+import type { ComponentType, ReactNode } from "react";
+import { ClientProvider } from "./index";
+
+export interface PagesConsentOptions {
+  config: ConsentConfig;
+  cookieName?: string;
+  provider?: RegionHeaderOptions["provider"];
+  header?: string;
+  region?: Region | null;
+  languages?: { available: readonly string[]; fallback: string };
+}
+
+export interface PagesConsentProps {
+  consent: ConsentState | null;
+  region: Region | null;
+  language?: string;
+}
+
+type RequestLike = { headers: IncomingHttpHeaders | Headers };
+
+function invalid(message: string): void {
+  const text = `Invalid CookieChimp Next.js Pages options: ${message}`;
+  if (typeof process !== "undefined" && process.env.NODE_ENV !== "production")
+    throw new TypeError(text);
+  console.warn(text);
+}
+
+function getHeader(headers: IncomingHttpHeaders | Headers, name: string) {
+  if (headers instanceof Headers) return headers.get(name);
+  const value = headers[name.toLowerCase()];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function validate(options: PagesConsentOptions) {
+  if (!options.config) invalid("config is required");
+  if (
+    options.cookieName &&
+    !/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(options.cookieName)
+  )
+    invalid("cookieName must be a valid cookie name");
+  if (options.provider === "custom" && !options.header)
+    invalid("header is required for the custom provider");
+}
+
+/** Resolve the serializable consent props for a Pages Router request. */
+export function getPagesConsentProps(
+  req: RequestLike,
+  options: PagesConsentOptions,
+): PagesConsentProps {
+  validate(options);
+  const cookieName = options.cookieName ?? CONSENT_COOKIE_NAME;
+  const cookie = getHeader(req.headers, "cookie") ?? "";
+  const consent =
+    cookieName === CONSENT_COOKIE_NAME
+      ? readConsentCookie(cookie)
+      : readConsentCookie(
+          cookie
+            .split(";")
+            .map((part) =>
+              part.trim().startsWith(`${cookieName}=`)
+                ? `${CONSENT_COOKIE_NAME}=${part.trim().slice(cookieName.length + 1)}`
+                : part,
+            )
+            .join(";"),
+        );
+  const forwardedValue = getHeader(req.headers, "x-cc-region");
+  const forwardedMatch = /^([A-Z]{2})(?:-([A-Z0-9]{1,3}))?$/.exec(
+    forwardedValue?.trim().toUpperCase() ?? "",
+  );
+  const forwarded = forwardedMatch
+    ? {
+        country: forwardedMatch[1] as string,
+        ...(forwardedMatch[2] ? { region: forwardedMatch[2] } : {}),
+      }
+    : null;
+  const region =
+    options.region !== undefined
+      ? options.region
+      : (forwarded ??
+        (options.provider
+          ? resolveRegion(req.headers, {
+              provider: options.provider,
+              header: options.header,
+            })
+          : null));
+  const language = options.languages
+    ? resolveLanguage(
+        getHeader(req.headers, "accept-language"),
+        options.languages.available,
+        options.languages.fallback,
+      )
+    : undefined;
+  return { consent, region, ...(language ? { language } : {}) };
+}
+
+export interface PagesConsentProviderProps extends PagesConsentProps {
+  config: ConsentConfig;
+  children: ReactNode;
+}
+
+/** Client boundary suitable for both a single page and pages/_app. */
+export function PagesConsentProvider({
+  config,
+  consent,
+  region,
+  language,
+  children,
+}: PagesConsentProviderProps) {
+  return (
+    <ClientProvider
+      config={{
+        ...config,
+        region,
+        regulation: regulationFor(region),
+        ...(language ? { language } : {}),
+      }}
+      initialState={consent}
+      language={language}
+    >
+      {children}
+    </ClientProvider>
+  );
+}
+
+type ServerPropsResult<P> =
+  | { props: P | Promise<P> }
+  | { redirect: unknown }
+  | { notFound: true };
+type ServerProps<P> = (context: {
+  req: RequestLike;
+}) => ServerPropsResult<P> | Promise<ServerPropsResult<P>>;
+
+/** Add `cookiechimp` to an existing getServerSideProps result. */
+export function withConsent<
+  P extends Record<string, unknown> = Record<string, never>,
+>(
+  options: PagesConsentOptions,
+  handler?: ServerProps<P>,
+): ServerProps<P & { cookiechimp: PagesConsentProps }> {
+  validate(options);
+  return async (context) => {
+    const result = handler ? await handler(context) : { props: {} as P };
+    if (!("props" in result))
+      return result as ServerPropsResult<
+        P & { cookiechimp: PagesConsentProps }
+      >;
+    return {
+      props: {
+        ...(await result.props),
+        cookiechimp: getPagesConsentProps(context.req, options),
+      },
+    };
+  };
+}
+
+/** Wrap a page component when a local provider is preferable to pages/_app. */
+export function withConsentPage<P extends { cookiechimp: PagesConsentProps }>(
+  Page: ComponentType<P>,
+  options: PagesConsentOptions,
+) {
+  validate(options);
+  return function ConsentPage(props: P) {
+    return (
+      <PagesConsentProvider config={options.config} {...props.cookiechimp}>
+        <Page {...props} />
+      </PagesConsentProvider>
+    );
+  };
+}

@@ -35,6 +35,18 @@ export interface GetServerConsentOptions {
   languages?: LanguageOptions | readonly string[];
 }
 
+function forwardedRegion(requestHeaders: Headers): Region | null {
+  const match = /^([A-Z]{2})(?:-([A-Z0-9]{1,3}))?$/.exec(
+    requestHeaders.get("x-cc-region")?.trim().toUpperCase() ?? "",
+  );
+  return match
+    ? {
+        country: match[1] as string,
+        ...(match[2] ? { region: match[2] } : {}),
+      }
+    : null;
+}
+
 export type ServerConsentState = ConsentState & {
   region: Region | null;
   regulation: Regulation;
@@ -112,9 +124,10 @@ export async function getServerConsent(
   const region =
     options.region !== undefined
       ? options.region
-      : options.provider
-        ? resolveRegion(requestHeaders, { provider: options.provider })
-        : (consent.region ?? null);
+      : (forwardedRegion(requestHeaders) ??
+        (options.provider
+          ? resolveRegion(requestHeaders, { provider: options.provider })
+          : (consent.region ?? null)));
   const languages = languageOptions(options.languages);
   const language = languages
     ? resolveLanguage(
@@ -157,9 +170,8 @@ export async function CookieChimpProvider({
   const region =
     suppliedRegion !== undefined
       ? suppliedRegion
-      : provider
-        ? resolveRegion(requestHeaders, { provider })
-        : null;
+      : (forwardedRegion(requestHeaders) ??
+        (provider ? resolveRegion(requestHeaders, { provider }) : null));
   const regulation = regulationFor(region);
   const language = languageConfig
     ? resolveLanguage(

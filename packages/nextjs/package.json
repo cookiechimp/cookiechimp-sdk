@@ -16,13 +16,28 @@
       "types": "./dist/server.d.ts",
       "import": "./dist/server.mjs",
       "require": "./dist/server.cjs"
+    },
+    "./pages": {
+      "types": "./dist/pages.d.ts",
+      "import": "./dist/pages.mjs",
+      "require": "./dist/pages.cjs"
+    },
+    "./middleware": {
+      "types": "./dist/middleware.d.ts",
+      "import": "./dist/middleware.mjs",
+      "require": "./dist/middleware.cjs"
+    },
+    "./styles-route": {
+      "types": "./dist/styles-route.d.ts",
+      "import": "./dist/styles-route.mjs",
+      "require": "./dist/styles-route.cjs"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "node scripts/generate-critical-css.mjs && tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/server.d.mts dist/server.d.ts",
+    "build": "node scripts/generate-critical-css.mjs && tsdown --config-loader native && for name in index server pages middleware styles-route; do cp dist/$name.d.mts dist/$name.d.ts; done",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"

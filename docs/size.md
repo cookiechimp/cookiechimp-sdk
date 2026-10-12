@@ -23,6 +23,8 @@ The checked budgets are the source-of-truth values below. Region header provider
 | react provider and hooks | extra | 4608 |
 | Next.js client provider bridge | extra | 4370 |
 | Next.js server entry | extra | 4096 |
+| Next.js Pages client wrapper | extra | 6225 |
+| Next.js middleware region helper | extra | 1053 |
 | react headless primitives | extra | 3491 |
 | banner only | initial | 11264 |
 | banner distribution entry | initial | 11264 |
@@ -58,3 +60,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | language | 954 B | 1050 B | Accept-Language q validation and regional fallback (measured 914 B, leaving 40 B (about 4%) under 954 B; 1050 B gives about 15% headroom) | M2 PR13 |
 | nextjs client | none | 4370 B | New client provider bridge, measured 3800 B with Next.js, React, and React DOM external, plus 15% headroom | M3 PR14 |
 | nextjs server | none | informational | Server-only App Router helpers and generated critical CSS | M3 PR14 |
+| nextjs pages | none | 6225 B | Pages provider and request helpers, measured 5413 B plus 15% headroom | M3 PR15 |
+| nextjs middleware | none | 1053 B | Edge region forwarding helper, measured 915 B plus 15% headroom | M3 PR15 |

@@ -46,3 +46,66 @@ The `provider="vercel"` or `provider="cloudflare"` shorthand is also
 available on the provider when it is preferable for the provider itself to
 read the request headers. Passing an explicit `region` keeps ownership visible
 in application code.
+
+## Pages Router
+
+Use `withConsent` to add the server cookie, normalized region, and negotiated
+language to `getServerSideProps`. Wrap the page in `PagesConsentProvider`,
+either locally or from `pages/_app`, so the browser hydrates the exact server
+snapshot.
+
+```tsx
+import { PagesConsentProvider, withConsent } from "@cookiechimp/nextjs/pages";
+
+export const getServerSideProps = withConsent({
+  config,
+  provider: "vercel",
+  languages: { available: ["en", "de"], fallback: "en" },
+});
+
+export default function Page({ cookiechimp }) {
+  return <PagesConsentProvider config={config} {...cookiechimp}>...</PagesConsentProvider>;
+}
+```
+
+An existing `getServerSideProps` can be passed as the second argument. The
+`withConsentPage` HOC is available when wrapping the individual component is
+more convenient.
+
+## Middleware region forwarding
+
+The middleware helper only parses headers already provided by the selected
+host. It does not perform geo-IP, fetch, or any external lookup. Selecting a
+provider is required, which prevents arbitrary provider headers from being
+trusted by accident. Any incoming `x-cc-region` is removed before the trusted
+value is written.
+
+```ts
+import { consentMiddleware } from "@cookiechimp/nextjs/middleware";
+
+export function middleware(request) {
+  return consentMiddleware(request, { provider: "cloudflare" });
+}
+```
+
+`getServerConsent`, `CookieChimpProvider`, and the Pages helpers automatically
+read the forwarded `x-cc-region` request header. Use `provider: "custom"` with
+`header` to opt in to a host-specific country header.
+
+## Strict CSP stylesheet
+
+For a policy such as `style-src 'self'`, expose a same-origin Route Handler and
+load it with a stylesheet link instead of rendering `CookieChimpStyles`.
+
+```ts
+// app/cookiechimp.css/route.ts
+import { stylesRoute } from "@cookiechimp/nextjs/styles-route";
+export const GET = stylesRoute;
+```
+
+```tsx
+<link rel="stylesheet" href="/cookiechimp.css" />
+```
+
+The response includes `text/css`, immutable one-year caching, and a stable
+ETag. Conditional requests return 304.
