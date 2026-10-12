@@ -14,6 +14,7 @@ import {
   useConsentActions,
   useHeadlessContext,
   usePreferences,
+  useTranslations,
 } from "./index";
 
 export type {
@@ -41,10 +42,11 @@ const bad = (component: string, message: string) => {
 };
 
 export function CookiePreferences({
-  title = "Cookie preferences",
-  description = "Choose which cookie categories you allow.",
+  title,
+  description,
   categories,
 }: CookiePreferencesProps) {
+  const { t } = useTranslations();
   if (!Array.isArray(categories)) {
     bad("CookiePreferences", "categories must be an array");
     categories = [];
@@ -52,9 +54,11 @@ export function CookiePreferences({
   return (
     <Preferences.Root className="cc-preferences">
       <div className="cc-preferences__panel">
-        <Preferences.Title className="cc-title">{title}</Preferences.Title>
+        <Preferences.Title className="cc-title">
+          {title ?? t("preferences.title")}
+        </Preferences.Title>
         <Preferences.Description className="cc-description">
-          {description}
+          {description ?? t("preferences.description")}
         </Preferences.Description>
         <div className="cc-categories">
           {categories.map((category) => (
@@ -72,17 +76,17 @@ export function CookiePreferences({
         </div>
         <div className="cc-actions">
           <Preferences.RejectAll className="cc-button cc-button--secondary">
-            Reject all
+            {t("banner.rejectAll")}
           </Preferences.RejectAll>
           <Preferences.Save className="cc-button cc-button--secondary">
-            Save choices
+            {t("banner.save")}
           </Preferences.Save>
           <Preferences.AcceptAll className="cc-button cc-button--primary">
-            Accept all
+            {t("banner.acceptAll")}
           </Preferences.AcceptAll>
           <Preferences.Close
             className="cc-close"
-            aria-label="Close preferences"
+            aria-label={t("banner.close")}
           >
             ×
           </Preferences.Close>
@@ -92,11 +96,8 @@ export function CookiePreferences({
   );
 }
 
-export function RecallButton({
-  children = "Cookie preferences",
-}: {
-  children?: ReactNode;
-}) {
+export function RecallButton({ children }: { children?: ReactNode }) {
+  const { t } = useTranslations();
   const preferences = usePreferences();
   const banner = useBanner();
   if (banner.open) return null;
@@ -108,19 +109,27 @@ export function RecallButton({
       data-cc-state="closed"
       onClick={preferences.show}
     >
-      {children}
+      {children ?? t("recall.label")}
     </button>
   );
 }
 
 export function CookieOptOut({
   category = "advertising",
+  children,
 }: {
   category?: string;
+  children?: ReactNode;
 }) {
+  const { t } = useTranslations();
   return (
     <OptOut.Root className="cc-opt-out" category={category}>
-      <OptOut.Toggle className="cc-button cc-button--secondary" />
+      <OptOut.Toggle
+        className="cc-button cc-button--secondary"
+        gpcLabel={t("gpc.honoured")}
+      >
+        {children ?? t("optOut.label")}
+      </OptOut.Toggle>
     </OptOut.Root>
   );
 }
@@ -174,10 +183,11 @@ export function GatedFrame({
   category,
   service,
   src,
-  placeholder = "This content requires consent.",
-  allowLabel = "Allow",
+  placeholder,
+  allowLabel,
   ...props
 }: GatedFrameProps) {
+  const { t } = useTranslations();
   if (!category) bad("GatedFrame", "category is required");
   if (!src) bad("GatedFrame", "src is required");
   const consent = useConsent();
@@ -209,7 +219,7 @@ export function GatedFrame({
           data-cc-part="gated-frame-placeholder"
           data-cc-state="blocked"
         >
-          <span>{placeholder}</span>
+          <span>{placeholder ?? t("gated.placeholder")}</span>
           <button
             type="button"
             className="cc-button cc-button--primary"
@@ -221,7 +231,7 @@ export function GatedFrame({
               )
             }
           >
-            {allowLabel}
+            {allowLabel ?? t("gated.allow")}
           </button>
         </div>
       )}

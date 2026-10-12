@@ -1,6 +1,7 @@
 "use client";
 
 import { Banner } from "./headless";
+import { useTranslations } from "./index";
 
 export type BannerPosition =
   | "bottom"
@@ -34,14 +35,16 @@ function invalid(message: string) {
 }
 
 export function CookieBanner({
-  title = "We value your privacy",
-  description = "We use cookies to improve your experience and understand how our site is used.",
+  title,
+  description,
   labels = {},
   position = "bottom",
   modal = false,
 }: CookieBannerProps) {
-  if (typeof title !== "string") invalid("title must be a string");
-  if (typeof description !== "string") invalid("description must be a string");
+  if (title !== undefined && typeof title !== "string")
+    invalid("title must be a string");
+  if (description !== undefined && typeof description !== "string")
+    invalid("description must be a string");
   if (!positions.has(position)) {
     invalid("position must be bottom, bottom-left, bottom-right, or center");
     position = "bottom";
@@ -50,6 +53,9 @@ export function CookieBanner({
     invalid("labels must be an object");
     labels = {};
   }
+  const { t } = useTranslations();
+  title ??= t("banner.title");
+  description ??= t("banner.description");
   return (
     <Banner.Root
       className="cc-banner"
@@ -64,13 +70,13 @@ export function CookieBanner({
       </div>
       <div className="cc-actions">
         <Banner.Customize className="cc-button cc-button--secondary">
-          {labels.customize ?? "Customize"}
+          {labels.customize ?? t("banner.customize")}
         </Banner.Customize>
         <Banner.RejectAll className="cc-button cc-button--secondary">
-          {labels.reject ?? "Reject all"}
+          {labels.reject ?? t("banner.rejectAll")}
         </Banner.RejectAll>
         <Banner.AcceptAll className="cc-button cc-button--primary">
-          {labels.accept ?? "Accept all"}
+          {labels.accept ?? t("banner.acceptAll")}
         </Banner.AcceptAll>
       </div>
     </Banner.Root>

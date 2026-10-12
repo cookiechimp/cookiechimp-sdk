@@ -346,8 +346,9 @@ function OptOutRoot({
 }
 function OptOutToggle({
   children = "Do not sell or share my personal information",
+  gpcLabel = "GPC honoured",
   ...props
-}: ActionProps) {
+}: ActionProps & { gpcLabel?: string }) {
   const category =
     required(useContext(OptOutContext), "OptOut.Toggle") ?? "advertising";
   const provider = useHeadlessContext();
@@ -374,7 +375,7 @@ function OptOutToggle({
       {gpc && (
         <span data-cc-part="opt-out-gpc" data-cc-state="honoured">
           {" "}
-          (GPC honoured)
+          ({gpcLabel})
         </span>
       )}
     </button>

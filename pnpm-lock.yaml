@@ -47,6 +47,9 @@ importers:
       '@cookiechimp/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@cookiechimp/translations':
+        specifier: workspace:*
+        version: link:../../packages/translations
       next:
         specifier: 16.4.0
         version: 16.4.0(@playwright/test@1.64.0)(@types/node@22.20.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -90,6 +93,9 @@ importers:
       '@cookiechimp/tokens':
         specifier: workspace:*
         version: link:../tokens
+      '@cookiechimp/translations':
+        specifier: workspace:*
+        version: link:../translations
     devDependencies:
       '@types/react':
         specifier: ^19.0.0
@@ -118,6 +124,18 @@ importers:
       tailwindcss:
         specifier: '>=3.0.0'
         version: 4.3.3
+    devDependencies:
+      tsdown:
+        specifier: 0.23.1
+        version: 0.23.1(typescript@7.0.2)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.0.4
+        version: 5.0.4(@types/node@22.20.5)(happy-dom@21.0.1)(vite@8.3.4(@types/node@22.20.5)(yaml@2.9.1))
+
+  packages/translations:
     devDependencies:
       tsdown:
         specifier: 0.23.1
