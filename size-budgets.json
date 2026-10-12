@@ -69,23 +69,20 @@
     "name": "banner only",
     "scenario": "banner",
     "entry": "packages/react/dist/banner.mjs",
-    "planned": true,
     "kind": "initial",
     "limit": 11264
   },
   {
     "name": "banner, preferences, recall initial",
     "scenario": "banner + preferences + recall",
-    "entry": "packages/react/dist/banner.mjs",
-    "planned": true,
+    "entry": "packages/react/dist/ui.mjs",
     "kind": "initial",
     "limit": 13824
   },
   {
     "name": "banner, preferences, recall total",
     "scenario": "banner + preferences + recall",
-    "entry": "packages/react/dist/banner.mjs",
-    "planned": true,
+    "entry": "packages/react/dist/ui.mjs",
     "kind": "total",
     "limit": 16384
   },

@@ -4,9 +4,9 @@ test("first visit shows the consent banner and accepting hides it", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.getByTestId("consent-banner")).toBeVisible();
+  await expect(page.locator('[data-cc-part="banner"]')).toBeVisible();
   await page.getByRole("button", { name: "Accept all cookies" }).click();
-  await expect(page.getByTestId("consent-banner")).toHaveCount(0);
+  await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
 });
 
 test("keyboard opens and closes the modal with restored focus", async ({
@@ -36,9 +36,9 @@ test("returning visitor has no consent banner before or after hydration", async 
   await page.getByRole("button", { name: "Accept all cookies" }).click();
 
   const response = await context.request.get("/");
-  expect(await response.text()).not.toContain('data-testid="consent-banner"');
+  expect(await response.text()).not.toContain('data-cc-part="banner"');
   await page.reload();
-  await expect(page.getByTestId("consent-banner")).toHaveCount(0);
+  await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
   await context.close();
 });
 

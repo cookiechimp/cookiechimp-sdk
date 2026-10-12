@@ -7,11 +7,16 @@ import { gateScripts } from "@cookiechimp/core/gate";
 import { blockNetwork } from "@cookiechimp/core/network";
 import {
   ConsentProvider,
-  useBanner,
   useCategory,
   useConsentActions,
 } from "@cookiechimp/react";
-import { Banner, Preferences } from "@cookiechimp/react/headless";
+import {
+  CookieBanner,
+  CookiePreferences,
+  GatedFrame,
+  GatedScript,
+  RecallButton,
+} from "@cookiechimp/react/ui";
 import { useEffect, useState } from "react";
 
 const config = {
@@ -47,8 +52,7 @@ function ConsentDemoContent({
   consent: ReturnType<typeof createConsent>;
 }) {
   const accepted = useCategory("analytics");
-  const banner = useBanner();
-  const { acceptAll, set } = useConsentActions();
+  const { set } = useConsentActions();
 
   useEffect(() => {
     const gate = gateScripts(consent);
@@ -71,35 +75,29 @@ function ConsentDemoContent({
 
   return (
     <section aria-label="Consent demo">
-      <Banner.Root data-testid="consent-banner">
-        <Banner.Title>Cookie consent</Banner.Title>
-        <Banner.Description>
-          Choose how this site may use cookies.
-        </Banner.Description>
-        <Banner.Customize>Customize</Banner.Customize>
-        <Banner.RejectAll>Reject all</Banner.RejectAll>
-        <Banner.AcceptAll>Accept all cookies</Banner.AcceptAll>
-      </Banner.Root>
-      <Preferences.Root>
-        <Preferences.Title>Cookie preferences</Preferences.Title>
-        <Preferences.Description>
-          Choose the categories you allow.
-        </Preferences.Description>
-        <Preferences.Category id="necessary">Necessary</Preferences.Category>
-        <Preferences.Category id="analytics">Analytics</Preferences.Category>
-        <Preferences.Save>Save preferences</Preferences.Save>
-        <Preferences.AcceptAll>Accept all</Preferences.AcceptAll>
-        <Preferences.RejectAll>Reject all</Preferences.RejectAll>
-        <Preferences.Close>Close</Preferences.Close>
-      </Preferences.Root>
+      <CookieBanner
+        title="Cookie consent"
+        description="Choose how this site may use cookies."
+        labels={{ accept: "Accept all cookies" }}
+      />
+      <CookiePreferences
+        categories={[
+          {
+            id: "necessary",
+            label: "Necessary",
+            description: "Required for the site to work.",
+          },
+          {
+            id: "analytics",
+            label: "Analytics",
+            description: "Helps us improve this site.",
+          },
+        ]}
+      />
+      <RecallButton />
       <p data-testid="consent-status">
         {accepted ? "Analytics accepted" : "Analytics declined"}
       </p>
-      {!banner.open && (
-        <button type="button" onClick={acceptAll}>
-          Accept all cookies
-        </button>
-      )}
       <p data-testid="service-status">
         {consent.hasService("analytics-demo")
           ? "Analytics demo accepted"
@@ -131,13 +129,13 @@ function ConsentDemoContent({
         >
           Send tracker requests
         </button>
-        <script type="text/plain" data-cc-category="analytics">
+        <GatedScript category="analytics">
           {"window.__ccAnalyticsRan = true;"}
-        </script>
-        <iframe
+        </GatedScript>
+        <GatedFrame
           title="Gated local frame"
-          data-cc-src="/frame"
-          data-cc-category="analytics"
+          src="/frame"
+          category="analytics"
         />
       </div>
     </section>

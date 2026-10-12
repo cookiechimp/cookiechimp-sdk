@@ -25,6 +25,8 @@ export interface BudgetResult extends SizeBudget {
 
 export const plannedEntries = new Set([
   "packages/react/dist/banner.mjs",
+  // M2 PR12's complete styled surface is intentionally measured separately.
+  "packages/react/dist/ui.mjs",
   "packages/react/dist/index.mjs",
   "packages/core/dist/sync.mjs",
   "packages/core/dist/tcf.mjs",

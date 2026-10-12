@@ -87,6 +87,9 @@ importers:
       '@cookiechimp/core':
         specifier: workspace:*
         version: link:../core
+      '@cookiechimp/tokens':
+        specifier: workspace:*
+        version: link:../tokens
     devDependencies:
       '@types/react':
         specifier: ^19.0.0

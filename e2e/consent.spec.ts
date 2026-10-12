@@ -145,3 +145,49 @@ test("network requests start only after consent", async ({ page }) => {
   await page.getByRole("button", { name: "Send tracker requests" }).click();
   await expect.poll(() => requests.length).toBe(3);
 });
+
+test("styled controls gate frames, recall preferences, and avoid layout shift", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    (window as typeof window & { __ccLayoutShift: number }).__ccLayoutShift = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        const shift = entry as PerformanceEntry & {
+          value: number;
+          hadRecentInput: boolean;
+        };
+        if (!shift.hadRecentInput)
+          (
+            window as typeof window & { __ccLayoutShift: number }
+          ).__ccLayoutShift += shift.value;
+      }
+    }).observe({ type: "layout-shift", buffered: true });
+  });
+  let frameRequests = 0;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/frame") frameRequests += 1;
+  });
+  await page.goto("/");
+  const banner = page.locator('[data-cc-part="banner"]');
+  await expect(banner).toBeVisible();
+  expect(
+    await banner.evaluate((node) => getComputedStyle(node).backgroundColor),
+  ).toBe("rgb(255, 255, 255)");
+  expect(frameRequests).toBe(0);
+  await page.getByRole("button", { name: "Allow" }).click();
+  await expect.poll(() => frameRequests).toBe(1);
+  const recall = page.locator('[data-cc-part="recall"]');
+  await expect(recall).toBeVisible();
+  await recall.click();
+  await expect(
+    page.getByRole("dialog", { name: "Cookie preferences" }),
+  ).toBeVisible();
+  await page.waitForTimeout(100);
+  expect(
+    await page.evaluate(
+      () =>
+        (window as typeof window & { __ccLayoutShift: number }).__ccLayoutShift,
+    ),
+  ).toBe(0);
+});

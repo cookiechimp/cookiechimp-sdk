@@ -1,11 +1,16 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.tsx", "src/headless.tsx"],
+  entry: ["src/index.tsx", "src/headless.tsx", "src/banner.tsx", "src/ui.tsx"],
   dts: true,
   format: ["esm", "cjs"],
   minify: true,
   sourcemap: true,
   banner: { js: '"use client";' },
-  external: ["react", "react-dom", "@cookiechimp/core"],
+  external: [
+    "react",
+    "react-dom",
+    "@cookiechimp/core",
+    "@cookiechimp/core/gate",
+  ],
 });

@@ -1,5 +1,6 @@
 import { consentModeInlineScript } from "@cookiechimp/core/consent-mode";
 import type { ReactNode } from "react";
+import "@cookiechimp/react/styles.css";
 import "./styles.css";
 
 export default function RootLayout({
