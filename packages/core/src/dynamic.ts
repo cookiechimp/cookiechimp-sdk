@@ -1,10 +1,11 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
 import type { BlockedInfo } from "./internal/blocked";
+import { findService } from "./internal/blocker";
+import { fail } from "./internal/dev";
 import { normalizeLight } from "./internal/normalize-light";
 import { acquire } from "./internal/patch";
 import { isHttpUrl } from "./internal/url";
-import { matchService } from "./match";
 
 export type { BlockedInfo } from "./internal/blocked";
 
@@ -20,41 +21,28 @@ export interface DynamicController {
   blocked(): BlockedInfo[];
 }
 
-const noop = (): DynamicController => ({
+const noop: DynamicController = {
   stop() {},
   scan() {},
   blocked: () => [],
-});
+};
 /** Block matching scripts and frames before a browser can start their request. */
 export function blockDynamic(
   consent: Pick<ConsentRuntime, "has" | "hasService" | "subscribe">,
   options: DynamicOptions,
 ): DynamicController {
   if (!options?.config) {
-    if (typeof process !== "undefined" && process.env.NODE_ENV !== "production")
-      throw new TypeError("blockDynamic requires config");
-    console.warn("CookieChimp dynamic blocker ignored missing config");
-    return noop();
+    fail("blockDynamic requires config");
+    return noop;
   }
   const doc = options.document ?? globalThis.document;
-  if (!doc?.defaultView) return noop();
+  if (!doc?.defaultView) return noop;
   const win = doc.defaultView;
   const config = normalizeLight(options.config);
   const reports: BlockedInfo[] = [];
-  const reported = new WeakSet<Element>();
   const bypass = new WeakSet<Element>();
   let stopped = false;
 
-  const definition = (url: string) => {
-    let host: string | undefined;
-    try {
-      host = new URL(url, doc.baseURI).hostname;
-    } catch {}
-    const service = matchService(config, { url, host });
-    return service
-      ? config.services.find(({ id }) => id === service)
-      : undefined;
-  };
   const shouldBlock = (el: Element, url: string) => {
     const { ccCategory: category, ccService: service } = (el as HTMLElement)
       .dataset;
@@ -63,7 +51,7 @@ export function blockDynamic(
       !(service ? consent.hasService(service) : consent.has(category))
     )
       return { category, service };
-    const found = definition(url);
+    const found = findService(config, url, doc.baseURI)?.[1];
     return found && !consent.hasService(found.id)
       ? { category: found.category, service: found.id }
       : undefined;
@@ -85,6 +73,7 @@ export function blockDynamic(
     bypass.add(el);
     el.removeAttribute("src");
     const data = (el as HTMLElement).dataset;
+    const first = !data.ccBlocked;
     data.ccSrc = url;
     data.ccCategory = match.category;
     if (match.service) data.ccService = match.service;
@@ -94,8 +83,7 @@ export function blockDynamic(
       el.type = "text/plain";
     }
     bypass.delete(el);
-    if (!reported.has(el)) {
-      reported.add(el);
+    if (first) {
       const info: BlockedInfo = {
         url,
         category: match.category,
@@ -120,15 +108,12 @@ export function blockDynamic(
     before: (self: unknown, args: unknown[]) => unknown[],
   ) => {
     releases.push(
-      acquire(target, key, (descriptor) => {
-        const previous = descriptor.value as (...args: unknown[]) => unknown;
-        return {
-          ...descriptor,
-          value: function (this: unknown, ...args: unknown[]) {
-            return Reflect.apply(previous, this, before(this, args));
-          },
-        };
-      }),
+      acquire(target, key, (descriptor) => ({
+        ...descriptor,
+        value: function (this: unknown, ...args: unknown[]) {
+          return Reflect.apply(descriptor.value, this, before(this, args));
+        },
+      })),
     );
   };
   const inspectArgs = (_self: unknown, args: unknown[]) => {
@@ -174,9 +159,6 @@ export function blockDynamic(
     releases.push(
       acquire(prototype, "src", (descriptor) => ({
         ...descriptor,
-        get(this: Element) {
-          return descriptor.get?.call(this);
-        },
         set(this: Element, value: string) {
           if (!neutralise(this, String(value)))
             descriptor.set?.call(this, value);

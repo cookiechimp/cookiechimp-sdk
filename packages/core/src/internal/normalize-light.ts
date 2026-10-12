@@ -1,4 +1,5 @@
 import type { ConfigInput, NormalizedConfig, ServiceConfig } from "../config";
+import { fail } from "./dev";
 
 type LightConfig = Omit<ConfigInput, "services"> & {
   services: readonly ServiceConfig[];
@@ -10,17 +11,9 @@ export function normalizeLight(
 ): LightConfig {
   const input = config.services ?? [];
   const services = input.filter(
-    (service) =>
-      service &&
-      typeof service.id === "string" &&
-      [service.scripts, service.cookies, service.domains].every(
-        (items) => items === undefined || Array.isArray(items),
-      ),
+    (service) => service && typeof service.id === "string",
   );
   if (services.length === input.length) return config as LightConfig;
-  const message = "Invalid consent config for CookieChimp blocker";
-  if (typeof process !== "undefined" && process.env.NODE_ENV !== "production")
-    throw new TypeError(message);
-  console.warn(message);
+  fail("Invalid consent config for CookieChimp blocker");
   return { ...config, services };
 }

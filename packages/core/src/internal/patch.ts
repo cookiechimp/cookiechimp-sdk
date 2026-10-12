@@ -1,14 +1,22 @@
+/* biome-ignore-all lint/style/noNonNullAssertion: registry entries are initialized before the release closure */
 export type PatchFactory = (
   descriptor: PropertyDescriptor,
 ) => PropertyDescriptor;
 
 interface Entry {
   original: PropertyDescriptor;
-  layers: Map<symbol, PatchFactory>;
-  installed: PropertyDescriptor;
+  layers: Set<PatchFactory>;
+  installed?: unknown;
 }
 
 const targets = new WeakMap<object, Map<PropertyKey, Entry>>();
+
+function install(target: object, key: PropertyKey, entry: Entry): void {
+  let descriptor = entry.original;
+  for (const factory of entry.layers) descriptor = factory(descriptor);
+  Object.defineProperty(target, key, descriptor);
+  entry.installed = descriptor.value ?? descriptor.set;
+}
 
 /** Share reversible prototype patches between opt-in controllers. */
 export function acquire(
@@ -25,42 +33,21 @@ export function acquire(
   if (!entry) {
     const original = Object.getOwnPropertyDescriptor(target, key);
     if (!original) return () => {};
-    entry = { original, layers: new Map(), installed: original };
+    entry = { original, layers: new Set() };
     entries.set(key, entry);
   }
-  const id = Symbol();
-  entry.layers.set(id, wrapperFactory);
-  let descriptor = entry.original;
-  for (const factory of entry.layers.values()) descriptor = factory(descriptor);
-  Object.defineProperty(target, key, descriptor);
-  entry.installed = descriptor;
-
-  let released = false;
+  entry.layers.add(wrapperFactory);
+  install(target, key, entry);
   return () => {
-    if (released) return;
-    released = true;
-    entry?.layers.delete(id);
-    if (!entry || !entries) return;
+    if (!entry!.layers.delete(wrapperFactory)) return;
     const current = Object.getOwnPropertyDescriptor(target, key);
     const stillInstalled =
-      current?.configurable === entry.installed.configurable &&
-      current?.enumerable === entry.installed.enumerable &&
-      current?.writable === entry.installed.writable &&
-      current?.value === entry.installed.value &&
-      current?.get === entry.installed.get &&
-      current?.set === entry.installed.set;
-    if (!stillInstalled) {
-      entries.delete(key);
-      return;
+      (current?.value ?? current?.set) === entry!.installed;
+    if (!stillInstalled) entries!.delete(key);
+    else if (entry!.layers.size) install(target, key, entry!);
+    else {
+      Object.defineProperty(target, key, entry!.original);
+      entries!.delete(key);
     }
-    if (entry.layers.size === 0) {
-      Object.defineProperty(target, key, entry.original);
-      entries.delete(key);
-      return;
-    }
-    let next = entry.original;
-    for (const factory of entry.layers.values()) next = factory(next);
-    Object.defineProperty(target, key, next);
-    entry.installed = next;
   };
 }
