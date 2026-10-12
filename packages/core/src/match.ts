@@ -3,7 +3,7 @@ import { prepareMatcher } from "./internal/blocker";
 
 export { prepareMatcher } from "./internal/blocker";
 
-/** Prepare a matcher so request interception never recompiles its patterns. */
+/** Signals a service can be matched on. */
 export interface ServiceMatch {
   url?: string;
   cookieName?: string;

@@ -23,6 +23,7 @@ const compile = (config: ConfigInput | NormalizedConfig) =>
       ] as const,
   );
 
+/** Prepare a matcher so request interception never recompiles its patterns. */
 export function prepareMatcher(config: ConfigInput | NormalizedConfig) {
   let compiled = cache.get(config);
   if (!compiled) {
