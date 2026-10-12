@@ -28,6 +28,7 @@ type ProviderValue = {
   subscribe: (listener: () => void) => () => void;
   preferences: ReturnType<typeof useVisibility>;
   banner: ReturnType<typeof useVisibility>;
+  preferencesTrigger: { current: HTMLElement | null };
 };
 
 const Context = createContext<ProviderValue | null>(null);
@@ -64,6 +65,7 @@ export function ConsentProvider(props: ConsentProviderProps) {
   ).current;
   const preferences = useVisibility(false);
   const banner = useVisibility(runtime.current.needsDecision);
+  const preferencesTrigger = useRef<HTMLElement | null>(null);
   const value = useMemo(() => {
     const consent = runtime.current as ConsentRuntime;
     return {
@@ -74,6 +76,7 @@ export function ConsentProvider(props: ConsentProviderProps) {
       subscribe: (listener: () => void) => consent.subscribe(listener),
       preferences,
       banner,
+      preferencesTrigger,
     };
   }, [serverState, props.translations, preferences, banner]);
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
@@ -206,4 +209,9 @@ export function useBanner() {
 
 export function usePreferences() {
   return useConsentContext()?.preferences ?? inertPreferences;
+}
+
+/** Internal shared UI state used by the headless entry. */
+export function useHeadlessContext() {
+  return useConsentContext();
 }

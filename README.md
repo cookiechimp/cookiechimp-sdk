@@ -99,6 +99,15 @@ for cleanup. Options support regions, `wait_for_update`, ads data redaction,
 URL passthrough, and custom category-to-signal mappings. Set `default: false`
 to suppress the runtime default. Mapping entries set to `null` remove built-in
 categories, while `replace: true` replaces all built-in mappings.
+The inline script is required for correct consent ordering before tag scripts.
+
+## React headless primitives
+
+Import `Banner`, `Preferences`, and `OptOut` from
+`@cookiechimp/react/headless` for unstyled, accessible consent controls. The
+preferences dialog traps focus, closes on Escape, and restores focus to its
+trigger. Applications may add background inertness or `aria-hidden`; the
+headless primitives deliberately do not alter content outside the provider.
 
 ### Install order for runtime blocking
 
@@ -143,6 +152,14 @@ network failure. Blocked beacons return `false`. Requests are
 dropped and are never queued or replayed. The returned controller provides
 `blocked()` reports and `stop()` to release its shared, reference-counted
 patches.
+
+Matching fails closed. If matching itself throws for a request or element (for
+example because of a hostile pattern), CookieChimp treats it as blocked: the
+request is dropped and reported, and a blocked script or iframe stays blocked
+with no category or service attached. Because it has no category or service,
+it is not restored by later consent, even after accept-all. Only an
+unresolvable or non-HTTP URL, or an error in the patching code itself, falls
+back to native behaviour.
 
 Limitations of `./network`:
 

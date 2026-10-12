@@ -58,6 +58,14 @@
     "excludedFrom": "packages/core/dist/index.mjs"
   },
   {
+    "name": "react headless primitives",
+    "scenario": "react-headless",
+    "entry": "packages/react/dist/headless.mjs",
+    "kind": "extra",
+    "limit": 3491,
+    "excludedFrom": "packages/react/dist/index.mjs"
+  },
+  {
     "name": "banner only",
     "scenario": "banner",
     "entry": "packages/react/dist/banner.mjs",

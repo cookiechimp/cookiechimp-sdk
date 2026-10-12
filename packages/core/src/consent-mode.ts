@@ -180,11 +180,7 @@ export function installConsentMode(
   };
   const gtag = target.gtag;
   const returning = consent.needsDecision === false;
-  let last = values(
-    returning ? consent.get().categories : (checked.categories ?? {}),
-    checked.mapping,
-    checked.replace,
-  );
+  let last = values(checked.categories ?? {}, checked.mapping, checked.replace);
   if (checked.default !== false && !target.__ccConsentModeDefault) {
     gtag("consent", "default", {
       ...last,
@@ -207,7 +203,15 @@ export function installConsentMode(
     last = nextValues;
     gtag("consent", "update", nextValues);
   };
-  if (returning) gtag("consent", "update", last);
+  if (returning) {
+    const stored = values(
+      consent.get().categories,
+      checked.mapping,
+      checked.replace,
+    );
+    gtag("consent", "update", stored);
+    last = stored;
+  }
   const unsubscribe = consent.subscribe(update);
   let stopped = false;
   return {
