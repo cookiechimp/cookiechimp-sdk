@@ -1,0 +1,53 @@
+[
+  {
+    "name": "core initial",
+    "scenario": "core",
+    "entry": "packages/core/dist/index.mjs",
+    "kind": "initial",
+    "limit": 7168
+  },
+  {
+    "name": "core total",
+    "scenario": "core",
+    "entry": "packages/core/dist/index.mjs",
+    "kind": "total",
+    "limit": 9216
+  },
+  {
+    "name": "banner only",
+    "scenario": "banner",
+    "entry": "packages/react/dist/banner.mjs",
+    "kind": "initial",
+    "limit": 11264
+  },
+  {
+    "name": "banner, preferences, recall initial",
+    "scenario": "banner + preferences + recall",
+    "entry": "packages/react/dist/index.mjs",
+    "kind": "initial",
+    "limit": 13824
+  },
+  {
+    "name": "banner, preferences, recall total",
+    "scenario": "banner + preferences + recall",
+    "entry": "packages/react/dist/index.mjs",
+    "kind": "total",
+    "limit": 16384
+  },
+  {
+    "name": "connected sync client",
+    "scenario": "sync",
+    "entry": "packages/core/dist/sync.mjs",
+    "kind": "extra",
+    "limit": 2048
+  },
+  {
+    "name": "TCF/GPP module",
+    "scenario": "tcf/gpp",
+    "entry": "packages/core/dist/tcf.mjs",
+    "kind": "lazy",
+    "limit": 12288,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["__tcfapi", "__gpp"]
+  }
+]
