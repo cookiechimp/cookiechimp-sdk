@@ -27,6 +27,11 @@
       "import": "./dist/network.mjs",
       "require": "./dist/network.cjs"
     },
+    "./consent-mode": {
+      "types": "./dist/consent-mode.d.ts",
+      "import": "./dist/consent-mode.mjs",
+      "require": "./dist/consent-mode.cjs"
+    },
     "./sync": {
       "types": "./dist/sync.d.ts",
       "import": "./dist/sync.mjs",
@@ -47,7 +52,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts && cp dist/gate.d.mts dist/gate.d.ts && cp dist/dynamic.d.mts dist/dynamic.d.ts && cp dist/network.d.mts dist/network.d.ts",
+    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts && cp dist/gate.d.mts dist/gate.d.ts && cp dist/dynamic.d.mts dist/dynamic.d.ts && cp dist/network.d.mts dist/network.d.ts && cp dist/consent-mode.d.mts dist/consent-mode.d.ts",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
