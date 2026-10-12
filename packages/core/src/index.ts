@@ -4,12 +4,23 @@ export const VERSION = "0.0.0";
 export const CONSENT_COOKIE_NAME = "cc_consent";
 export const CONSENT_SCHEMA_VERSION = 1 as const;
 
+import {
+  type CategoriesInput,
+  type CategoryInput,
+  type ConfigInput,
+  type NormalizedConfig,
+  normalizeConfig,
+} from "./config";
+
+export * from "./config";
+
 export type ConsentAction = "accept_all" | "reject_all" | "custom" | "gpc_auto";
 
 export interface ConsentRecord {
   consentId: string;
   ts: string;
   categories: Record<string, boolean>;
+  services?: Record<string, boolean>;
   action: ConsentAction;
 }
 
@@ -23,8 +34,8 @@ export interface ConsentCategory {
 }
 
 export type ConsentCategories =
-  | Record<string, boolean>
-  | readonly (string | ConsentCategory)[];
+  | CategoriesInput
+  | readonly (string | ConsentCategory | CategoryInput)[];
 
 export interface ConsentCookieOptions {
   /** Lifetime in seconds. Defaults to 180 days. */
@@ -33,7 +44,7 @@ export interface ConsentCookieOptions {
   secure?: boolean;
 }
 
-export interface ConsentConfig {
+export interface ConsentConfig extends ConfigInput {
   categories: ConsentCategories;
   cookie?: ConsentCookieOptions;
   initial?: ConsentState | null;
@@ -43,11 +54,19 @@ export interface ConsentConfig {
 
 export interface ConsentRuntime {
   get(): ConsentState;
-  set(partial: Readonly<Record<string, boolean>>): ConsentState;
+  set(
+    partial:
+      | Readonly<Record<string, boolean>>
+      | {
+          categories?: Readonly<Record<string, boolean>>;
+          services?: Readonly<Record<string, boolean>>;
+        },
+  ): ConsentState;
   acceptAll(): ConsentState;
   rejectAll(): ConsentState;
   subscribe(listener: (state: ConsentState) => void): () => void;
   has(category: string): boolean;
+  hasService(service: string): boolean;
   readonly region: null;
   readonly regulation: "none";
   readonly language: string;
@@ -102,11 +121,21 @@ function validState(value: unknown): ConsentState | null {
     categories[name] = enabled;
   }
   if (categories.necessary !== true) return null;
+  let services: Record<string, boolean> | undefined;
+  if (value.services !== undefined) {
+    if (!isRecord(value.services)) return null;
+    services = {};
+    for (const [id, enabled] of Object.entries(value.services)) {
+      if (!id || typeof enabled !== "boolean") return null;
+      services[id] = enabled;
+    }
+  }
   return {
     schemaVersion: CONSENT_SCHEMA_VERSION,
     consentId: value.consentId,
     ts: value.ts,
     categories,
+    ...(services ? { services } : {}),
     action: value.action as ConsentAction,
   };
 }
@@ -173,22 +202,10 @@ export function createEmitter<T>() {
   };
 }
 
-function categoryDefaults(config: ConsentCategories): Record<string, boolean> {
-  const result: Record<string, boolean> = { necessary: true };
-  if (Array.isArray(config)) {
-    for (const item of config) {
-      const name = typeof item === "string" ? item : item.name;
-      if (name)
-        result[name] =
-          name === "necessary" ||
-          (typeof item !== "string" && item.default === true);
-    }
-  } else {
-    for (const [name, enabled] of Object.entries(config))
-      if (name) result[name] = name === "necessary" || enabled;
-  }
-  result.necessary = true;
-  return result;
+function categoryDefaults(config: NormalizedConfig): Record<string, boolean> {
+  return Object.fromEntries(
+    config.categories.map(({ id, default: enabled }) => [id, enabled]),
+  );
 }
 
 function newConsentId(): string {
@@ -214,7 +231,11 @@ function persist(state: ConsentState, options: ConsentCookieOptions): void {
 }
 
 export function createConsent(config: ConsentConfig): ConsentRuntime {
-  const defaults = categoryDefaults(config.categories);
+  const normalized = normalizeConfig(config);
+  const defaults = categoryDefaults(normalized);
+  const serviceCategories = Object.fromEntries(
+    normalized.services.map(({ id, category }) => [id, category]),
+  );
   const browserState =
     typeof document === "undefined" ? null : readConsentCookie(document.cookie);
   const restored = validState(config.initial) ?? browserState;
@@ -222,6 +243,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     ? {
         ...restored,
         categories: { ...defaults, ...restored.categories, necessary: true },
+        ...(restored.services ? { services: { ...restored.services } } : {}),
       }
     : {
         schemaVersion: CONSENT_SCHEMA_VERSION,
@@ -235,11 +257,15 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   const decide = (
     categories: Record<string, boolean>,
     action: ConsentAction,
+    services = state.services,
   ): ConsentState => {
     state = {
       ...state,
       ts: new Date().toISOString(),
       categories: { ...categories, necessary: true },
+      ...(services && Object.keys(services).length
+        ? { services }
+        : { services: undefined }),
       action,
     };
     persist(state, config.cookie ?? {});
@@ -252,15 +278,33 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   return {
     get: () => state,
     set: (partial) => {
+      const structured =
+        isRecord(partial.categories) || isRecord(partial.services);
+      const categoryPartial = structured
+        ? (partial.categories ?? {})
+        : (partial as Readonly<Record<string, boolean>>);
+      const servicePartial = structured ? (partial.services ?? {}) : {};
       const allowed = Object.fromEntries(
-        Object.entries(partial).filter(([name]) => name in defaults),
+        Object.entries(categoryPartial).filter(
+          ([name, enabled]) => name in defaults && typeof enabled === "boolean",
+        ),
       );
-      return decide({ ...state.categories, ...allowed }, "custom");
+      const allowedServices = Object.fromEntries(
+        Object.entries(servicePartial).filter(
+          ([id, enabled]) =>
+            id in serviceCategories && typeof enabled === "boolean",
+        ),
+      );
+      return decide({ ...state.categories, ...allowed }, "custom", {
+        ...state.services,
+        ...allowedServices,
+      });
     },
     acceptAll: () =>
       decide(
         Object.fromEntries(Object.keys(defaults).map((name) => [name, true])),
         "accept_all",
+        Object.fromEntries(normalized.services.map(({ id }) => [id, true])),
       ),
     rejectAll: () =>
       decide(
@@ -268,9 +312,20 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
           Object.keys(defaults).map((name) => [name, name === "necessary"]),
         ),
         "reject_all",
+        Object.fromEntries(
+          normalized.services.map(({ id, category }) => [
+            id,
+            category === "necessary",
+          ]),
+        ),
       ),
     subscribe: emitter.subscribe,
     has: (category) => state.categories[category] === true,
+    hasService: (service) => {
+      const category = serviceCategories[service];
+      if (!category) return false;
+      return state.services?.[service] ?? state.categories[category] === true;
+    },
     region: null,
     regulation: "none",
     language: config.language ?? "en",

@@ -20,4 +20,17 @@ describe("browser consent", () => {
     expect(reloaded.has("analytics")).toBe(true);
     expect(reloaded.get().action).toBe("accept_all");
   });
+
+  it("persists and restores a per-service decision", () => {
+    const config = {
+      categories: ["analytics"],
+      services: [{ id: "analytics-demo", category: "analytics" }],
+    } as const;
+    const first = createConsent(config);
+    first.set({ services: { "analytics-demo": true } });
+    expect(document.cookie).toContain("cc_consent=v1.");
+    const second = createConsent(config);
+    expect(second.hasService("analytics-demo")).toBe(true);
+    expect(second.get().services).toEqual({ "analytics-demo": true });
+  });
 });

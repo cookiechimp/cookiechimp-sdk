@@ -19,3 +19,18 @@ test("acceptance persists after reload", async ({ page, context }) => {
     "Analytics accepted",
   );
 });
+
+test("a service decision persists after reload", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("service-status")).toHaveText(
+    "Analytics demo declined",
+  );
+  await page.getByRole("button", { name: "Toggle analytics demo" }).click();
+  await expect(page.getByTestId("service-status")).toHaveText(
+    "Analytics demo accepted",
+  );
+  await page.reload();
+  await expect(page.getByTestId("service-status")).toHaveText(
+    "Analytics demo accepted",
+  );
+});

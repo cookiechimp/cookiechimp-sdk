@@ -133,6 +133,24 @@ describe("createConsent", () => {
       ads: false,
     });
   });
+
+  it("resolves service consent from its category and explicit decisions", () => {
+    const runtime = createConsent({
+      categories: { analytics: false },
+      services: [{ id: "analytics-demo", category: "analytics" }],
+    });
+    expect(runtime.hasService("analytics-demo")).toBe(false);
+    runtime.set({ categories: { analytics: true } });
+    expect(runtime.hasService("analytics-demo")).toBe(true);
+    runtime.set({ services: { "analytics-demo": false } });
+    expect(runtime.hasService("analytics-demo")).toBe(false);
+  });
+
+  it("decodes old v1 cookies that omit service decisions", () => {
+    const encoded = encodeConsentCookie(state());
+    expect(decodeConsentCookie(encoded)).toEqual(state());
+    expect(decodeConsentCookie(encoded)?.services).toBeUndefined();
+  });
 });
 
 describe("VERSION", () => {
