@@ -38,6 +38,18 @@ describe("matchService", () => {
     expect(matchService(config, {})).toBeNull();
   });
 
+  it("removes stateful flags and isolates installed patterns from callers", () => {
+    const pattern = /tracker/g;
+    const installed = {
+      ...config,
+      services: [{ ...config.services[0], scripts: [pattern] }],
+    };
+    expect(matchService(installed, { url: "tracker" })).toBe("metrics");
+    expect(matchService(installed, { url: "tracker" })).toBe("metrics");
+    pattern.test = () => false;
+    expect(matchService(installed, { url: "tracker" })).toBe("metrics");
+  });
+
   it("compiles patterns only once for a normalized config", () => {
     let sourceReads = 0;
     class ObservedRegExp extends RegExp {

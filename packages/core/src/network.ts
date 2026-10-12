@@ -5,6 +5,7 @@ import { prepareServiceFinder } from "./internal/blocker";
 import { fail } from "./internal/dev";
 import { normalizeLight } from "./internal/normalize-light";
 import { acquire, type PatchFactory } from "./internal/patch";
+import { resolveHttp } from "./internal/url";
 
 export type { BlockedInfo } from "./internal/blocked";
 
@@ -57,18 +58,23 @@ export function blockNetwork(
   };
 
   const match = (source: unknown) => {
+    let value: string;
+    try {
+      value = source instanceof win.Request ? source.url : String(source);
+    } catch {
+      return;
+    }
     let found: ReturnType<typeof findService>;
     try {
-      found = findService(
-        source instanceof win.Request ? source.url : String(source),
-        win.document.baseURI,
-      );
+      found = findService(value, win.document.baseURI);
     } catch {
+      const url = resolveHttp(value, win.document.baseURI);
+      if (!url) return;
       if (!matchWarned) {
         matchWarned = true;
         console.warn("CookieChimp matcher failed");
       }
-      return;
+      return { url: url.href };
     }
     if (!found) return;
     const [url, { id, category }] = found;
@@ -80,7 +86,7 @@ export function blockNetwork(
     };
   };
   const report = (
-    found: { url: string; service: string; category: string },
+    found: { url: string; service?: string; category?: string },
     kind: "fetch" | "xhr" | "beacon",
   ) => {
     const info: BlockedInfo = { ...found, kind, ts: Date.now() };

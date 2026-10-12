@@ -181,26 +181,50 @@ describe("dynamic src interception", () => {
     ).toThrow("Invalid consent config for CookieChimp blocker");
   });
 
-  it("allows DOM insertion and warns once when matching throws", () => {
+  it("fails closed for setters, setAttribute, and insertion when matching throws", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const poisoned = /tracker/;
-    const first = document.createElement("iframe");
-    first.src = "https://tracker.test/frame";
-    const second = document.createElement("script");
-    second.src = "https://tracker.test/script";
+    const onBlock = vi.fn();
     const controller = blockDynamic(runtime(), {
       config: {
         categories: ["analytics"],
-        services: [{ id: "bad", category: "analytics", scripts: [poisoned] }],
+        services: [
+          {
+            id: "demo",
+            category: "analytics",
+            domains: ["tracker.test"],
+          },
+        ],
       },
+      onBlock,
     });
     controllers.push(controller);
-    poisoned.test = () => {
-      throw new Error("poisoned matcher");
-    };
-    expect(() => document.body.append(first, second)).not.toThrow();
-    expect(document.body.contains(first)).toBe(true);
-    expect(document.body.contains(second)).toBe(true);
+    const test = RegExp.prototype.test;
+    vi.spyOn(RegExp.prototype, "test").mockImplementation(function (
+      this: RegExp,
+      value,
+    ) {
+      if (this.source === "^tracker\\.test$")
+        throw new Error("poisoned matcher");
+      return test.call(this, value);
+    });
+    const frame = document.createElement("iframe");
+    const script = document.createElement("script");
+    const attribute = document.createElement("iframe");
+    const inserted = document.createElement("script");
+    frame.src = "https://tracker.test/frame";
+    script.src = "https://tracker.test/script";
+    attribute.setAttribute("src", "https://tracker.test/attribute");
+    inserted.setAttribute("src", "https://tracker.test/inserted");
+    document.body.appendChild(inserted);
+    for (const element of [frame, script, attribute, inserted]) {
+      expect(element.hasAttribute("src")).toBe(false);
+      expect(element.dataset.ccBlocked).toBe("true");
+    }
+    expect(controller.blocked()).toHaveLength(4);
+    expect(onBlock).toHaveBeenCalledTimes(4);
+    expect(
+      controller.blocked().every(({ service }) => service === undefined),
+    ).toBe(true);
     expect(warn).toHaveBeenCalledOnce();
   });
 

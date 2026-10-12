@@ -1,5 +1,6 @@
 import type { ConfigInput, NormalizedConfig, ServiceConfig } from "../config";
 import { fail } from "./dev";
+import { validPattern } from "./pattern";
 
 type LightConfig = Omit<ConfigInput, "services"> & {
   services: readonly ServiceConfig[];
@@ -11,11 +12,7 @@ export function normalizeLight(
 ): LightConfig {
   const input = config.services ?? [];
   const patterns = (value: unknown) =>
-    value === undefined ||
-    (Array.isArray(value) &&
-      value.every(
-        (item) => typeof item === "string" || item instanceof RegExp,
-      ));
+    value === undefined || (Array.isArray(value) && value.every(validPattern));
   const services = input.filter((service) => {
     try {
       return (

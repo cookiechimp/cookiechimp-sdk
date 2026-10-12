@@ -25,7 +25,7 @@ export interface BudgetResult extends SizeBudget {
 
 export const plannedEntries = new Set([
   "packages/react/dist/banner.mjs",
-  "packages/react/dist/ui.mjs",
+  "packages/react/dist/index.mjs",
   "packages/core/dist/sync.mjs",
   "packages/core/dist/tcf.mjs",
 ]);

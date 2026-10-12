@@ -1,3 +1,4 @@
+import { validPattern } from "./internal/pattern";
 import type { Region, Regulation } from "./regions";
 
 export type ServicePattern = string | RegExp;
@@ -109,13 +110,6 @@ export function categoryRecords(
     const { name: id, ...rest } = value;
     return { id, ...rest };
   });
-}
-
-function validPattern(pattern: unknown): boolean {
-  if (pattern instanceof RegExp) return pattern.source.length > 0;
-  return (
-    typeof pattern === "string" && pattern.length > 0 && !/\s/.test(pattern)
-  );
 }
 
 function freezeCategory(category: CategoryConfig): NormalizedCategoryConfig {

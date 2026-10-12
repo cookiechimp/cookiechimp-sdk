@@ -384,6 +384,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   }
   const emitter = createEmitter<ConsentState>();
   let decided = restored !== null || mustApplyGpc;
+  let current = snapshot(state);
 
   const decide = (
     categories: Record<string, boolean>,
@@ -412,6 +413,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     decided = true;
     persist(state, config.cookie ?? {});
     const result = snapshot(state);
+    current = result;
     emitter.emit(result);
     const { schemaVersion: _, ...record } = state;
     config.onConsent?.(record);
@@ -425,7 +427,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   }
 
   return {
-    get: () => snapshot(state),
+    get: () => current,
     set: (partial) => {
       const structured =
         isRecord(partial.categories) || isRecord(partial.services);

@@ -16,10 +16,10 @@ export default defineConfig([
       "src/match.ts",
       "src/regions.ts",
       "src/gate.ts",
-      "src/dynamic.ts",
-      "src/network.ts",
       "src/consent-mode.ts",
     ],
     clean: false,
   },
+  { ...shared, entry: ["src/dynamic.ts"], clean: false },
+  { ...shared, entry: ["src/network.ts"], clean: false },
 ]);

@@ -1,5 +1,5 @@
 import { type ConsentState, createConsent } from "@cookiechimp/core";
-import { act } from "react";
+import { act, useRef } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
@@ -54,6 +54,12 @@ function Status({ changed }: { changed?: (state: ConsentState) => void }) {
       <button type="button" onClick={preferences.show}>
         preferences
       </button>
+      <button type="button" onClick={banner.hide}>
+        hide banner
+      </button>
+      <button type="button" onClick={banner.show}>
+        show banner
+      </button>
     </div>
   );
 }
@@ -81,7 +87,7 @@ describe("ConsentProvider hooks", () => {
     expect(target.textContent).toContain("Cookies");
     await act(() => target.querySelector<HTMLButtonElement>("button")?.click());
     expect(target.querySelector("span")?.textContent).toBe("true");
-    expect(target.textContent).not.toContain("banner");
+    expect(target.querySelector("b")).toBeNull();
     expect(changed).toHaveBeenCalledOnce();
     await act(() => root.unmount());
   });
@@ -130,6 +136,54 @@ describe("ConsentProvider hooks", () => {
     await act(() => root.unmount());
   });
 
+  it("shares banner visibility and supports dismissing and reopening", async () => {
+    const consent = createConsent(config);
+    const target = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(target);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <Status />
+          <Status />
+        </ConsentProvider>,
+      ),
+    );
+    expect(target.querySelectorAll("b")).toHaveLength(2);
+    await act(() =>
+      target.querySelectorAll<HTMLButtonElement>("button")[2]?.click(),
+    );
+    expect(target.querySelectorAll("b")).toHaveLength(0);
+    await act(() =>
+      target.querySelectorAll<HTMLButtonElement>("button")[3]?.click(),
+    );
+    expect(target.querySelectorAll("b")).toHaveLength(2);
+    await act(() => root.unmount());
+  });
+
+  it("observes a consent change made before subscription effects run", async () => {
+    const consent = createConsent(config);
+    function Decide() {
+      const decided = useRef(false);
+      if (!decided.current) {
+        decided.current = true;
+        consent.acceptAll();
+      }
+      return null;
+    }
+    const target = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(target);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <Status />
+          <Decide />
+        </ConsentProvider>,
+      ),
+    );
+    expect(target.querySelector("span")?.textContent).toBe("true");
+    await act(() => root.unmount());
+  });
+
   it("uses the runtime snapshot on the client instead of initialState", async () => {
     const consent = createConsent(config);
     consent.acceptAll();
@@ -155,7 +209,7 @@ describe("ConsentProvider hooks", () => {
       </ConsentProvider>
     );
     const html = renderToString(app);
-    expect(html).not.toContain("banner");
+    expect(html).not.toContain("<b>banner</b>");
     const target = document.body.appendChild(document.createElement("div"));
     target.innerHTML = html;
     const error = vi.spyOn(console, "error").mockImplementation(() => {});

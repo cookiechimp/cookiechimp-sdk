@@ -27,6 +27,7 @@ type ProviderValue = {
   getSnapshot: () => ConsentState;
   subscribe: (listener: () => void) => () => void;
   preferences: ReturnType<typeof useVisibility>;
+  banner: ReturnType<typeof useVisibility>;
 };
 
 const Context = createContext<ProviderValue | null>(null);
@@ -56,40 +57,25 @@ export function ConsentProvider(props: ConsentProviderProps) {
       props.consent ??
       createConsent({
         ...props.config,
-        initial: props.config.initial,
+        initial: props.initialState ?? props.config.initial,
       });
   const serverState = useRef(
     props.initialState ?? runtime.current.get(),
   ).current;
-  const snapshot = useRef(runtime.current.get());
-  const snapshotKey = useRef(JSON.stringify(snapshot.current));
   const preferences = useVisibility(false);
+  const banner = useVisibility(runtime.current.needsDecision);
   const value = useMemo(() => {
     const consent = runtime.current as ConsentRuntime;
     return {
       consent,
       serverState,
       translations: props.translations ?? {},
-      getSnapshot: () => {
-        const next = consent.get();
-        if (next !== snapshot.current) {
-          const key = JSON.stringify(next);
-          if (key !== snapshotKey.current) {
-            snapshot.current = next;
-            snapshotKey.current = key;
-          }
-        }
-        return snapshot.current;
-      },
-      subscribe: (listener: () => void) =>
-        consent.subscribe((state) => {
-          snapshot.current = state;
-          snapshotKey.current = JSON.stringify(state);
-          listener();
-        }),
+      getSnapshot: () => consent.get(),
+      subscribe: (listener: () => void) => consent.subscribe(listener),
       preferences,
+      banner,
     };
-  }, [serverState, props.translations, preferences]);
+  }, [serverState, props.translations, preferences, banner]);
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }
 
@@ -210,13 +196,11 @@ function useVisibility(initial: boolean) {
 
 export function useBanner() {
   const value = useConsentContext();
-  const snapshot = useConsent() as ConsentState & { needsDecision?: boolean };
-  const needsDecision =
-    snapshot.needsDecision ?? value?.consent.needsDecision ?? false;
+  useConsent();
+  const visibility = value?.banner ?? inertPreferences;
   return {
-    open: needsDecision,
-    show() {},
-    hide() {},
+    ...visibility,
+    open: visibility.open && (value?.consent.needsDecision ?? false),
   };
 }
 
