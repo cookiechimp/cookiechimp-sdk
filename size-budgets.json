@@ -27,6 +27,15 @@
     "forbiddenTokens": ["blockNetwork", "ConsentBlockedError"]
   },
   {
+    "name": "consent-mode",
+    "scenario": "consent-mode",
+    "entry": "packages/core/dist/consent-mode.mjs",
+    "kind": "extra",
+    "limit": 1560,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["installConsentMode", "wait_for_update"]
+  },
+  {
     "name": "core initial",
     "scenario": "core",
     "entry": "packages/core/dist/index.mjs",
