@@ -196,7 +196,8 @@ export function mountDevtools(options: DevtoolsOptions): DevtoolsController {
   const body = el("div");
 
   // Simulation form, built once so typing is not lost on refresh.
-  const sim = readSimulation(storage);
+  // The panel only mounts in production with allowProduction, so it may show the stored simulation.
+  const sim = readSimulation({ storage, allowProduction: true });
   const country = el("input", undefined, {
     type: "text",
     name: "country",

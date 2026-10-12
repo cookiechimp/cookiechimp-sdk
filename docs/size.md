@@ -97,5 +97,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | scripts hotjar | 935 B | 1025 B | Vendor consent API sync, measured 889 B (about 15% headroom) | M4 PR17 (lead approved) |
 | scripts linkedin | 880 B | 970 B | Vendor consent API sync, measured 842 B (about 15% headroom) | M4 PR17 (lead approved) |
 | scripts tiktok | 995 B | 1095 B | Vendor consent API sync, measured 952 B (about 15% headroom) | M4 PR17 (lead approved) |
-| devtools | none | 3295 B | New opt-in development panel, measured 2863 B (about 15% headroom) | M4 PR18 |
-| devtools simulation | none | 585 B | New simulation reader subpath, measured 506 B (about 16% headroom) | M4 PR18 |
+| devtools | none | 3295 B | New opt-in development panel, measured 2890 B (about 14% headroom) | M4 PR18 |
+| devtools simulation | none | 585 B | New simulation reader subpath with the production guard, measured 542 B (about 8% headroom) | M4 PR18 |

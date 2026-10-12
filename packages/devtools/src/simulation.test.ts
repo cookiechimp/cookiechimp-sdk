@@ -32,12 +32,12 @@ describe("simulation storage", () => {
         storage,
       ),
     ).toBe(true);
-    expect(readSimulation(storage)).toEqual({
+    expect(readSimulation({ storage })).toEqual({
       region: { country: "US", region: "CA" },
       gpc: true,
     });
     clearSimulation(storage);
-    expect(readSimulation(storage)).toBeNull();
+    expect(readSimulation({ storage })).toBeNull();
   });
 
   it("accepts a null region and a missing gpc", () => {
@@ -59,13 +59,13 @@ describe("simulation storage", () => {
     '{"region":"DE"}',
     '{"gpc":"true"}',
   ])("ignores malformed stored data %s without throwing", (raw) => {
-    expect(readSimulation(memory(raw))).toBeNull();
+    expect(readSimulation({ storage: memory(raw) })).toBeNull();
   });
 
   it("drops unknown and prototype keys", () => {
     const raw =
       '{"__proto__":{"polluted":true},"region":{"country":"DE","extra":"x","__proto__":{"y":1}},"gpc":true,"script":"<img>"}';
-    const read = readSimulation(memory(raw));
+    const read = readSimulation({ storage: memory(raw) });
     expect(read).toEqual({ region: { country: "DE" }, gpc: true });
     expect(Object.keys(read ?? {})).toEqual(["region", "gpc"]);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
@@ -74,8 +74,10 @@ describe("simulation storage", () => {
   it("returns null when storage throws", () => {
     expect(
       readSimulation({
-        getItem() {
-          throw new Error("blocked");
+        storage: {
+          getItem() {
+            throw new Error("blocked");
+          },
         },
       }),
     ).toBeNull();
@@ -90,5 +92,40 @@ describe("simulation storage", () => {
     expect(writeSimulation(bad, storage)).toBe(false);
     expect(warn).toHaveBeenCalledOnce();
     expect(storage.data.size).toBe(0);
+  });
+
+  it("returns null in production even with valid stored data", () => {
+    const storage = memory(
+      '{"region":{"country":"US","region":"CA"},"gpc":false}',
+    );
+    vi.stubEnv("NODE_ENV", "production");
+    const getItem = vi.spyOn(storage, "getItem");
+    expect(readSimulation({ storage })).toBeNull();
+    expect(readSimulation({ storage, allowProduction: false })).toBeNull();
+    expect(getItem).not.toHaveBeenCalled();
+  });
+
+  it("reads valid stored data in production with allowProduction", () => {
+    const storage = memory(
+      '{"region":{"country":"US","region":"CA"},"gpc":false}',
+    );
+    vi.stubEnv("NODE_ENV", "production");
+    expect(readSimulation({ storage, allowProduction: true })).toEqual({
+      region: { country: "US", region: "CA" },
+      gpc: false,
+    });
+    expect(
+      readSimulation({
+        storage: memory('{"region":{"country":"<s>"}}'),
+        allowProduction: true,
+      }),
+    ).toBeNull();
+  });
+
+  it("reads stored data in development without allowProduction", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect(readSimulation({ storage: memory('{"gpc":true}') })).toEqual({
+      gpc: true,
+    });
   });
 });

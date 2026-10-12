@@ -45,12 +45,32 @@ export function cleanSimulation(input: unknown): Simulation | null {
   return out;
 }
 
+export interface ReadSimulationOptions {
+  /** Storage to read. Defaults to sessionStorage. */
+  storage?: Reader;
+  /**
+   * Read the simulation in a production build too. Off by default, so a
+   * visitor cannot edit sessionStorage to change the region or GPC signal.
+   */
+  allowProduction?: boolean;
+}
+
 /**
- * Read the simulation saved by the devtools panel. Pass the result to
- * `createConsent({ ...config, ...readSimulation() })` in development only.
- * Malformed stored data is ignored, never thrown.
+ * Read the simulation saved by the devtools panel, for
+ * `createConsent({ ...config, ...readSimulation() })`. Returns null in a
+ * production build unless `allowProduction` is set. Malformed stored data is
+ * ignored, never thrown.
  */
-export function readSimulation(storage: Reader | undefined = session()) {
+export function readSimulation({
+  storage = session(),
+  allowProduction,
+}: ReadSimulationOptions = {}): Simulation | null {
+  if (
+    !allowProduction &&
+    typeof process !== "undefined" &&
+    process.env.NODE_ENV === "production"
+  )
+    return null;
   try {
     const raw = storage?.getItem(SIMULATION_KEY);
     return raw ? cleanSimulation(JSON.parse(raw)) : null;

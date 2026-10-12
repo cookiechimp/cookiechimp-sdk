@@ -17,7 +17,7 @@ export function DevtoolsDemo({
 
   useEffect(() => {
     if (!consent) return;
-    const simulation = readSimulation();
+    const simulation = readSimulation({ allowProduction });
     setSimulated(simulation ? JSON.stringify(simulation) : "off");
     const script = document.createElement("script");
     script.type = "text/plain";

@@ -41,7 +41,7 @@ const devtools = mountDevtools({ consent, blockers: [gate] });
 
 The core runtime fixes its region and GPC when it is created, so a simulation applies on the next load. The panel saves a simulated country (2 letters), optional region (up to 3 letters or digits) and GPC flag to `sessionStorage`, previews the regulation that would apply, and reloads the page. Spread `readSimulation()` from the small `@cookiechimp/devtools/simulation` subpath into your config to apply it. "Clear simulation" removes it and reloads.
 
-Only use `readSimulation` in development. It validates stored data strictly and returns `null` for anything malformed, so a tampered value is ignored, not thrown.
+`readSimulation` returns `null` in a production build (`process.env.NODE_ENV === "production"`), even when valid data is stored, so a visitor cannot edit `cc_devtools_simulation` in sessionStorage to drop GDPR or turn off GPC. To read it in a production build, for example on a staging site, call `readSimulation({ allowProduction: true })`. Only do that where visitors cannot reach the build. In every mode it validates stored data strictly and returns `null` for anything malformed, so a tampered value is ignored, not thrown. Pass `{ storage }` to read from another storage.
 
 ## Safety
 

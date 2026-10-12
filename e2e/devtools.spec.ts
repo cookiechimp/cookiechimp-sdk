@@ -108,3 +108,25 @@ test("devtools does not mount in a production build by default", async ({
     warnings.some((text) => text.includes("not mounted in production")),
   ).toBe(true);
 });
+
+test("a stored simulation is ignored in a production build by default", async ({
+  page,
+}) => {
+  await page.goto("/devtools?guard=1");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-devtools",
+    "ready",
+  );
+  await page.evaluate(() =>
+    sessionStorage.setItem(
+      "cc_devtools_simulation",
+      '{"region":{"country":"US","region":"CA"},"gpc":false}',
+    ),
+  );
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-devtools",
+    "ready",
+  );
+  await expect(page.getByTestId("simulation")).toHaveText("off");
+});
