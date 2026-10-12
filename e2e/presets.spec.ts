@@ -5,6 +5,8 @@ const googleHosts = [
   "google-analytics.com",
   "googleadservices.com",
   "doubleclick.net",
+  "googlesyndication.com",
+  "google.com",
 ];
 
 async function recordGoogleRequests(page: Page) {
@@ -127,4 +129,39 @@ test("advanced GTM loads only after denied defaults are queued", async ({
     ad_user_data: "denied",
     ad_personalization: "denied",
   });
+});
+
+test("no Google request leaves the page before consent, even after waiting", async ({
+  page,
+}) => {
+  const urls = await recordGoogleRequests(page);
+  await page.goto("/presets");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-presets",
+    "ready",
+  );
+  await page.waitForLoadState("networkidle");
+  expect(urls).toEqual([]);
+  const scripts = await page.evaluate(() =>
+    [...document.querySelectorAll("script")]
+      .map((node) => node.getAttribute("src") ?? "")
+      .filter((src) => /google|doubleclick/.test(src)),
+  );
+  expect(scripts).toEqual([]);
+});
+
+test("advanced GTM sends only gtm.js before consent, never GA4 or Ads", async ({
+  page,
+}) => {
+  const urls = await recordGoogleRequests(page);
+  await page.goto("/presets?gtm=advanced");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-presets",
+    "ready",
+  );
+  await expect
+    .poll(() => urls.some((url) => url.includes("gtm.js?id=GTM-")))
+    .toBe(true);
+  await page.waitForLoadState("networkidle");
+  expect(urls.every((url) => url.includes("/gtm.js?id=GTM-"))).toBe(true);
 });

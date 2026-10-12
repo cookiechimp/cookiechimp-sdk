@@ -10,11 +10,15 @@ export interface GtmOptions {
 export function gtm({
   containerId,
   category,
-  dataLayerName = "dataLayer",
+  dataLayerName: layerName = "dataLayer",
   nonce,
   consentMode = "basic",
 }: GtmOptions): ScriptPreset {
   validateId("GTM container", containerId, /^GTM-[A-Z0-9]+$/);
+  // A plain identifier only: no URL parts, markup or prototype keys.
+  const layerPattern = /^(?!__proto__$)[A-Za-z_$][\w$]*$/;
+  validateId("GTM data layer", layerName, layerPattern);
+  const dataLayerName = layerPattern.test(layerName) ? layerName : "dataLayer";
   const query =
     dataLayerName === "dataLayer"
       ? ""
