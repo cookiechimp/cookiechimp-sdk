@@ -12,6 +12,12 @@ export function validateId(kind: string, id: string, expression: RegExp): void {
     throw new TypeError(message);
   console.warn(message);
 }
+/** Percent-encode everything outside unreserved URL characters, quotes included. */
+export const encodeId = (id: string): string =>
+  encodeURIComponent(id).replace(
+    /[!'()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
 export function queue(
   dataLayerName = "dataLayer",
   defaults = false,

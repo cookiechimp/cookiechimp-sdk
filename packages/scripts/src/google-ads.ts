@@ -1,5 +1,5 @@
 import type { ScriptPreset } from "./index";
-import { preset, validateId } from "./shared";
+import { encodeId, preset, validateId } from "./shared";
 export interface GoogleAdsOptions {
   conversionId: string;
   category?: string;
@@ -14,7 +14,7 @@ export function googleAds({
   return preset(
     "google-ads",
     category,
-    `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(conversionId)}`,
+    `https://www.googletagmanager.com/gtag/js?id=${encodeId(conversionId)}`,
     [
       "https://www.googletagmanager.com/gtag/js?id=AW-*",
       "https://www.googleadservices.com/*",

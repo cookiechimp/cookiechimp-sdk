@@ -1,5 +1,5 @@
 import type { ScriptPreset } from "./index";
-import { preset, validateId } from "./shared";
+import { encodeId, preset, validateId } from "./shared";
 export interface GtmOptions {
   containerId: string;
   category: string;
@@ -26,7 +26,7 @@ export function gtm({
   return preset(
     "gtm",
     category,
-    `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(containerId)}${query}`,
+    `https://www.googletagmanager.com/gtm.js?id=${encodeId(containerId)}${query}`,
     ["https://www.googletagmanager.com/gtm.js?id=GTM-*"],
     ["googletagmanager.com", "*.googletagmanager.com"],
     // GTM is a container: it adds no Consent Mode signals of its own, so each

@@ -1,5 +1,5 @@
 import type { ScriptPreset } from "./index";
-import { preset, validateId } from "./shared";
+import { encodeId, preset, validateId } from "./shared";
 export interface Ga4Options {
   measurementId: string;
   category?: string;
@@ -14,7 +14,7 @@ export function ga4({
   return preset(
     "ga4",
     category,
-    `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`,
+    `https://www.googletagmanager.com/gtag/js?id=${encodeId(measurementId)}`,
     ["https://www.googletagmanager.com/gtag/js?id=*"],
     ["google-analytics.com", "*.google-analytics.com"],
     { [category]: ["analytics_storage"] },
