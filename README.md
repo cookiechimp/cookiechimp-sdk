@@ -114,8 +114,19 @@ Non-HTTP URLs and URLs that cannot be parsed are left alone.
 
 Blocked requests are dropped, not queued or replayed. This is the safer privacy default: a request made before consent may carry data the visitor never agreed to share, and replaying it later would send that data anyway. Code that needs the request after consent should make it again from a consent subscriber.
 
-Blocked fetch calls reject with `ConsentBlockedError`. Blocked XHR sends emit
-`error` and `loadend` with status 0. Blocked beacons return `false`. Requests are
+Blocked fetch calls reject with `ConsentBlockedError`. Blocked XHR sends behave like a network error: `readyState` is 4, status is 0,
+and `readystatechange`, `error`, and `loadend` fire asynchronously as
+ProgressEvents. `ConsentBlockedError` extends `TypeError`, like a native fetch
+network failure. Blocked beacons return `false`. Requests are
 dropped and are never queued or replayed. The returned controller provides
 `blocked()` reports and `stop()` to release its shared, reference-counted
 patches.
+
+Limitations of `./network`:
+
+- `fetch` or XMLHttpRequest references captured before `blockNetwork` runs are
+  not covered. Install it before any third-party code.
+- Code running in iframes or workers is not covered, since each has its own
+  globals.
+- Image pixels, WebSocket, and EventSource requests are not covered. An image
+  pixel handler for `./dynamic` is on the backlog.

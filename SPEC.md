@@ -25,7 +25,7 @@ Status: draft v0.1 (2026-10-12). Clean-room build. The CookieYes SDK (MIT) was i
   - banner only <= 11 KB
   - banner + preferences + recall <= 13.5 KB initial, <= 16 KB total
   - connected mode sync client lazy loaded, <= 2 KB extra
-  - network blocker opt-in, <= 2 KB extra
+  - network blocker opt-in, <= 2.25 KB extra
   - TCF/GPP module opt-in, lazy, <= 12 KB, never in the default bundle
 - Perf: zero CLS, banner interactive in < 50 ms after hydration, no blocking network request on the critical path (connected config is cached and revalidated).
 
@@ -97,6 +97,8 @@ M1 Core (local mode)
 7. Script gating and iframe blocker.
 8. Network blocker (fetch, XHR, beacon).
 9. Google Consent Mode v2 signals.
+
+Backlog (after M1): image pixel handler in `./dynamic` (block `img` and `Image()` tracking pixels whose URL matches a service without consent).
 
 M2 React
 10. Provider and hooks.

@@ -19,7 +19,7 @@ export interface NetworkController {
 }
 
 /** Error returned by a fetch that CookieChimp prevented from starting. */
-export class ConsentBlockedError extends Error {}
+export class ConsentBlockedError extends TypeError {}
 
 const noop = (): NetworkController => ({ stop() {}, blocked: () => [] });
 const isDevelopment = () =>
@@ -142,8 +142,16 @@ export function blockNetwork(
               const found = match(xhrUrls.get(this));
               if (!found) return Reflect.apply(native, this, args);
               report(found, "xhr");
-              this.dispatchEvent(new win.Event("error"));
-              this.dispatchEvent(new win.Event("loadend"));
+              // Mirror a real network error: DONE state, status 0, async events.
+              Object.defineProperty(this, "readyState", {
+                configurable: true,
+                get: () => 4,
+              });
+              setTimeout(() => {
+                const Progress = win.ProgressEvent ?? win.Event;
+                for (const type of ["readystatechange", "error", "loadend"])
+                  this.dispatchEvent(new Progress(type) as Event);
+              });
             },
           };
         }),

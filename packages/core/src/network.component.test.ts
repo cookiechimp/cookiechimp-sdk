@@ -67,18 +67,30 @@ describe("network blocker", () => {
     expect(native).toHaveBeenCalledOnce();
   });
 
-  it("blocks XHR send and emits error then loadend", () => {
+  it("blocks XHR send and emits readystatechange, error, loadend asynchronously", async () => {
     const send = vi.spyOn(window.XMLHttpRequest.prototype, "send");
     install();
     const xhr = new window.XMLHttpRequest();
     const events: string[] = [];
-    xhr.addEventListener("error", () => events.push("error"));
+    const states: number[] = [];
+    xhr.addEventListener("readystatechange", () => {
+      events.push("readystatechange");
+      states.push(xhr.readyState);
+    });
+    xhr.addEventListener("error", (event) => {
+      events.push("error");
+      expect(event).toBeInstanceOf(window.ProgressEvent);
+    });
     xhr.addEventListener("loadend", () => events.push("loadend"));
     xhr.open("POST", "https://tracker.test/xhr");
     xhr.send();
     expect(send).not.toHaveBeenCalled();
+    expect(xhr.readyState).toBe(4);
     expect(xhr.status).toBe(0);
-    expect(events).toEqual(["error", "loadend"]);
+    expect(events).toEqual([]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(events).toEqual(["readystatechange", "error", "loadend"]);
+    expect(states).toEqual([4]);
   });
 
   it("allows XHR with consent", () => {
@@ -90,6 +102,13 @@ describe("network blocker", () => {
     xhr.open("GET", "https://tracker.test/xhr");
     xhr.send();
     expect(send).toHaveBeenCalledOnce();
+  });
+
+  it("rejects blocked fetch with a TypeError subclass", async () => {
+    install();
+    await expect(
+      window.fetch("https://tracker.test/collect"),
+    ).rejects.toBeInstanceOf(TypeError);
   });
 
   it("blocks and allows beacon", () => {
