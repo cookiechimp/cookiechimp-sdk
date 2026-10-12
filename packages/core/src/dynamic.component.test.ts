@@ -50,6 +50,7 @@ const script = () => {
 afterEach(() => {
   for (const controller of controllers.splice(0)) controller.stop();
   document.body.replaceChildren();
+  vi.unstubAllEnvs();
   vi.restoreAllMocks();
 });
 
@@ -124,6 +125,48 @@ describe("dynamic insertion APIs", () => {
 });
 
 describe("dynamic src interception", () => {
+  it("normalises object categories and missing service arrays", () => {
+    const consent = runtime();
+    const controller = blockDynamic(consent, {
+      config: {
+        categories: { analytics: false },
+        services: [{ id: "raw", category: "analytics", domains: ["raw.test"] }],
+      },
+    });
+    controllers.push(controller);
+    const denied = document.body.appendChild(document.createElement("iframe"));
+    denied.src = "https://raw.test/denied";
+    expect(denied.hasAttribute("src")).toBe(false);
+
+    consent.allow("raw");
+    expect(denied.src).toBe("https://raw.test/denied");
+    const allowed = document.body.appendChild(document.createElement("iframe"));
+    allowed.src = "https://raw.test/allowed";
+    expect(allowed.src).toBe("https://raw.test/allowed");
+  });
+
+  it("throws for invalid services in development", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect(() =>
+      blockDynamic(runtime(), {
+        config: { categories: ["analytics"], services: [null] } as never,
+      }),
+    ).toThrow("Invalid consent config for CookieChimp blocker");
+  });
+
+  it("warns and drops invalid services in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const controller = blockDynamic(runtime(), {
+      config: { categories: ["analytics"], services: [null] } as never,
+    });
+    controllers.push(controller);
+    const frame = document.body.appendChild(document.createElement("iframe"));
+    frame.src = "https://raw.test/allowed";
+    expect(frame.src).toBe("https://raw.test/allowed");
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
   it("does not call the native src setter when src is set after insertion", () => {
     const nativeSetter = vi.spyOn(HTMLIFrameElement.prototype, "src", "set");
     install();

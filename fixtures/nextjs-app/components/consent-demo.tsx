@@ -1,14 +1,21 @@
 "use client";
 
-import { createConsent } from "@cookiechimp/core";
+import { type ConsentState, createConsent } from "@cookiechimp/core";
 import { installConsentMode } from "@cookiechimp/core/consent-mode";
 import { blockDynamic } from "@cookiechimp/core/dynamic";
 import { gateScripts } from "@cookiechimp/core/gate";
 import { blockNetwork } from "@cookiechimp/core/network";
+import {
+  ConsentProvider,
+  useBanner,
+  useCategory,
+  useConsentActions,
+} from "@cookiechimp/react";
 import { useEffect, useState } from "react";
 
-const consent = createConsent({
+const config = {
   categories: { analytics: false },
+  regulation: "gdpr" as const,
   services: [
     {
       id: "analytics-demo",
@@ -16,48 +23,40 @@ const consent = createConsent({
       domains: ["dynamic.cookiechimp.test"],
     },
   ],
-});
+};
 
-export function ConsentDemo() {
-  const [accepted, setAccepted] = useState(false);
-  const [serviceAccepted, setServiceAccepted] = useState(false);
+export function ConsentDemo({
+  initialState = null,
+}: {
+  initialState?: ConsentState | null;
+}) {
+  const [consent] = useState(() =>
+    createConsent({ ...config, initial: initialState }),
+  );
+  return (
+    <ConsentProvider consent={consent} initialState={initialState}>
+      <ConsentDemoContent consent={consent} />
+    </ConsentProvider>
+  );
+}
+
+function ConsentDemoContent({
+  consent,
+}: {
+  consent: ReturnType<typeof createConsent>;
+}) {
+  const accepted = useCategory("analytics");
+  const { acceptAll, set } = useConsentActions();
+  const banner = useBanner();
 
   useEffect(() => {
     const gate = gateScripts(consent);
     const consentMode = installConsentMode(consent);
-    const dynamic = blockDynamic(consent, {
-      config: {
-        categories: ["analytics"],
-        services: [
-          {
-            id: "analytics-demo",
-            category: "analytics",
-            domains: ["dynamic.cookiechimp.test"],
-          },
-        ],
-      },
-    });
-    const network = blockNetwork(consent, {
-      config: {
-        categories: ["analytics"],
-        services: [
-          {
-            id: "analytics-demo",
-            category: "analytics",
-            domains: ["dynamic.cookiechimp.test"],
-          },
-        ],
-      },
-    });
+    const dynamic = blockDynamic(consent, { config });
+    const network = blockNetwork(consent, { config });
     document.documentElement.dataset.ccDynamic = "ready";
     document.documentElement.dataset.ccConsentMode = "ready";
     document.documentElement.dataset.ccNetwork = "ready";
-    setAccepted(consent.has("analytics"));
-    setServiceAccepted(consent.hasService("analytics-demo"));
-    const unsubscribe = consent.subscribe((state) => {
-      setAccepted(state.categories.analytics === true);
-      setServiceAccepted(consent.hasService("analytics-demo"));
-    });
     return () => {
       delete document.documentElement.dataset.ccDynamic;
       delete document.documentElement.dataset.ccConsentMode;
@@ -66,27 +65,29 @@ export function ConsentDemo() {
       gate.stop();
       dynamic.stop();
       network.stop();
-      unsubscribe();
     };
-  }, []);
+  }, [consent]);
 
   return (
     <section aria-label="Consent demo">
+      {banner.open && (
+        <aside data-testid="consent-banner">Cookie preferences</aside>
+      )}
       <p data-testid="consent-status">
         {accepted ? "Analytics accepted" : "Analytics declined"}
       </p>
-      <button type="button" onClick={() => consent.acceptAll()}>
+      <button type="button" onClick={acceptAll}>
         Accept all cookies
       </button>
       <p data-testid="service-status">
-        {serviceAccepted
+        {consent.hasService("analytics-demo")
           ? "Analytics demo accepted"
           : "Analytics demo declined"}
       </p>
       <button
         type="button"
         onClick={() =>
-          consent.set({
+          set({
             services: {
               "analytics-demo": !consent.hasService("analytics-demo"),
             },

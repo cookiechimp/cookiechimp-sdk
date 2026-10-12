@@ -50,6 +50,14 @@
     "limit": 5120
   },
   {
+    "name": "react provider and hooks",
+    "scenario": "react",
+    "entry": "packages/react/dist/index.mjs",
+    "kind": "extra",
+    "limit": 1536,
+    "excludedFrom": "packages/core/dist/index.mjs"
+  },
+  {
     "name": "banner only",
     "scenario": "banner",
     "entry": "packages/react/dist/banner.mjs",

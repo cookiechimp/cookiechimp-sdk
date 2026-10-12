@@ -1,4 +1,5 @@
 import type { ConsentRuntime } from "./index";
+import { fail, isDev } from "./internal/dev";
 import { isHttpUrl } from "./internal/url";
 
 export interface GateOptions {
@@ -25,17 +26,15 @@ const noop = (): GateController => ({
   scan() {},
   blocked: () => [],
 });
-const isDevelopment = () =>
-  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
-
 function invalid(message: string): void {
-  if (isDevelopment())
-    throw new TypeError(`Invalid gateScripts options: ${message}`);
-  console.warn(`CookieChimp ignored invalid gateScripts options: ${message}`);
+  fail(
+    `Invalid gateScripts options: ${message}`,
+    `CookieChimp ignored invalid gateScripts options: ${message}`,
+  );
 }
 
 function warn(message: string): void {
-  if (isDevelopment()) console.warn(`CookieChimp gate: ${message}`);
+  if (isDev()) console.warn(`CookieChimp gate: ${message}`);
 }
 
 /**
