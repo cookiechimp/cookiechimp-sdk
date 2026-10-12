@@ -107,6 +107,10 @@ test("dynamic iframe src set after insertion makes no request before consent", a
     await route.abort();
   });
   await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-dynamic",
+    "ready",
+  );
   await page.evaluate(() => {
     const frame = document.body.appendChild(document.createElement("iframe"));
     frame.src = "https://dynamic.cookiechimp.test/embed";

@@ -119,6 +119,19 @@ describe("dynamic insertion APIs", () => {
 });
 
 describe("dynamic src interception", () => {
+  it("does not call the native src setter when src is set after insertion", () => {
+    const nativeSetter = vi.spyOn(HTMLIFrameElement.prototype, "src", "set");
+    install();
+    const frame = document.body.appendChild(document.createElement("iframe"));
+
+    frame.src = "https://frames.test/embed";
+
+    expect(nativeSetter).not.toHaveBeenCalled();
+    expect(frame.hasAttribute("src")).toBe(false);
+    expect(frame.dataset.ccSrc).toBe("https://frames.test/embed");
+    expect(frame.dataset.ccBlocked).toBe("true");
+  });
+
   it("blocks the src property setter after insertion", () => {
     const { controller } = install();
     const frame = document.body.appendChild(document.createElement("iframe"));

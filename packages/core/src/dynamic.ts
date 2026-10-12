@@ -180,6 +180,9 @@ export function blockDynamic(
     releases.push(
       acquire(prototype, "src", (descriptor) => ({
         ...descriptor,
+        get(this: Element) {
+          return descriptor.get?.call(this);
+        },
         set(this: Element, value: string) {
           if (!neutralise(this, String(value)))
             descriptor.set?.call(this, value);

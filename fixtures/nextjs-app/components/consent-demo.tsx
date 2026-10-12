@@ -34,6 +34,7 @@ export function ConsentDemo() {
         ],
       },
     });
+    document.documentElement.dataset.ccDynamic = "ready";
     setAccepted(consent.has("analytics"));
     setServiceAccepted(consent.hasService("analytics-demo"));
     const unsubscribe = consent.subscribe((state) => {
@@ -41,6 +42,7 @@ export function ConsentDemo() {
       setServiceAccepted(consent.hasService("analytics-demo"));
     });
     return () => {
+      delete document.documentElement.dataset.ccDynamic;
       gate.stop();
       dynamic.stop();
       unsubscribe();
