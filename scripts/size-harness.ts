@@ -1,9 +1,9 @@
-import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname, parse, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { constants, gzip } from "node:zlib";
+import { type OutputChunk, rolldown } from "rolldown";
 
 const gzipAsync = promisify(gzip);
 export type BudgetKind = "initial" | "total" | "extra" | "lazy";
@@ -43,36 +43,85 @@ export function compareBudget(
   return { ...budget, bytes, status: bytes <= budget.limit ? "pass" : "fail" };
 }
 
-const importPattern =
-  /(?:import\s*(?:[^"']*?from\s*)?|export\s+[^"']*?from\s*|import\s*\()(["'])(\.[^"']+)\1/g;
+const alwaysExternal = new Set([
+  "react",
+  "react-dom",
+  "react/jsx-runtime",
+  "react/jsx-dev-runtime",
+]);
 
-async function moduleFiles(
-  entry: string,
-  includeLazy: boolean,
-): Promise<string[]> {
-  const seen = new Set<string>();
-  async function visit(file: string): Promise<void> {
-    if (seen.has(file) || !existsSync(file)) return;
-    seen.add(file);
-    const source = await readFile(file, "utf8");
-    for (const match of source.matchAll(importPattern)) {
-      if (!includeLazy && match[0].startsWith("import(")) continue;
-      const target = match[2];
-      if (target) await visit(resolve(dirname(file), target));
+async function peerDependencies(entry: string): Promise<Set<string>> {
+  let directory = dirname(entry);
+  const { root } = parse(directory);
+  while (directory !== root) {
+    try {
+      const manifest = JSON.parse(
+        await readFile(resolve(directory, "package.json"), "utf8"),
+      ) as { peerDependencies?: Record<string, string> };
+      return new Set(Object.keys(manifest.peerDependencies ?? {}));
+    } catch {
+      directory = dirname(directory);
     }
   }
-  await visit(entry);
-  return [...seen].sort();
+  return new Set();
+}
+
+export interface BundledEntry {
+  chunks: OutputChunk[];
+  measuredChunks: OutputChunk[];
+}
+
+export async function bundleEntry(
+  entry: string,
+  kind: BudgetKind,
+  treeshake = true,
+): Promise<BundledEntry | undefined> {
+  try {
+    await readFile(entry);
+  } catch {
+    return undefined;
+  }
+  const peers = await peerDependencies(entry);
+  const external = (specifier: string): boolean =>
+    [...alwaysExternal, ...peers].some(
+      (peer) => specifier === peer || specifier.startsWith(`${peer}/`),
+    );
+  const build = await rolldown({
+    input: entry,
+    external,
+    treeshake,
+    onLog(level, log, handler) {
+      if (log.code === "UNRESOLVED_IMPORT") throw new Error(log.message);
+      if (log.code !== "MODULE_LEVEL_DIRECTIVE") handler(level, log);
+    },
+  });
+  try {
+    const generated = await build.generate({
+      format: "esm",
+      minify: true,
+      codeSplitting: kind === "initial",
+    });
+    const chunks = generated.output.filter(
+      (output): output is OutputChunk => output.type === "chunk",
+    );
+    return {
+      chunks,
+      measuredChunks:
+        kind === "initial" ? chunks.filter((chunk) => chunk.isEntry) : chunks,
+    };
+  } finally {
+    await build.close();
+  }
 }
 
 export async function measureEntry(
   entry: string,
   kind: BudgetKind,
 ): Promise<number | undefined> {
-  if (!existsSync(entry)) return undefined;
-  const files = await moduleFiles(entry, kind !== "initial");
+  const bundled = await bundleEntry(entry, kind);
+  if (!bundled) return undefined;
   const sizes = await Promise.all(
-    files.map(async (file) => gzipSize(await readFile(file))),
+    bundled.measuredChunks.map((chunk) => gzipSize(chunk.code)),
   );
   return sizes.reduce((sum, size) => sum + size, 0);
 }
@@ -83,14 +132,12 @@ export async function checkDefaultExclusion(
 ): Promise<string | undefined> {
   if (!budget.excludedFrom) return undefined;
   const defaultEntry = resolve(root, budget.excludedFrom);
-  if (!existsSync(defaultEntry))
-    return `default entry missing: ${budget.excludedFrom}`;
-  const files = await moduleFiles(defaultEntry, true);
-  if (files.includes(resolve(root, budget.entry)))
+  const bundled = await bundleEntry(defaultEntry, "total", false);
+  if (!bundled) return `default entry missing: ${budget.excludedFrom}`;
+  const modules = bundled.chunks.flatMap((chunk) => Object.keys(chunk.modules));
+  if (modules.includes(resolve(root, budget.entry)))
     return `default bundle imports ${budget.entry}`;
-  const source = (
-    await Promise.all(files.map((file) => readFile(file, "utf8")))
-  ).join("\n");
+  const source = bundled.chunks.map((chunk) => chunk.code).join("\n");
   const token = budget.forbiddenTokens?.find((candidate) =>
     source.includes(candidate),
   );

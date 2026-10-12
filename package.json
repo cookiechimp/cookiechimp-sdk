@@ -16,11 +16,12 @@
     "typecheck": "tsc --noEmit --project tsconfig.tools.json && turbo run typecheck"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
     "@biomejs/biome": "2.5.15",
     "@changesets/cli": "3.0.3",
     "@playwright/test": "1.64.0",
+    "@types/node": "^22.0.0",
     "happy-dom": "21.0.1",
+    "rolldown": "1.2.13",
     "tsdown": "0.23.1",
     "turbo": "2.11.7",
     "typescript": "7.0.2",
