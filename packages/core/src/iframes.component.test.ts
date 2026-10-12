@@ -2,35 +2,35 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { gateScripts } from "./iframes";
 
 function runtime(categories: Record<string, boolean> = {}) {
-  let state = categories;
+  let state = { ...categories };
+  const serviceState: Record<string, boolean> = {};
   const listeners = new Set<(state: never) => void>();
-  const services: Record<string, boolean> = {};
   return {
     has: (category: string) => state[category] === true,
-    hasService: (service: string) =>
-      services[service] ?? state.analytics === true,
-    subscribe: (fn: (state: never) => void) => {
-      listeners.add(fn);
+    hasService: (service: string) => serviceState[service] ?? false,
+    subscribe: (listener: (state: never) => void) => {
+      listeners.add(listener);
       return () => {
-        listeners.delete(fn);
+        listeners.delete(listener);
       };
     },
     set(category: string, value: boolean) {
       state = { ...state, [category]: value };
-      for (const fn of listeners) fn(undefined as never);
+      for (const listener of listeners) listener(undefined as never);
     },
     setService(service: string, value: boolean) {
-      services[service] = value;
-      for (const fn of listeners) fn(undefined as never);
+      serviceState[service] = value;
+      for (const listener of listeners) listener(undefined as never);
     },
   };
 }
+
 const controllers: ReturnType<typeof gateScripts>[] = [];
-const gate = (...args: Parameters<typeof gateScripts>) => {
+function gate(...args: Parameters<typeof gateScripts>) {
   const controller = gateScripts(...args);
   controllers.push(controller);
   return controller;
-};
+}
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 afterEach(() => {
@@ -39,126 +39,254 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("gateScripts", () => {
-  it("activates inline scripts once and preserves script attributes", async () => {
+describe("gateScripts script activation", () => {
+  it("copies nonce, integrity, async, defer, crossorigin, referrerpolicy, data attributes, and module type", async () => {
     const consent = runtime({ analytics: false });
-    document.body.innerHTML = `<script type="text/plain" data-cc-category="analytics" data-cc-type="module" nonce="abc" integrity="sha256-test" async defer data-extra="yes">globalThis.__gateRuns=(globalThis.__gateRuns||0)+1</script>`;
-    const controller = gate(consent);
-    expect(controller.blocked()).toHaveLength(1);
+    document.body.innerHTML = `<script type="text/plain" data-cc-category="analytics" data-cc-type="module" data-owner="chimp" nonce="abc" integrity="sha256-test" async defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>`;
+    gate(consent);
+
     consent.set("analytics", true);
     await tick();
-    const script = document.querySelector("script");
-    if (!script) throw new Error("activated script missing");
-    expect(script.type).toBe("module");
-    expect(script.getAttribute("nonce")).toBe("abc");
-    expect(script.integrity).toBe("sha256-test");
-    expect(script.async).toBe(true);
-    expect(script.defer).toBe(true);
-    expect(script.dataset.extra).toBe("yes");
-    expect(script.dataset.ccActivated).toBe("true");
-    expect(controller.blocked()).toEqual([]);
-    consent.set("analytics", true);
-    await tick();
-    expect(document.querySelectorAll("[data-cc-activated]")).toHaveLength(1);
+
+    const script = document.querySelector<HTMLScriptElement>("script");
+    expect(script).not.toBeNull();
+    expect(script?.type).toBe("module");
+    expect(script?.getAttribute("nonce")).toBe("abc");
+    expect(script?.integrity).toBe("sha256-test");
+    expect(script?.async).toBe(true);
+    expect(script?.defer).toBe(true);
+    expect(script?.crossOrigin).toBe("anonymous");
+    expect(script?.referrerPolicy).toBe("no-referrer");
+    expect(script?.dataset.owner).toBe("chimp");
   });
 
-  it("uses service decisions and activates ordered sources sequentially", async () => {
+  it("loads ordered source scripts sequentially and keeps intervening inline scripts in document order", async () => {
     const consent = runtime({ analytics: false });
-    let finishFirst: (() => void) | undefined;
-    const nativeAdd = HTMLScriptElement.prototype.addEventListener;
+    const loadCallbacks: Array<() => void> = [];
     vi.spyOn(
       HTMLScriptElement.prototype,
       "addEventListener",
-    ).mockImplementation(function (
-      this: HTMLScriptElement,
-      type,
-      listener,
-      options,
-    ) {
-      if (type === "load" && !finishFirst) finishFirst = listener as () => void;
-      else if (type !== "error") nativeAdd.call(this, type, listener, options);
+    ).mockImplementation(function (this: HTMLScriptElement, type, listener) {
+      if (type === "load") loadCallbacks.push(listener as () => void);
     });
-    document.body.innerHTML = `<script type="text/plain" data-cc-category="analytics" data-cc-service="demo" src="/one.js"></script><script type="text/plain" data-cc-category="analytics" src="/two.js"></script>`;
+    document.body.innerHTML = [
+      '<script id="first" type="text/plain" data-cc-category="analytics" src="/first.js"></script>',
+      '<script id="inline" type="text/plain" data-cc-category="analytics">window.inline = true</script>',
+      '<script id="last" type="text/plain" data-cc-category="analytics" src="/last.js"></script>',
+    ].join("");
     gate(consent);
-    await tick();
-    expect(
-      document.querySelector("[src='/two.js']")?.getAttribute("type"),
-    ).toBe("text/plain");
+
     consent.set("analytics", true);
     await tick();
-    const first = document.querySelector<HTMLScriptElement>("[src='/one.js']");
-    if (!first) throw new Error("first script missing");
-    expect(first.dataset.ccActivated).toBe("true");
     expect(
-      document.querySelector("[src='/two.js']")?.getAttribute("type"),
-    ).toBe("text/plain");
-    finishFirst?.();
+      document.querySelector("#first")?.getAttribute("data-cc-activated"),
+    ).toBe("true");
+    expect(document.querySelector("#inline")?.getAttribute("type")).toBe(
+      "text/plain",
+    );
+    expect(document.querySelector("#last")?.getAttribute("type")).toBe(
+      "text/plain",
+    );
+
+    loadCallbacks[0]?.();
     await tick();
     expect(
-      document.querySelector<HTMLScriptElement>("[src='/two.js']")?.dataset
-        .ccActivated,
+      document.querySelector("#inline")?.getAttribute("data-cc-activated"),
+    ).toBe("true");
+    expect(
+      document.querySelector("#last")?.getAttribute("data-cc-activated"),
     ).toBe("true");
   });
 
-  it("observes later markup and dynamically blocks matching resources", async () => {
+  it("activates late-added scripts when consent is granted and leaves them pending when it is not", async () => {
     const consent = runtime({ analytics: false });
-    const placeholder = vi.fn();
-    const controller = gate(consent, {
-      blockDynamic: true,
-      placeholder,
-      config: {
-        categories: ["analytics"],
-        services: [
-          {
-            id: "demo",
-            category: "analytics",
-            scripts: ["*tracker.js"],
-            domains: ["frames.test"],
-          },
-        ],
+    const controller = gate(consent);
+    const waiting = document.createElement("script");
+    waiting.type = "text/plain";
+    waiting.dataset.ccCategory = "analytics";
+    document.body.append(waiting);
+    await tick();
+    expect(controller.blocked().map(({ el }) => el)).toContain(waiting);
+
+    consent.set("analytics", true);
+    await tick();
+    const allowed = document.createElement("script");
+    allowed.type = "text/plain";
+    allowed.dataset.ccCategory = "analytics";
+    document.body.append(allowed);
+    await tick();
+    expect(allowed.isConnected).toBe(false);
+    expect(
+      document.querySelectorAll("[data-cc-activated='true']"),
+    ).toHaveLength(2);
+  });
+
+  it("runs each script only once across repeated consent changes and scans", async () => {
+    const consent = runtime({ analytics: false });
+    document.body.innerHTML =
+      '<script type="text/plain" data-cc-category="analytics"></script>';
+    const replace = vi.spyOn(Element.prototype, "replaceWith");
+    const controller = gate(consent);
+    consent.set("analytics", true);
+    await tick();
+    consent.set("analytics", true);
+    controller.scan();
+    controller.scan();
+    await tick();
+    expect(replace).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("gateScripts revocation and controller", () => {
+  it("calls onRevoke with the affected category, reloads only when configured", async () => {
+    const reload = vi
+      .spyOn(window.location, "reload")
+      .mockImplementation(() => {});
+    const firstConsent = runtime({ analytics: false });
+    const firstRevoke = vi.fn();
+    document.body.innerHTML =
+      '<iframe srcdoc="" data-cc-src="/first" data-cc-category="analytics"></iframe>';
+    gate(firstConsent, { onRevoke: firstRevoke, reloadOnRevoke: false });
+    firstConsent.set("analytics", true);
+    await tick();
+    firstConsent.set("analytics", false);
+    expect(firstRevoke).toHaveBeenCalledWith("analytics", undefined);
+    expect(reload).not.toHaveBeenCalled();
+
+    document.body.innerHTML =
+      '<iframe srcdoc="" data-cc-src="/second" data-cc-category="marketing"></iframe>';
+    const secondConsent = runtime({ marketing: false });
+    gate(secondConsent, { reloadOnRevoke: true });
+    secondConsent.set("marketing", true);
+    await tick();
+    secondConsent.set("marketing", false);
+    expect(reload).toHaveBeenCalledOnce();
+  });
+
+  it("stop disconnects automatic work, while scan finds missed elements and blocked reports exact pending metadata", async () => {
+    const consent = runtime({ analytics: false, marketing: false });
+    const controller = gate(consent);
+    controller.stop();
+    const script = document.createElement("script");
+    script.type = "text/plain";
+    script.dataset.ccCategory = "analytics";
+    script.dataset.ccService = "stats";
+    const frame = document.createElement("iframe");
+    frame.srcdoc = "";
+    frame.dataset.ccSrc = "/ad";
+    frame.dataset.ccCategory = "marketing";
+    document.body.append(script, frame);
+    consent.setService("stats", true);
+    consent.set("marketing", true);
+    await tick();
+    expect(script.isConnected).toBe(true);
+    expect(frame.hasAttribute("src")).toBe(false);
+
+    consent.setService("stats", false);
+    consent.set("marketing", false);
+    controller.scan();
+    expect(controller.blocked()).toEqual([
+      { el: script, category: "analytics", service: "stats" },
+      { el: frame, category: "marketing" },
+    ]);
+  });
+});
+
+describe("gateScripts dynamic blocking", () => {
+  const config = {
+    categories: ["analytics"],
+    services: [
+      {
+        id: "demo",
+        category: "analytics",
+        scripts: ["*tracker.js"],
+        domains: ["frames.test"],
       },
-    });
+    ],
+  } as const;
+
+  it("neutralises matching runtime scripts and iframes, restores them on service consent, and leaves nonmatches untouched", async () => {
+    const consent = runtime({ analytics: false });
+    const controller = gate(consent, { blockDynamic: true, config });
     const script = document.createElement("script");
     script.src = "https://cdn.test/tracker.js";
-    document.body.append(script);
     const frame = document.createElement("iframe");
+    frame.srcdoc = "";
     frame.src = "https://frames.test/embed";
-    document.body.append(frame);
+    const safeScript = document.createElement("script");
+    safeScript.src = "https://cdn.test/app.js";
+    const safeFrame = document.createElement("iframe");
+    safeFrame.srcdoc = "";
+    safeFrame.src = "https://safe.test/embed";
+    document.body.append(script, frame, safeScript, safeFrame);
     await tick();
+
     expect(script.type).toBe("text/plain");
     expect(script.dataset.ccBlocked).toBe("true");
     expect(frame.dataset.ccSrc).toContain("frames.test/embed");
+    expect(frame.dataset.ccBlocked).toBe("true");
     expect(frame.src).toBe("about:blank");
-    expect(placeholder).toHaveBeenCalledWith(frame, "analytics");
+    expect(safeScript.type).not.toBe("text/plain");
+    expect(safeFrame.src).toContain("safe.test/embed");
     expect(controller.blocked()).toHaveLength(2);
-    consent.set("analytics", true);
+
+    consent.setService("demo", true);
     await tick();
     expect(
-      document.querySelector<HTMLScriptElement>("script")?.dataset.ccActivated,
-    ).toBe("true");
+      document.querySelector("script[data-cc-activated='true']"),
+    ).not.toBeNull();
     expect(frame.src).toContain("frames.test/embed");
+    expect(frame.dataset.ccSrc).toBeUndefined();
   });
 
-  it("activates declarative frames, reports revocation, and stops observation", async () => {
+  it("leaves runtime resources alone when blockDynamic is false", async () => {
+    const consent = runtime({ analytics: false });
+    gate(consent, { blockDynamic: false, config });
+    const script = document.createElement("script");
+    script.src = "https://cdn.test/tracker.js";
+    const frame = document.createElement("iframe");
+    frame.srcdoc = "";
+    frame.src = "https://frames.test/embed";
+    document.body.append(script, frame);
+    await tick();
+    expect(script.type).not.toBe("text/plain");
+    expect(script.dataset.ccBlocked).toBeUndefined();
+    expect(frame.src).toContain("frames.test/embed");
+    expect(frame.dataset.ccSrc).toBeUndefined();
+  });
+});
+
+describe("gateScripts iframe activation", () => {
+  it("activates category and service frames, calls placeholders only while blocked", async () => {
     const consent = runtime({ marketing: false });
-    const onRevoke = vi.fn();
-    document.body.innerHTML = `<iframe data-cc-src="/frame" data-cc-category="marketing"></iframe>`;
-    const controller = gate(consent, { onRevoke });
-    const frame = document.querySelector<HTMLIFrameElement>("iframe");
-    if (!frame) throw new Error("frame missing");
-    expect(frame.hasAttribute("src")).toBe(false);
+    const placeholder = vi.fn();
+    document.body.innerHTML = [
+      '<iframe srcdoc="" id="category" data-cc-src="/category" data-cc-category="marketing"></iframe>',
+      '<iframe srcdoc="" id="service" data-cc-src="/service" data-cc-category="marketing" data-cc-service="video"></iframe>',
+    ].join("");
+    gate(consent, { placeholder });
+    const category = document.querySelector<HTMLIFrameElement>("#category");
+    const service = document.querySelector<HTMLIFrameElement>("#service");
+    if (!category || !service) throw new Error("test frames missing");
+    expect(placeholder).toHaveBeenCalledWith(category, "marketing");
+    expect(placeholder).toHaveBeenCalledWith(service, "marketing");
+
     consent.set("marketing", true);
     await tick();
-    expect(frame.getAttribute("src")).toBe("/frame");
-    consent.set("marketing", false);
-    expect(onRevoke).toHaveBeenCalledWith("marketing", undefined);
-    controller.stop();
+    expect(category.getAttribute("src")).toBe("/category");
+    expect(service.hasAttribute("src")).toBe(false);
+    consent.setService("video", true);
+    await tick();
+    expect(service.getAttribute("src")).toBe("/service");
+
+    placeholder.mockClear();
     const late = document.createElement("iframe");
+    late.srcdoc = "";
     late.dataset.ccSrc = "/late";
     late.dataset.ccCategory = "marketing";
     document.body.append(late);
-    consent.set("marketing", true);
     await tick();
-    expect(late.hasAttribute("src")).toBe(false);
+    expect(late.getAttribute("src")).toBe("/late");
+    expect(placeholder).not.toHaveBeenCalled();
   });
 });

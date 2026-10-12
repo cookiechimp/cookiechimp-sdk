@@ -67,21 +67,21 @@ export function gateScripts(
     typeof options.blockDynamic !== "boolean"
   ) {
     reportInvalid("blockDynamic must be a boolean");
-    return noOpController();
+    options = { ...options, blockDynamic: false };
   }
   if (
     options.placeholder !== undefined &&
     typeof options.placeholder !== "function"
   ) {
     reportInvalid("placeholder must be a function");
-    return noOpController();
+    options = { ...options, placeholder: undefined };
   }
   if (
     options.onRevoke !== undefined &&
     typeof options.onRevoke !== "function"
   ) {
     reportInvalid("onRevoke must be a function");
-    return noOpController();
+    options = { ...options, onRevoke: undefined };
   }
   const doc =
     options.document ??
@@ -120,9 +120,10 @@ export function gateScripts(
     }
     done.add(script);
     pending.delete(script);
+    granted.set(`${category}\0${service ?? ""}`, true);
     const activate = () =>
       new Promise<void>((resolve) => {
-        if (!script.isConnected || stopped) return resolve();
+        if (!script.isConnected) return resolve();
         const fresh = doc.createElement("script");
         for (const { name, value } of [...script.attributes]) {
           if (
@@ -166,6 +167,7 @@ export function gateScripts(
     }
     done.add(frame);
     pending.delete(frame);
+    granted.set(`${category}\0${service ?? ""}`, true);
     frame.src = source;
     delete frame.dataset.ccSrc;
     delete frame.dataset.ccBlocked;
@@ -252,7 +254,7 @@ export function gateScripts(
     patchInsertion(doc.defaultView.Element.prototype, "prepend");
   }
   const scan = () => {
-    if (!stopped) process(doc);
+    process(doc);
   };
   scan();
   const observer =
