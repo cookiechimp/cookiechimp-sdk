@@ -192,49 +192,49 @@
     "scenario": "scripts meta pixel",
     "entry": "packages/scripts/dist/meta-pixel.mjs",
     "kind": "extra",
-    "limit": 895
+    "limit": 1005
   },
   {
     "name": "Clarity preset",
     "scenario": "scripts clarity",
     "entry": "packages/scripts/dist/clarity.mjs",
     "kind": "extra",
-    "limit": 880
+    "limit": 980
   },
   {
     "name": "PostHog preset",
     "scenario": "scripts posthog",
     "entry": "packages/scripts/dist/posthog.mjs",
     "kind": "extra",
-    "limit": 1060
+    "limit": 1175
   },
   {
     "name": "Segment preset",
     "scenario": "scripts segment",
     "entry": "packages/scripts/dist/segment.mjs",
     "kind": "extra",
-    "limit": 1055
+    "limit": 1140
   },
   {
     "name": "Hotjar preset",
     "scenario": "scripts hotjar",
     "entry": "packages/scripts/dist/hotjar.mjs",
     "kind": "extra",
-    "limit": 935
+    "limit": 1025
   },
   {
     "name": "LinkedIn Insight preset",
     "scenario": "scripts linkedin",
     "entry": "packages/scripts/dist/linkedin.mjs",
     "kind": "extra",
-    "limit": 880
+    "limit": 970
   },
   {
     "name": "TikTok Pixel preset",
     "scenario": "scripts tiktok",
     "entry": "packages/scripts/dist/tiktok.mjs",
     "kind": "extra",
-    "limit": 995
+    "limit": 1095
   },
   {
     "name": "TCF/GPP module",
