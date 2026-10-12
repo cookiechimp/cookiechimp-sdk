@@ -30,7 +30,8 @@
   "dependencies": {
     "@cookiechimp/core": "workspace:*",
     "@cookiechimp/react": "workspace:*",
-    "@cookiechimp/tokens": "workspace:*"
+    "@cookiechimp/tokens": "workspace:*",
+    "server-only": "0.0.1"
   },
   "peerDependencies": {
     "next": ">=14",
@@ -44,7 +45,6 @@
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "server-only": "0.0.1",
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
     "vitest": "5.0.4"

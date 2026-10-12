@@ -99,6 +99,9 @@ importers:
       '@cookiechimp/tokens':
         specifier: workspace:*
         version: link:../tokens
+      server-only:
+        specifier: 0.0.1
+        version: 0.0.1
     devDependencies:
       '@cookiechimp/translations':
         specifier: workspace:*
@@ -118,9 +121,6 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
-      server-only:
-        specifier: 0.0.1
-        version: 0.0.1
       tsdown:
         specifier: 0.23.1
         version: 0.23.1(typescript@7.0.2)

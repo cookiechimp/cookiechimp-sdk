@@ -78,7 +78,6 @@
     "scenario": "nextjs server",
     "entry": "packages/nextjs/dist/server.mjs",
     "kind": "extra",
-    "limit": 4096,
     "informational": true
   },
   {

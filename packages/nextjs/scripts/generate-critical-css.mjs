@@ -23,18 +23,55 @@ async function inline(file) {
 }
 
 const css = (await inline(reactCss)).replace(/\/\*[\s\S]*?\*\//g, "");
-const rules = css.match(/[^{}]+{[^{}]*}/g) ?? [];
-const tokens = rules
-  .filter((rule) => /(?:^|,)\s*(?::root|\[data-cc-theme)/.test(rule))
-  .join("\n");
-const banner = rules
-  .filter((rule) =>
-    /\.(?:cc-banner|cc-title|cc-description|cc-actions|cc-button)(?:\b|[-_:])/.test(
-      rule,
-    ),
-  )
-  .join("\n");
-const critical = `${tokens}\n${banner}`.replace(/\s+/g, " ").trim();
+
+function blocks(source) {
+  const result = [];
+  let start = 0;
+  while (start < source.length) {
+    const open = source.indexOf("{", start);
+    if (open < 0) break;
+    let depth = 1;
+    let quote = "";
+    let close = open + 1;
+    for (; close < source.length && depth; close++) {
+      const character = source[close];
+      if (quote) {
+        if (character === "\\") close++;
+        else if (character === quote) quote = "";
+      } else if (character === '"' || character === "'") quote = character;
+      else if (character === "{") depth++;
+      else if (character === "}") depth--;
+    }
+    if (depth) throw new Error("Unbalanced CSS block");
+    result.push({
+      prelude: source.slice(start, open).trim().replace(/^.*;/s, "").trim(),
+      body: source.slice(open + 1, close - 1),
+    });
+    start = close;
+  }
+  return result;
+}
+
+const wanted = (selector) =>
+  /(?:^|,)\s*(?::root|\[data-cc-theme)/.test(selector) ||
+  /\.(?:cc-banner|cc-title|cc-description|cc-actions|cc-button)(?:\b|[-_:])/.test(
+    selector,
+  );
+
+function select(source) {
+  return blocks(source)
+    .map(({ prelude, body }) => {
+      if (prelude.startsWith("@")) {
+        const children = select(body);
+        return children ? `${prelude}{${children}}` : "";
+      }
+      return wanted(prelude) ? `${prelude}{${body}}` : "";
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
+const critical = select(css).replace(/\s+/g, " ").trim();
 if (
   !/(?:^|\s):root\s*{[^}]*--cc-banner-bg:/.test(critical) ||
   !critical.includes("position: fixed")

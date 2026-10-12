@@ -22,7 +22,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | core total | total | 5120 |
 | react provider and hooks | extra | 4608 |
 | Next.js client provider bridge | extra | 4370 |
-| Next.js server entry | extra | 4096 |
+| Next.js server entry | extra | INFO |
 | react headless primitives | extra | 3491 |
 | banner only | initial | 11264 |
 | banner distribution entry | initial | 11264 |
