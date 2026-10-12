@@ -63,6 +63,16 @@ describe("getServerConsent", () => {
     });
   });
 
+  it("uses an explicitly supplied region without a provider", async () => {
+    mocks.cookie = encodeConsentCookie(state);
+    await expect(
+      getServerConsent({ region: { country: "US", region: "CA" } }),
+    ).resolves.toMatchObject({
+      region: { country: "US", region: "CA" },
+      regulation: "ccpa",
+    });
+  });
+
   it("throws in development and warns in production for invalid options", async () => {
     await expect(getServerConsent({ cookieName: "bad name" })).rejects.toThrow(
       "cookieName",
@@ -107,5 +117,18 @@ describe("CookieChimpProvider", () => {
       children: <span />,
     });
     expect(output.props.config.region).toBeNull();
+  });
+
+  it("accepts an already-resolved region", async () => {
+    mocks.values.set("x-vercel-ip-country", "DE");
+    const output = await CookieChimpProvider({
+      config: { categories: { analytics: false } },
+      region: { country: "US", region: "CA" },
+      children: <span />,
+    });
+    expect(output.props.config).toMatchObject({
+      region: { country: "US", region: "CA" },
+      regulation: "ccpa",
+    });
   });
 });

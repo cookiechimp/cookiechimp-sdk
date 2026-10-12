@@ -25,6 +25,13 @@ export function ConsentDemo() {
   const { set } = useConsentActions();
 
   useEffect(() => {
+    document.documentElement.dataset.ccHydrated = "true";
+    return () => {
+      delete document.documentElement.dataset.ccHydrated;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!consent) return;
     const gate = gateScripts(consent);
     const consentMode = installConsentMode(consent);

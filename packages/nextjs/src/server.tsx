@@ -30,6 +30,8 @@ export interface LanguageOptions {
 export interface GetServerConsentOptions {
   cookieName?: string;
   provider?: RegionHeaderOptions["provider"];
+  /** Already-resolved request region. No location lookup is performed. */
+  region?: Region | null;
   languages?: LanguageOptions | readonly string[];
 }
 
@@ -83,6 +85,7 @@ export function getServerConsent(
   options: GetServerConsentOptions &
     (
       | { provider: NonNullable<GetServerConsentOptions["provider"]> }
+      | { region: Region | null }
       | {
           languages: NonNullable<GetServerConsentOptions["languages"]>;
         }
@@ -100,11 +103,18 @@ export async function getServerConsent(
   const consent = value
     ? readConsentCookie(`${CONSENT_COOKIE_NAME}=${encodeURIComponent(value)}`)
     : null;
-  if (!consent || (!options.provider && !options.languages)) return consent;
+  if (
+    !consent ||
+    (!options.provider && options.region === undefined && !options.languages)
+  )
+    return consent;
   const requestHeaders = await headers();
-  const region = options.provider
-    ? resolveRegion(requestHeaders, { provider: options.provider })
-    : (consent.region ?? null);
+  const region =
+    options.region !== undefined
+      ? options.region
+      : options.provider
+        ? resolveRegion(requestHeaders, { provider: options.provider })
+        : (consent.region ?? null);
   const languages = languageOptions(options.languages);
   const language = languages
     ? resolveLanguage(
@@ -135,6 +145,7 @@ export interface CookieChimpProviderProps extends GetServerConsentOptions {
 export async function CookieChimpProvider({
   config,
   provider,
+  region: suppliedRegion,
   languages,
   translations,
   cookieName,
@@ -143,7 +154,12 @@ export async function CookieChimpProvider({
   validate({ cookieName, provider, languages });
   const languageConfig = languageOptions(languages);
   const requestHeaders = await headers();
-  const region = provider ? resolveRegion(requestHeaders, { provider }) : null;
+  const region =
+    suppliedRegion !== undefined
+      ? suppliedRegion
+      : provider
+        ? resolveRegion(requestHeaders, { provider })
+        : null;
   const regulation = regulationFor(region);
   const language = languageConfig
     ? resolveLanguage(

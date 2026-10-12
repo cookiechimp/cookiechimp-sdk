@@ -1,5 +1,84 @@
 import { expect, test } from "@playwright/test";
 
+async function observeBannerChanges(
+  page: import("@playwright/test").Page,
+  serverHasBanner: boolean,
+) {
+  await page.addInitScript((hasServerBanner) => {
+    const selector = '[data-cc-part="banner"]';
+    let initialized = !hasServerBanner;
+    let present = false;
+    const changes: string[] = [];
+    new MutationObserver((records) => {
+      const next = document.querySelector(selector) !== null;
+      if (!initialized && next) {
+        initialized = true;
+        present = true;
+        return;
+      }
+      if (initialized && next !== present) {
+        changes.push(next ? "inserted" : "removed");
+        present = next;
+      }
+      // Inspect records so removal and insertion in one callback are not hidden.
+      for (const record of records) {
+        for (const node of record.removedNodes)
+          if (
+            node instanceof Element &&
+            (node.matches(selector) || node.querySelector(selector))
+          )
+            changes.push("removed");
+        for (const node of record.addedNodes)
+          if (
+            initialized &&
+            node instanceof Element &&
+            (node.matches(selector) || node.querySelector(selector))
+          )
+            changes.push("inserted");
+      }
+    }).observe(document, { childList: true, subtree: true });
+    Object.defineProperty(window, "__ccBannerChanges", { value: changes });
+  }, serverHasBanner);
+}
+
+test("no-flash: first visit keeps the server banner through hydration", async ({
+  page,
+}) => {
+  const response = await page.request.get("/");
+  expect(await response.text()).toContain('data-cc-part="banner"');
+  await observeBannerChanges(page, true);
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-hydrated",
+    "true",
+  );
+  await expect(page.locator('[data-cc-part="banner"]')).toBeVisible();
+  expect(await page.evaluate(() => window.__ccBannerChanges)).toEqual([]);
+});
+
+test("no-flash: returning visitor never inserts the consent banner", async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const setupPage = await context.newPage();
+  await setupPage.goto("/");
+  await setupPage.getByRole("button", { name: "Accept all cookies" }).click();
+  await setupPage.close();
+
+  const response = await context.request.get("/");
+  expect(await response.text()).not.toContain('data-cc-part="banner"');
+  const page = await context.newPage();
+  await observeBannerChanges(page, false);
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-hydrated",
+    "true",
+  );
+  await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__ccBannerChanges)).toEqual([]);
+  await context.close();
+});
+
 test("first visit shows the consent banner and accepting hides it", async ({
   page,
 }) => {
