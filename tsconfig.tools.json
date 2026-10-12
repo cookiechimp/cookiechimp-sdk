@@ -2,11 +2,15 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "types": ["node", "vitest/globals"],
+    "jsx": "react-jsx",
     "paths": {
-      "@cookiechimp/react": ["./packages/react/dist/index.d.ts"],
-      "@cookiechimp/react/banner": ["./packages/react/dist/banner.d.ts"],
-      "@cookiechimp/react/ui": ["./packages/react/dist/ui.d.ts"],
-      "react": ["./packages/react/node_modules/@types/react/index.d.ts"]
+      "@cookiechimp/react": ["./packages/react/src/index.tsx"],
+      "@cookiechimp/react/banner": ["./packages/react/src/banner.tsx"],
+      "@cookiechimp/react/ui": ["./packages/react/src/ui.tsx"],
+      "react": ["./packages/react/node_modules/@types/react/index.d.ts"],
+      "react/jsx-runtime": [
+        "./packages/react/node_modules/@types/react/jsx-runtime.d.ts"
+      ]
     }
   },
   "include": ["scripts/**/*.ts"]
