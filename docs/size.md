@@ -31,6 +31,9 @@ The checked budgets are the source-of-truth values below. Region header provider
 | banner, preferences, recall total | total | 16384 |
 | UI distribution entry total | total | 16384 |
 | connected sync client | extra | 2048 |
+| GA4 preset | extra | 750 |
+| GTM preset | extra | 805 |
+| Google Ads preset | extra | 810 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -58,3 +61,6 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | language | 954 B | 1050 B | Accept-Language q validation and regional fallback (measured 914 B, leaving 40 B (about 4%) under 954 B; 1050 B gives about 15% headroom) | M2 PR13 |
 | nextjs client | none | 4370 B | New client provider bridge, measured 3800 B with Next.js, React, and React DOM external, plus 15% headroom | M3 PR14 |
 | nextjs server | none | informational | Server-only App Router helpers and generated critical CSS | M3 PR14 |
+| scripts ga4 | none | 750 B | New preset, measured with about 15% headroom | M4 PR16 |
+| scripts gtm | none | 805 B | New preset, measured with about 15% headroom | M4 PR16 |
+| scripts google-ads | none | 810 B | New preset, measured with about 15% headroom | M4 PR16 |

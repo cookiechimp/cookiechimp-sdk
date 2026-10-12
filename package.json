@@ -10,8 +10,8 @@
     "format": "biome format --write .",
     "lint": "biome check . && turbo run lint",
     "size": "pnpm build && node --experimental-strip-types scripts/size-harness.ts",
-    "test:component": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs build && vitest run --config vitest.component.config.ts",
-    "test:e2e": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs build && pnpm --filter @cookiechimp/fixture-nextjs build && playwright test",
+    "test:component": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs --filter @cookiechimp/scripts build && vitest run --config vitest.component.config.ts",
+    "test:e2e": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs --filter @cookiechimp/scripts build && pnpm --filter @cookiechimp/fixture-nextjs build && playwright test",
     "test:unit": "turbo run test:unit && vitest run scripts",
     "typecheck": "tsc --noEmit --project tsconfig.tools.json && turbo run typecheck"
   },

@@ -146,6 +146,27 @@
     "forbiddenTokens": ["mergeConfig", "categoriesHash", "matchService"]
   },
   {
+    "name": "GA4 preset",
+    "scenario": "scripts ga4",
+    "entry": "packages/scripts/dist/ga4.mjs",
+    "kind": "extra",
+    "limit": 750
+  },
+  {
+    "name": "GTM preset",
+    "scenario": "scripts gtm",
+    "entry": "packages/scripts/dist/gtm.mjs",
+    "kind": "extra",
+    "limit": 805
+  },
+  {
+    "name": "Google Ads preset",
+    "scenario": "scripts google ads",
+    "entry": "packages/scripts/dist/google-ads.mjs",
+    "kind": "extra",
+    "limit": 810
+  },
+  {
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",

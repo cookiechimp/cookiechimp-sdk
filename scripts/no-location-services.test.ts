@@ -19,7 +19,7 @@ function filesBelow(directory: string): string[] {
 }
 
 describe("published SDK location privacy", () => {
-  for (const name of ["core", "react", "nextjs"]) {
+  for (const name of ["core", "react", "nextjs", "scripts"]) {
     it(`${name} dist contains no location-service references`, () => {
       const dist = resolve(`packages/${name}/dist`);
       expect(existsSync(dist), `${dist} must be built before this test`).toBe(
