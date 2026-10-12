@@ -33,7 +33,7 @@ const devtools = mountDevtools({ consent, blockers: [gate] });
 | `refreshMs` | `1000` | Refresh the lists while open; `0` turns the timer off. The panel also refreshes on every consent change. |
 | `nonce` | none | Nonce for the panel's style element under a strict CSP. |
 | `reload` | `location.reload()` | Called after a simulation is saved or cleared. |
-| `allowProduction` | `false` | The panel does not mount in a production build unless this is set. |
+| `allowProduction` | `false` | The panel does not mount in a production build unless this is set. Script-tag and CDN builds without `process` count as production. |
 
 `mountDevtools` returns `{ element, refresh, open, close, unmount }`.
 
@@ -41,11 +41,11 @@ const devtools = mountDevtools({ consent, blockers: [gate] });
 
 The core runtime fixes its region and GPC when it is created, so a simulation applies on the next load. The panel saves a simulated country (2 letters), optional region (up to 3 letters or digits) and GPC flag to `sessionStorage`, previews the regulation that would apply, and reloads the page. Spread `readSimulation()` from the small `@cookiechimp/devtools/simulation` subpath into your config to apply it. "Clear simulation" removes it and reloads.
 
-`readSimulation` returns `null` in a production build (`process.env.NODE_ENV === "production"`), even when valid data is stored, so a visitor cannot edit `cc_devtools_simulation` in sessionStorage to drop GDPR or turn off GPC. To read it in a production build, for example on a staging site, call `readSimulation({ allowProduction: true })`. Only do that where visitors cannot reach the build. In every mode it validates stored data strictly and returns `null` for anything malformed, so a tampered value is ignored, not thrown. Pass `{ storage }` to read from another storage.
+`readSimulation` only reads storage when the build is known to be in development (`process` is defined and `process.env.NODE_ENV !== "production"`). Production builds, and script-tag, CDN or other builds where `process` is not defined, are treated as production: it returns `null` without reading storage, even when valid data is stored, so a visitor cannot edit `cc_devtools_simulation` in sessionStorage to drop GDPR or turn off GPC. To read it in a production build, for example on a staging site, call `readSimulation({ allowProduction: true })`. Only do that where visitors cannot reach the build. In every mode it validates stored data strictly and returns `null` for anything malformed, so a tampered value is ignored, not thrown. Pass `{ storage }` to read from another storage.
 
 ## Safety
 
 - The panel never makes a network request, and it inserts no scripts, iframes, images or links.
 - Every value, including blocked URLs, category names and queued records, is written as text, never parsed as markup. The panel lives in a shadow root, so page styles do not leak in or out.
-- Invalid options throw in development and warn in production (where the panel stays unmounted).
+- Invalid options throw in development and warn in production (where the panel stays unmounted). Every guard fails closed: a build without `process` is treated as production.
 - Escape closes the panel while focus is inside it, and returns focus to the toggle button.

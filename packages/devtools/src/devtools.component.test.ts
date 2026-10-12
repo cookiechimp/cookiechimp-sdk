@@ -386,4 +386,31 @@ describe("panel behaviour", () => {
     expect(text()).toContain("Nothing blocked");
     expect(text()).toContain("Queue empty");
   });
+
+  describe("without process (script tag or CDN build)", () => {
+    it("does not mount unless allowProduction is set", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      vi.stubGlobal("process", undefined);
+      const hidden = mountDevtools({ consent: fakeConsent().consent });
+      const shown = mountDevtools({
+        consent: fakeConsent().consent,
+        allowProduction: true,
+        refreshMs: 0,
+      });
+      vi.unstubAllGlobals();
+      expect(hidden.element).toBeNull();
+      expect(warn).toHaveBeenCalledOnce();
+      expect(shown.element).not.toBeNull();
+      expect(document.querySelectorAll("[data-cc-devtools]")).toHaveLength(1);
+    });
+
+    it("warns instead of throwing for invalid options", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      vi.stubGlobal("process", undefined);
+      const tools = mountDevtools({} as never);
+      vi.unstubAllGlobals();
+      expect(tools.element).toBeNull();
+      expect(warn).toHaveBeenCalledOnce();
+    });
+  });
 });

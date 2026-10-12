@@ -1,5 +1,6 @@
 import type { ConsentState, Region, Regulation } from "@cookiechimp/core";
 import { regulationFor } from "@cookiechimp/core/regions";
+import { isDev } from "./dev";
 import {
   clearSimulation,
   readSimulation,
@@ -67,12 +68,9 @@ const noop: DevtoolsController = {
   unmount() {},
 };
 
-const production = () =>
-  typeof process !== "undefined" && process.env.NODE_ENV === "production";
-
 function invalid(message: string): DevtoolsController {
   const text = `CookieChimp devtools: ${message}`;
-  if (!production()) throw new TypeError(text);
+  if (isDev()) throw new TypeError(text);
   console.warn(text);
   return noop;
 }
@@ -146,7 +144,7 @@ export function mountDevtools(options: DevtoolsOptions): DevtoolsController {
     return invalid("blockers must provide blocked()");
   if (sync !== undefined && typeof sync?.queue !== "function")
     return invalid("sync must provide queue()");
-  if (production() && !options.allowProduction) {
+  if (!isDev() && options.allowProduction !== true) {
     console.warn(
       "CookieChimp devtools is not mounted in production; pass allowProduction to override.",
     );

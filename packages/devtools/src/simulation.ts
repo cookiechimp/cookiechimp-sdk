@@ -1,4 +1,5 @@
 import type { Region } from "@cookiechimp/core";
+import { isDev } from "./dev";
 
 /** sessionStorage key holding the simulated region and GPC signal. */
 export const SIMULATION_KEY = "cc_devtools_simulation";
@@ -58,21 +59,17 @@ export interface ReadSimulationOptions {
 /**
  * Read the simulation saved by the devtools panel, for
  * `createConsent({ ...config, ...readSimulation() })`. Returns null in a
- * production build unless `allowProduction` is set. Malformed stored data is
+ * production build, and in any build without `process` (script tag or CDN),
+ * unless `allowProduction` is true; storage is not read in that case. Malformed stored data is
  * ignored, never thrown.
  */
 export function readSimulation({
-  storage = session(),
+  storage,
   allowProduction,
 }: ReadSimulationOptions = {}): Simulation | null {
-  if (
-    !allowProduction &&
-    typeof process !== "undefined" &&
-    process.env.NODE_ENV === "production"
-  )
-    return null;
+  if (!isDev() && allowProduction !== true) return null;
   try {
-    const raw = storage?.getItem(SIMULATION_KEY);
+    const raw = (storage ?? session())?.getItem(SIMULATION_KEY);
     return raw ? cleanSimulation(JSON.parse(raw)) : null;
   } catch {
     return null;
@@ -87,8 +84,7 @@ export function writeSimulation(
   const clean = cleanSimulation(simulation);
   if (!clean) {
     const message = `CookieChimp devtools simulation ${JSON.stringify(simulation)} is invalid`;
-    if (typeof process !== "undefined" && process.env.NODE_ENV !== "production")
-      throw new TypeError(message);
+    if (isDev()) throw new TypeError(message);
     console.warn(message);
     return false;
   }

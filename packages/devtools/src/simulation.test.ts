@@ -8,6 +8,7 @@ import {
 } from "./simulation";
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
 });
@@ -126,6 +127,56 @@ describe("simulation storage", () => {
     vi.stubEnv("NODE_ENV", "development");
     expect(readSimulation({ storage: memory('{"gpc":true}') })).toEqual({
       gpc: true,
+    });
+  });
+
+  describe("without process (script tag or CDN build)", () => {
+    it("returns null and never reads storage, even with valid data", () => {
+      const storage = memory(
+        '{"region":{"country":"US","region":"CA"},"gpc":false}',
+      );
+      const getItem = vi.spyOn(storage, "getItem");
+      const session = vi.fn();
+      vi.stubGlobal("process", undefined);
+      vi.stubGlobal("sessionStorage", {
+        get getItem() {
+          session();
+          return () => null;
+        },
+      });
+      expect(readSimulation({ storage })).toBeNull();
+      expect(readSimulation()).toBeNull();
+      expect(readSimulation({ storage, allowProduction: false })).toBeNull();
+      vi.unstubAllGlobals();
+      expect(getItem).not.toHaveBeenCalled();
+      expect(session).not.toHaveBeenCalled();
+    });
+
+    it("still reads with allowProduction", () => {
+      const storage = memory(
+        '{"region":{"country":"US","region":"CA"},"gpc":false}',
+      );
+      vi.stubGlobal("process", undefined);
+      const read = readSimulation({ storage, allowProduction: true });
+      vi.unstubAllGlobals();
+      expect(read).toEqual({
+        region: { country: "US", region: "CA" },
+        gpc: false,
+      });
+    });
+
+    it("warns instead of throwing for an invalid write", () => {
+      const storage = memory();
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      vi.stubGlobal("process", undefined);
+      const saved = writeSimulation(
+        { region: { country: "x" } } as never,
+        storage,
+      );
+      vi.unstubAllGlobals();
+      expect(saved).toBe(false);
+      expect(warn).toHaveBeenCalledOnce();
+      expect(storage.data.size).toBe(0);
     });
   });
 });
