@@ -17,6 +17,7 @@
     "name": "banner only",
     "scenario": "banner",
     "entry": "packages/react/dist/banner.mjs",
+    "planned": true,
     "kind": "initial",
     "limit": 11264
   },
@@ -24,6 +25,7 @@
     "name": "banner, preferences, recall initial",
     "scenario": "banner + preferences + recall",
     "entry": "packages/react/dist/index.mjs",
+    "planned": true,
     "kind": "initial",
     "limit": 13824
   },
@@ -31,6 +33,7 @@
     "name": "banner, preferences, recall total",
     "scenario": "banner + preferences + recall",
     "entry": "packages/react/dist/index.mjs",
+    "planned": true,
     "kind": "total",
     "limit": 16384
   },
@@ -38,6 +41,7 @@
     "name": "connected sync client",
     "scenario": "sync",
     "entry": "packages/core/dist/sync.mjs",
+    "planned": true,
     "kind": "extra",
     "limit": 2048
   },
@@ -45,6 +49,7 @@
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",
+    "planned": true,
     "kind": "lazy",
     "limit": 12288,
     "excludedFrom": "packages/core/dist/index.mjs",
