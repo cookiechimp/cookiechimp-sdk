@@ -4,6 +4,7 @@ import {
   type ButtonHTMLAttributes,
   createContext,
   type HTMLAttributes,
+  type KeyboardEvent,
   type ReactNode,
   useContext,
   useEffect,
@@ -42,17 +43,39 @@ function BannerRoot({ modal = false, children, ...props }: RootProps) {
   const banner = useBanner();
   const title = useId();
   const description = useId();
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!banner.open || !modal) return;
+    const previous = document.activeElement as HTMLElement | null;
+    queueMicrotask(() => focusable(root.current as HTMLElement)[0]?.focus());
+    return () => {
+      queueMicrotask(() =>
+        (previous?.isConnected ? previous : document.body).focus(),
+      );
+    };
+  }, [banner.open, modal]);
   if (!banner.open) return null;
   return (
     <BannerContext.Provider value={{ title, description }}>
       <div
         {...props}
+        ref={root}
         role="dialog"
         aria-modal={modal || undefined}
         aria-labelledby={title}
         aria-describedby={description}
         data-cc-part="banner"
         data-cc-state="open"
+        onKeyDown={(event) => {
+          props.onKeyDown?.(event);
+          if (event.defaultPrevented || !modal) return;
+          if (event.key === "Escape") {
+            event.preventDefault();
+            banner.hide();
+          } else if (event.key === "Tab") {
+            trapFocus(event, root.current);
+          }
+        }}
       >
         {children}
       </div>
@@ -61,12 +84,24 @@ function BannerRoot({ modal = false, children, ...props }: RootProps) {
 }
 function BannerTitle(props: PartProps) {
   const context = required(useContext(BannerContext), "Banner.Title");
-  return <h2 {...props} id={context?.title} data-cc-part="banner-title" />;
+  return (
+    <h2
+      {...props}
+      id={context?.title}
+      data-cc-part="banner-title"
+      data-cc-state="open"
+    />
+  );
 }
 function BannerDescription(props: PartProps) {
   const context = required(useContext(BannerContext), "Banner.Description");
   return (
-    <p {...props} id={context?.description} data-cc-part="banner-description" />
+    <p
+      {...props}
+      id={context?.description}
+      data-cc-part="banner-description"
+      data-cc-state="open"
+    />
   );
 }
 function BannerAction({
@@ -86,13 +121,13 @@ function BannerAction({
           (action === "accept" ? actions.acceptAll : actions.rejectAll)();
       }}
       data-cc-part={`banner-${part}`}
+      data-cc-state="open"
     />
   );
 }
 function BannerCustomize(props: ActionProps) {
   required(useContext(BannerContext), "Banner.Customize");
   const preferences = usePreferences();
-  const provider = useHeadlessContext();
   return (
     <button
       type="button"
@@ -100,12 +135,11 @@ function BannerCustomize(props: ActionProps) {
       onClick={(event) => {
         props.onClick?.(event);
         if (!event.defaultPrevented) {
-          if (provider)
-            provider.preferencesTrigger.current = event.currentTarget;
           preferences.show();
         }
       }}
       data-cc-part="banner-customize"
+      data-cc-state="open"
     />
   );
 }
@@ -124,6 +158,19 @@ function focusable(root: HTMLElement) {
       'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
     ),
   ];
+}
+function trapFocus(event: KeyboardEvent, root: HTMLElement | null) {
+  const items = root ? focusable(root) : [];
+  const first = items[0];
+  const last = items.at(-1);
+  if (
+    items.length &&
+    ((event.shiftKey && document.activeElement === first) ||
+      (!event.shiftKey && document.activeElement === last))
+  ) {
+    event.preventDefault();
+    (event.shiftKey ? last : first)?.focus();
+  }
 }
 function PreferencesRoot({
   children,
@@ -146,7 +193,15 @@ function PreferencesRoot({
   }, [preferences.open, consent.categories]);
   const close = () => {
     preferences.hide();
-    queueMicrotask(() => provider?.preferencesTrigger.current?.focus());
+    queueMicrotask(() => {
+      queueMicrotask(() => {
+        const trigger = provider?.preferencesTrigger.current;
+        const fallback = document.querySelector<HTMLElement>(
+          '[data-cc-part="recall"]',
+        );
+        (trigger?.isConnected ? trigger : (fallback ?? document.body)).focus();
+      });
+    });
   };
   if (!preferences.open) return null;
   return (
@@ -176,17 +231,7 @@ function PreferencesRoot({
             close();
           }
           if (event.key === "Tab") {
-            const items = root.current ? focusable(root.current) : [];
-            const first = items[0];
-            const last = items.at(-1);
-            if (
-              items.length &&
-              ((event.shiftKey && document.activeElement === first) ||
-                (!event.shiftKey && document.activeElement === last))
-            ) {
-              event.preventDefault();
-              (event.shiftKey ? last : first)?.focus();
-            }
+            trapFocus(event, root.current);
           }
         }}
       >
@@ -203,6 +248,7 @@ function PreferencesTitle(props: PartProps) {
       id={context?.title}
       tabIndex={-1}
       data-cc-part="preferences-title"
+      data-cc-state="open"
     />
   );
 }
@@ -216,6 +262,7 @@ function PreferencesDescription(props: PartProps) {
       {...props}
       id={context?.description}
       data-cc-part="preferences-description"
+      data-cc-state="open"
     />
   );
 }
@@ -264,6 +311,7 @@ function PreferenceAction({
       type="button"
       {...props}
       data-cc-part={`preferences-${kind}`}
+      data-cc-state="open"
       onClick={(event) => {
         props.onClick?.(event);
         if (event.defaultPrevented) return;
@@ -287,7 +335,7 @@ function OptOutRoot({
   const state = useConsent();
   const gpc = provider?.consent.gpc === true;
   const on = gpc || state.categories[category] === false;
-  if (regulation !== "ccpa") return null;
+  if (regulation !== "ccpa" && !gpc) return null;
   return (
     <OptOutContext.Provider value={category}>
       <div {...props} data-cc-part="opt-out" data-cc-state={on ? "on" : "off"}>
@@ -323,7 +371,12 @@ function OptOutToggle({
       data-cc-state={on ? "on" : "off"}
     >
       {children}
-      {gpc && <span data-cc-part="opt-out-gpc"> (GPC honoured)</span>}
+      {gpc && (
+        <span data-cc-part="opt-out-gpc" data-cc-state="honoured">
+          {" "}
+          (GPC honoured)
+        </span>
+      )}
     </button>
   );
 }

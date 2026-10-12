@@ -63,9 +63,12 @@ export function ConsentProvider(props: ConsentProviderProps) {
   const serverState = useRef(
     props.initialState ?? runtime.current.get(),
   ).current;
-  const preferences = useVisibility(false);
-  const banner = useVisibility(runtime.current.needsDecision);
   const preferencesTrigger = useRef<HTMLElement | null>(null);
+  const capturePreferencesTrigger = useCallback(() => {
+    preferencesTrigger.current = document.activeElement as HTMLElement | null;
+  }, []);
+  const preferences = useVisibility(false, capturePreferencesTrigger);
+  const banner = useVisibility(runtime.current.needsDecision);
   const value = useMemo(() => {
     const consent = runtime.current as ConsentRuntime;
     return {
@@ -190,9 +193,12 @@ export function useTranslations() {
   return useMemo(() => ({ translations, t }), [translations, t]);
 }
 
-function useVisibility(initial: boolean) {
+function useVisibility(initial: boolean, onShow?: () => void) {
   const [open, setOpen] = useState(initial);
-  const show = useCallback(() => setOpen(true), []);
+  const show = useCallback(() => {
+    onShow?.();
+    setOpen(true);
+  }, [onShow]);
   const hide = useCallback(() => setOpen(false), []);
   return useMemo(() => ({ open, show, hide }), [open, show, hide]);
 }
