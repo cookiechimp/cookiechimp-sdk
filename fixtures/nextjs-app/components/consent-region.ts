@@ -14,6 +14,12 @@ export function ConsentRegion() {
     { "aria-label": "Regional consent", "data-testid": "consent-region" },
     line("regulation", runtime.regulation),
     line(
+      "region",
+      state.region
+        ? `${state.region.country}${state.region.region ? `-${state.region.region}` : ""}`
+        : "null",
+    ),
+    line(
       "decision",
       runtime.needsDecision ? "decision needed" : "no decision needed",
     ),

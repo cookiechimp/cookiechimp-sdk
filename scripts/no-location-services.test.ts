@@ -34,4 +34,17 @@ describe("published SDK location privacy", () => {
       expect(matches).toEqual([]);
     });
   }
+
+  for (const entry of ["pages", "middleware", "styles-route"]) {
+    it(`nextjs ${entry} distribution entry contains no location-service references`, () => {
+      for (const extension of ["mjs", "cjs"]) {
+        const file = resolve(`packages/nextjs/dist/${entry}.${extension}`);
+        expect(existsSync(file), `${file} must be built before this test`).toBe(
+          true,
+        );
+        const source = readFileSync(file, "utf8").toLowerCase();
+        expect(forbidden.filter((term) => source.includes(term))).toEqual([]);
+      }
+    });
+  }
 });
