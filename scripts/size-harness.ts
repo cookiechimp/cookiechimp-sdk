@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { dirname, parse, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -16,17 +17,16 @@ export interface SizeBudget {
   planned?: true;
   excludedFrom?: string;
   forbiddenTokens?: string[];
+  css?: string[];
+  informational?: true;
 }
 export interface BudgetResult extends SizeBudget {
   bytes?: number;
-  status: "pass" | "fail" | "pending";
+  status: "pass" | "fail" | "pending" | "info";
   detail?: string;
 }
 
 export const plannedEntries = new Set([
-  "packages/react/dist/banner.mjs",
-  // M2 PR12's complete styled surface is intentionally measured separately.
-  "packages/react/dist/ui.mjs",
   "packages/react/dist/index.mjs",
   "packages/core/dist/sync.mjs",
   "packages/core/dist/tcf.mjs",
@@ -42,7 +42,32 @@ export function compareBudget(
   bytes: number | undefined,
 ): BudgetResult {
   if (bytes === undefined) return { ...budget, status: "pending" };
+  if (budget.informational) return { ...budget, bytes, status: "info" };
   return { ...budget, bytes, status: bytes <= budget.limit ? "pass" : "fail" };
+}
+
+const cssImport = /@import\s+["']([^"']+)["']\s*;/g;
+
+/** Read CSS and recursively replace package and relative @imports with their contents. */
+export async function inlineCss(entry: string): Promise<string> {
+  const source = await readFile(entry, "utf8");
+  let output = "";
+  let offset = 0;
+  for (const match of source.matchAll(cssImport)) {
+    const index = match.index;
+    const specifier = match[1] as string;
+    output += source.slice(offset, index);
+    const imported = specifier.startsWith(".")
+      ? resolve(dirname(entry), specifier)
+      : createRequire(entry).resolve(specifier);
+    output += await inlineCss(imported);
+    offset = index + match[0].length;
+  }
+  return output + source.slice(offset);
+}
+
+export async function measureCss(entries: string[]): Promise<number> {
+  return gzipSize((await Promise.all(entries.map(inlineCss))).join("\n"));
 }
 
 const alwaysExternal = new Set([
@@ -68,6 +93,41 @@ async function peerDependencies(entry: string): Promise<Set<string>> {
   return new Set();
 }
 
+async function workspaceRoot(entry: string): Promise<string | undefined> {
+  let directory = dirname(entry);
+  const { root } = parse(directory);
+  while (directory !== root) {
+    try {
+      await readFile(resolve(directory, "pnpm-workspace.yaml"));
+      return directory;
+    } catch {
+      directory = dirname(directory);
+    }
+  }
+  return undefined;
+}
+
+async function resolveWorkspacePackage(
+  specifier: string,
+  root: string | undefined,
+): Promise<string | undefined> {
+  if (!root || !specifier.startsWith("@cookiechimp/")) return undefined;
+  const [scope, name, ...subpath] = specifier.split("/");
+  if (!scope || !name) return undefined;
+  try {
+    const directory = resolve(root, "packages", name);
+    const manifest = JSON.parse(
+      await readFile(resolve(directory, "package.json"), "utf8"),
+    ) as { exports?: Record<string, string | Record<string, string>> };
+    const key = subpath.length ? `./${subpath.join("/")}` : ".";
+    const target = manifest.exports?.[key];
+    const file = typeof target === "string" ? target : target?.import;
+    return file ? resolve(directory, file) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export interface BundledEntry {
   chunks: OutputChunk[];
   measuredChunks: OutputChunk[];
@@ -84,6 +144,7 @@ export async function bundleEntry(
     return undefined;
   }
   const peers = await peerDependencies(entry);
+  const root = await workspaceRoot(entry);
   const external = (specifier: string): boolean =>
     [...alwaysExternal, ...peers].some(
       (peer) => specifier === peer || specifier.startsWith(`${peer}/`),
@@ -91,6 +152,12 @@ export async function bundleEntry(
   const build = await rolldown({
     input: entry,
     external,
+    plugins: [
+      {
+        name: "cookiechimp-workspace-packages",
+        resolveId: (specifier) => resolveWorkspacePackage(specifier, root),
+      },
+    ],
     treeshake,
     onLog(level, log, handler) {
       if (log.code === "UNRESOLVED_IMPORT") throw new Error(log.message);
@@ -152,10 +219,20 @@ export async function runBudgets(
 ): Promise<BudgetResult[]> {
   return Promise.all(
     budgets.map(async (budget) => {
-      const result = compareBudget(
-        budget,
-        await measureEntry(resolve(root, budget.entry), budget.kind),
+      const jsBytes = await measureEntry(
+        resolve(root, budget.entry),
+        budget.kind,
       );
+      const bytes =
+        jsBytes === undefined
+          ? undefined
+          : jsBytes +
+            (budget.css
+              ? await measureCss(
+                  budget.css.map((entry) => resolve(root, entry)),
+                )
+              : 0);
+      const result = compareBudget(budget, bytes);
       const detail = await checkDefaultExclusion(budget, root);
       if (detail) return { ...result, status: "fail" as const, detail };
       if (

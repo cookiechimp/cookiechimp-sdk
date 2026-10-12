@@ -68,23 +68,50 @@
   {
     "name": "banner only",
     "scenario": "banner",
+    "entry": "scripts/size-scenarios/banner.ts",
+    "kind": "initial",
+    "limit": 11264,
+    "css": ["packages/react/styles.css"]
+  },
+  {
+    "name": "banner distribution entry",
+    "scenario": "banner entry",
     "entry": "packages/react/dist/banner.mjs",
     "kind": "initial",
-    "limit": 11264
+    "limit": 11264,
+    "informational": true
   },
   {
     "name": "banner, preferences, recall initial",
     "scenario": "banner + preferences + recall",
+    "entry": "scripts/size-scenarios/ui.ts",
+    "kind": "initial",
+    "limit": 13824,
+    "css": ["packages/react/styles.css"]
+  },
+  {
+    "name": "UI distribution entry initial",
+    "scenario": "UI entry",
     "entry": "packages/react/dist/ui.mjs",
     "kind": "initial",
-    "limit": 13824
+    "limit": 13824,
+    "informational": true
   },
   {
     "name": "banner, preferences, recall total",
     "scenario": "banner + preferences + recall",
+    "entry": "scripts/size-scenarios/ui.ts",
+    "kind": "total",
+    "limit": 16384,
+    "css": ["packages/react/styles.css"]
+  },
+  {
+    "name": "UI distribution entry total",
+    "scenario": "UI entry",
     "entry": "packages/react/dist/ui.mjs",
     "kind": "total",
-    "limit": 16384
+    "limit": 16384,
+    "informational": true
   },
   {
     "name": "connected sync client",
