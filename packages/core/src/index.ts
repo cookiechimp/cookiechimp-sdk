@@ -12,7 +12,16 @@ import {
   normalizeConfig,
 } from "./config";
 
-export * from "./config";
+export type {
+  CategoryConfig,
+  ConfigInput,
+  NormalizedCategoryConfig,
+  NormalizedConfig,
+  NormalizedServiceConfig,
+  ServiceConfig,
+  ServicePattern,
+} from "./config";
+export { ConsentConfigError, normalizeConfig } from "./config";
 
 export type ConsentAction = "accept_all" | "reject_all" | "custom" | "gpc_auto";
 

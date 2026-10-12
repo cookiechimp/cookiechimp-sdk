@@ -1,11 +1,12 @@
-import { describe, expect, it } from "vitest";
-import {
-  ConsentConfigError,
-  categoriesHash,
-  matchService,
-  mergeConfig,
-  normalizeConfig,
-} from "./index";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { ConsentConfigError, normalizeConfig } from "./index";
+
+const originalEnvironment = process.env.NODE_ENV;
+
+afterEach(() => {
+  process.env.NODE_ENV = originalEnvironment;
+  vi.restoreAllMocks();
+});
 
 describe("normalizeConfig", () => {
   it("normalizes every category shorthand identically", () => {
@@ -60,67 +61,24 @@ describe("normalizeConfig", () => {
       default: true,
     });
   });
-});
 
-describe("config utilities", () => {
-  it("merges records by id with override, dashboard, defaults precedence", () => {
-    const merged = mergeConfig(
-      {
-        categories: [{ id: "analytics", label: "Default" }],
-        services: [{ id: "ga", category: "analytics", name: "Default" }],
-      },
-      {
-        categories: [{ id: "analytics", label: "Dashboard", default: true }],
-        services: [{ id: "ga", category: "analytics", name: "Dashboard" }],
-      },
-      {
-        categories: [{ id: "analytics", label: "Override" }],
-        services: [{ id: "ga", category: "analytics", name: "Override" }],
-      },
-    );
-    expect(merged.categories[1]).toMatchObject({
-      label: "Override",
-      default: true,
-    });
-    expect(merged.services[0]).toMatchObject({ name: "Override" });
-  });
-
-  it("hashes categories deterministically without depending on order", () => {
-    const a = { categories: ["analytics", "ads"] };
-    const b = { categories: ["ads", "analytics"] };
-    expect(categoriesHash(a)).toBe(categoriesHash(a));
-    expect(categoriesHash(a)).toBe(categoriesHash(b));
-    expect(categoriesHash(a)).not.toBe(
-      categoriesHash({ categories: [...a.categories, "video"] }),
-    );
-    expect(categoriesHash(a)).toMatch(/^[a-z0-9]{7}$/);
-  });
-
-  it("matches script wildcards and regexes, cookie names and hosts", () => {
+  it("warns once and drops invalid entries in production", () => {
+    process.env.NODE_ENV = "production";
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const config = normalizeConfig({
-      categories: ["analytics"],
+      categories: ["analytics", "analytics", "Bad id"],
       services: [
-        {
-          id: "analytics-demo",
-          category: "analytics",
-          scripts: ["https://cdn.example/*", /tracker\d+\.js$/],
-          cookies: ["_ga*"],
-          domains: ["*.metrics.example"],
-        },
+        { id: "ga", category: "analytics" },
+        { id: "ga", category: "analytics" },
+        { id: "unknown", category: "missing" },
+        { id: "Bad Service", category: "analytics" },
       ],
     });
-    expect(matchService(config, { url: "https://cdn.example/a.js" })).toBe(
-      "analytics-demo",
-    );
-    expect(matchService(config, { url: "https://other/tracker12.js" })).toBe(
-      "analytics-demo",
-    );
-    expect(matchService(config, { cookieName: "_ga_123" })).toBe(
-      "analytics-demo",
-    );
-    expect(matchService(config, { host: "api.metrics.example" })).toBe(
-      "analytics-demo",
-    );
-    expect(matchService(config, { host: "example.org" })).toBeNull();
+    expect(config.categories.map(({ id }) => id)).toEqual([
+      "necessary",
+      "analytics",
+    ]);
+    expect(config.services.map(({ id }) => id)).toEqual(["ga"]);
+    expect(warn).toHaveBeenCalledOnce();
   });
 });
