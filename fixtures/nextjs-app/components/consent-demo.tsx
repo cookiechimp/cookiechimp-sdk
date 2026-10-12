@@ -1,14 +1,13 @@
 "use client";
 
-import { type ConsentState, createConsent } from "@cookiechimp/core";
 import { installConsentMode } from "@cookiechimp/core/consent-mode";
 import { blockDynamic } from "@cookiechimp/core/dynamic";
 import { gateScripts } from "@cookiechimp/core/gate";
 import { blockNetwork } from "@cookiechimp/core/network";
 import {
-  ConsentProvider,
   useCategory,
   useConsentActions,
+  useHeadlessContext,
 } from "@cookiechimp/react";
 import {
   CookieBanner,
@@ -17,58 +16,20 @@ import {
   GatedScript,
   RecallButton,
 } from "@cookiechimp/react/ui";
-import type { Messages } from "@cookiechimp/translations";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { consentConfig } from "../consent-config";
 
-const config = {
-  categories: { analytics: false },
-  regulation: "gdpr" as const,
-  services: [
-    {
-      id: "analytics-demo",
-      category: "analytics",
-      domains: ["dynamic.cookiechimp.test"],
-    },
-  ],
-};
-
-export function ConsentDemo({
-  initialState = null,
-  language,
-  translations,
-}: {
-  initialState?: ConsentState | null;
-  language?: string;
-  translations?: Messages;
-}) {
-  const [consent] = useState(() =>
-    createConsent({ ...config, initial: initialState }),
-  );
-  return (
-    <ConsentProvider
-      consent={consent}
-      initialState={initialState}
-      language={language}
-      translations={translations}
-    >
-      <ConsentDemoContent consent={consent} />
-    </ConsentProvider>
-  );
-}
-
-function ConsentDemoContent({
-  consent,
-}: {
-  consent: ReturnType<typeof createConsent>;
-}) {
+export function ConsentDemo() {
+  const consent = useHeadlessContext()?.consent;
   const accepted = useCategory("analytics");
   const { set } = useConsentActions();
 
   useEffect(() => {
+    if (!consent) return;
     const gate = gateScripts(consent);
     const consentMode = installConsentMode(consent);
-    const dynamic = blockDynamic(consent, { config });
-    const network = blockNetwork(consent, { config });
+    const dynamic = blockDynamic(consent, { config: consentConfig });
+    const network = blockNetwork(consent, { config: consentConfig });
     document.documentElement.dataset.ccDynamic = "ready";
     document.documentElement.dataset.ccConsentMode = "ready";
     document.documentElement.dataset.ccNetwork = "ready";
@@ -82,6 +43,8 @@ function ConsentDemoContent({
       network.stop();
     };
   }, [consent]);
+
+  if (!consent) return null;
 
   return (
     <section aria-label="Consent demo">

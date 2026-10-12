@@ -3,8 +3,12 @@ import { expect, test } from "@playwright/test";
 test("first visit shows the consent banner and accepting hides it", async ({
   page,
 }) => {
+  await page.route(/\.css(?:\?|$)/, (route) => route.abort());
   await page.goto("/");
-  await expect(page.locator('[data-cc-part="banner"]')).toBeVisible();
+  const banner = page.locator('[data-cc-part="banner"]');
+  await expect(banner).toBeVisible();
+  await expect(banner).toHaveCSS("position", "fixed");
+  await expect(banner).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await page.getByRole("button", { name: "Accept all cookies" }).click();
   await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
 });
@@ -36,7 +40,9 @@ test("returning visitor has no consent banner before or after hydration", async 
   await page.getByRole("button", { name: "Accept all cookies" }).click();
 
   const response = await context.request.get("/");
-  expect(await response.text()).not.toContain('data-cc-part="banner"');
+  const html = await response.text();
+  expect(html).not.toContain('data-cc-part="banner"');
+  expect(html).toContain("data-cookiechimp-critical");
   await page.reload();
   await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
   await context.close();
