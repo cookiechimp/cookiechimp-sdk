@@ -8,6 +8,7 @@ import {
   type CategoriesInput,
   type CategoryInput,
   type ConfigInput,
+  isDevelopment,
   type NormalizedConfig,
   normalizeConfig,
 } from "./config";
@@ -310,7 +311,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     ? `${region.country}${region.region ? `-${region.region}` : ""}`
     : "";
   if (
-    process.env.NODE_ENV !== "production" &&
+    isDevelopment() &&
     region &&
     config.regulation === undefined &&
     config.resolveRegulation === undefined

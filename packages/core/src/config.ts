@@ -84,6 +84,8 @@ export interface NormalizedConfig {
 }
 
 const ID = /^[a-z0-9_-]+$/;
+export const isDevelopment = () =>
+  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
 
 export class ConsentConfigError extends Error {
   readonly name = "ConsentConfigError";
@@ -136,8 +138,7 @@ function freezeCategory(category: CategoryConfig): NormalizedCategoryConfig {
 
 /** Validate and canonicalise all supported local configuration shorthands. */
 export function normalizeConfig(input: ConfigInput): NormalizedConfig {
-  const development =
-    typeof process !== "undefined" && process.env.NODE_ENV !== "production";
+  const development = isDevelopment();
   const sourceCategories = categoryRecords(input.categories);
   const categories = sourceCategories.some(({ id }) => id === "necessary")
     ? sourceCategories
