@@ -171,21 +171,21 @@
     "scenario": "scripts ga4",
     "entry": "packages/scripts/dist/ga4.mjs",
     "kind": "extra",
-    "limit": 750
+    "limit": 830
   },
   {
     "name": "GTM preset",
     "scenario": "scripts gtm",
     "entry": "packages/scripts/dist/gtm.mjs",
     "kind": "extra",
-    "limit": 805
+    "limit": 915
   },
   {
     "name": "Google Ads preset",
     "scenario": "scripts google ads",
     "entry": "packages/scripts/dist/google-ads.mjs",
     "kind": "extra",
-    "limit": 810
+    "limit": 890
   },
   {
     "name": "TCF/GPP module",

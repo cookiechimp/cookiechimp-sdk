@@ -34,9 +34,9 @@ The checked budgets are the source-of-truth values below. Region header provider
 | banner, preferences, recall total | total | 16384 |
 | UI distribution entry total | total | 16384 |
 | connected sync client | extra | 2048 |
-| GA4 preset | extra | 750 |
-| GTM preset | extra | 805 |
-| Google Ads preset | extra | 810 |
+| GA4 preset | extra | 830 |
+| GTM preset | extra | 915 |
+| Google Ads preset | extra | 890 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -68,6 +68,9 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | nextjs middleware | none | 1053 B | Edge region forwarding helper, first measured 915 B plus 15% headroom; 1003 B after explicit-provider parsing, about 5% headroom left | M3 PR15 |
 | nextjs middleware | 1053 B | 1150 B | Explicit provider allowlist and forwarded header stripping, measured 1003 B | M3 PR15 (lead approved) |
 | nextjs styles route | none | informational | Server-only CSS response helper for strict CSP deployments | M3 PR15 |
-| scripts ga4 | none | 750 B | New preset, measured with about 15% headroom | M4 PR16 |
-| scripts gtm | none | 805 B | New preset, measured with about 15% headroom | M4 PR16 |
-| scripts google-ads | none | 810 B | New preset, measured with about 15% headroom | M4 PR16 |
+| scripts ga4 | none | 750 B | New preset, first measured 647 B (about 16% headroom) | M4 PR16 |
+| scripts gtm | none | 805 B | New preset, first measured 676 B (about 19% headroom) | M4 PR16 |
+| scripts google-ads | none | 810 B | New preset, first measured 702 B (about 15% headroom) | M4 PR16 |
+| scripts ga4 | 750 B | 830 B | ID encoding hardening and full Consent Mode default, measured 719 B (about 15% headroom) | M4 PR16 (lead approved) |
+| scripts gtm | 805 B | 915 B | ID encoding hardening and full Consent Mode default, measured 794 B (about 15% headroom) | M4 PR16 (lead approved) |
+| scripts google-ads | 810 B | 890 B | ID encoding hardening and full Consent Mode default, measured 772 B (about 15% headroom) | M4 PR16 (lead approved) |
