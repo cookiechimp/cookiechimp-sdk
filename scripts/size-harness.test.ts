@@ -1,13 +1,15 @@
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import {
+  bundleEntry,
   checkDefaultExclusion,
   compareBudget,
   gzipSize,
   main,
+  measureEntry,
   runBudgets,
   type SizeBudget,
 } from "./size-harness";
@@ -51,6 +53,52 @@ describe("size harness", () => {
   it("compares inclusive byte budgets", () => {
     expect(compareBudget(budget("entry", 10), 10).status).toBe("pass");
     expect(compareBudget(budget("entry", 10), 11).status).toBe("fail");
+  });
+
+  it("bundles code reached through a bare package import", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
+    const packageA = join(root, "package-a");
+    const packageB = join(root, "package-b");
+    await mkdir(join(packageA, "node_modules"), { recursive: true });
+    await mkdir(packageB);
+    await writeFile(
+      join(packageB, "package.json"),
+      JSON.stringify({ name: "fixture-b", exports: "./index.mjs" }),
+    );
+    const marker = "B_PACKAGE_UNIQUE_7f91c3a8_".repeat(20);
+    await writeFile(
+      join(packageB, "index.mjs"),
+      `export const value = '${marker}'`,
+    );
+    await symlink(packageB, join(packageA, "node_modules/fixture-b"), "dir");
+    const entry = join(packageA, "index.mjs");
+    const alone = join(packageA, "alone.mjs");
+    await writeFile(
+      entry,
+      "import { value } from 'fixture-b'; export const result = value;",
+    );
+    await writeFile(alone, "export const result = ''; ");
+
+    const bundled = await bundleEntry(entry, "total");
+    expect(
+      bundled?.measuredChunks.map(({ code }) => code).join("\n"),
+    ).toContain(marker);
+    expect(await measureEntry(entry, "total")).toBeGreaterThan(
+      (await measureEntry(alone, "total")) ?? 0,
+    );
+  });
+
+  it("leaves React external", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
+    const entry = join(root, "index.mjs");
+    await writeFile(
+      entry,
+      "import React from 'react'; export const result = React.createElement;",
+    );
+    const bundled = await bundleEntry(entry, "total");
+    const code = bundled?.measuredChunks.map((chunk) => chunk.code).join("\n");
+    expect(code).toContain('from"react"');
+    expect(code).not.toContain("createContext");
   });
 
   it("keeps an allowlisted planned entry pending and enforces it once present", async () => {

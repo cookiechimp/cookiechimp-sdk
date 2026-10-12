@@ -245,48 +245,44 @@ describe("headless primitives", () => {
     await act(() => root.unmount());
   });
 
-  it("falls back to recall, then body, when the preferences opener unmounts", async () => {
-    for (const withRecall of [true, false]) {
-      const consent = createConsent({ categories: [], regulation: "gdpr" });
-      const host = document.body.appendChild(document.createElement("div"));
-      const root = createRoot(host);
-      await act(() =>
-        root.render(
-          <ConsentProvider consent={consent}>
-            <Controls />
-            {withRecall && (
-              <button
-                type="button"
-                data-cc-part="recall"
-                data-cc-state="closed"
-              >
-                Recall
-              </button>
-            )}
-          </ConsentProvider>,
-        ),
-      );
-      const opener = host.querySelector<HTMLButtonElement>(
-        "[data-cc-part='banner-customize']",
-      )!;
-      opener.focus();
-      await act(() => opener.click());
-      await act(() =>
-        host
-          .querySelector<HTMLButtonElement>(
-            "[data-cc-part='preferences-accept-all']",
-          )
-          ?.click(),
-      );
-      expect(document.activeElement).toBe(
-        withRecall
-          ? host.querySelector("[data-cc-part='recall']")
-          : document.body,
-      );
-      await act(() => root.unmount());
-      host.remove();
-      document.cookie = "cc_consent=; Max-Age=0; Path=/";
-    }
+  it.each([
+    ["recall", true],
+    ["body", false],
+  ])("falls back to %s when Save closes the banner", async (_, withRecall) => {
+    const consent = createConsent({ categories: [], regulation: "gdpr" });
+    const host = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(host);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <Controls />
+          {withRecall && (
+            <button type="button" data-cc-part="recall" data-cc-state="closed">
+              Recall
+            </button>
+          )}
+        </ConsentProvider>,
+      ),
+    );
+    const opener = host.querySelector<HTMLButtonElement>(
+      "[data-cc-part='banner-customize']",
+    )!;
+    opener.focus();
+    await act(() => opener.click());
+    await act(() =>
+      host
+        .querySelector<HTMLButtonElement>("[data-cc-part='preferences-save']")
+        ?.click(),
+    );
+    expect(host.querySelector("[data-cc-part='banner']")).toBeNull();
+    expect(host.querySelector("[data-cc-part='preferences']")).toBeNull();
+    expect(opener.isConnected).toBe(false);
+    expect(document.activeElement).toBe(
+      withRecall
+        ? host.querySelector("[data-cc-part='recall']")
+        : document.body,
+    );
+    await act(() => root.unmount());
   });
 
   it("adds state to every rendered headless part", async () => {

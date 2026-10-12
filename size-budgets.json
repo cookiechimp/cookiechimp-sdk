@@ -54,7 +54,7 @@
     "scenario": "react",
     "entry": "packages/react/dist/index.mjs",
     "kind": "extra",
-    "limit": 1536,
+    "limit": 4608,
     "excludedFrom": "packages/core/dist/index.mjs"
   },
   {
