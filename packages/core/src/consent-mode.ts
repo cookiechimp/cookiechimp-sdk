@@ -24,7 +24,7 @@ export interface ConsentModeOptions {
   /** Replace the built-in category mapping instead of extending it. */
   replace?: boolean;
   mapping?: ConsentModeMapping;
-  /** Category values used by the standalone default and inline helpers. */
+  /** Category values granted by the runtime's initial consent update. */
   categories?: Readonly<Record<string, boolean>>;
 }
 export type ConsentModeDefault = Record<ConsentModeSignal, ConsentModeValue> & {
@@ -133,13 +133,22 @@ function values(
   return result;
 }
 
+function deniedValues() {
+  return Object.fromEntries(
+    signals.map((signal) => [
+      signal,
+      signal === "security_storage" ? "granted" : "denied",
+    ]),
+  ) as Record<ConsentModeSignal, ConsentModeValue>;
+}
+
 /** Build the object passed to `gtag('consent', 'default', ...)`. */
 export function consentModeDefault(
   options: ConsentModeOptions = {},
 ): ConsentModeDefault {
   const checked = normalize(options);
   return {
-    ...values(checked.categories ?? {}, checked.mapping, checked.replace),
+    ...deniedValues(),
     wait_for_update: checked.wait_for_update,
     ...(checked.region ? { region: [...checked.region] } : {}),
   };
@@ -180,7 +189,7 @@ export function installConsentMode(
   };
   const gtag = target.gtag;
   const returning = consent.needsDecision === false;
-  let last = values(checked.categories ?? {}, checked.mapping, checked.replace);
+  let last = deniedValues();
   if (checked.default !== false && !target.__ccConsentModeDefault) {
     gtag("consent", "default", {
       ...last,
@@ -203,14 +212,14 @@ export function installConsentMode(
     last = nextValues;
     gtag("consent", "update", nextValues);
   };
-  if (returning) {
-    const stored = values(
-      consent.get().categories,
-      checked.mapping,
-      checked.replace,
-    );
-    gtag("consent", "update", stored);
-    last = stored;
+  const initial = values(
+    returning ? consent.get().categories : (checked.categories ?? {}),
+    checked.mapping,
+    checked.replace,
+  );
+  if (signals.some((signal) => initial[signal] !== last[signal])) {
+    gtag("consent", "update", initial);
+    last = initial;
   }
   const unsubscribe = consent.subscribe(update);
   let stopped = false;
