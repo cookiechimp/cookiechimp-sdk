@@ -7,6 +7,7 @@ import { gateScripts } from "@cookiechimp/core/gate";
 import { blockNetwork } from "@cookiechimp/core/network";
 import {
   ConsentProvider,
+  useBanner,
   useCategory,
   useConsentActions,
 } from "@cookiechimp/react";
@@ -46,6 +47,7 @@ function ConsentDemoContent({
   consent: ReturnType<typeof createConsent>;
 }) {
   const accepted = useCategory("analytics");
+  const banner = useBanner();
   const { acceptAll, set } = useConsentActions();
 
   useEffect(() => {
@@ -70,7 +72,7 @@ function ConsentDemoContent({
   return (
     <section aria-label="Consent demo">
       <Banner.Root data-testid="consent-banner">
-        <Banner.Title>Cookie preferences</Banner.Title>
+        <Banner.Title>Cookie consent</Banner.Title>
         <Banner.Description>
           Choose how this site may use cookies.
         </Banner.Description>
@@ -93,9 +95,11 @@ function ConsentDemoContent({
       <p data-testid="consent-status">
         {accepted ? "Analytics accepted" : "Analytics declined"}
       </p>
-      <button type="button" onClick={acceptAll}>
-        Accept all cookies
-      </button>
+      {!banner.open && (
+        <button type="button" onClick={acceptAll}>
+          Accept all cookies
+        </button>
+      )}
       <p data-testid="service-status">
         {consent.hasService("analytics-demo")
           ? "Analytics demo accepted"
