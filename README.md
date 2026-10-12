@@ -61,15 +61,18 @@ rendering use the same context.
 
 ## Script and iframe gating
 
-The opt-in `@cookiechimp/core/iframes` subpath contains both script gating and
-iframe blocking. Call `gateScripts(consent)` after creating a consent runtime.
+The opt-in `@cookiechimp/core/gate` subpath provides declarative script and
+iframe gating. Call `gateScripts(consent)` after creating a consent runtime.
 Declarative scripts use `type="text/plain"` with `data-cc-category` and optional
 `data-cc-service`; gated frames use `data-cc-src` instead of `src`. The
 controller scans later DOM additions and exposes `scan()`, `blocked()`, and
 `stop()`.
 
-Set `blockDynamic: true` and provide the normalized consent `config` to block
-runtime-added resources that match a configured service. Revocation cannot undo
+Use `blockDynamic(consent, { config })` from `@cookiechimp/core/dynamic` to
+block runtime-added resources that match a configured service. This runtime
+entry intercepts source assignments and DOM insertion APIs. Gate alone observes
+declarative markup, but cannot prevent a third-party plain `src` assignment
+before the browser starts it. Revocation cannot undo
 code that has already run. By default it leaves activated resources in place.
 Use `onRevoke` to notify the application, or `reloadOnRevoke: true` when a page
 reload is the desired policy. Core invokes the optional iframe `placeholder`

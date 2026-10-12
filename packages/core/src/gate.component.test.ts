@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { gateScripts } from "./iframes";
+import { gateScripts } from "./gate";
 
 function runtime(categories: Record<string, boolean> = {}) {
   let state = { ...categories };
@@ -138,6 +138,42 @@ describe("gateScripts script activation", () => {
 });
 
 describe("gateScripts revocation and controller", () => {
+  it("reports one revoke across later unrelated consent changes", async () => {
+    const consent = runtime({ analytics: false, marketing: false });
+    const onRevoke = vi.fn();
+    document.body.innerHTML =
+      '<iframe srcdoc="" data-cc-src="/first" data-cc-category="analytics"></iframe>';
+    gate(consent, { onRevoke });
+    consent.set("analytics", true);
+    await tick();
+    consent.set("analytics", false);
+    consent.set("marketing", true);
+    consent.set("marketing", false);
+    expect(onRevoke).toHaveBeenCalledTimes(1);
+  });
+
+  it("cancels scripts waiting in the ordered activation chain on stop", async () => {
+    const consent = runtime({ analytics: false });
+    const callbacks: Array<() => void> = [];
+    vi.spyOn(
+      HTMLScriptElement.prototype,
+      "addEventListener",
+    ).mockImplementation((_type, listener) => {
+      callbacks.push(listener as () => void);
+    });
+    document.body.innerHTML =
+      '<script id="one" type="text/plain" data-cc-category="analytics" src="/one.js"></script><script id="two" type="text/plain" data-cc-category="analytics" src="/two.js"></script>';
+    const controller = gate(consent);
+    consent.set("analytics", true);
+    await tick();
+    controller.stop();
+    callbacks[0]?.();
+    await tick();
+    expect(document.querySelector("#two")?.getAttribute("type")).toBe(
+      "text/plain",
+    );
+  });
+
   it("calls onRevoke with the affected category, reloads only when configured", async () => {
     const reload = vi
       .spyOn(window.location, "reload")
@@ -192,67 +228,25 @@ describe("gateScripts revocation and controller", () => {
   });
 });
 
-describe("gateScripts dynamic blocking", () => {
-  const config = {
-    categories: ["analytics"],
-    services: [
-      {
-        id: "demo",
-        category: "analytics",
-        scripts: ["*tracker.js"],
-        domains: ["frames.test"],
-      },
-    ],
-  } as const;
-
-  it("neutralises matching runtime scripts and iframes, restores them on service consent, and leaves nonmatches untouched", async () => {
-    const consent = runtime({ analytics: false });
-    const controller = gate(consent, { blockDynamic: true, config });
-    const script = document.createElement("script");
-    script.src = "https://cdn.test/tracker.js";
-    const frame = document.createElement("iframe");
-    frame.srcdoc = "";
-    frame.src = "https://frames.test/embed";
-    const safeScript = document.createElement("script");
-    safeScript.src = "https://cdn.test/app.js";
-    const safeFrame = document.createElement("iframe");
-    safeFrame.srcdoc = "";
-    safeFrame.src = "https://safe.test/embed";
-    document.body.append(script, frame, safeScript, safeFrame);
+describe("gateScripts URL safety", () => {
+  it("never activates javascript or data data-cc-src values and warns in development", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const consent = runtime({ analytics: true });
+    document.body.innerHTML =
+      '<script type="text/plain" data-cc-category="analytics" data-cc-src=" \njAvAsCrIpT:alert(1)"></script><iframe data-cc-category="analytics" data-cc-src="\tDaTa:text/html,bad"></iframe>';
+    const controller = gate(consent);
     await tick();
-
-    expect(script.type).toBe("text/plain");
-    expect(script.dataset.ccBlocked).toBe("true");
-    expect(frame.dataset.ccSrc).toContain("frames.test/embed");
-    expect(frame.dataset.ccBlocked).toBe("true");
-    expect(frame.src).toBe("about:blank");
-    expect(safeScript.type).not.toBe("text/plain");
-    expect(safeFrame.src).toContain("safe.test/embed");
     expect(controller.blocked()).toHaveLength(2);
-
-    consent.setService("demo", true);
-    await tick();
-    expect(
-      document.querySelector("script[data-cc-activated='true']"),
-    ).not.toBeNull();
-    expect(frame.src).toContain("frames.test/embed");
-    expect(frame.dataset.ccSrc).toBeUndefined();
+    expect(document.querySelector("iframe")?.hasAttribute("src")).toBe(false);
+    expect(warn).toHaveBeenCalledTimes(2);
   });
 
-  it("leaves runtime resources alone when blockDynamic is false", async () => {
-    const consent = runtime({ analytics: false });
-    gate(consent, { blockDynamic: false, config });
-    const script = document.createElement("script");
-    script.src = "https://cdn.test/tracker.js";
-    const frame = document.createElement("iframe");
-    frame.srcdoc = "";
-    frame.src = "https://frames.test/embed";
-    document.body.append(script, frame);
-    await tick();
-    expect(script.type).not.toBe("text/plain");
-    expect(script.dataset.ccBlocked).toBeUndefined();
-    expect(frame.src).toContain("frames.test/embed");
-    expect(frame.dataset.ccSrc).toBeUndefined();
+  it("warns when data-cc-category is combined with plain src", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    document.body.innerHTML =
+      '<iframe data-cc-category="analytics" src="/too-early"></iframe>';
+    gate(runtime());
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("plain src"));
   });
 });
 

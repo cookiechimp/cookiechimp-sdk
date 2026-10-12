@@ -1,12 +1,19 @@
 "use client";
 
 import { createConsent } from "@cookiechimp/core";
-import { gateScripts } from "@cookiechimp/core/iframes";
+import { blockDynamic } from "@cookiechimp/core/dynamic";
+import { gateScripts } from "@cookiechimp/core/gate";
 import { useEffect, useState } from "react";
 
 const consent = createConsent({
   categories: { analytics: false },
-  services: [{ id: "analytics-demo", category: "analytics" }],
+  services: [
+    {
+      id: "analytics-demo",
+      category: "analytics",
+      domains: ["dynamic.cookiechimp.test"],
+    },
+  ],
 });
 
 export function ConsentDemo() {
@@ -15,6 +22,18 @@ export function ConsentDemo() {
 
   useEffect(() => {
     const gate = gateScripts(consent);
+    const dynamic = blockDynamic(consent, {
+      config: {
+        categories: ["analytics"],
+        services: [
+          {
+            id: "analytics-demo",
+            category: "analytics",
+            domains: ["dynamic.cookiechimp.test"],
+          },
+        ],
+      },
+    });
     setAccepted(consent.has("analytics"));
     setServiceAccepted(consent.hasService("analytics-demo"));
     const unsubscribe = consent.subscribe((state) => {
@@ -23,6 +42,7 @@ export function ConsentDemo() {
     });
     return () => {
       gate.stop();
+      dynamic.stop();
       unsubscribe();
     };
   }, []);

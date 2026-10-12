@@ -97,3 +97,24 @@ test("gated script and frame activate with consent and after reload", async ({
     page.locator("iframe[title='Gated local frame']"),
   ).toHaveAttribute("src", "/frame");
 });
+
+test("dynamic iframe src set after insertion makes no request before consent", async ({
+  page,
+}) => {
+  let requests = 0;
+  await page.route("https://dynamic.cookiechimp.test/**", async (route) => {
+    requests += 1;
+    await route.abort();
+  });
+  await page.goto("/");
+  await page.evaluate(() => {
+    const frame = document.body.appendChild(document.createElement("iframe"));
+    frame.src = "https://dynamic.cookiechimp.test/embed";
+  });
+  await page.waitForTimeout(100);
+  expect(requests).toBe(0);
+  await expect(page.locator("iframe[data-cc-blocked='true']")).toHaveAttribute(
+    "data-cc-src",
+    "https://dynamic.cookiechimp.test/embed",
+  );
+});

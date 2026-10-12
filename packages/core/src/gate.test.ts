@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { gateScripts } from "./iframes";
+import { gateScripts } from "./gate";
 
 const consent = {
   has: () => false,
@@ -27,25 +27,25 @@ describe("gateScripts SSR", () => {
 });
 
 describe("gateScripts option validation", () => {
-  it.each([
-    ["placeholder", { placeholder: "invalid" as never }],
-    ["blockDynamic", { blockDynamic: "invalid" as never }],
-  ])("throws a typed error for invalid %s in development", (name, options) => {
-    process.env.NODE_ENV = "development";
-    expect(() => gateScripts(consent, options)).toThrowError(TypeError);
-    expect(() => gateScripts(consent, options)).toThrow(name);
-  });
+  it.each([["placeholder", { placeholder: "invalid" as never }]])(
+    "throws a typed error for invalid %s in development",
+    (name, options) => {
+      process.env.NODE_ENV = "development";
+      expect(() => gateScripts(consent, options)).toThrowError(TypeError);
+      expect(() => gateScripts(consent, options)).toThrow(name);
+    },
+  );
 
-  it.each([
-    ["placeholder", { placeholder: "invalid" as never }],
-    ["blockDynamic", { blockDynamic: "invalid" as never }],
-  ])("warns once and continues for invalid %s in production", (_, options) => {
-    process.env.NODE_ENV = "production";
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const controller = gateScripts(consent, options);
-    expect(warn).toHaveBeenCalledOnce();
-    expect(controller.blocked()).toEqual([]);
-  });
+  it.each([["placeholder", { placeholder: "invalid" as never }]])(
+    "warns once and continues for invalid %s in production",
+    (_, options) => {
+      process.env.NODE_ENV = "production";
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const controller = gateScripts(consent, options);
+      expect(warn).toHaveBeenCalledOnce();
+      expect(controller.blocked()).toEqual([]);
+    },
+  );
 
   it("warns once and continues when process is unavailable", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
