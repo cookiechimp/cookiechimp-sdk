@@ -8,6 +8,12 @@ Open-source, lightweight consent SDK for React, Next.js and plain JavaScript, bu
 
 Status: pre-alpha. See [SPEC.md](./SPEC.md) for the design and roadmap.
 
+## React server rendering
+
+Pass `initialState` to `ConsentProvider` when server rendering. It is required
+for the server snapshot to match the first hydration render. After hydration,
+hooks read the live runtime state, and `initialState` is no longer used.
+
 License: MIT
 
 ## Region and regulation behavior

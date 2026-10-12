@@ -104,6 +104,49 @@ describe("ConsentProvider hooks", () => {
     await act(() => root.unmount());
   });
 
+  it("shares preference visibility across hook consumers", async () => {
+    const consent = createConsent(config);
+    const target = document.body.appendChild(document.createElement("div"));
+    function Preference({ label }: { label: string }) {
+      const preferences = usePreferences();
+      return (
+        <button type="button" onClick={preferences.show}>
+          {label}:{String(preferences.open)}
+        </button>
+      );
+    }
+    const root = createRoot(target);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent}>
+          <Preference label="first" />
+          <Preference label="second" />
+        </ConsentProvider>,
+      ),
+    );
+    await act(() => target.querySelector("button")?.click());
+    expect(target.textContent).toContain("first:true");
+    expect(target.textContent).toContain("second:true");
+    await act(() => root.unmount());
+  });
+
+  it("uses the runtime snapshot on the client instead of initialState", async () => {
+    const consent = createConsent(config);
+    consent.acceptAll();
+    const initial = createConsent(config).rejectAll();
+    const target = document.body.appendChild(document.createElement("div"));
+    const root = createRoot(target);
+    await act(() =>
+      root.render(
+        <ConsentProvider consent={consent} initialState={initial}>
+          <Status />
+        </ConsentProvider>,
+      ),
+    );
+    expect(target.querySelector("span")?.textContent).toBe("true");
+    await act(() => root.unmount());
+  });
+
   it("hydrates an initial snapshot without mismatch warnings", async () => {
     const initial = createConsent(config).acceptAll();
     const app = (

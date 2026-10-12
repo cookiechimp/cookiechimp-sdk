@@ -10,9 +10,26 @@ export function normalizeLight(
   config: ConfigInput | NormalizedConfig,
 ): LightConfig {
   const input = config.services ?? [];
-  const services = input.filter(
-    (service) => service && typeof service.id === "string",
-  );
+  const patterns = (value: unknown) =>
+    value === undefined ||
+    (Array.isArray(value) &&
+      value.every(
+        (item) => typeof item === "string" || item instanceof RegExp,
+      ));
+  const services = input.filter((service) => {
+    try {
+      return (
+        !!service &&
+        typeof service.id === "string" &&
+        typeof service.category === "string" &&
+        patterns(service.scripts) &&
+        patterns(service.domains) &&
+        patterns(service.cookies)
+      );
+    } catch {
+      return false;
+    }
+  });
   if (services.length === input.length) return config as LightConfig;
   fail("Invalid consent config for CookieChimp blocker");
   return { ...config, services };

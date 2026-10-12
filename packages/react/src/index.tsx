@@ -26,6 +26,7 @@ type ProviderValue = {
   translations: Translations;
   getSnapshot: () => ConsentState;
   subscribe: (listener: () => void) => () => void;
+  preferences: ReturnType<typeof useVisibility>;
 };
 
 const Context = createContext<ProviderValue | null>(null);
@@ -55,32 +56,58 @@ export function ConsentProvider(props: ConsentProviderProps) {
       props.consent ??
       createConsent({
         ...props.config,
-        initial: props.initialState ?? props.config.initial,
+        initial: props.config.initial,
       });
   const serverState = useRef(
     props.initialState ?? runtime.current.get(),
   ).current;
-  const snapshot = useRef(serverState);
+  const snapshot = useRef(runtime.current.get());
+  const snapshotKey = useRef(JSON.stringify(snapshot.current));
+  const preferences = useVisibility(false);
   const value = useMemo(() => {
     const consent = runtime.current as ConsentRuntime;
     return {
       consent,
       serverState,
       translations: props.translations ?? {},
-      getSnapshot: () => snapshot.current,
+      getSnapshot: () => {
+        const next = consent.get();
+        if (next !== snapshot.current) {
+          const key = JSON.stringify(next);
+          if (key !== snapshotKey.current) {
+            snapshot.current = next;
+            snapshotKey.current = key;
+          }
+        }
+        return snapshot.current;
+      },
       subscribe: (listener: () => void) =>
         consent.subscribe((state) => {
           snapshot.current = state;
+          snapshotKey.current = JSON.stringify(state);
           listener();
         }),
+      preferences,
     };
-  }, [serverState, props.translations]);
+  }, [serverState, props.translations, preferences]);
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }
 
 const production = () =>
   typeof process !== "undefined" && process.env.NODE_ENV === "production";
 const message = "CookieChimp hooks must be used within a <ConsentProvider>.";
+const inertState: ConsentState = Object.freeze({
+  schemaVersion: 1,
+  consentId: "",
+  ts: "",
+  categories: Object.freeze({ necessary: true }),
+  action: "custom",
+});
+const inertPreferences = Object.freeze({
+  open: false,
+  show() {},
+  hide() {},
+});
 
 function useConsentContext(): ProviderValue | null {
   const value = useContext(Context);
@@ -94,19 +121,10 @@ function useConsentContext(): ProviderValue | null {
 /** Read the immutable current consent snapshot. */
 export function useConsent(): ConsentState {
   const value = useConsentContext();
-  const fallback = useRef<ConsentState>(
-    Object.freeze({
-      schemaVersion: 1,
-      consentId: "",
-      ts: "",
-      categories: Object.freeze({ necessary: true }),
-      action: "custom",
-    }),
-  ).current;
   return useSyncExternalStore(
     value?.subscribe ?? (() => () => {}),
-    value?.getSnapshot ?? (() => fallback),
-    () => value?.serverState ?? fallback,
+    value?.getSnapshot ?? (() => inertState),
+    () => value?.serverState ?? inertState,
   );
 }
 
@@ -129,13 +147,7 @@ export function useConsentActions(): ConsentActions {
   );
 }
 
-const useConsentFallback = Object.freeze({
-  schemaVersion: 1,
-  consentId: "",
-  ts: "",
-  categories: Object.freeze({ necessary: true }),
-  action: "custom" as const,
-});
+const useConsentFallback = inertState;
 
 export function useCategory(id: string): boolean {
   return useConsent().categories[id] === true;
@@ -197,16 +209,17 @@ function useVisibility(initial: boolean) {
 }
 
 export function useBanner() {
-  const runtime = useConsentContext()?.consent;
-  useConsent();
-  const visibility = useVisibility(runtime?.needsDecision ?? false);
+  const value = useConsentContext();
+  const snapshot = useConsent() as ConsentState & { needsDecision?: boolean };
+  const needsDecision =
+    snapshot.needsDecision ?? value?.consent.needsDecision ?? false;
   return {
-    ...visibility,
-    open: visibility.open && (runtime?.needsDecision ?? false),
+    open: needsDecision,
+    show() {},
+    hide() {},
   };
 }
 
 export function usePreferences() {
-  useConsentContext();
-  return useVisibility(false);
+  return useConsentContext()?.preferences ?? inertPreferences;
 }

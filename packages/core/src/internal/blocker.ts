@@ -1,15 +1,34 @@
 import type { ConfigInput, NormalizedConfig, ServiceConfig } from "../config";
-import { matchService } from "../match";
 import { resolveHttp } from "./url";
 
-export function findService(
-  config: ConfigInput | NormalizedConfig,
-  source: string,
-  base: string,
-): [URL, ServiceConfig] | undefined {
-  const url = resolveHttp(source, base);
-  if (!url) return;
-  const id = matchService(config, { url: url.href, host: url.hostname });
-  const service = config.services?.find((item) => item.id === id);
-  return service && [url, service];
+const pattern = (value: string, host = false) =>
+  new RegExp(
+    `^${value.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replaceAll("*", ".*")}$`,
+    host ? "i" : "",
+  );
+
+export function prepareServiceFinder(config: ConfigInput | NormalizedConfig) {
+  const services = config.services ?? [];
+  const matches = services.map(
+    (service) =>
+      [
+        service,
+        (service.scripts ?? []).map((value) =>
+          value instanceof RegExp ? value : pattern(value),
+        ),
+        (service.domains ?? []).map((value) =>
+          value instanceof RegExp ? value : pattern(value, true),
+        ),
+      ] as const,
+  );
+  return (source: string, base: string): [URL, ServiceConfig] | undefined => {
+    const url = resolveHttp(source, base);
+    if (!url) return;
+    for (const [service, scripts, domains] of matches)
+      if (
+        scripts.some((value) => value.test(url.href)) ||
+        domains.some((value) => value.test(url.hostname))
+      )
+        return [url, service];
+  };
 }

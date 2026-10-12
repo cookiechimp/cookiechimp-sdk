@@ -19,17 +19,36 @@ function compile(config: ConfigInput | NormalizedConfig) {
       ({ id, scripts = [], cookies = [], domains = [] }) => [
         id,
         scripts.map((pattern) =>
-          pattern instanceof RegExp
-            ? new RegExp(pattern.source, pattern.flags)
-            : wildcard(pattern),
+          pattern instanceof RegExp ? pattern : wildcard(pattern),
         ),
-        cookies.map((pattern) => wildcard(pattern)),
-        domains.map((pattern) => wildcard(pattern, true)),
+        cookies.map((pattern) =>
+          pattern instanceof RegExp ? pattern : wildcard(pattern),
+        ),
+        domains.map((pattern) =>
+          pattern instanceof RegExp ? pattern : wildcard(pattern, true),
+        ),
       ],
     );
     cache.set(config, result);
   }
   return result;
+}
+
+/** Prepare a matcher so request interception never recompiles its patterns. */
+export function prepareMatcher(config: ConfigInput | NormalizedConfig) {
+  const compiled = compile(config);
+  return (target: ServiceMatch): string | null => {
+    const { url, cookieName, host } = target;
+    for (const [id, scripts, cookies, domains] of compiled) {
+      if (
+        (url && scripts.some((pattern) => pattern.test(url))) ||
+        (cookieName && cookies.some((pattern) => pattern.test(cookieName))) ||
+        (host && domains.some((pattern) => pattern.test(host)))
+      )
+        return id;
+    }
+    return null;
+  };
 }
 
 export interface ServiceMatch {
@@ -43,16 +62,5 @@ export function matchService(
   config: ConfigInput | NormalizedConfig,
   target: ServiceMatch,
 ): string | null {
-  for (const [id, scripts, cookies, domains] of compile(config)) {
-    if (
-      (target.url &&
-        scripts.some((pattern) => pattern.test(target.url as string))) ||
-      (target.cookieName &&
-        cookies.some((pattern) => pattern.test(target.cookieName as string))) ||
-      (target.host &&
-        domains.some((pattern) => pattern.test(target.host as string)))
-    )
-      return id;
-  }
-  return null;
+  return prepareMatcher(config)(target);
 }

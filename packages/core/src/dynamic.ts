@@ -1,7 +1,7 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
 import type { BlockedInfo } from "./internal/blocked";
-import { findService } from "./internal/blocker";
+import { prepareServiceFinder } from "./internal/blocker";
 import { fail } from "./internal/dev";
 import { normalizeLight } from "./internal/normalize-light";
 import { acquire } from "./internal/patch";
@@ -39,9 +39,22 @@ export function blockDynamic(
   if (!doc?.defaultView) return noop;
   const win = doc.defaultView;
   const config = normalizeLight(options.config);
+  const findService = prepareServiceFinder(config);
   const reports: BlockedInfo[] = [];
   const bypass = new WeakSet<Element>();
   let stopped = false;
+  let matchWarned = false;
+
+  const safeFind = (url: string) => {
+    try {
+      return findService(url, doc.baseURI);
+    } catch {
+      if (!matchWarned) {
+        matchWarned = true;
+        console.warn("CookieChimp matcher failed");
+      }
+    }
+  };
 
   const shouldBlock = (el: Element, url: string) => {
     const { ccCategory: category, ccService: service } = (el as HTMLElement)
@@ -51,7 +64,7 @@ export function blockDynamic(
       !(service ? consent.hasService(service) : consent.has(category))
     )
       return { category, service };
-    const found = findService(config, url, doc.baseURI)?.[1];
+    const found = safeFind(url)?.[1];
     return found && !consent.hasService(found.id)
       ? { category: found.category, service: found.id }
       : undefined;

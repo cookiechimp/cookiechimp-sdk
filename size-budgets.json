@@ -68,7 +68,7 @@
   {
     "name": "banner, preferences, recall initial",
     "scenario": "banner + preferences + recall",
-    "entry": "packages/react/dist/index.mjs",
+    "entry": "packages/react/dist/ui.mjs",
     "planned": true,
     "kind": "initial",
     "limit": 13824
@@ -76,7 +76,7 @@
   {
     "name": "banner, preferences, recall total",
     "scenario": "banner + preferences + recall",
-    "entry": "packages/react/dist/index.mjs",
+    "entry": "packages/react/dist/ui.mjs",
     "planned": true,
     "kind": "total",
     "limit": 16384

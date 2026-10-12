@@ -73,6 +73,44 @@ describe("network blocker", () => {
   });
 
   it.each([
+    { id: "bad", category: "analytics", scripts: [123] },
+    { id: "bad", category: "analytics", domains: "x.com" },
+    { id: "bad", category: 5 },
+    { id: "bad", category: "analytics", cookies: [{}] },
+  ])("rejects malformed service fields in development", (service) => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect(() =>
+      blockNetwork(runtime(), {
+        config: { categories: ["analytics"], services: [service] } as never,
+        window,
+      }),
+    ).toThrow("Invalid consent config for CookieChimp blocker");
+  });
+
+  it("falls through to native network calls and warns once when matching throws", async () => {
+    const native = vi.spyOn(window, "fetch").mockResolvedValue(new Response());
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const poisoned = /tracker/;
+    const controller = blockNetwork(runtime(), {
+      config: {
+        categories: ["analytics"],
+        services: [{ id: "bad", category: "analytics", domains: [poisoned] }],
+      },
+      window,
+    });
+    controllers.push(controller);
+    poisoned.test = () => {
+      throw new Error("poisoned matcher");
+    };
+    await expect(
+      window.fetch("https://tracker.test/one"),
+    ).resolves.toBeInstanceOf(Response);
+    await window.fetch("https://tracker.test/two");
+    expect(native).toHaveBeenCalledTimes(2);
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
+  it.each([
     "https://tracker.test/collect",
     new URL("https://tracker.test/collect"),
     new Request("https://tracker.test/collect"),

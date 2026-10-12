@@ -167,6 +167,43 @@ describe("dynamic src interception", () => {
     expect(warn).toHaveBeenCalledOnce();
   });
 
+  it.each([
+    { id: "bad", category: "analytics", scripts: [123] },
+    { id: "bad", category: "analytics", domains: "x.com" },
+    { id: "bad", category: 5 },
+    { id: "bad", category: "analytics", cookies: [{}] },
+  ])("rejects malformed service fields in development", (service) => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect(() =>
+      blockDynamic(runtime(), {
+        config: { categories: ["analytics"], services: [service] } as never,
+      }),
+    ).toThrow("Invalid consent config for CookieChimp blocker");
+  });
+
+  it("allows DOM insertion and warns once when matching throws", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const poisoned = /tracker/;
+    const first = document.createElement("iframe");
+    first.src = "https://tracker.test/frame";
+    const second = document.createElement("script");
+    second.src = "https://tracker.test/script";
+    const controller = blockDynamic(runtime(), {
+      config: {
+        categories: ["analytics"],
+        services: [{ id: "bad", category: "analytics", scripts: [poisoned] }],
+      },
+    });
+    controllers.push(controller);
+    poisoned.test = () => {
+      throw new Error("poisoned matcher");
+    };
+    expect(() => document.body.append(first, second)).not.toThrow();
+    expect(document.body.contains(first)).toBe(true);
+    expect(document.body.contains(second)).toBe(true);
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
   it("does not call the native src setter when src is set after insertion", () => {
     const nativeSetter = vi.spyOn(HTMLIFrameElement.prototype, "src", "set");
     install();
