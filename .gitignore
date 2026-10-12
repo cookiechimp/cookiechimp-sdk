@@ -1,0 +1,8 @@
+node_modules/
+.turbo/
+coverage/
+dist/
+.next/
+playwright-report/
+test-results/
+*.tsbuildinfo
