@@ -27,7 +27,7 @@
   "scripts": {
     "build": "tsdown --config-loader native && node scripts/generate.mjs",
     "lint": "biome check .",
-    "test:unit": "vitest run --config vitest.config.ts",
+    "test:unit": "pnpm build && vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
