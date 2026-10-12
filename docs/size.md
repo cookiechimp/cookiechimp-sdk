@@ -37,6 +37,13 @@ The checked budgets are the source-of-truth values below. Region header provider
 | GA4 preset | extra | 830 |
 | GTM preset | extra | 915 |
 | Google Ads preset | extra | 890 |
+| Meta Pixel preset | extra | 1005 |
+| Clarity preset | extra | 980 |
+| PostHog preset | extra | 1175 |
+| Segment preset | extra | 1140 |
+| Hotjar preset | extra | 1025 |
+| LinkedIn Insight preset | extra | 970 |
+| TikTok Pixel preset | extra | 1095 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -74,3 +81,17 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | scripts ga4 | 750 B | 830 B | ID encoding hardening and full Consent Mode default, measured 719 B (about 15% headroom) | M4 PR16 (lead approved) |
 | scripts gtm | 805 B | 915 B | ID encoding hardening and full Consent Mode default, measured 794 B (about 15% headroom) | M4 PR16 (lead approved) |
 | scripts google-ads | 810 B | 890 B | ID encoding hardening and full Consent Mode default, measured 772 B (about 15% headroom) | M4 PR16 (lead approved) |
+| scripts meta-pixel | none | 895 B | New preset with vendor consent API mapping, measured 874 B (about 2% headroom) | M4 PR17 |
+| scripts clarity | none | 880 B | New preset with vendor consent API mapping, measured 852 B (about 3% headroom) | M4 PR17 |
+| scripts posthog | none | 1060 B | New preset with vendor consent API mapping, measured 1022 B (about 4% headroom) | M4 PR17 |
+| scripts segment | none | 1055 B | New preset with vendor consent API mapping, measured 989 B (about 7% headroom) | M4 PR17 |
+| scripts hotjar | none | 935 B | New preset with vendor consent API mapping, measured 889 B (about 5% headroom) | M4 PR17 |
+| scripts linkedin | none | 880 B | New preset with vendor consent API mapping, measured 842 B (about 5% headroom) | M4 PR17 |
+| scripts tiktok | none | 995 B | New preset with vendor consent API mapping, measured 952 B (about 5% headroom) | M4 PR17 |
+| scripts meta-pixel | 895 B | 1005 B | Vendor consent API sync, measured 874 B (about 15% headroom) | M4 PR17 (lead approved) |
+| scripts clarity | 880 B | 980 B | Vendor consent API sync, measured 852 B (about 15% headroom) | M4 PR17 (lead approved) |
+| scripts posthog | 1060 B | 1175 B | Vendor consent API sync, measured 1022 B (about 15% headroom) | M4 PR17 (lead approved) |
+| scripts segment | 1055 B | 1140 B | Vendor consent API sync, measured 989 B (about 15% headroom) | M4 PR17 (lead approved) |
+| scripts hotjar | 935 B | 1025 B | Vendor consent API sync, measured 889 B (about 15% headroom) | M4 PR17 (lead approved) |
+| scripts linkedin | 880 B | 970 B | Vendor consent API sync, measured 842 B (about 15% headroom) | M4 PR17 (lead approved) |
+| scripts tiktok | 995 B | 1095 B | Vendor consent API sync, measured 952 B (about 15% headroom) | M4 PR17 (lead approved) |
