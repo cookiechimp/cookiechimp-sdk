@@ -5,18 +5,23 @@ import type {
   ScriptPreset,
 } from "./index";
 
-export function validateId(kind: string, id: string, expression: RegExp): void {
-  if (expression.test(id)) return;
+export function validateId(
+  kind: string,
+  id: string,
+  expression: RegExp,
+): boolean {
+  if (expression.test(id)) return true;
   const message = `CookieChimp ${kind} id ${JSON.stringify(id)} is invalid`;
   if (typeof process !== "undefined" && process.env.NODE_ENV !== "production")
     throw new TypeError(message);
   console.warn(message);
+  return false;
 }
 /** Percent-encode everything outside unreserved URL characters, quotes included. */
 export const encodeId = (id: string): string =>
   encodeURIComponent(id).replace(
     /[!'()*]/g,
-    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+    (c) => `%${c.charCodeAt(0).toString(16)}`,
   );
 export function queue(
   dataLayerName = "dataLayer",
