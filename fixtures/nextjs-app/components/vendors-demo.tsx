@@ -20,11 +20,13 @@ export function VendorsDemo() {
       document.head.append(script);
       return script;
     });
+    const stops = presets.map((preset) => preset.sync?.(consent, window));
     const gate = gateScripts(consent);
     document.documentElement.dataset.ccVendors = "ready";
     return () => {
       delete document.documentElement.dataset.ccVendors;
       gate.stop();
+      for (const stop of stops) stop?.();
       for (const script of scripts) script.remove();
     };
   }, [consent]);
@@ -41,6 +43,14 @@ export function VendorsDemo() {
       </button>
       <button type="button" onClick={acceptAll}>
         Accept all vendors
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          set({ categories: { analytics: false, marketing: false } })
+        }
+      >
+        Revoke vendors
       </button>
     </section>
   );

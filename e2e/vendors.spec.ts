@@ -89,3 +89,53 @@ test("vendors load only for their granted category", async ({ page }) => {
   ])
     await expect.poll(() => urls.some((url) => url.includes(part))).toBe(true);
 });
+
+test("revoking after load calls the loaded vendor consent APIs", async ({
+  page,
+}) => {
+  // Each loader body replaces the stub with a recording "library", as the
+  // real vendor scripts replace their queue stubs when they load.
+  const bodies: Record<string, string> = {
+    "fbevents.js":
+      "window.__fbq=[];window.fbq=function(){window.__fbq.push([].slice.call(arguments))};",
+    "clarity.ms/tag/":
+      "window.__clarity=[];window.clarity=function(){window.__clarity.push([].slice.call(arguments))};",
+    "events.js?sdkid=":
+      "window.__ttq=[];window.ttq={grantConsent:function(){window.__ttq.push('grant')},revokeConsent:function(){window.__ttq.push('revoke')}};",
+  };
+  for (const host of vendorHosts) {
+    const handler = async (
+      route: Parameters<Parameters<Page["route"]>[1]>[0],
+    ) => {
+      const url = route.request().url();
+      const key = Object.keys(bodies).find((part) => url.includes(part));
+      await route.fulfill({
+        contentType: "application/javascript",
+        body: key ? bodies[key] : "",
+      });
+    };
+    await page.route(`**/*.${host}/**`, handler);
+    await page.route(`**://${host}/**`, handler);
+  }
+  await ready(page);
+  await page.getByRole("button", { name: "Accept all vendors" }).click();
+  const loaded = () =>
+    page.evaluate(() => {
+      const w = window as unknown as Record<string, unknown>;
+      return Boolean(w.__fbq && w.__clarity && w.__ttq);
+    });
+  await expect.poll(loaded).toBe(true);
+  await page.getByRole("button", { name: "Revoke vendors" }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const w = window as unknown as Record<string, unknown[]>;
+        return { fbq: w.__fbq, clarity: w.__clarity, ttq: w.__ttq };
+      }),
+    )
+    .toEqual({
+      fbq: [["consent", "revoke"]],
+      clarity: [["consent", false]],
+      ttq: ["revoke"],
+    });
+});

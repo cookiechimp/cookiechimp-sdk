@@ -21,5 +21,6 @@ export function clarity({
     "clarity",
     (host) => callQueue(host, "clarity"),
     nonce,
+    (host, granted) => host.clarity("consent", granted),
   );
 }

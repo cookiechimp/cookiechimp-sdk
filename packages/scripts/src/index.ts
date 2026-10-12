@@ -35,6 +35,15 @@ export interface QueueStub {
   dataLayerName: string;
   install(target?: QueueTarget): (...args: unknown[]) => void;
 }
+/** The part of a core consent runtime that preset consent sync reads. */
+export interface ConsentSource {
+  get(): { categories: Readonly<Record<string, boolean>> };
+  subscribe(
+    listener: (state: {
+      categories: Readonly<Record<string, boolean>>;
+    }) => void,
+  ): () => void;
+}
 export interface ScriptPreset {
   id: string;
   category: string;
@@ -43,6 +52,13 @@ export interface ScriptPreset {
   script: PresetScript;
   queue: QueueStub;
   load: "gated" | "immediate";
+  /**
+   * How a revoke reaches a vendor script that already loaded: `"api"` calls the
+   * vendor's own consent API, `"reload"` means only a page reload stops it.
+   */
+  revoke?: "api" | "reload";
+  /** Keep the vendor consent API in step with this preset's category. Returns an unsubscribe. */
+  sync?(consent: ConsentSource, target?: object): () => void;
 }
 export type PresetConfig = ConfigInput & { consentMode?: ConsentModeOptions };
 

@@ -26,18 +26,31 @@ GTM uses basic consent mode by default and is gated. With `consentMode: "advance
 
 Each vendor has its own opt-in subpath, so nothing ships unless you import it:
 
-| Import | Option | ID format | Default category | Loader origin |
-| --- | --- | --- | --- | --- |
-| `@cookiechimp/scripts/meta-pixel` | `pixelId` | 15 or 16 digits | marketing | `https://connect.facebook.net` |
-| `@cookiechimp/scripts/clarity` | `projectId` | 10 lowercase letters or digits | analytics | `https://www.clarity.ms` |
-| `@cookiechimp/scripts/posthog` | `apiKey`, `region` (`us` or `eu`) | `phc_` then 20 to 64 letters or digits | analytics | `https://us-assets.i.posthog.com` or `https://eu-assets.i.posthog.com` |
-| `@cookiechimp/scripts/segment` | `writeKey` | 32 letters or digits | analytics | `https://cdn.segment.com` |
-| `@cookiechimp/scripts/hotjar` | `siteId` | 5 to 10 digits | analytics | `https://static.hotjar.com` |
-| `@cookiechimp/scripts/linkedin` | `partnerId` | 4 to 10 digits | marketing | `https://snap.licdn.com` |
-| `@cookiechimp/scripts/tiktok` | `pixelId` | 20 uppercase letters or digits | marketing | `https://analytics.tiktok.com` |
+| Import | Option | ID format | Default category | Loader origin | Revoke after load |
+| --- | --- | --- | --- | --- | --- |
+| `@cookiechimp/scripts/meta-pixel` | `pixelId` | 15 or 16 digits | marketing | `https://connect.facebook.net` | `fbq('consent', 'revoke')`, grant: `fbq('consent', 'grant')` |
+| `@cookiechimp/scripts/clarity` | `projectId` | 10 lowercase letters or digits | analytics | `https://www.clarity.ms` | `clarity('consent', false)`, grant: `clarity('consent', true)` |
+| `@cookiechimp/scripts/posthog` | `apiKey`, `region` (`us` or `eu`) | `phc_` then 20 to 64 letters or digits | analytics | `https://us-assets.i.posthog.com` or `https://eu-assets.i.posthog.com` | `opt_out_capturing()`, grant: `opt_in_capturing()`, on the configured global |
+| `@cookiechimp/scripts/segment` | `writeKey` | 32 letters or digits | analytics | `https://cdn.segment.com` | Reload needed (not injected again until granted) |
+| `@cookiechimp/scripts/hotjar` | `siteId` | 5 to 10 digits | analytics | `https://static.hotjar.com` | Reload needed (no consent API) |
+| `@cookiechimp/scripts/linkedin` | `partnerId` | 4 to 10 digits | marketing | `https://snap.licdn.com` | Reload needed (no consent API) |
+| `@cookiechimp/scripts/tiktok` | `pixelId` | 20 uppercase letters or digits | marketing | `https://analytics.tiktok.com` | `ttq.revokeConsent()`, grant: `ttq.grantConsent()` |
 
 All of them are gated: the loader script is inert (`type="text/plain"`) until its category is granted. `preset.queue.install(window)` only creates the vendor's queue global (`fbq`, `clarity`, `posthog`, `analytics`, `hj`, `lintrk`, `ttq`) so early calls are kept; it never inserts a script or sends a request.
 
 IDs are checked against a strict pattern and encoded before they are placed in a URL, and loader URLs always use the fixed origin above. PostHog and Segment accept a custom `globalName`, which must be a plain identifier. Invalid values throw in development and warn in production, where the preset falls back to its default global name or region.
 
 These vendors do not read Google Consent Mode, so they add no Consent Mode mapping. Google signals keep following core's categories and defaults.
+
+### Revoking consent after a vendor script loaded
+
+Gating only stops a script that has not run yet. To reach a script that already loaded, call `preset.sync(consent)` with your core consent runtime. It installs the queue stub, applies the current state of the preset's category, then subscribes to consent changes and calls the vendor's own consent API whenever that category flips. It returns an unsubscribe function. Changes to other categories make no call. When the vendor script has not loaded yet, the call goes into the stub queue and the vendor replays it on load, so it is never lost.
+
+```ts
+const stop = metaPixel({ pixelId: "123456789012345" }).sync?.(consent);
+```
+
+`preset.revoke` says what a revoke can do once the script has loaded:
+
+- `"api"` (Meta Pixel, Clarity, PostHog, TikTok): the vendor API is called on every revoke and grant, as in the table above.
+- `"reload"` (Segment, Hotjar, LinkedIn): there is no consent API to call, so `sync` makes no vendor call. The gated script is not injected again until the category is granted, but code that already loaded keeps running until the page reloads. For Segment this means the loaded analytics.js keeps sending events. The SDK never reloads the page for you; check `preset.revoke === "reload"` and reload, or ask the visitor to, when that category is revoked.

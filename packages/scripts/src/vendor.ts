@@ -1,9 +1,10 @@
-import type { ScriptPreset } from "./index";
+import type { ConsentSource, ScriptPreset } from "./index";
 import { preset, validateId } from "./shared";
 
 // biome-ignore lint/suspicious/noExplicitAny: vendor globals have no shared shape.
 export type Host = Record<string, any>;
 export type Install = (host: Host) => (...args: unknown[]) => void;
+export type Apply = (host: Host, granted: boolean) => void;
 
 /** Global names must be plain identifiers, never prototype keys. */
 export const globalName = (kind: string, name: string, fallback: string) =>
@@ -19,12 +20,29 @@ export function vendor(
   name: string,
   install: Install,
   nonce?: string,
+  apply?: Apply,
 ): ScriptPreset {
   return {
     ...preset(id, category, src, scripts, domains, {}, nonce),
     queue: {
       dataLayerName: name,
       install: (target = globalThis as never) => install(target as Host),
+    },
+    revoke: apply ? "api" : "reload",
+    // Installing the stub first means a call made before the vendor script
+    // loads is queued and replayed by the vendor, never dropped.
+    sync(consent: ConsentSource, target: object = globalThis) {
+      const host = target as Host;
+      install(host);
+      let last: boolean | undefined;
+      const run = (state: ReturnType<ConsentSource["get"]>) => {
+        const granted = state.categories[category] === true;
+        if (granted === last) return;
+        last = granted;
+        apply?.(host, granted);
+      };
+      run(consent.get());
+      return consent.subscribe(run);
     },
   };
 }

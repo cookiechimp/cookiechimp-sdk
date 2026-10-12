@@ -33,5 +33,6 @@ export function tiktok({
       return call;
     },
     nonce,
+    (host, granted) => host.ttq[granted ? "grantConsent" : "revokeConsent"](),
   );
 }

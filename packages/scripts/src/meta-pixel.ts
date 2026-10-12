@@ -35,5 +35,6 @@ export function metaPixel({
       return host.fbq;
     },
     nonce,
+    (host, granted) => host.fbq("consent", granted ? "grant" : "revoke"),
   );
 }
