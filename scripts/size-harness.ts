@@ -13,6 +13,7 @@ export interface SizeBudget {
   entry: string;
   kind: BudgetKind;
   limit: number;
+  planned?: true;
   excludedFrom?: string;
   forbiddenTokens?: string[];
 }
@@ -21,6 +22,13 @@ export interface BudgetResult extends SizeBudget {
   status: "pass" | "fail" | "pending";
   detail?: string;
 }
+
+export const plannedEntries = new Set([
+  "packages/react/dist/banner.mjs",
+  "packages/react/dist/index.mjs",
+  "packages/core/dist/sync.mjs",
+  "packages/core/dist/tcf.mjs",
+]);
 
 export async function gzipSize(input: Uint8Array | string): Promise<number> {
   return (await gzipAsync(input, { level: constants.Z_BEST_COMPRESSION }))
@@ -73,8 +81,7 @@ export async function checkDefaultExclusion(
   budget: SizeBudget,
   root: string,
 ): Promise<string | undefined> {
-  if (!budget.excludedFrom || !existsSync(resolve(root, budget.entry)))
-    return undefined;
+  if (!budget.excludedFrom) return undefined;
   const defaultEntry = resolve(root, budget.excludedFrom);
   if (!existsSync(defaultEntry))
     return `default entry missing: ${budget.excludedFrom}`;
@@ -100,10 +107,17 @@ export async function runBudgets(
         budget,
         await measureEntry(resolve(root, budget.entry), budget.kind),
       );
-      if (result.status !== "pending") {
-        const detail = await checkDefaultExclusion(budget, root);
-        if (detail) return { ...result, status: "fail" as const, detail };
-      }
+      const detail = await checkDefaultExclusion(budget, root);
+      if (detail) return { ...result, status: "fail" as const, detail };
+      if (
+        result.status === "pending" &&
+        (!budget.planned || !plannedEntries.has(budget.entry))
+      )
+        return {
+          ...result,
+          status: "fail" as const,
+          detail: `missing entry is not an approved planned entry: ${budget.entry}`,
+        };
       return result;
     }),
   );

@@ -33,32 +33,65 @@ describe("size harness", () => {
     expect(compareBudget(budget("entry", 10), 11).status).toBe("fail");
   });
 
-  it("marks missing entries pending and enforces them once present", async () => {
+  it("keeps an allowlisted planned entry pending and enforces it once present", async () => {
     const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
-    expect((await runBudgets([budget("missing.mjs")], root))[0]?.status).toBe(
+    const entry = "packages/react/dist/banner.mjs";
+    const plannedBudget = { ...budget(entry), planned: true as const };
+    expect((await runBudgets([plannedBudget], root))[0]?.status).toBe(
       "pending",
     );
-    await writeFile(join(root, "missing.mjs"), "export const ready = true;");
-    expect((await runBudgets([budget("missing.mjs")], root))[0]?.status).toBe(
-      "pass",
-    );
+    await mkdir(join(root, "packages/react/dist"), { recursive: true });
+    await writeFile(join(root, entry), "export const ready = true;");
+    expect((await runBudgets([plannedBudget], root))[0]?.status).toBe("pass");
   });
 
-  it("detects TCF/GPP code imported by the default bundle", async () => {
+  it.each(["__tcfapi", "__gpp"])(
+    "fails when the core output contains %s while the TCF entry is absent",
+    async (token) => {
+      const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
+      await writeFile(
+        join(root, "index.mjs"),
+        `export const api = '${token}';`,
+      );
+      const configured = {
+        ...budget("packages/core/dist/tcf.mjs"),
+        planned: true as const,
+        excludedFrom: "index.mjs",
+        forbiddenTokens: ["__tcfapi", "__gpp"],
+      };
+      const result = (await runBudgets([configured], root))[0];
+      expect(result).toMatchObject({
+        status: "fail",
+        detail: `default bundle contains ${token}`,
+      });
+    },
+  );
+
+  it("passes the default-bundle guard for clean core output", async () => {
     const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
-    await writeFile(join(root, "tcf.mjs"), "export const api = '__tcfapi';");
-    await writeFile(
-      join(root, "index.mjs"),
-      "export { api } from './tcf.mjs';",
-    );
+    await writeFile(join(root, "index.mjs"), "export const clean = true;");
     const configured = {
-      ...budget("tcf.mjs"),
+      ...budget("packages/core/dist/tcf.mjs"),
+      planned: true as const,
       excludedFrom: "index.mjs",
       forbiddenTokens: ["__tcfapi", "__gpp"],
     };
-    expect(await checkDefaultExclusion(configured, root)).toContain(
-      "imports tcf.mjs",
+    expect(await checkDefaultExclusion(configured, root)).toBeUndefined();
+    expect((await runBudgets([configured], root))[0]?.status).toBe("pending");
+  });
+
+  it("fails an unknown missing path with a clear message", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
+    const result = (await runBudgets([budget("typo/banner.mjs")], root))[0];
+    expect(result).toMatchObject({
+      status: "fail",
+      detail: "missing entry is not an approved planned entry: typo/banner.mjs",
+    });
+    await writeFile(
+      join(root, "size-budgets.json"),
+      JSON.stringify([budget("typo/banner.mjs")]),
     );
+    expect(await main(root)).toBe(1);
   });
 
   it("returns a non-zero exit code for an over-budget fixture entry", async () => {

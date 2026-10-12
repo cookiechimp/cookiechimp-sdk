@@ -1,0 +1,46 @@
+{
+  "name": "@cookiechimp/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./css": "./dist/tokens.css",
+    "./tailwind": {
+      "types": "./dist/tailwind.d.ts",
+      "import": "./dist/tailwind.mjs",
+      "require": "./dist/tailwind.cjs"
+    },
+    "./json": "./dist/tokens.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsdown --config-loader native && node scripts/generate.mjs",
+    "lint": "biome check .",
+    "test:unit": "pnpm build && vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "tailwindcss": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "tsdown": "0.23.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4"
+  }
+}
