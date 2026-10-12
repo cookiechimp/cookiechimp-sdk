@@ -4,11 +4,13 @@ test("German is present in initial HTML without an English flash", async ({
   browser,
 }) => {
   const context = await browser.newContext({
+    locale: "de",
     extraHTTPHeaders: { "Accept-Language": "de" },
   });
   const response = await context.request.get("/");
   const html = await response.text();
   expect(html).toContain("Alle Cookies akzeptieren");
+  expect(html).toMatch(/<html[^>]*lang="de"/);
   expect(html).not.toContain("Accept all cookies");
   const page = await context.newPage();
   await page.goto("/");
@@ -22,6 +24,7 @@ test("German is present in initial HTML without an English flash", async ({
 
 test("fr-CA falls back to French on the server", async ({ browser }) => {
   const context = await browser.newContext({
+    locale: "fr-CA",
     extraHTTPHeaders: { "Accept-Language": "fr-CA" },
   });
   const response = await context.request.get("/");
