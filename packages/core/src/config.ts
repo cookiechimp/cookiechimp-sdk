@@ -66,6 +66,8 @@ export interface NormalizedConfig {
 }
 
 const ID = /^[a-z0-9_-]+$/;
+const isDevelopment = () =>
+  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
 
 export class ConsentConfigError extends Error {
   readonly name = "ConsentConfigError";
@@ -118,8 +120,7 @@ function freezeCategory(category: CategoryConfig): NormalizedCategoryConfig {
 
 /** Validate and canonicalise all supported local configuration shorthands. */
 export function normalizeConfig(input: ConfigInput): NormalizedConfig {
-  const development =
-    typeof process !== "undefined" && process.env.NODE_ENV !== "production";
+  const DEV = isDevelopment();
   const sourceCategories = categoryRecords(input.categories);
   const categories = sourceCategories.some(({ id }) => id === "necessary")
     ? sourceCategories
@@ -131,12 +132,12 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
   const validCategories = categories.filter((category) => {
     if (typeof category.id !== "string" || !ID.test(category.id)) {
       invalid = true;
-      if (development) problems.push(`category id "${category.id}" is invalid`);
+      if (DEV) problems.push(`category id "${category.id}" is invalid`);
       return false;
     }
     if (categoryIds.has(category.id)) {
       invalid = true;
-      if (development) problems.push(`duplicate category id "${category.id}"`);
+      if (DEV) problems.push(`duplicate category id "${category.id}"`);
       return false;
     }
     categoryIds.add(category.id);
@@ -148,18 +149,18 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
     if (typeof service.id !== "string" || !ID.test(service.id)) {
       invalid = true;
       valid = false;
-      if (development) problems.push(`service id "${service.id}" is invalid`);
+      if (DEV) problems.push(`service id "${service.id}" is invalid`);
     }
     if (serviceIds.has(service.id)) {
       invalid = true;
       valid = false;
-      if (development) problems.push(`duplicate service id "${service.id}"`);
+      if (DEV) problems.push(`duplicate service id "${service.id}"`);
     }
     serviceIds.add(service.id);
     if (!categoryIds.has(service.category)) {
       invalid = true;
       valid = false;
-      if (development)
+      if (DEV)
         problems.push(
           `service "${service.id}" references unknown category "${service.category}"`,
         );
@@ -169,15 +170,14 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
       if (values && !Array.isArray(values)) {
         invalid = true;
         valid = false;
-        if (development)
-          problems.push(`service "${service.id}" has invalid ${kind}`);
+        if (DEV) problems.push(`service "${service.id}" has invalid ${kind}`);
         continue;
       }
       for (const pattern of values ?? [])
         if (!validPattern(pattern, kind)) {
           invalid = true;
           valid = false;
-          if (development)
+          if (DEV)
             problems.push(
               `service "${service.id}" has invalid ${kind} pattern`,
             );
@@ -186,7 +186,7 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
     return valid;
   });
   if (invalid) {
-    if (development) throw new ConsentConfigError(Object.freeze(problems));
+    if (DEV) throw new ConsentConfigError(Object.freeze(problems));
     console.warn("CookieChimp ignored invalid consent configuration entries");
   }
 

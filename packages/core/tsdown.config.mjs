@@ -6,8 +6,4 @@ export default defineConfig({
   format: ["esm", "cjs"],
   minify: true,
   sourcemap: true,
-  define: {
-    "process.env.NODE_ENV": '"production"',
-    "typeof process": '"object"',
-  },
 });
