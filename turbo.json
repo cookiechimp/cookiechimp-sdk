@@ -1,16 +1,16 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": ["PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".next/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
-    "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+    "test:unit": {
+      "dependsOn": ["^build"]
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]

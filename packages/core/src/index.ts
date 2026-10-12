@@ -1,2 +1,2 @@
-// Public APIs will be added in a later milestone.
-export {};
+/** The current CookieChimp SDK package version. */
+export const VERSION = "0.0.0";

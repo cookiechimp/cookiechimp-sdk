@@ -1,0 +1,7 @@
+[
+  {
+    "name": "@cookiechimp/core",
+    "path": "packages/core/dist/index.mjs",
+    "limit": "2 kB"
+  }
+]
