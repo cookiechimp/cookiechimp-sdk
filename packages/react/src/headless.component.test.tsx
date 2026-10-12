@@ -148,7 +148,7 @@ describe("headless primitives", () => {
     );
     await act(() =>
       reopened
-        .querySelector<HTMLButtonElement>(`[data-cc-part='${part}']`)
+        .querySelector<HTMLButtonElement>("[data-cc-part='preferences-save']")
         ?.click(),
     );
     expect(consent.has("analytics")).toBe(true);
