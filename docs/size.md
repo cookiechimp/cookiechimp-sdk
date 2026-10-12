@@ -22,9 +22,10 @@ The checked budgets are the source-of-truth values below. Region header provider
 | core total | total | 5120 |
 | react provider and hooks | extra | 4608 |
 | Next.js client provider bridge | extra | 4370 |
-| Next.js server entry | extra | 4096 |
+| Next.js server entry | extra | INFO |
 | Next.js Pages client wrapper | extra | 6225 |
 | Next.js middleware region helper | extra | 1053 |
+| Next.js styles route | extra | INFO |
 | react headless primitives | extra | 3491 |
 | banner only | initial | 11264 |
 | banner distribution entry | initial | 11264 |
@@ -62,3 +63,4 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | nextjs server | none | informational | Server-only App Router helpers and generated critical CSS | M3 PR14 |
 | nextjs pages | none | 6225 B | Pages provider and request helpers, measured 5413 B plus 15% headroom | M3 PR15 |
 | nextjs middleware | none | 1053 B | Edge region forwarding helper, measured 915 B plus 15% headroom | M3 PR15 |
+| nextjs styles route | none | informational | Server-only CSS response helper for strict CSP deployments | M3 PR15 |

@@ -7,16 +7,23 @@ vi.mock("server-only", () => ({}));
 
 const mocks = vi.hoisted(() => ({
   cookie: undefined as string | undefined,
+  cookies: new Map<string, string>(),
+  cookieRequests: [] as Map<string, string>[],
   values: new Map<string, string>(),
 }));
 
 vi.mock("next/headers", () => ({
-  cookies: async () => ({
-    get: (name: string) =>
-      name === "cc_consent" && mocks.cookie
-        ? { name, value: mocks.cookie }
-        : undefined,
-  }),
+  cookies: async () => {
+    const requestCookies = mocks.cookieRequests.shift() ?? mocks.cookies;
+    return {
+      get: (name: string) => {
+        const value =
+          requestCookies.get(name) ??
+          (name === "cc_consent" ? mocks.cookie : undefined);
+        return value ? { name, value } : undefined;
+      },
+    };
+  },
   headers: async () => ({
     get: (name: string) => mocks.values.get(name.toLowerCase()) ?? null,
   }),
@@ -34,6 +41,8 @@ const state: ConsentState = {
 
 beforeEach(() => {
   mocks.cookie = undefined;
+  mocks.cookies.clear();
+  mocks.cookieRequests.length = 0;
   mocks.values.clear();
 });
 
@@ -47,6 +56,29 @@ describe("getServerConsent", () => {
   it("reads a valid App Router cookie", async () => {
     mocks.cookie = encodeConsentCookie(state);
     expect(await getServerConsent()).toEqual(state);
+  });
+
+  it.each([
+    ["an oversized cookie", `v1.${"a".repeat(32_769)}`],
+    ["malformed percent encoding", "%E0%A4%A"],
+    ["invalid JSON", "v1.e25vdC1qc29ufQ"],
+  ])("returns null without throwing for %s", async (_label, value) => {
+    mocks.cookie = value;
+    await expect(getServerConsent()).resolves.toBeNull();
+  });
+
+  it("does not share cookie state between concurrent requests", async () => {
+    const other = { ...state, consentId: "fedcba0987654321" };
+    mocks.cookieRequests.push(
+      new Map([["cc_consent", encodeConsentCookie(state)]]),
+      new Map([["cc_consent", encodeConsentCookie(other)]]),
+    );
+    const [first, second] = await Promise.all([
+      getServerConsent(),
+      getServerConsent(),
+    ]);
+    expect(first?.consentId).toBe(state.consentId);
+    expect(second?.consentId).toBe(other.consentId);
   });
 
   it("adds opted-in region, regulation, and language request context", async () => {
@@ -71,6 +103,28 @@ describe("getServerConsent", () => {
       region: { country: "US", region: "CA" },
       regulation: "ccpa",
     });
+  });
+
+  it("does not derive request region from consent cookie state", async () => {
+    mocks.cookie = encodeConsentCookie({
+      ...state,
+      region: { country: "DE" },
+      regulation: "gdpr",
+    });
+    await expect(
+      getServerConsent({ languages: ["en"] }),
+    ).resolves.toMatchObject({ region: null });
+  });
+
+  it("ignores a client-writable cookie region without an explicit source", async () => {
+    mocks.cookie = encodeConsentCookie({
+      ...state,
+      region: { country: "US", region: "CA" },
+      regulation: "ccpa",
+    });
+    await expect(
+      getServerConsent({ languages: ["en"] }),
+    ).resolves.toMatchObject({ region: null, regulation: "gdpr" });
   });
 
   it("throws in development and warns in production for invalid options", async () => {
@@ -130,5 +184,18 @@ describe("CookieChimpProvider", () => {
       region: { country: "US", region: "CA" },
       regulation: "ccpa",
     });
+  });
+
+  it("shares one custom config cookie name with server and client", async () => {
+    mocks.cookies.set("custom_consent", encodeConsentCookie(state));
+    const output = await CookieChimpProvider({
+      config: {
+        categories: { analytics: false },
+        cookie: { name: "custom_consent" },
+      },
+      children: <span />,
+    });
+    expect(output.props.config.cookie.name).toBe("custom_consent");
+    expect(output.props.initialState).toEqual(state);
   });
 });

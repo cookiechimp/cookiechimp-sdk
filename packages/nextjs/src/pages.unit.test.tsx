@@ -28,6 +28,12 @@ describe("Pages Router consent", () => {
         { config },
       ).consent,
     ).toEqual(state);
+    expect(
+      getPagesConsentProps(
+        { headers: { cookie: `custom=${encodeConsentCookie(state)}` } },
+        { config: { ...config, cookie: { name: "custom" } } },
+      ).consent,
+    ).toEqual(state);
   });
 
   it("uses forwarded region and resolves language", () => {

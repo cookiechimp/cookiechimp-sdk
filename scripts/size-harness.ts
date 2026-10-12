@@ -13,7 +13,7 @@ export interface SizeBudget {
   scenario: string;
   entry: string;
   kind: BudgetKind;
-  limit: number;
+  limit?: number;
   planned?: true;
   excludedFrom?: string;
   forbiddenTokens?: string[];
@@ -43,6 +43,8 @@ export function compareBudget(
 ): BudgetResult {
   if (bytes === undefined) return { ...budget, status: "pending" };
   if (budget.informational) return { ...budget, bytes, status: "info" };
+  if (budget.limit === undefined)
+    return { ...budget, bytes, status: "fail", detail: "missing size limit" };
   return { ...budget, bytes, status: bytes <= budget.limit ? "pass" : "fail" };
 }
 
@@ -146,6 +148,7 @@ export async function bundleEntry(
   const peers = await peerDependencies(entry);
   const root = await workspaceRoot(entry);
   const external = (specifier: string): boolean =>
+    specifier.startsWith("node:") ||
     [...alwaysExternal, ...peers].some(
       (peer) => specifier === peer || specifier.startsWith(`${peer}/`),
     );
@@ -258,7 +261,7 @@ export function printTable(results: BudgetResult[]): void {
       scenario,
       kind,
       "size gzip -9": formatBytes(bytes),
-      limit: `${limit} B`,
+      limit: limit === undefined ? "INFO" : `${limit} B`,
       status: status.toUpperCase(),
       ...(detail ? { detail } : {}),
     })),

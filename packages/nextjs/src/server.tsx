@@ -113,7 +113,7 @@ export async function getServerConsent(
   const name = options.cookieName ?? CONSENT_COOKIE_NAME;
   const value = (await cookies()).get(name)?.value;
   const consent = value
-    ? readConsentCookie(`${CONSENT_COOKIE_NAME}=${encodeURIComponent(value)}`)
+    ? readConsentCookie(`${name}=${encodeURIComponent(value)}`, name)
     : null;
   if (
     !consent ||
@@ -127,7 +127,7 @@ export async function getServerConsent(
       : (forwardedRegion(requestHeaders) ??
         (options.provider
           ? resolveRegion(requestHeaders, { provider: options.provider })
-          : (consent.region ?? null)));
+          : null));
   const languages = languageOptions(options.languages);
   const language = languages
     ? resolveLanguage(
@@ -148,7 +148,8 @@ export type TranslationLoader = (
   locale: string,
 ) => Messages | Promise<Messages>;
 
-export interface CookieChimpProviderProps extends GetServerConsentOptions {
+export interface CookieChimpProviderProps
+  extends Omit<GetServerConsentOptions, "cookieName"> {
   config: ConsentConfig;
   translations?: Messages | TranslationLoader;
   children: ReactNode;
@@ -161,10 +162,11 @@ export async function CookieChimpProvider({
   region: suppliedRegion,
   languages,
   translations,
-  cookieName,
   children,
 }: CookieChimpProviderProps) {
-  validate({ cookieName, provider, languages });
+  const resolvedCookieName =
+    cookieName ?? config.cookie?.name ?? CONSENT_COOKIE_NAME;
+  validate({ cookieName: resolvedCookieName, provider, languages });
   const languageConfig = languageOptions(languages);
   const requestHeaders = await headers();
   const region =
@@ -186,11 +188,14 @@ export async function CookieChimpProvider({
       : typeof translations === "function"
         ? undefined
         : translations;
-  const initialState = await getServerConsent({ cookieName });
+  const initialState = await getServerConsent({
+    cookieName: resolvedCookieName,
+  });
   return (
     <ClientProvider
       config={{
         ...config,
+        cookie: { ...config.cookie, name: resolvedCookieName },
         region,
         regulation,
         gpc: readGpc(requestHeaders),

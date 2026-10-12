@@ -19,7 +19,6 @@ import { ClientProvider } from "./index";
 
 export interface PagesConsentOptions {
   config: ConsentConfig;
-  cookieName?: string;
   provider?: RegionHeaderOptions["provider"];
   header?: string;
   region?: Region | null;
@@ -49,11 +48,6 @@ function getHeader(headers: IncomingHttpHeaders | Headers, name: string) {
 
 function validate(options: PagesConsentOptions) {
   if (!options.config) invalid("config is required");
-  if (
-    options.cookieName &&
-    !/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(options.cookieName)
-  )
-    invalid("cookieName must be a valid cookie name");
   if (options.provider === "custom" && !options.header)
     invalid("header is required for the custom provider");
 }
@@ -64,21 +58,9 @@ export function getPagesConsentProps(
   options: PagesConsentOptions,
 ): PagesConsentProps {
   validate(options);
-  const cookieName = options.cookieName ?? CONSENT_COOKIE_NAME;
+  const cookieName = options.config.cookie?.name ?? CONSENT_COOKIE_NAME;
   const cookie = getHeader(req.headers, "cookie") ?? "";
-  const consent =
-    cookieName === CONSENT_COOKIE_NAME
-      ? readConsentCookie(cookie)
-      : readConsentCookie(
-          cookie
-            .split(";")
-            .map((part) =>
-              part.trim().startsWith(`${cookieName}=`)
-                ? `${CONSENT_COOKIE_NAME}=${part.trim().slice(cookieName.length + 1)}`
-                : part,
-            )
-            .join(";"),
-        );
+  const consent = readConsentCookie(cookie, cookieName);
   const forwardedValue = getHeader(req.headers, "x-cc-region");
   const forwardedMatch = /^([A-Z]{2})(?:-([A-Z0-9]{1,3}))?$/.exec(
     forwardedValue?.trim().toUpperCase() ?? "",

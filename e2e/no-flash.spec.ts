@@ -92,6 +92,41 @@ test("first visit shows the consent banner and accepting hides it", async ({
   await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
 });
 
+for (const viewport of [
+  { name: "desktop", width: 1280, height: 800 },
+  { name: "mobile", width: 375, height: 740 },
+])
+  test(`critical banner layout matches the full stylesheet on ${viewport.name}`, async ({
+    browser,
+  }) => {
+    const record = async (blockExternalCss: boolean) => {
+      const context = await browser.newContext({ viewport });
+      const page = await context.newPage();
+      if (blockExternalCss)
+        await page.route(/\.css(?:\?|$)/, (route) => route.abort());
+      await page.goto("/");
+      const banner = page.locator('[data-cc-part="banner"]');
+      await expect(banner).toBeVisible();
+      const layout = await banner.evaluate((element) => {
+        const style = getComputedStyle(element);
+        const box = element.getBoundingClientRect();
+        return {
+          flexDirection: style.flexDirection,
+          alignItems: style.alignItems,
+          boundingBox: {
+            x: box.x,
+            y: box.y,
+            width: box.width,
+            height: box.height,
+          },
+        };
+      });
+      await context.close();
+      return layout;
+    };
+    expect(await record(true)).toEqual(await record(false));
+  });
+
 test("keyboard opens and closes the modal with restored focus", async ({
   page,
 }) => {
