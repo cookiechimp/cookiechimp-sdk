@@ -47,7 +47,9 @@ describe("Google presets", () => {
     expect(output.consentMode.mapping?.analytics).toEqual([
       "analytics_storage",
     ]);
-    expect(gtm({ containerId: "GTM-X", category: "analytics" }).consentMode).toEqual({});
+    expect(
+      gtm({ containerId: "GTM-X", category: "analytics" }).consentMode,
+    ).toEqual({});
   });
   it("merges services and mappings", () => {
     const output = applyPresets(
