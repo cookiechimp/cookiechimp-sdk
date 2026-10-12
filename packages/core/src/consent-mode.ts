@@ -1,4 +1,5 @@
 import type { ConsentState } from "./index";
+import { inlineJson } from "./internal/inline-json";
 
 export type ConsentModeSignal =
   | "ad_storage"
@@ -72,9 +73,13 @@ function normalize(
   if (
     region !== undefined &&
     (!Array.isArray(region) ||
-      region.some((code) => typeof code !== "string" || code.length === 0))
+      region.some(
+        (code) =>
+          typeof code !== "string" ||
+          !/^[A-Z]{2}(?:-[A-Z0-9]{1,3})?$/.test(code),
+      ))
   ) {
-    invalid("region must contain non-empty strings");
+    invalid("region must contain ISO region codes");
     region = undefined;
   }
   for (const key of ["ads_data_redaction", "url_passthrough"] as const) {
@@ -227,9 +232,6 @@ export function consentModeInlineScript(
     commands.push(["set", "ads_data_redaction", checked.ads_data_redaction]);
   if (checked.url_passthrough !== undefined)
     commands.push(["set", "url_passthrough", checked.url_passthrough]);
-  const json = JSON.stringify(commands)
-    .replaceAll("<", "\\u003c")
-    .replaceAll("\u2028", "\\u2028")
-    .replaceAll("\u2029", "\\u2029");
+  const json = inlineJson(commands);
   return `(function(w){w.dataLayer=w.dataLayer||[];w.gtag=w.gtag||function(){w.dataLayer.push(arguments)};var c=${json};for(var i=0;i<c.length;i++)w.gtag.apply(w,c[i]);w.__ccConsentModeDefault=true})(window);`;
 }

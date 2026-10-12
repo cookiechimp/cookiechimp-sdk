@@ -57,24 +57,25 @@ describe("consentModeDefault", () => {
     ).toBe("denied");
   });
 
-  it("escapes HTML and JavaScript separators while preserving values", () => {
-    const region = "</script>\u2028x\u2029";
-    const script = consentModeInlineScript({
-      region: [region],
-    });
-    expect(script).not.toContain("</script>");
-    expect(script).not.toContain("\u2028");
-    expect(script).not.toContain("\u2029");
-    expect(script).toContain("\\u003c/script>");
-    expect(script).toContain("\\u2028");
-    expect(script).toContain("\\u2029");
+  it("embeds the inline payload through the escaping serialiser", () => {
+    const script = consentModeInlineScript({ region: ["US-CA"] });
     expect(() => new Function("window", script)).not.toThrow();
     const dataLayer: ArrayLike<unknown>[] = [];
     new Function("window", script)({ dataLayer });
     expect(Array.from(dataLayer[0] ?? [])[2]).toMatchObject({
-      region: [region],
+      region: ["US-CA"],
     });
   });
+
+  it.each(["</script>", "us", "\u2028", "USA-CALIF"])(
+    "rejects non-ISO region %j in development",
+    (code) => {
+      vi.stubEnv("NODE_ENV", "development");
+      expect(() => consentModeInlineScript({ region: [code] })).toThrow(
+        "ISO region codes",
+      );
+    },
+  );
 
   it("throws for invalid options in development", () => {
     vi.stubEnv("NODE_ENV", "development");
