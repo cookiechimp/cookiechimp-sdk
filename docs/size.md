@@ -4,7 +4,19 @@ Run `pnpm size` to build the packages and print every budget from `size-budgets.
 
 The harness uses Node's `zlib.gzip` with `level: 9`. Sizes are bytes, and limits use 1 KB = 1024 bytes. It sums the gzip size of each emitted JavaScript module, matching the bytes transferred as separately compressed files. `initial` follows static imports only. `total` follows static and dynamic imports. `extra` and `lazy` measure their opt-in entry and all reachable modules.
 
-The SPEC ceilings remain 7 KB initial and 9 KB total for core. The repository enforces tighter working budgets of 4 KB initial and 5 KB total. The `@cookiechimp/core/sync` entry is enforced separately against the SPEC limit of 2 KB extra and is excluded from the default entry.
+The checked budgets are the source-of-truth values below. Region header providers and built-in regulation tables live only in `@cookiechimp/core/regions`. The `@cookiechimp/core/sync` entry is enforced separately and is excluded from the default entry.
+
+<!-- size-budgets:start -->
+| Name | Kind | Limit (bytes) |
+|---|---:|---:|
+| core initial | initial | 4096 |
+| core total | total | 5120 |
+| banner only | initial | 11264 |
+| banner, preferences, recall initial | initial | 13824 |
+| banner, preferences, recall total | total | 16384 |
+| connected sync client | extra | 2048 |
+| TCF/GPP module | lazy | 12288 |
+<!-- size-budgets:end -->
 
 Until the M3 Next.js package exists, `fixtures/nextjs-app` is the empty stand-in application. Its page is the baseline and contributes zero package bytes. Direct entry measurement is approved for the current milestones. Fixture-delta measurement is deferred to M7. Direct measurement avoids build identifiers and framework chunk allocation changing the result, while measuring exactly the CookieChimp JavaScript added to that fixture. The fixture no-flash test remains part of the required end-to-end job.
 

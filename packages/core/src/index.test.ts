@@ -9,6 +9,7 @@ import {
   readConsentCookie,
   VERSION,
 } from "./index";
+import { regulationFor } from "./regions";
 
 const state = (id = "abcdefghijklmnop"): ConsentState => ({
   schemaVersion: CONSENT_SCHEMA_VERSION,
@@ -76,6 +77,126 @@ describe("emitter", () => {
 });
 
 describe("createConsent", () => {
+  it("applies regulation defaults and decision visibility", () => {
+    const gdpr = createConsent({
+      categories: { analytics: true },
+      region: { country: "DE" },
+    });
+    expect(gdpr.get().categories.analytics).toBe(false);
+    expect(gdpr.needsDecision).toBe(true);
+    gdpr.acceptAll();
+    expect(gdpr.needsDecision).toBe(false);
+
+    const ccpa = createConsent({
+      categories: { analytics: false },
+      region: { country: "US", region: "CA" },
+      regulation: "ccpa",
+    });
+    expect(ccpa.get().categories.analytics).toBe(true);
+    expect(ccpa.needsDecision).toBe(false);
+    expect(ccpa.showOptOut).toBe(true);
+
+    const none = createConsent({
+      categories: { analytics: true },
+      region: { country: "JP" },
+      regulation: "none",
+    });
+    expect(none.get().categories.analytics).toBe(true);
+    expect(none.needsDecision).toBe(false);
+  });
+
+  it("supports regulation and region-table overrides", () => {
+    expect(
+      createConsent({
+        categories: [],
+        region: { country: "JP" },
+        regulation: () => "ccpa",
+      }).regulation,
+    ).toBe("ccpa");
+    expect(
+      createConsent({
+        categories: [],
+        region: { country: "US", region: "NY" },
+        regions: { "US-NY": "ccpa" },
+      }).regulation,
+    ).toBe("ccpa");
+    expect(
+      createConsent({ categories: [], fallbackRegulation: "none" }).regulation,
+    ).toBe("none");
+  });
+
+  it("accepts a resolveRegulation option so region alone selects a rule", () => {
+    const resolveRegulation = (region: { country: string } | null) =>
+      region?.country === "US" ? ("ccpa" as const) : ("gdpr" as const);
+    const region = { country: "US", region: "CA" };
+    expect(
+      createConsent({ categories: [], region, resolveRegulation }).regulation,
+    ).toBe("ccpa");
+    expect(
+      createConsent({
+        categories: [],
+        region: { country: "US", region: "CA" },
+        resolveRegulation: regulationFor,
+      }).regulation,
+    ).toBe("ccpa");
+  });
+
+  it("warns in development and falls back when region has no resolver", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(
+      createConsent({
+        categories: [],
+        region: { country: "US", region: "CA" },
+        fallbackRegulation: "none",
+      }).regulation,
+    ).toBe("none");
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("without resolveRegulation"),
+    );
+  });
+
+  it("passes the injectable current time to the regulation resolver", () => {
+    const resolveRegulation = vi.fn(() => "none" as const);
+    const region = { country: "US", region: "OK" };
+    createConsent({ categories: [], region, resolveRegulation, now: 123 });
+    expect(resolveRegulation).toHaveBeenCalledWith(region, 123);
+  });
+
+  it("applies GPC once and preserves explicit decisions outside sale/share", () => {
+    const onConsent = vi.fn();
+    const initial = state();
+    initial.categories = {
+      necessary: true,
+      analytics: true,
+      advertising: true,
+    };
+    const runtime = createConsent({
+      categories: ["analytics", "advertising"],
+      region: { country: "US", region: "CA" },
+      regulation: "ccpa",
+      gpc: true,
+      initial,
+      onConsent,
+    });
+    expect(runtime.get()).toMatchObject({
+      action: "gpc_auto",
+      gpc: true,
+      categories: { analytics: true, advertising: false },
+    });
+    expect(onConsent).toHaveBeenCalledOnce();
+    runtime.acceptAll();
+    expect(runtime.get().categories.advertising).toBe(false);
+    const restored = createConsent({
+      categories: ["advertising"],
+      region: runtime.region,
+      regulation: "ccpa",
+      gpc: true,
+      initial: runtime.get(),
+      onConsent,
+    });
+    expect(restored.get().categories.advertising).toBe(false);
+    expect(onConsent).toHaveBeenCalledTimes(2);
+  });
   it("supports decisions while keeping necessary enabled", () => {
     const listener = vi.fn();
     const runtime = createConsent({
@@ -85,7 +206,7 @@ describe("createConsent", () => {
     runtime.subscribe(listener);
 
     expect(runtime.region).toBeNull();
-    expect(runtime.regulation).toBe("none");
+    expect(runtime.regulation).toBe("gdpr");
     expect(runtime.language).toBe("fr");
     expect(runtime.set({ necessary: false, analytics: true }).action).toBe(
       "custom",
@@ -121,6 +242,9 @@ describe("createConsent", () => {
       ts: expect.any(String),
       categories: { necessary: true, analytics: true },
       action: "accept_all",
+      region: null,
+      regulation: "gdpr",
+      gpc: false,
     });
     expect(onConsent.mock.calls[0]?.[0]).not.toHaveProperty("schemaVersion");
   });

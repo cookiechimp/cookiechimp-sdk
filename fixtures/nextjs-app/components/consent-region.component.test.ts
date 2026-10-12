@@ -1,3 +1,4 @@
+import { regulationFor } from "@cookiechimp/core/regions";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
@@ -18,9 +19,57 @@ describe("ConsentRegion", () => {
     const region = document.querySelector<HTMLElement>(
       "[data-testid='consent-region']",
     );
-    expect(region?.getAttribute("aria-label")).toBe("Consent placeholder");
-    expect(region?.textContent).toBe("Consent controls will appear here.");
+    expect(region?.getAttribute("aria-label")).toBe("Regional consent");
+    expect(region?.textContent).toContain("decision needed");
+    expect(region?.textContent).toContain("analytics off");
 
+    const button = document.querySelector("button");
+    await act(() => button?.click());
+    expect(region?.textContent).toContain("no decision needed");
+
+    await act(() => root.unmount());
+  });
+
+  it("honours browser GPC for a CCPA region and persists gpc_auto", async () => {
+    Object.defineProperty(navigator, "globalPrivacyControl", {
+      configurable: true,
+      value: true,
+    });
+    const container = document.createElement("div");
+    document.body.append(container);
+    const root = createRoot(container);
+    await act(() =>
+      root.render(
+        createElement(ConsentRegion, {
+          region: { country: "US", region: "CA" },
+          regulation: "ccpa",
+          gpc: true,
+        }),
+      ),
+    );
+    expect(container.textContent).toContain("advertising off");
+    expect(container.textContent).toContain("gpc_auto");
+    expect(document.cookie).toContain("cc_consent=v1.");
+    await act(() => root.unmount());
+    // biome-ignore lint/suspicious/noDocumentCookie: expire the fixture cookie between tests.
+    document.cookie = "cc_consent=; Path=/; Max-Age=0";
+  });
+
+  it("resolves regulation from region when given an explicit resolver", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    const root = createRoot(container);
+    await act(() =>
+      root.render(
+        createElement(ConsentRegion, {
+          region: { country: "US", region: "CA" },
+          resolveRegulation: regulationFor,
+        }),
+      ),
+    );
+    expect(
+      container.querySelector("[data-testid='regulation']")?.textContent,
+    ).toBe("ccpa");
     await act(() => root.unmount());
   });
 });

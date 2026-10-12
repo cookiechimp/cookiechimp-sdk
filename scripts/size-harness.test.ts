@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
@@ -21,6 +21,26 @@ const budget = (entry: string, limit = 100): SizeBudget => ({
 });
 
 describe("size harness", () => {
+  it("keeps every documented budget aligned with size-budgets.json", async () => {
+    const root = join(import.meta.dirname, "..");
+    const configured = JSON.parse(
+      await readFile(join(root, "size-budgets.json"), "utf8"),
+    ) as SizeBudget[];
+    const docs = await readFile(join(root, "docs/size.md"), "utf8");
+    const block = docs.match(
+      /<!-- size-budgets:start -->([\s\S]*?)<!-- size-budgets:end -->/,
+    )?.[1];
+    expect(block, "marked size budget table").toBeDefined();
+    const documented = [
+      ...(block ?? "").matchAll(
+        /^\| (.+?) \| (initial|total|extra|lazy) \| (\d+) \|$/gm,
+      ),
+    ].map(([, name, kind, limit]) => ({ name, kind, limit: Number(limit) }));
+    expect(documented).toEqual(
+      configured.map(({ name, kind, limit }) => ({ name, kind, limit })),
+    );
+  });
+
   it("uses the exact Node gzip level 9 result", async () => {
     const input = "CookieChimp".repeat(200);
     expect(await gzipSize(input)).toBe(

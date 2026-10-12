@@ -8,9 +8,11 @@ import {
   type CategoriesInput,
   type CategoryInput,
   type ConfigInput,
+  isDevelopment,
   type NormalizedConfig,
   normalizeConfig,
 } from "./config";
+import type { Region, Regulation } from "./regions";
 
 export type {
   CategoryConfig,
@@ -22,6 +24,16 @@ export type {
   ServicePattern,
 } from "./config";
 export { ConsentConfigError, normalizeConfig } from "./config";
+export type { Region, Regulation } from "./regions";
+
+/** Read browser Global Privacy Control. Use the regions subpath for headers. */
+export function readGpc(): boolean {
+  return (
+    typeof navigator !== "undefined" &&
+    (navigator as Navigator & { globalPrivacyControl?: boolean })
+      .globalPrivacyControl === true
+  );
+}
 
 export type ConsentAction = "accept_all" | "reject_all" | "custom" | "gpc_auto";
 
@@ -31,6 +43,9 @@ export interface ConsentRecord {
   categories: Record<string, boolean>;
   services?: Record<string, boolean>;
   action: ConsentAction;
+  region?: Region | null;
+  regulation?: Regulation;
+  gpc?: boolean;
 }
 
 export interface ConsentState extends ConsentRecord {
@@ -59,6 +74,13 @@ export interface ConsentConfig extends ConfigInput {
   initial?: ConsentState | null;
   language?: string;
   onConsent?: (record: ConsentRecord) => void;
+  /** Region supplied by server rendering or application configuration. */
+  region?: Region | null;
+  /** Override browser GPC detection, useful for server-provided context. */
+  gpc?: boolean;
+  /** Categories treated as sale/share for GPC. */
+  saleShareCategories?: readonly string[];
+  forceDecision?: boolean;
 }
 
 export interface ConsentRuntime {
@@ -76,8 +98,11 @@ export interface ConsentRuntime {
   subscribe(listener: (state: ConsentState) => void): () => void;
   has(category: string): boolean;
   hasService(service: string): boolean;
-  readonly region: null;
-  readonly regulation: "none";
+  readonly region: Region | null;
+  readonly regulation: Regulation;
+  readonly gpc: boolean;
+  readonly needsDecision: boolean;
+  readonly showOptOut: boolean;
   readonly language: string;
 }
 
@@ -146,6 +171,15 @@ function validState(value: unknown): ConsentState | null {
     categories,
     ...(services ? { services } : {}),
     action: value.action as ConsentAction,
+    ...(isRecord(value.region) && typeof value.region.country === "string"
+      ? { region: value.region as unknown as Region }
+      : value.region === null
+        ? { region: null }
+        : {}),
+    ...(["gdpr", "ccpa", "none"].includes(value.regulation as string)
+      ? { regulation: value.regulation as Regulation }
+      : {}),
+    ...(typeof value.gpc === "boolean" ? { gpc: value.gpc } : {}),
   };
 }
 
@@ -271,13 +305,57 @@ function persist(state: ConsentState, options: ConsentCookieOptions): void {
 export function createConsent(config: ConsentConfig): ConsentRuntime {
   validateCookieOptions(config.cookie ?? {});
   const normalized = normalizeConfig(config);
-  const defaults = categoryDefaults(normalized);
+  const configuredDefaults = categoryDefaults(normalized);
+  const region = config.region ?? config.initial?.region ?? null;
+  const regionKey = region
+    ? `${region.country}${region.region ? `-${region.region}` : ""}`
+    : "";
+  if (
+    isDevelopment() &&
+    region &&
+    config.regulation === undefined &&
+    config.resolveRegulation === undefined
+  )
+    console.warn(
+      "CookieChimp received a region without resolveRegulation; using configured overrides or fallbackRegulation",
+    );
+  const regulation =
+    (typeof normalized.regulation === "function"
+      ? normalized.regulation(region)
+      : normalized.regulation) ??
+    normalized.regions[regionKey] ??
+    (region ? normalized.regions[region.country] : undefined) ??
+    normalized.resolveRegulation?.(region, normalized.now) ??
+    normalized.fallbackRegulation;
+  const gpc = config.gpc ?? (readGpc() || config.initial?.gpc === true);
+  const defaults = Object.fromEntries(
+    Object.entries(configuredDefaults).map(([name, enabled]) => [
+      name,
+      name === "necessary"
+        ? true
+        : regulation === "gdpr"
+          ? false
+          : regulation === "ccpa"
+            ? true
+            : enabled,
+    ]),
+  );
   const serviceCategories = Object.fromEntries(
     normalized.services.map(({ id, category }) => [id, category]),
   );
   const browserState =
     typeof document === "undefined" ? null : readConsentCookie(document.cookie);
   const restored = validState(config.initial) ?? browserState;
+  const saleShare = new Set(
+    config.saleShareCategories ?? ["advertising", "marketing"],
+  );
+  const mustApplyGpc =
+    regulation === "ccpa" &&
+    gpc &&
+    (!restored?.gpc ||
+      [...saleShare].some(
+        (category) => restored.categories[category] === true,
+      ));
   let state: ConsentState = restored
     ? {
         ...restored,
@@ -290,23 +368,48 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
         ts: new Date().toISOString(),
         categories: defaults,
         action: "custom",
+        region,
+        regulation,
+        gpc,
       };
+  state = { ...state, region, regulation, gpc };
+  if (regulation === "ccpa" && gpc) {
+    state.categories = Object.fromEntries(
+      Object.entries(state.categories).map(([name, enabled]) => [
+        name,
+        saleShare.has(name) ? false : enabled,
+      ]),
+    );
+    if (mustApplyGpc) state.action = "gpc_auto";
+  }
   const emitter = createEmitter<ConsentState>();
+  let decided = restored !== null || mustApplyGpc;
 
   const decide = (
     categories: Record<string, boolean>,
     action: ConsentAction,
     services = state.services,
   ): ConsentState => {
+    const compliantCategories =
+      regulation === "ccpa" && gpc
+        ? Object.fromEntries(
+            Object.entries(categories).map(([name, enabled]) => [
+              name,
+              saleShare.has(name) ? false : enabled,
+            ]),
+          )
+        : categories;
     state = {
       ...state,
       ts: new Date().toISOString(),
-      categories: { ...categories, necessary: true },
-      ...(services && Object.keys(services).length
-        ? { services }
-        : { services: undefined }),
+      categories: { ...compliantCategories, necessary: true },
+      ...(services && Object.keys(services).length ? { services } : {}),
       action,
+      region,
+      regulation,
+      gpc,
     };
+    decided = true;
     persist(state, config.cookie ?? {});
     const result = snapshot(state);
     emitter.emit(result);
@@ -314,6 +417,12 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     config.onConsent?.(record);
     return result;
   };
+
+  if (mustApplyGpc) {
+    persist(state, config.cookie ?? {});
+    const { schemaVersion: _, ...record } = state;
+    config.onConsent?.(record);
+  }
 
   return {
     get: () => snapshot(state),
@@ -366,8 +475,15 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
       if (!category) return false;
       return state.services?.[service] ?? state.categories[category] === true;
     },
-    region: null,
-    regulation: "none",
+    region,
+    regulation,
+    gpc,
+    get needsDecision() {
+      return (
+        config.forceDecision === true || (regulation === "gdpr" && !decided)
+      );
+    },
+    showOptOut: regulation === "ccpa",
     language: config.language ?? "en",
   };
 }

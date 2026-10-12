@@ -9,6 +9,27 @@ afterEach(() => {
 });
 
 describe("normalizeConfig", () => {
+  it("rejects malformed regulation configuration in development", () => {
+    process.env.NODE_ENV = "development";
+    expect(() =>
+      normalizeConfig({
+        regulation: "invalid" as "gdpr",
+        regions: { us: "ccpa", "US-CA": "invalid" as "ccpa" },
+      }),
+    ).toThrow(ConsentConfigError);
+  });
+
+  it("warns and ignores malformed regulation configuration in production", () => {
+    process.env.NODE_ENV = "production";
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const config = normalizeConfig({
+      regulation: "invalid" as "gdpr",
+      regions: { us: "ccpa" },
+    });
+    expect(config.regulation).toBeUndefined();
+    expect(config.regions).toEqual({});
+    expect(warn).toHaveBeenCalledOnce();
+  });
   it("normalizes every category shorthand identically", () => {
     const forms = [
       ["analytics"],
