@@ -50,6 +50,9 @@ importers:
       '@cookiechimp/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@cookiechimp/scripts':
+        specifier: workspace:*
+        version: link:../../packages/scripts
       '@cookiechimp/translations':
         specifier: workspace:*
         version: link:../../packages/translations
@@ -155,6 +158,21 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
+      tsdown:
+        specifier: 0.23.1
+        version: 0.23.1(typescript@7.0.2)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.0.4
+        version: 5.0.4(@types/node@22.20.5)(happy-dom@21.0.1)(vite@8.3.4(@types/node@22.20.5)(yaml@2.9.1))
+
+  packages/scripts:
+    devDependencies:
+      '@cookiechimp/core':
+        specifier: workspace:*
+        version: link:../core
       tsdown:
         specifier: 0.23.1
         version: 0.23.1(typescript@7.0.2)

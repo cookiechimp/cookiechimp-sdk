@@ -1,0 +1,55 @@
+{
+  "name": "@cookiechimp/scripts",
+  "version": "0.0.0",
+  "description": "Opt-in analytics and advertising presets for CookieChimp",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsdown --config-loader native && for f in index ga4 gtm google-ads; do cp dist/$f.d.mts dist/$f.d.ts; done",
+    "lint": "biome check .",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cookiechimp/core": "workspace:*",
+    "tsdown": "0.23.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4"
+  },
+  "peerDependencies": {
+    "@cookiechimp/core": "workspace:*"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./ga4": {
+      "types": "./dist/ga4.d.ts",
+      "import": "./dist/ga4.mjs",
+      "require": "./dist/ga4.cjs"
+    },
+    "./gtm": {
+      "types": "./dist/gtm.d.ts",
+      "import": "./dist/gtm.mjs",
+      "require": "./dist/gtm.cjs"
+    },
+    "./google-ads": {
+      "types": "./dist/google-ads.d.ts",
+      "import": "./dist/google-ads.mjs",
+      "require": "./dist/google-ads.cjs"
+    }
+  }
+}
