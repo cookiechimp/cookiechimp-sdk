@@ -12,6 +12,7 @@
     "@cookiechimp/core": "workspace:*",
     "@cookiechimp/nextjs": "workspace:*",
     "@cookiechimp/react": "workspace:*",
+    "@cookiechimp/scripts": "workspace:*",
     "@cookiechimp/translations": "workspace:*",
     "next": "16.4.0",
     "react": "19.3.0",

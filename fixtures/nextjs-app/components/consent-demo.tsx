@@ -34,7 +34,7 @@ export function ConsentDemo() {
   useEffect(() => {
     if (!consent) return;
     const gate = gateScripts(consent);
-    const consentMode = installConsentMode(consent);
+    const consentMode = installConsentMode(consent, consentConfig.consentMode);
     const dynamic = blockDynamic(consent, { config: consentConfig });
     const network = blockNetwork(consent, { config: consentConfig });
     document.documentElement.dataset.ccDynamic = "ready";

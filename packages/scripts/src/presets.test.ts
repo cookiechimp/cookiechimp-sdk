@@ -58,12 +58,19 @@ describe("Google presets", () => {
       "ad_personalization",
     ]);
   });
-  it("throws in development and warns in production", () => {
-    expect(() => ga4({ measurementId: "bad" })).toThrow(/invalid/);
-    vi.stubEnv("NODE_ENV", "production");
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    expect(() => googleAds({ conversionId: "bad" })).not.toThrow();
-    expect(warn).toHaveBeenCalledOnce();
-    warn.mockRestore();
-  });
+  it.each([
+    ["GA4", () => ga4({ measurementId: "bad" })],
+    ["GTM", () => gtm({ containerId: "bad", category: "analytics" })],
+    ["Google Ads", () => googleAds({ conversionId: "bad" })],
+  ])(
+    "throws in development and warns in production for %s ids",
+    (_name, create) => {
+      expect(create).toThrow(/invalid/);
+      vi.stubEnv("NODE_ENV", "production");
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      expect(create).not.toThrow();
+      expect(warn).toHaveBeenCalledOnce();
+      warn.mockRestore();
+    },
+  );
 });

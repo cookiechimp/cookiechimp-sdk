@@ -50,6 +50,9 @@ importers:
       '@cookiechimp/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@cookiechimp/scripts':
+        specifier: workspace:*
+        version: link:../../packages/scripts
       '@cookiechimp/translations':
         specifier: workspace:*
         version: link:../../packages/translations
