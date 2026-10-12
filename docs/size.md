@@ -10,10 +10,11 @@ The checked budgets are the source-of-truth values below. Region header provider
 | Name | Kind | Limit (bytes) |
 |---|---:|---:|
 | declarative script and iframe gating | extra | 2048 |
-| runtime script and iframe blocking | extra | 2688 |
+| runtime script and iframe blocking | extra | 2816 |
 | network blocking | extra | 2304 |
 | core initial | initial | 4096 |
 | core total | total | 5120 |
+| react provider and hooks | extra | 1536 |
 | banner only | initial | 11264 |
 | banner, preferences, recall initial | initial | 13824 |
 | banner, preferences, recall total | total | 16384 |
@@ -33,3 +34,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | --- | --- | --- | --- | --- |
 | dynamic | 2560 B | 2688 B | Shared patch registry and broader DOM insertion coverage for runtime blocking | #10 |
 | network | 2048 B | 2304 B | Headroom for fetch, XHR, and beacon interception (measured 2039 B at landing) | #10 |
+| react | none | 1536 B | New React provider and hooks entry | M2 PR10 |
+| dynamic | 2688 B | 2816 B | Shared raw-config validation for dynamic and network blockers (measured 2811 B) | M2 PR10 |

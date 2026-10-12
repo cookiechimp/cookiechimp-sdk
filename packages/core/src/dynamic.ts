@@ -41,6 +41,7 @@ export function blockDynamic(
   if (!doc?.defaultView) return noop();
   const win = doc.defaultView;
   const config = options.config as NormalizedConfig;
+  matchService(config, {});
   const reports: BlockedInfo[] = [];
   const reported = new WeakSet<Element>();
   const bypass = new WeakSet<Element>();

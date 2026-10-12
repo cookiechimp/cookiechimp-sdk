@@ -22,7 +22,7 @@ export default async function Home() {
         gpc={gpc}
         initial={initial}
       />
-      <ConsentDemo />
+      <ConsentDemo initialState={initial} />
     </main>
   );
 }

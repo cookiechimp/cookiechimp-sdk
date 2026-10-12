@@ -1,5 +1,29 @@
 import { expect, test } from "@playwright/test";
 
+test("first visit shows the consent banner and accepting hides it", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.getByTestId("consent-banner")).toBeVisible();
+  await page.getByRole("button", { name: "Accept all cookies" }).click();
+  await expect(page.getByTestId("consent-banner")).toHaveCount(0);
+});
+
+test("returning visitor has no consent banner before or after hydration", async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto("/");
+  await page.getByRole("button", { name: "Accept all cookies" }).click();
+
+  const response = await context.request.get("/");
+  expect(await response.text()).not.toContain('data-testid="consent-banner"');
+  await page.reload();
+  await expect(page.getByTestId("consent-banner")).toHaveCount(0);
+  await context.close();
+});
+
 test("gated markup matches before consent hydration", async ({ browser }) => {
   const serverContext = await browser.newContext({ javaScriptEnabled: false });
   const serverPage = await serverContext.newPage();

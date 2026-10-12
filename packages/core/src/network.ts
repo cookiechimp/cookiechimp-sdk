@@ -62,6 +62,7 @@ export function blockNetwork(
     | undefined;
   if (!win) return noop();
   const config = options.config as NormalizedConfig;
+  matchService(config, {});
   const reports: BlockedInfo[] = [];
   const releases: Array<() => void> = [];
 

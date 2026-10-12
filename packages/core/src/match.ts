@@ -15,8 +15,18 @@ function wildcard(pattern: string, host = false): RegExp {
 function compile(config: ConfigInput | NormalizedConfig) {
   let result = cache.get(config);
   if (!result) {
-    result = (config.services ?? []).map(
-      ({ id, scripts = [], cookies = [], domains = [] }) => [
+    let invalid = false;
+    result = (config.services ?? [])
+      .filter((service) => {
+        const valid =
+          typeof service.id === "string" &&
+          [service.scripts, service.cookies, service.domains].every(
+            (value) => value === undefined || Array.isArray(value),
+          );
+        invalid ||= !valid;
+        return valid;
+      })
+      .map(({ id, scripts = [], cookies = [], domains = [] }) => [
         id,
         scripts.map((pattern) =>
           pattern instanceof RegExp
@@ -25,8 +35,16 @@ function compile(config: ConfigInput | NormalizedConfig) {
         ),
         cookies.map((pattern) => wildcard(pattern)),
         domains.map((pattern) => wildcard(pattern, true)),
-      ],
-    );
+      ]);
+    if (invalid) {
+      const message = "Invalid consent config for CookieChimp blocker";
+      if (
+        typeof process !== "undefined" &&
+        process.env.NODE_ENV !== "production"
+      )
+        throw new TypeError(message);
+      console.warn(message);
+    }
     cache.set(config, result);
   }
   return result;

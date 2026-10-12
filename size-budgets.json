@@ -13,7 +13,7 @@
     "scenario": "dynamic",
     "entry": "packages/core/dist/dynamic.mjs",
     "kind": "extra",
-    "limit": 2688,
+    "limit": 2816,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["blockDynamic", "insertAdjacentHTML"]
   },
@@ -39,6 +39,14 @@
     "entry": "packages/core/dist/index.mjs",
     "kind": "total",
     "limit": 5120
+  },
+  {
+    "name": "react provider and hooks",
+    "scenario": "react",
+    "entry": "packages/react/dist/index.mjs",
+    "kind": "extra",
+    "limit": 1536,
+    "excludedFrom": "packages/core/dist/index.mjs"
   },
   {
     "name": "banner only",
