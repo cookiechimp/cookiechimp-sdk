@@ -13,7 +13,7 @@
     "scenario": "dynamic",
     "entry": "packages/core/dist/dynamic.mjs",
     "kind": "extra",
-    "limit": 2816,
+    "limit": 2848,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["blockDynamic", "insertAdjacentHTML"]
   },

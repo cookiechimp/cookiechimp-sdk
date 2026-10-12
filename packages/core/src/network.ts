@@ -1,6 +1,7 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
 import type { BlockedInfo } from "./internal/blocked";
+import { normalizeLight } from "./internal/normalize-light";
 import { acquire } from "./internal/patch";
 import { isHttpUrl } from "./internal/url";
 import { matchService } from "./match";
@@ -22,22 +23,18 @@ export interface NetworkController {
 export class ConsentBlockedError extends TypeError {}
 
 const noop = (): NetworkController => ({ stop() {}, blocked: () => [] });
-const isDevelopment = () =>
-  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
-
-const optionError = "Invalid blockNetwork options";
 function invalid(): void {
-  if (isDevelopment()) throw new TypeError(optionError);
-  console.warn(optionError);
+  const message = "Invalid blockNetwork options";
+  if (typeof process !== "undefined" && process.env.NODE_ENV !== "production")
+    throw new TypeError(message);
+  console.warn(message);
 }
 
 function descriptorOwner(target: object, key: PropertyKey): object | undefined {
   let current: object | null = target;
-  while (current) {
-    if (Object.getOwnPropertyDescriptor(current, key)) return current;
+  while (current && !Object.hasOwn(current, key))
     current = Object.getPrototypeOf(current);
-  }
-  return undefined;
+  return current ?? undefined;
 }
 
 /** Block matching fetch, XHR, and beacon requests. Blocked requests are dropped. */
@@ -53,24 +50,17 @@ export function blockNetwork(
     invalid();
     return noop();
   }
-  if (options.window !== undefined && typeof options.window !== "object") {
-    invalid();
-    return noop();
-  }
   const win = (options.window ?? globalThis.window) as
     | (Window & typeof globalThis)
     | undefined;
   if (!win) return noop();
-  const config = options.config as NormalizedConfig;
-  matchService(config, {});
+  const config = normalizeLight(options.config);
   const reports: BlockedInfo[] = [];
   const releases: Array<() => void> = [];
 
   const match = (source: unknown) => {
     const raw =
-      typeof win.Request === "function" && source instanceof win.Request
-        ? source.url
-        : String(source);
+      source instanceof win.Request ? source.url : String(source);
     if (!isHttpUrl(raw, win.document.baseURI)) return undefined;
     const url = new URL(raw, win.document.baseURI);
     const service = matchService(config, { url: url.href, host: url.hostname });

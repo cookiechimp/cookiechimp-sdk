@@ -26,10 +26,52 @@ function install(consent = runtime(), onBlock?: (value: unknown) => void) {
 
 afterEach(() => {
   for (const controller of controllers.splice(0)) controller.stop();
+  vi.unstubAllEnvs();
   vi.restoreAllMocks();
 });
 
 describe("network blocker", () => {
+  it("normalises object categories and missing service arrays", async () => {
+    const native = vi.spyOn(window, "fetch").mockResolvedValue(new Response());
+    const consent = runtime();
+    const controller = blockNetwork(consent, {
+      config: {
+        categories: { analytics: false },
+        services: [{ id: "raw", category: "analytics", domains: ["raw.test"] }],
+      },
+      window,
+    });
+    controllers.push(controller);
+    await expect(window.fetch("https://raw.test/denied")).rejects.toThrow();
+    consent.set(true);
+    await window.fetch("https://raw.test/allowed");
+    expect(native).toHaveBeenCalledOnce();
+  });
+
+  it("throws for invalid services in development", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect(() =>
+      blockNetwork(runtime(), {
+        config: { categories: ["analytics"], services: [null] } as never,
+        window,
+      }),
+    ).toThrow("Invalid consent config for CookieChimp blocker");
+  });
+
+  it("warns and drops invalid services in production", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const native = vi.spyOn(window, "fetch").mockResolvedValue(new Response());
+    const controller = blockNetwork(runtime(), {
+      config: { categories: ["analytics"], services: [null] } as never,
+      window,
+    });
+    controllers.push(controller);
+    await window.fetch("https://raw.test/allowed");
+    expect(native).toHaveBeenCalledOnce();
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
   it.each([
     "https://tracker.test/collect",
     new URL("https://tracker.test/collect"),

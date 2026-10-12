@@ -1,6 +1,7 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
 import type { BlockedInfo } from "./internal/blocked";
+import { normalizeLight } from "./internal/normalize-light";
 import { acquire } from "./internal/patch";
 import { isHttpUrl } from "./internal/url";
 import { matchService } from "./match";
@@ -24,24 +25,21 @@ const noop = (): DynamicController => ({
   scan() {},
   blocked: () => [],
 });
-const isDevelopment = () =>
-  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
-
 /** Block matching scripts and frames before a browser can start their request. */
 export function blockDynamic(
   consent: Pick<ConsentRuntime, "has" | "hasService" | "subscribe">,
   options: DynamicOptions,
 ): DynamicController {
   if (!options?.config) {
-    if (isDevelopment()) throw new TypeError("blockDynamic requires config");
+    if (typeof process !== "undefined" && process.env.NODE_ENV !== "production")
+      throw new TypeError("blockDynamic requires config");
     console.warn("CookieChimp dynamic blocker ignored missing config");
     return noop();
   }
   const doc = options.document ?? globalThis.document;
   if (!doc?.defaultView) return noop();
   const win = doc.defaultView;
-  const config = options.config as NormalizedConfig;
-  matchService(config, {});
+  const config = normalizeLight(options.config);
   const reports: BlockedInfo[] = [];
   const reported = new WeakSet<Element>();
   const bypass = new WeakSet<Element>();
@@ -52,14 +50,14 @@ export function blockDynamic(
     try {
       host = new URL(url, doc.baseURI).hostname;
     } catch {}
-    const service = matchService(config, { url, ...(host ? { host } : {}) });
+    const service = matchService(config, { url, host });
     return service
       ? config.services.find(({ id }) => id === service)
       : undefined;
   };
   const shouldBlock = (el: Element, url: string) => {
-    const category = (el as HTMLElement).dataset.ccCategory;
-    const service = (el as HTMLElement).dataset.ccService;
+    const { ccCategory: category, ccService: service } = (el as HTMLElement)
+      .dataset;
     if (
       category &&
       !(service ? consent.hasService(service) : consent.has(category))
@@ -86,10 +84,11 @@ export function blockDynamic(
     if (!match) return false;
     bypass.add(el);
     el.removeAttribute("src");
-    el.setAttribute("data-cc-src", url);
-    el.setAttribute("data-cc-category", match.category);
-    if (match.service) el.setAttribute("data-cc-service", match.service);
-    el.setAttribute("data-cc-blocked", "true");
+    const data = (el as HTMLElement).dataset;
+    data.ccSrc = url;
+    data.ccCategory = match.category;
+    if (match.service) data.ccService = match.service;
+    data.ccBlocked = "true";
     if (el instanceof win.HTMLScriptElement) {
       el.dataset.ccType = el.type || "text/javascript";
       el.type = "text/plain";
@@ -109,18 +108,16 @@ export function blockDynamic(
     }
     return true;
   };
-  const process = (root: ParentNode) => {
-    const elements: Element[] = root instanceof win.Element ? [root] : [];
-    elements.push(...root.querySelectorAll("script,iframe"));
-    for (const el of elements) neutralise(el);
+  const scanRoot = (root: ParentNode) => {
+    if (root instanceof win.Element) neutralise(root);
+    for (const el of root.querySelectorAll("script,iframe")) neutralise(el);
   };
 
   const releases: Array<() => void> = [];
   const patchMethod = (
     target: object,
     key: PropertyKey,
-    before: (self: unknown, args: unknown[]) => unknown[] = (_self, args) =>
-      args,
+    before: (self: unknown, args: unknown[]) => unknown[],
   ) => {
     releases.push(
       acquire(target, key, (descriptor) => {
@@ -135,7 +132,7 @@ export function blockDynamic(
     );
   };
   const inspectArgs = (_self: unknown, args: unknown[]) => {
-    for (const arg of args) if (arg instanceof win.Element) process(arg);
+    for (const arg of args) if (arg instanceof win.Element) scanRoot(arg);
     return args;
   };
   for (const [target, names] of [
@@ -158,7 +155,7 @@ export function blockDynamic(
     if (typeof html !== "string") return args;
     const template = doc.createElement("template");
     template.innerHTML = html;
-    process(template.content);
+    scanRoot(template.content);
     return [args[0], template.innerHTML];
   });
   patchMethod(win.Element.prototype, "setAttribute", (self, args) => {
@@ -188,13 +185,12 @@ export function blockDynamic(
     );
   }
 
-  const Observer = win.MutationObserver;
-  const observer = new Observer((records) => {
+  const observer = new win.MutationObserver((records) => {
     for (const record of records) {
       if (record.type === "attributes" && record.target instanceof win.Element)
         neutralise(record.target);
       for (const node of record.addedNodes)
-        if (node instanceof win.Element) process(node);
+        if (node instanceof win.Element) scanRoot(node);
     }
   });
   observer.observe(doc.documentElement, {
@@ -234,7 +230,7 @@ export function blockDynamic(
       bypass.delete(el);
     }
   });
-  process(doc);
+  scanRoot(doc);
   return {
     stop() {
       if (!stopped) {
@@ -245,9 +241,7 @@ export function blockDynamic(
       }
     },
     scan() {
-      if (!stopped) {
-        process(doc);
-      }
+      if (!stopped) scanRoot(doc);
     },
     blocked: () => [...reports],
   };
