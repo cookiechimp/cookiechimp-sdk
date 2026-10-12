@@ -61,6 +61,6 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | language | 954 B | 1050 B | Accept-Language q validation and regional fallback (measured 914 B, leaving 40 B (about 4%) under 954 B; 1050 B gives about 15% headroom) | M2 PR13 |
 | nextjs client | none | 4370 B | New client provider bridge, measured 3800 B with Next.js, React, and React DOM external, plus 15% headroom | M3 PR14 |
 | nextjs server | none | informational | Server-only App Router helpers and generated critical CSS | M3 PR14 |
-| nextjs pages | none | 6225 B | Pages provider and request helpers, measured 5413 B plus 15% headroom | M3 PR15 |
-| nextjs middleware | none | 1053 B | Edge region forwarding helper, measured 915 B plus 15% headroom | M3 PR15 |
+| nextjs pages | none | 6225 B | Pages provider and request helpers, measured 5413 B plus 15% headroom (now 5379 B) | M3 PR15 |
+| nextjs middleware | none | 1053 B | Edge region forwarding helper, first measured 915 B plus 15% headroom; 1003 B after explicit-provider parsing, about 5% headroom left | M3 PR15 |
 | nextjs styles route | none | informational | Server-only CSS response helper for strict CSP deployments | M3 PR15 |
