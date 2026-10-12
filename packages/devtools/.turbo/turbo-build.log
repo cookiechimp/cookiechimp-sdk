@@ -1,0 +1,35 @@
+
+> @cookiechimp/devtools@0.0.0 build /workspace/m24/w/packages/devtools
+> tsdown --config-loader native && for f in index simulation; do cp dist/$f.d.mts dist/$f.d.ts; done
+
+ℹ tsdown v0.23.1 powered by rolldown v1.2.13
+ℹ config file: /workspace/m24/w/packages/devtools/tsdown.config.mjs 
+ℹ entry: src/index.ts, src/simulation.ts
+ℹ tsconfig: tsconfig.json
+ℹ Build start
+ℹ Cleaning 18 files
+
+ WARN  TypeScript 7.0 does not yet have a stable API and is experimental. Some options will be unavailable.
+
+ℹ Emit types with typescript@7.0.2
+ℹ [CJS] dist/index.cjs            5.69 kB │ gzip: 2.68 kB
+ℹ [CJS] dist/simulation.cjs       1.16 kB │ gzip: 0.62 kB
+ℹ [CJS] dist/index.cjs.map       19.31 kB │ gzip: 6.93 kB
+ℹ [CJS] dist/simulation.cjs.map   4.21 kB │ gzip: 1.74 kB
+ℹ [CJS] 4 files, total: 30.35 kB
+ℹ [CJS] dist/index.d.cts.map       0.40 kB │ gzip: 0.25 kB
+ℹ [CJS] dist/simulation.d.cts.map  0.26 kB │ gzip: 0.20 kB
+ℹ [CJS] dist/index.d.cts           2.22 kB │ gzip: 1.01 kB
+ℹ [CJS] dist/simulation.d.cts      1.18 kB │ gzip: 0.58 kB
+ℹ [CJS] 4 files, total: 4.05 kB
+✔ Build complete in 251ms
+ℹ [ESM] dist/index.mjs              5.63 kB │ gzip: 2.65 kB
+ℹ [ESM] dist/simulation.mjs         1.07 kB │ gzip: 0.58 kB
+ℹ [ESM] dist/index.mjs.map         19.24 kB │ gzip: 6.90 kB
+ℹ [ESM] dist/simulation.mjs.map     4.20 kB │ gzip: 1.74 kB
+ℹ [ESM] dist/index.d.mts.map        0.40 kB │ gzip: 0.25 kB
+ℹ [ESM] dist/simulation.d.mts.map   0.26 kB │ gzip: 0.20 kB
+ℹ [ESM] dist/index.d.mts            2.22 kB │ gzip: 1.01 kB
+ℹ [ESM] dist/simulation.d.mts       1.18 kB │ gzip: 0.58 kB
+ℹ [ESM] 8 files, total: 34.19 kB
+✔ Build complete in 255ms

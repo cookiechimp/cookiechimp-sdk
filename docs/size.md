@@ -44,6 +44,8 @@ The checked budgets are the source-of-truth values below. Region header provider
 | Hotjar preset | extra | 1025 |
 | LinkedIn Insight preset | extra | 970 |
 | TikTok Pixel preset | extra | 1095 |
+| Devtools panel | extra | 3295 |
+| Devtools simulation reader | extra | 585 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -95,3 +97,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | scripts hotjar | 935 B | 1025 B | Vendor consent API sync, measured 889 B (about 15% headroom) | M4 PR17 (lead approved) |
 | scripts linkedin | 880 B | 970 B | Vendor consent API sync, measured 842 B (about 15% headroom) | M4 PR17 (lead approved) |
 | scripts tiktok | 995 B | 1095 B | Vendor consent API sync, measured 952 B (about 15% headroom) | M4 PR17 (lead approved) |
+| devtools | none | 3295 B | New opt-in development panel, measured 2863 B (about 15% headroom) | M4 PR18 |
+| devtools simulation | none | 585 B | New simulation reader subpath, measured 506 B (about 16% headroom) | M4 PR18 |

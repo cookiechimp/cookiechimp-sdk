@@ -1,0 +1,4 @@
+
+> @cookiechimp/devtools@0.0.0 typecheck /workspace/m24/w/packages/devtools
+> tsc --noEmit
+
