@@ -37,9 +37,13 @@ describe("size harness", () => {
     expect(block, "marked size budget table").toBeDefined();
     const documented = [
       ...(block ?? "").matchAll(
-        /^\| (.+?) \| (initial|total|extra|lazy) \| (\d+) \|$/gm,
+        /^\| (.+?) \| (initial|total|extra|lazy) \| (\d+|INFO) \|$/gm,
       ),
-    ].map(([, name, kind, limit]) => ({ name, kind, limit: Number(limit) }));
+    ].map(([, name, kind, limit]) => ({
+      name,
+      kind,
+      limit: limit === "INFO" ? undefined : Number(limit),
+    }));
     expect(documented).toEqual(
       configured.map(({ name, kind, limit }) => ({ name, kind, limit })),
     );

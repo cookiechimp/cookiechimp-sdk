@@ -9,6 +9,7 @@
   z-index: var(--cc-banner-recall-z-index);
 }
 .cc-banner {
+  box-sizing: border-box;
   position: fixed;
   left: var(--cc-spacing-4);
   right: var(--cc-spacing-4);

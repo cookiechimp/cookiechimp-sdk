@@ -24,13 +24,22 @@ License: MIT
 
 ## Region and regulation behavior
 
+The SDK never looks up a visitor's location. It does not make geo-IP requests,
+inspect an IP address, or call an external location service. Applications own
+their location policy and pass trusted region context to `createConsent({
+region })`. On a server, an application can instead read geo headers supplied
+by its hosting platform, pass them to `resolveRegion`, and then pass that result
+to the consent runtime or server provider.
+
 Import `resolveRegion`, `regulationFor`, and the server header form of
 `readGpc` from `@cookiechimp/core/regions`. `resolveRegion(headers, options)`
 accepts Web `Headers`, plain records, and
 Node-style incoming header records. The `provider` option is required to trust
 geo headers and must be `"vercel"`, `"cloudflare"`, `"cloudfront"`, or
 `"custom"`. Only that provider's country and subdivision headers are read.
-Custom providers use `header` and optional `regionHeader` names. There is no
+Vercel supplies `x-vercel-ip-country` and `x-vercel-ip-country-region`.
+Cloudflare supplies `cf-ipcountry`. Custom providers use `header` and optional
+`regionHeader` names. There is no
 generic geo header fallback. Country and subdivision values are normalized to
 uppercase. Unknown and malformed provider values are ignored.
 

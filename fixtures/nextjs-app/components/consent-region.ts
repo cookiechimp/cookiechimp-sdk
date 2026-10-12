@@ -1,37 +1,12 @@
 "use client";
 
-import {
-  type ConsentState,
-  createConsent,
-  type Region,
-  type Regulation,
-} from "@cookiechimp/core";
-import { createElement, useState } from "react";
+import { useConsent, useHeadlessContext } from "@cookiechimp/react";
+import { createElement } from "react";
 
-export function ConsentRegion({
-  region = null,
-  regulation,
-  resolveRegulation,
-  gpc = false,
-  initial = null,
-}: {
-  region?: Region | null;
-  regulation?: Regulation;
-  resolveRegulation?: (region: Region | null, now?: number) => Regulation;
-  gpc?: boolean;
-  initial?: ConsentState | null;
-}) {
-  const [runtime] = useState(() =>
-    createConsent({
-      categories: ["analytics", "advertising"],
-      region,
-      regulation,
-      resolveRegulation,
-      gpc,
-      initial,
-    }),
-  );
-  const [state, setState] = useState(runtime.get());
+export function ConsentRegion() {
+  const runtime = useHeadlessContext()?.consent;
+  const state = useConsent();
+  if (!runtime) return null;
   const line = (testId: string, text: string) =>
     createElement("p", { "data-testid": testId }, text);
   return createElement(
@@ -53,7 +28,7 @@ export function ConsentRegion({
     line("regional-action", state.action),
     createElement(
       "button",
-      { type: "button", onClick: () => setState(runtime.acceptAll()) },
+      { type: "button", onClick: runtime.acceptAll },
       "Accept regional cookies",
     ),
   );

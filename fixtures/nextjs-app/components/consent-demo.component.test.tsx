@@ -1,6 +1,8 @@
+import { ConsentProvider } from "@cookiechimp/react";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
+import { consentConfig } from "../consent-config";
 import { ConsentDemo } from "./consent-demo";
 
 afterEach(() => {
@@ -15,7 +17,13 @@ describe("ConsentDemo", () => {
     const container = document.createElement("div");
     document.body.append(container);
     const root = createRoot(container);
-    await act(() => root.render(<ConsentDemo />));
+    await act(() =>
+      root.render(
+        <ConsentProvider config={consentConfig}>
+          <ConsentDemo />
+        </ConsentProvider>,
+      ),
+    );
     expect(document.documentElement.dataset.ccDynamic).toBe("ready");
     const button = [...document.querySelectorAll("button")].find(
       (element) => element.textContent === "Accept all cookies",

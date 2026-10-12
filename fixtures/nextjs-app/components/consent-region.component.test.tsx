@@ -1,8 +1,18 @@
+import type { ConsentConfig } from "@cookiechimp/core";
 import { regulationFor } from "@cookiechimp/core/regions";
-import { act, createElement } from "react";
+import { ConsentProvider } from "@cookiechimp/react";
+import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { ConsentRegion } from "./consent-region";
+
+const renderRegion = (props: Partial<ConsentConfig> = {}) => (
+  <ConsentProvider
+    config={{ categories: ["analytics", "advertising"], ...props }}
+  >
+    <ConsentRegion />
+  </ConsentProvider>
+);
 
 afterEach(() => {
   document.body.replaceChildren();
@@ -14,7 +24,7 @@ describe("ConsentRegion", () => {
     document.body.append(container);
     const root = createRoot(container);
 
-    await act(() => root.render(createElement(ConsentRegion)));
+    await act(() => root.render(renderRegion()));
 
     const region = document.querySelector<HTMLElement>(
       "[data-testid='consent-region']",
@@ -40,10 +50,11 @@ describe("ConsentRegion", () => {
     const root = createRoot(container);
     await act(() =>
       root.render(
-        createElement(ConsentRegion, {
+        renderRegion({
           region: { country: "US", region: "CA" },
           regulation: "ccpa",
           gpc: true,
+          saleShareCategories: ["advertising"],
         }),
       ),
     );
@@ -61,7 +72,7 @@ describe("ConsentRegion", () => {
     const root = createRoot(container);
     await act(() =>
       root.render(
-        createElement(ConsentRegion, {
+        renderRegion({
           region: { country: "US", region: "CA" },
           resolveRegulation: regulationFor,
         }),

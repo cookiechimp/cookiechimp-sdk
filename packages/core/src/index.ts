@@ -62,6 +62,8 @@ export type ConsentCategories =
   | readonly (string | ConsentCategory | CategoryInput)[];
 
 export interface ConsentCookieOptions {
+  /** Cookie name. Defaults to cc_consent. */
+  name?: string;
   /** Lifetime in seconds. Defaults to 180 days. */
   maxAge?: number;
   domain?: string;
@@ -206,15 +208,12 @@ export function decodeConsentCookie(value: string): ConsentState | null {
 /** Read Cookie header text in an SSR environment. */
 export function readConsentCookie(
   header: string | null | undefined,
+  name = CONSENT_COOKIE_NAME,
 ): ConsentState | null {
   if (!header || header.length > 32_768) return null;
   for (const part of header.split(";")) {
     const separator = part.indexOf("=");
-    if (
-      separator < 0 ||
-      part.slice(0, separator).trim() !== CONSENT_COOKIE_NAME
-    )
-      continue;
+    if (separator < 0 || part.slice(0, separator).trim() !== name) continue;
     try {
       return decodeConsentCookie(
         decodeURIComponent(part.slice(separator + 1).trim()),
@@ -274,6 +273,11 @@ function snapshot(state: ConsentState): ConsentState {
 
 function validateCookieOptions(options: ConsentCookieOptions): void {
   if (
+    options.name !== undefined &&
+    !/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(options.name)
+  )
+    throw new TypeError("Invalid cookie.name: expected a valid cookie name");
+  if (
     options.domain !== undefined &&
     (/[;\s]/.test(options.domain) ||
       [...options.domain].some((character) => {
@@ -290,7 +294,7 @@ function persist(state: ConsentState, options: ConsentCookieOptions): void {
   if (typeof document === "undefined") return;
   const maxAge = options.maxAge ?? 180 * 24 * 60 * 60;
   const fields = [
-    `${CONSENT_COOKIE_NAME}=${encodeURIComponent(encodeConsentCookie(state))}`,
+    `${options.name ?? CONSENT_COOKIE_NAME}=${encodeURIComponent(encodeConsentCookie(state))}`,
     "Path=/",
     "SameSite=Lax",
     `Max-Age=${Math.max(0, Math.floor(maxAge))}`,
@@ -344,7 +348,9 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     normalized.services.map(({ id, category }) => [id, category]),
   );
   const browserState =
-    typeof document === "undefined" ? null : readConsentCookie(document.cookie);
+    typeof document === "undefined"
+      ? null
+      : readConsentCookie(document.cookie, config.cookie?.name);
   const restored = validState(config.initial) ?? browserState;
   const saleShare = new Set(
     config.saleShareCategories ?? ["advertising", "marketing"],

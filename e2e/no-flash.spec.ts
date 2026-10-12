@@ -1,13 +1,131 @@
 import { expect, test } from "@playwright/test";
 
+async function observeBannerChanges(
+  page: import("@playwright/test").Page,
+  serverHasBanner: boolean,
+) {
+  await page.addInitScript((hasServerBanner) => {
+    const selector = '[data-cc-part="banner"]';
+    let initialized = !hasServerBanner;
+    let present = false;
+    const changes: string[] = [];
+    new MutationObserver((records) => {
+      const next = document.querySelector(selector) !== null;
+      if (!initialized && next) {
+        initialized = true;
+        present = true;
+        return;
+      }
+      if (initialized && next !== present) {
+        changes.push(next ? "inserted" : "removed");
+        present = next;
+      }
+      // Inspect records so removal and insertion in one callback are not hidden.
+      for (const record of records) {
+        for (const node of record.removedNodes)
+          if (
+            node instanceof Element &&
+            (node.matches(selector) || node.querySelector(selector))
+          )
+            changes.push("removed");
+        for (const node of record.addedNodes)
+          if (
+            initialized &&
+            node instanceof Element &&
+            (node.matches(selector) || node.querySelector(selector))
+          )
+            changes.push("inserted");
+      }
+    }).observe(document, { childList: true, subtree: true });
+    Object.defineProperty(window, "__ccBannerChanges", { value: changes });
+  }, serverHasBanner);
+}
+
+test("no-flash: first visit keeps the server banner through hydration", async ({
+  page,
+}) => {
+  const response = await page.request.get("/");
+  expect(await response.text()).toContain('data-cc-part="banner"');
+  await observeBannerChanges(page, true);
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-hydrated",
+    "true",
+  );
+  await expect(page.locator('[data-cc-part="banner"]')).toBeVisible();
+  expect(await page.evaluate(() => window.__ccBannerChanges)).toEqual([]);
+});
+
+test("no-flash: returning visitor never inserts the consent banner", async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const setupPage = await context.newPage();
+  await setupPage.goto("/");
+  await setupPage.getByRole("button", { name: "Accept all cookies" }).click();
+  await setupPage.close();
+
+  const response = await context.request.get("/");
+  expect(await response.text()).not.toContain('data-cc-part="banner"');
+  const page = await context.newPage();
+  await observeBannerChanges(page, false);
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-hydrated",
+    "true",
+  );
+  await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__ccBannerChanges)).toEqual([]);
+  await context.close();
+});
+
 test("first visit shows the consent banner and accepting hides it", async ({
   page,
 }) => {
+  await page.route(/\.css(?:\?|$)/, (route) => route.abort());
   await page.goto("/");
-  await expect(page.locator('[data-cc-part="banner"]')).toBeVisible();
+  const banner = page.locator('[data-cc-part="banner"]');
+  await expect(banner).toBeVisible();
+  await expect(banner).toHaveCSS("position", "fixed");
+  await expect(banner).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await page.getByRole("button", { name: "Accept all cookies" }).click();
   await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
 });
+
+for (const viewport of [
+  { name: "desktop", width: 1280, height: 800 },
+  { name: "mobile", width: 375, height: 740 },
+])
+  test(`critical banner layout matches the full stylesheet on ${viewport.name}`, async ({
+    browser,
+  }) => {
+    const record = async (blockExternalCss: boolean) => {
+      const context = await browser.newContext({ viewport });
+      const page = await context.newPage();
+      if (blockExternalCss)
+        await page.route(/\.css(?:\?|$)/, (route) => route.abort());
+      await page.goto("/");
+      const banner = page.locator('[data-cc-part="banner"]');
+      await expect(banner).toBeVisible();
+      const layout = await banner.evaluate((element) => {
+        const style = getComputedStyle(element);
+        const box = element.getBoundingClientRect();
+        return {
+          flexDirection: style.flexDirection,
+          alignItems: style.alignItems,
+          boundingBox: {
+            x: box.x,
+            y: box.y,
+            width: box.width,
+            height: box.height,
+          },
+        };
+      });
+      await context.close();
+      return layout;
+    };
+    expect(await record(true)).toEqual(await record(false));
+  });
 
 test("keyboard opens and closes the modal with restored focus", async ({
   page,
@@ -36,7 +154,9 @@ test("returning visitor has no consent banner before or after hydration", async 
   await page.getByRole("button", { name: "Accept all cookies" }).click();
 
   const response = await context.request.get("/");
-  expect(await response.text()).not.toContain('data-cc-part="banner"');
+  const html = await response.text();
+  expect(html).not.toContain('data-cc-part="banner"');
+  expect(html).toContain("data-cookiechimp-critical");
   await page.reload();
   await expect(page.locator('[data-cc-part="banner"]')).toHaveCount(0);
   await context.close();

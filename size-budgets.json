@@ -67,6 +67,20 @@
     "excludedFrom": "packages/core/dist/index.mjs"
   },
   {
+    "name": "Next.js client provider bridge",
+    "scenario": "nextjs client",
+    "entry": "packages/nextjs/dist/index.mjs",
+    "kind": "extra",
+    "limit": 4370
+  },
+  {
+    "name": "Next.js server entry",
+    "scenario": "nextjs server",
+    "entry": "packages/nextjs/dist/server.mjs",
+    "kind": "extra",
+    "informational": true
+  },
+  {
     "name": "react headless primitives",
     "scenario": "react-headless",
     "entry": "packages/react/dist/headless.mjs",
