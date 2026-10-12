@@ -89,6 +89,7 @@ describe("createConsent", () => {
     const ccpa = createConsent({
       categories: { analytics: false },
       region: { country: "US", region: "CA" },
+      regulation: "ccpa",
     });
     expect(ccpa.get().categories.analytics).toBe(true);
     expect(ccpa.needsDecision).toBe(false);
@@ -97,6 +98,7 @@ describe("createConsent", () => {
     const none = createConsent({
       categories: { analytics: true },
       region: { country: "JP" },
+      regulation: "none",
     });
     expect(none.get().categories.analytics).toBe(true);
     expect(none.needsDecision).toBe(false);
@@ -122,6 +124,17 @@ describe("createConsent", () => {
     ).toBe("none");
   });
 
+  it("accepts regulation resolved outside the default entry", () => {
+    const resolveRegulation = (region: { country: string } | null) =>
+      region?.country === "US" ? ("ccpa" as const) : ("gdpr" as const);
+    const region = { country: "US", region: "CA" };
+    expect(
+      createConsent({ categories: [], region, regulation: resolveRegulation })
+        .regulation,
+    ).toBe("ccpa");
+    expect(createConsent({ categories: [], region }).regulation).toBe("gdpr");
+  });
+
   it("applies GPC once and preserves explicit decisions outside sale/share", () => {
     const onConsent = vi.fn();
     const initial = state();
@@ -133,6 +146,7 @@ describe("createConsent", () => {
     const runtime = createConsent({
       categories: ["analytics", "advertising"],
       region: { country: "US", region: "CA" },
+      regulation: "ccpa",
       gpc: true,
       initial,
       onConsent,
@@ -148,6 +162,7 @@ describe("createConsent", () => {
     const restored = createConsent({
       categories: ["advertising"],
       region: runtime.region,
+      regulation: "ccpa",
       gpc: true,
       initial: runtime.get(),
       onConsent,

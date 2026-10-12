@@ -4,15 +4,18 @@ import {
   type ConsentState,
   createConsent,
   type Region,
+  type Regulation,
 } from "@cookiechimp/core";
 import { createElement, useState } from "react";
 
 export function ConsentRegion({
   region = null,
+  regulation,
   gpc = false,
   initial = null,
 }: {
   region?: Region | null;
+  regulation?: Regulation;
   gpc?: boolean;
   initial?: ConsentState | null;
 }) {
@@ -20,6 +23,7 @@ export function ConsentRegion({
     createConsent({
       categories: ["analytics", "advertising"],
       region,
+      regulation,
       gpc,
       initial,
     }),

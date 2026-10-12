@@ -12,7 +12,9 @@ License: MIT
 
 ## Region and regulation behavior
 
-`resolveRegion(headers, options?)` accepts Web `Headers`, plain records, and
+Import `resolveRegion`, `regulationFor`, and the server header form of
+`readGpc` from `@cookiechimp/core/regions`. `resolveRegion(headers, options?)`
+accepts Web `Headers`, plain records, and
 Node-style incoming header records. It checks a configured custom country
 header first, followed by Vercel, Cloudflare, CloudFront, and generic
 `x-country-code` headers. Country and subdivision values are normalized to
@@ -21,8 +23,25 @@ uppercase. Unknown and malformed provider values are ignored.
 The default rules treat the EU and EEA, the UK, and Switzerland as GDPR.
 California and the other states listed by `US_OPT_OUT_STATES` use a common
 CCPA-style opt-out behavior. This behavior model does not imply that the state
-statutes are identical. Unknown locations use the safe GDPR fallback. Use
-`regulation`, `regions`, or `fallbackRegulation` to override those rules.
+statutes are identical. Unknown locations use the safe GDPR fallback. Pass the
+result into the default entry as already-resolved context:
+
+```ts
+import { createConsent } from "@cookiechimp/core";
+import { regulationFor, resolveRegion } from "@cookiechimp/core/regions";
+
+const region = resolveRegion(headers);
+const consent = createConsent({
+  categories: ["analytics", "advertising"],
+  region,
+  regulation: regulationFor(region),
+  gpc: true,
+});
+```
+
+`regulation` may also be a resolver function. Without it, `createConsent`
+uses `fallbackRegulation`, which defaults to `"gdpr"`, even when `region` is
+present. `regions` remains available for application-specific overrides.
 
 GDPR starts non-required categories disabled and requires a decision. CCPA
 starts them enabled and exposes an opt-out link. GPC disables the configured

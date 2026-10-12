@@ -11,12 +11,7 @@ import {
   type NormalizedConfig,
   normalizeConfig,
 } from "./config";
-import type {
-  HeaderSource,
-  Region,
-  RegionHeaderOptions,
-  Regulation,
-} from "./regions";
+import type { Region, Regulation } from "./regions";
 
 export type {
   CategoryConfig,
@@ -28,72 +23,15 @@ export type {
   ServicePattern,
 } from "./config";
 export { ConsentConfigError, normalizeConfig } from "./config";
-export type {
-  HeaderSource,
-  Region,
-  RegionHeaderOptions,
-  Regulation,
-} from "./regions";
+export type { Region, Regulation } from "./regions";
 
-function getHeader(source: HeaderSource | undefined, name: string) {
-  if (!source) return null;
-  if ("get" in source && typeof source.get === "function")
-    return source.get(name);
-  const key = Object.keys(source).find((item) => item.toLowerCase() === name);
-  const value = key
-    ? (source as Record<string, string | string[] | undefined>)[key]
-    : undefined;
-  return Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
-}
-
-export function resolveRegion(
-  headers: HeaderSource,
-  options: RegionHeaderOptions = {},
-): Region | null {
-  for (const [countryHeader, regionHeader] of [
-    [options.customHeader, options.customRegionHeader],
-    ["x-vercel-ip-country", "x-vercel-ip-country-region"],
-    ["cf-ipcountry", "cf-region-code"],
-    ["cloudfront-viewer-country", "cloudfront-viewer-country-region"],
-    ["x-country-code", "x-region-code"],
-  ]) {
-    if (!countryHeader) continue;
-    const country =
-      getHeader(headers, countryHeader)?.trim().toUpperCase() ?? "";
-    if (!/^[A-Z]{2}$/.test(country) || country === "XX" || country === "T1")
-      continue;
-    let region = regionHeader
-      ? (getHeader(headers, regionHeader)?.trim().toUpperCase() ?? "")
-      : "";
-    if (region.startsWith(`${country}-`)) region = region.slice(3);
-    return { country, ...(/^[A-Z0-9]{1,3}$/.test(region) ? { region } : {}) };
-  }
-  return null;
-}
-
-export function readGpc(headers?: HeaderSource): boolean {
-  return headers
-    ? getHeader(headers, "sec-gpc")?.trim() === "1"
-    : typeof navigator !== "undefined" &&
-        (navigator as Navigator & { globalPrivacyControl?: boolean })
-          .globalPrivacyControl === true;
-}
-
-const GDPR_COUNTRIES =
-  "AT BE BG HR CY CZ DE DK EE ES FI FR GR HU IE IS IT LI LT LU LV MT NL NO PL PT RO SE SI SK GB CH";
-const OPT_OUT_STATES =
-  "CA CO CT DE IA IN KY MD MN MT NE NH NJ OR RI TN TX UT VA";
-export function defaultRegulation(
-  region: Region | null,
-  fallback: Regulation = "gdpr",
-): Regulation {
-  if (!region) return fallback;
-  if (GDPR_COUNTRIES.includes(region.country)) return "gdpr";
-  return region.country === "US" &&
-    region.region &&
-    OPT_OUT_STATES.includes(region.region)
-    ? "ccpa"
-    : "none";
+/** Read browser Global Privacy Control. Use the regions subpath for headers. */
+export function readGpc(): boolean {
+  return (
+    typeof navigator !== "undefined" &&
+    (navigator as Navigator & { globalPrivacyControl?: boolean })
+      .globalPrivacyControl === true
+  );
 }
 
 export type ConsentAction = "accept_all" | "reject_all" | "custom" | "gpc_auto";
@@ -377,7 +315,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
       : normalized.regulation) ??
     normalized.regions[regionKey] ??
     (region ? normalized.regions[region.country] : undefined) ??
-    defaultRegulation(region, normalized.fallbackRegulation);
+    normalized.fallbackRegulation;
   const gpc = config.gpc ?? (readGpc() || config.initial?.gpc === true);
   const defaults = Object.fromEntries(
     Object.entries(configuredDefaults).map(([name, enabled]) => [

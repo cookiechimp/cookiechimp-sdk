@@ -41,6 +41,7 @@ describe("ConsentRegion", () => {
       root.render(
         createElement(ConsentRegion, {
           region: { country: "US", region: "CA" },
+          regulation: "ccpa",
           gpc: true,
         }),
       ),

@@ -91,3 +91,6 @@ export function defaultRegulation(
     return "ccpa";
   return "none";
 }
+
+/** Resolve the built-in regulation for a region before creating consent. */
+export const regulationFor = defaultRegulation;
