@@ -112,6 +112,8 @@ runs. Consent is checked for every request, so later grants take effect and
 later revocations block again. Relative URLs resolve against `document.baseURI`.
 Non-HTTP URLs and URLs that cannot be parsed are left alone.
 
+Blocked requests are dropped, not queued or replayed. This is the safer privacy default: a request made before consent may carry data the visitor never agreed to share, and replaying it later would send that data anyway. Code that needs the request after consent should make it again from a consent subscriber.
+
 Blocked fetch calls reject with `ConsentBlockedError`. Blocked XHR sends emit
 `error` and `loadend` with status 0. Blocked beacons return `false`. Requests are
 dropped and are never queued or replayed. The returned controller provides

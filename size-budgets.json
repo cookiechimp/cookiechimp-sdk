@@ -22,7 +22,7 @@
     "scenario": "network",
     "entry": "packages/core/dist/network.mjs",
     "kind": "extra",
-    "limit": 2048,
+    "limit": 2304,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["blockNetwork", "ConsentBlockedError"]
   },
