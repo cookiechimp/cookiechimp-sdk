@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   bundleEntry,
   checkDefaultExclusion,
@@ -164,6 +164,24 @@ describe("size harness", () => {
     expect(
       compareBudget({ ...budget("entry", 1), informational: true }, 1000),
     ).toMatchObject({ status: "info", bytes: 1000 });
+  });
+
+  it("excludes informational rows from the enforced summary count", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
+    await writeFile(join(root, "entry.mjs"), "export const value = true;");
+    await writeFile(
+      join(root, "size-budgets.json"),
+      JSON.stringify([
+        budget("entry.mjs"),
+        { ...budget("entry.mjs"), informational: true },
+      ]),
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const table = vi.spyOn(console, "table").mockImplementation(() => {});
+    await expect(main(root)).resolves.toBe(0);
+    expect(log).toHaveBeenCalledWith("\n1 enforced, 0 pending");
+    log.mockRestore();
+    table.mockRestore();
   });
 
   it("leaves React external", async () => {

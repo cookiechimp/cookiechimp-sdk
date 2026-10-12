@@ -4,6 +4,12 @@ Open-source, lightweight consent SDK for React, Next.js and plain JavaScript, bu
 
 - Works with no account (local mode).
 - Connect a CookieChimp project to sync a consent log, scanner categories, dashboard-managed copy, translations, regional rules and styling, plus IAB TCF/GPP and multi-site.
+
+Language negotiation checks each requested locale in preference order. It first
+matches the exact tag, then an available base language, then the first available
+regional variant with the same base, and finally the configured fallback. For
+example, `fr-CA` can select `fr`, or `fr-FR` when only that regional variant is
+available, while `pt` can select `pt-BR`.
 - Small, fast, no banner flash on SSR, strict CSP friendly, Google Consent Mode v2 ready.
 
 Status: pre-alpha. See [SPEC.md](./SPEC.md) for the design and roadmap.

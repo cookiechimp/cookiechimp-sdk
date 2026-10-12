@@ -175,7 +175,7 @@ test("styled controls gate frames, recall preferences, and avoid layout shift", 
     await banner.evaluate((node) => getComputedStyle(node).backgroundColor),
   ).toBe("rgb(255, 255, 255)");
   expect(frameRequests).toBe(0);
-  await page.getByRole("button", { name: "Allow" }).click();
+  await page.getByRole("button", { name: "Allow content" }).click();
   await expect.poll(() => frameRequests).toBe(1);
   const recall = page.locator('[data-cc-part="recall"]');
   await expect(recall).toBeVisible();

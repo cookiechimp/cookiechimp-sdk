@@ -42,7 +42,8 @@
   },
   "dependencies": {
     "@cookiechimp/core": "workspace:*",
-    "@cookiechimp/tokens": "workspace:*"
+    "@cookiechimp/tokens": "workspace:*",
+    "@cookiechimp/translations": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18",

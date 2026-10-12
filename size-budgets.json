@@ -36,6 +36,15 @@
     "forbiddenTokens": ["installConsentMode", "wait_for_update"]
   },
   {
+    "name": "language controller",
+    "scenario": "language",
+    "entry": "packages/core/dist/language.mjs",
+    "kind": "extra",
+    "limit": 1050,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["createLanguageController", "parseAcceptLanguage"]
+  },
+  {
     "name": "core initial",
     "scenario": "core",
     "entry": "packages/core/dist/index.mjs",

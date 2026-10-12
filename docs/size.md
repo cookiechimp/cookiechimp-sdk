@@ -17,6 +17,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | runtime script and iframe blocking | extra | 2688 |
 | network blocking | extra | 2304 |
 | consent-mode | extra | 1560 |
+| language controller | extra | 1050 |
 | core initial | initial | 4096 |
 | core total | total | 5120 |
 | react provider and hooks | extra | 4608 |
@@ -51,3 +52,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | ui | PENDING | 13824 B initial, 16384 B total | Styled preferences and recall entry is now enforced | M2 PR12 |
 | banner | `packages/react/dist/banner.mjs` | `scripts/size-scenarios/banner.ts` | entry changed to scenario, limit unchanged | M2 PR12 |
 | ui | `packages/react/dist/ui.mjs` | `scripts/size-scenarios/ui.ts` | entry changed to scenario, limit unchanged | M2 PR12 |
+| language | none | 954 B | New opt-in controller (measured 829 B at landing) | M2 PR13 |
+| language | 954 B | 1050 B | Accept-Language q validation and regional fallback (measured 914 B, leaving 40 B (about 4%) under 954 B; 1050 B gives about 15% headroom) | M2 PR13 |

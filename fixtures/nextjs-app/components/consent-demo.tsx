@@ -17,6 +17,7 @@ import {
   GatedScript,
   RecallButton,
 } from "@cookiechimp/react/ui";
+import type { Messages } from "@cookiechimp/translations";
 import { useEffect, useState } from "react";
 
 const config = {
@@ -33,14 +34,23 @@ const config = {
 
 export function ConsentDemo({
   initialState = null,
+  language,
+  translations,
 }: {
   initialState?: ConsentState | null;
+  language?: string;
+  translations?: Messages;
 }) {
   const [consent] = useState(() =>
     createConsent({ ...config, initial: initialState }),
   );
   return (
-    <ConsentProvider consent={consent} initialState={initialState}>
+    <ConsentProvider
+      consent={consent}
+      initialState={initialState}
+      language={language}
+      translations={translations}
+    >
       <ConsentDemoContent consent={consent} />
     </ConsentProvider>
   );
@@ -75,11 +85,7 @@ function ConsentDemoContent({
 
   return (
     <section aria-label="Consent demo">
-      <CookieBanner
-        title="Cookie consent"
-        description="Choose how this site may use cookies."
-        labels={{ accept: "Accept all cookies" }}
-      />
+      <CookieBanner />
       <CookiePreferences
         categories={[
           {

@@ -1,0 +1,205 @@
+{
+  "name": "@cookiechimp/translations",
+  "version": "0.0.0",
+  "description": "Tree-shakeable consent UI translations for CookieChimp",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown --config-loader native && node scripts/copy-types.mjs",
+    "lint": "biome check .",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsdown": "0.23.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./en": {
+      "types": "./dist/en.d.ts",
+      "import": "./dist/en.mjs",
+      "require": "./dist/en.cjs"
+    },
+    "./meta": {
+      "types": "./dist/meta.d.ts",
+      "import": "./dist/meta.mjs",
+      "require": "./dist/meta.cjs"
+    },
+    "./de": {
+      "types": "./dist/de.d.ts",
+      "import": "./dist/de.mjs",
+      "require": "./dist/de.cjs"
+    },
+    "./fr": {
+      "types": "./dist/fr.d.ts",
+      "import": "./dist/fr.mjs",
+      "require": "./dist/fr.cjs"
+    },
+    "./es": {
+      "types": "./dist/es.d.ts",
+      "import": "./dist/es.mjs",
+      "require": "./dist/es.cjs"
+    },
+    "./it": {
+      "types": "./dist/it.d.ts",
+      "import": "./dist/it.mjs",
+      "require": "./dist/it.cjs"
+    },
+    "./nl": {
+      "types": "./dist/nl.d.ts",
+      "import": "./dist/nl.mjs",
+      "require": "./dist/nl.cjs"
+    },
+    "./pt": {
+      "types": "./dist/pt.d.ts",
+      "import": "./dist/pt.mjs",
+      "require": "./dist/pt.cjs"
+    },
+    "./pt-BR": {
+      "types": "./dist/pt-BR.d.ts",
+      "import": "./dist/pt-BR.mjs",
+      "require": "./dist/pt-BR.cjs"
+    },
+    "./pl": {
+      "types": "./dist/pl.d.ts",
+      "import": "./dist/pl.mjs",
+      "require": "./dist/pl.cjs"
+    },
+    "./sv": {
+      "types": "./dist/sv.d.ts",
+      "import": "./dist/sv.mjs",
+      "require": "./dist/sv.cjs"
+    },
+    "./da": {
+      "types": "./dist/da.d.ts",
+      "import": "./dist/da.mjs",
+      "require": "./dist/da.cjs"
+    },
+    "./fi": {
+      "types": "./dist/fi.d.ts",
+      "import": "./dist/fi.mjs",
+      "require": "./dist/fi.cjs"
+    },
+    "./no": {
+      "types": "./dist/no.d.ts",
+      "import": "./dist/no.mjs",
+      "require": "./dist/no.cjs"
+    },
+    "./cs": {
+      "types": "./dist/cs.d.ts",
+      "import": "./dist/cs.mjs",
+      "require": "./dist/cs.cjs"
+    },
+    "./sk": {
+      "types": "./dist/sk.d.ts",
+      "import": "./dist/sk.mjs",
+      "require": "./dist/sk.cjs"
+    },
+    "./hu": {
+      "types": "./dist/hu.d.ts",
+      "import": "./dist/hu.mjs",
+      "require": "./dist/hu.cjs"
+    },
+    "./ro": {
+      "types": "./dist/ro.d.ts",
+      "import": "./dist/ro.mjs",
+      "require": "./dist/ro.cjs"
+    },
+    "./bg": {
+      "types": "./dist/bg.d.ts",
+      "import": "./dist/bg.mjs",
+      "require": "./dist/bg.cjs"
+    },
+    "./el": {
+      "types": "./dist/el.d.ts",
+      "import": "./dist/el.mjs",
+      "require": "./dist/el.cjs"
+    },
+    "./hr": {
+      "types": "./dist/hr.d.ts",
+      "import": "./dist/hr.mjs",
+      "require": "./dist/hr.cjs"
+    },
+    "./sl": {
+      "types": "./dist/sl.d.ts",
+      "import": "./dist/sl.mjs",
+      "require": "./dist/sl.cjs"
+    },
+    "./et": {
+      "types": "./dist/et.d.ts",
+      "import": "./dist/et.mjs",
+      "require": "./dist/et.cjs"
+    },
+    "./lv": {
+      "types": "./dist/lv.d.ts",
+      "import": "./dist/lv.mjs",
+      "require": "./dist/lv.cjs"
+    },
+    "./lt": {
+      "types": "./dist/lt.d.ts",
+      "import": "./dist/lt.mjs",
+      "require": "./dist/lt.cjs"
+    },
+    "./ga": {
+      "types": "./dist/ga.d.ts",
+      "import": "./dist/ga.mjs",
+      "require": "./dist/ga.cjs"
+    },
+    "./mt": {
+      "types": "./dist/mt.d.ts",
+      "import": "./dist/mt.mjs",
+      "require": "./dist/mt.cjs"
+    },
+    "./tr": {
+      "types": "./dist/tr.d.ts",
+      "import": "./dist/tr.mjs",
+      "require": "./dist/tr.cjs"
+    },
+    "./ja": {
+      "types": "./dist/ja.d.ts",
+      "import": "./dist/ja.mjs",
+      "require": "./dist/ja.cjs"
+    },
+    "./zh": {
+      "types": "./dist/zh.d.ts",
+      "import": "./dist/zh.mjs",
+      "require": "./dist/zh.cjs"
+    },
+    "./ko": {
+      "types": "./dist/ko.d.ts",
+      "import": "./dist/ko.mjs",
+      "require": "./dist/ko.cjs"
+    },
+    "./ar": {
+      "types": "./dist/ar.d.ts",
+      "import": "./dist/ar.mjs",
+      "require": "./dist/ar.cjs"
+    },
+    "./he": {
+      "types": "./dist/he.d.ts",
+      "import": "./dist/he.mjs",
+      "require": "./dist/he.cjs"
+    },
+    "./uk": {
+      "types": "./dist/uk.d.ts",
+      "import": "./dist/uk.mjs",
+      "require": "./dist/uk.cjs"
+    }
+  }
+}
