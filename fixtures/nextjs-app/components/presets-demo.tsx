@@ -1,5 +1,7 @@
 "use client";
 
+import { installConsentMode } from "@cookiechimp/core/consent-mode";
+import { gateScripts } from "@cookiechimp/core/gate";
 import { useConsentActions, useHeadlessContext } from "@cookiechimp/react";
 import {
   applyPresets,
@@ -35,17 +37,24 @@ export function PresetsDemo({ advanced }: { advanced: boolean }) {
     ];
     // Exercise config composition in the browser as well as exporting the
     // composed fixture config used by the provider.
-    applyPresets({ categories: ["analytics", "marketing"] }, presets);
+    const composed = applyPresets(
+      { categories: ["analytics", "marketing"] },
+      presets,
+    );
     for (const preset of presets)
       preset.queue.install(window as unknown as QueueTarget);
+    const consentMode = installConsentMode(consent, composed.consentMode);
     (window as typeof window & { gtag?: (...args: unknown[]) => void }).gtag?.(
       "event",
       "preset_early_call",
     );
     for (const preset of presets) addScript(preset);
+    const gate = gateScripts(consent);
     document.documentElement.dataset.ccPresets = "ready";
     return () => {
       delete document.documentElement.dataset.ccPresets;
+      gate.stop();
+      consentMode.stop();
       for (const preset of presets)
         document.querySelector(`[data-cc-service="${preset.id}"]`)?.remove();
     };
