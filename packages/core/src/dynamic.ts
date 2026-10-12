@@ -1,11 +1,11 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
 import type { BlockedInfo } from "./internal/blocked";
-import { findService } from "./internal/blocker";
+import { prepareServiceFinder } from "./internal/blocker";
 import { fail } from "./internal/dev";
 import { normalizeLight } from "./internal/normalize-light";
 import { acquire } from "./internal/patch";
-import { isHttpUrl } from "./internal/url";
+import { isHttpUrl, resolveHttp } from "./internal/url";
 
 export type { BlockedInfo } from "./internal/blocked";
 
@@ -39,9 +39,25 @@ export function blockDynamic(
   if (!doc?.defaultView) return noop;
   const win = doc.defaultView;
   const config = normalizeLight(options.config);
+  const findService = prepareServiceFinder(config);
   const reports: BlockedInfo[] = [];
   const bypass = new WeakSet<Element>();
   let stopped = false;
+  let matchWarned = false;
+
+  const safeFind = (url: string) => {
+    try {
+      return findService(url, doc.baseURI);
+    } catch {
+      const resolved = resolveHttp(url, doc.baseURI);
+      if (!resolved) return;
+      if (!matchWarned) {
+        matchWarned = true;
+        console.warn("CookieChimp matcher failed");
+      }
+      return [resolved, undefined] as const;
+    }
+  };
 
   const shouldBlock = (el: Element, url: string) => {
     const { ccCategory: category, ccService: service } = (el as HTMLElement)
@@ -51,7 +67,9 @@ export function blockDynamic(
       !(service ? consent.hasService(service) : consent.has(category))
     )
       return { category, service };
-    const found = findService(config, url, doc.baseURI)?.[1];
+    const result = safeFind(url);
+    if (result && !result[1]) return { category, service };
+    const found = result?.[1];
     return found && !consent.hasService(found.id)
       ? { category: found.category, service: found.id }
       : undefined;
@@ -75,7 +93,7 @@ export function blockDynamic(
     const data = (el as HTMLElement).dataset;
     const first = !data.ccBlocked;
     data.ccSrc = url;
-    data.ccCategory = match.category;
+    if (match.category) data.ccCategory = match.category;
     if (match.service) data.ccService = match.service;
     data.ccBlocked = "true";
     if (el instanceof win.HTMLScriptElement) {
@@ -86,7 +104,7 @@ export function blockDynamic(
     if (first) {
       const info: BlockedInfo = {
         url,
-        category: match.category,
+        ...(match.category ? { category: match.category } : {}),
         kind: el instanceof win.HTMLScriptElement ? "script" : "iframe",
         ts: Date.now(),
         ...(match.service ? { service: match.service } : {}),

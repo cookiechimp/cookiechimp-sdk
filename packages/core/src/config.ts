@@ -1,3 +1,4 @@
+import { validPattern } from "./internal/pattern";
 import type { Region, Regulation } from "./regions";
 
 export type ServicePattern = string | RegExp;
@@ -17,8 +18,8 @@ export interface ServiceConfig {
   category: string;
   name?: string;
   scripts?: readonly ServicePattern[];
-  cookies?: readonly string[];
-  domains?: readonly string[];
+  cookies?: readonly ServicePattern[];
+  domains?: readonly ServicePattern[];
   default?: boolean;
 }
 
@@ -65,8 +66,8 @@ export interface NormalizedServiceConfig {
   readonly category: string;
   readonly name?: string;
   readonly scripts: readonly ServicePattern[];
-  readonly cookies: readonly string[];
-  readonly domains: readonly string[];
+  readonly cookies: readonly ServicePattern[];
+  readonly domains: readonly ServicePattern[];
   readonly default: boolean;
 }
 
@@ -109,14 +110,6 @@ export function categoryRecords(
     const { name: id, ...rest } = value;
     return { id, ...rest };
   });
-}
-
-function validPattern(pattern: unknown, kind: string): boolean {
-  if (kind === "scripts" && pattern instanceof RegExp)
-    return pattern.source.length > 0;
-  return (
-    typeof pattern === "string" && pattern.length > 0 && !/\s/.test(pattern)
-  );
 }
 
 function freezeCategory(category: CategoryConfig): NormalizedCategoryConfig {
@@ -220,7 +213,7 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
         continue;
       }
       for (const pattern of values ?? [])
-        if (!validPattern(pattern, kind)) {
+        if (!validPattern(pattern)) {
           invalid = true;
           valid = false;
           if (development)

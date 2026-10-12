@@ -26,6 +26,8 @@ type ProviderValue = {
   translations: Translations;
   getSnapshot: () => ConsentState;
   subscribe: (listener: () => void) => () => void;
+  preferences: ReturnType<typeof useVisibility>;
+  banner: ReturnType<typeof useVisibility>;
 };
 
 const Context = createContext<ProviderValue | null>(null);
@@ -60,27 +62,38 @@ export function ConsentProvider(props: ConsentProviderProps) {
   const serverState = useRef(
     props.initialState ?? runtime.current.get(),
   ).current;
-  const snapshot = useRef(serverState);
+  const preferences = useVisibility(false);
+  const banner = useVisibility(runtime.current.needsDecision);
   const value = useMemo(() => {
     const consent = runtime.current as ConsentRuntime;
     return {
       consent,
       serverState,
       translations: props.translations ?? {},
-      getSnapshot: () => snapshot.current,
-      subscribe: (listener: () => void) =>
-        consent.subscribe((state) => {
-          snapshot.current = state;
-          listener();
-        }),
+      getSnapshot: () => consent.get(),
+      subscribe: (listener: () => void) => consent.subscribe(listener),
+      preferences,
+      banner,
     };
-  }, [serverState, props.translations]);
+  }, [serverState, props.translations, preferences, banner]);
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }
 
 const production = () =>
   typeof process !== "undefined" && process.env.NODE_ENV === "production";
 const message = "CookieChimp hooks must be used within a <ConsentProvider>.";
+const inertState: ConsentState = Object.freeze({
+  schemaVersion: 1,
+  consentId: "",
+  ts: "",
+  categories: Object.freeze({ necessary: true }),
+  action: "custom",
+});
+const inertPreferences = Object.freeze({
+  open: false,
+  show() {},
+  hide() {},
+});
 
 function useConsentContext(): ProviderValue | null {
   const value = useContext(Context);
@@ -94,19 +107,10 @@ function useConsentContext(): ProviderValue | null {
 /** Read the immutable current consent snapshot. */
 export function useConsent(): ConsentState {
   const value = useConsentContext();
-  const fallback = useRef<ConsentState>(
-    Object.freeze({
-      schemaVersion: 1,
-      consentId: "",
-      ts: "",
-      categories: Object.freeze({ necessary: true }),
-      action: "custom",
-    }),
-  ).current;
   return useSyncExternalStore(
     value?.subscribe ?? (() => () => {}),
-    value?.getSnapshot ?? (() => fallback),
-    () => value?.serverState ?? fallback,
+    value?.getSnapshot ?? (() => inertState),
+    () => value?.serverState ?? inertState,
   );
 }
 
@@ -129,13 +133,7 @@ export function useConsentActions(): ConsentActions {
   );
 }
 
-const useConsentFallback = Object.freeze({
-  schemaVersion: 1,
-  consentId: "",
-  ts: "",
-  categories: Object.freeze({ necessary: true }),
-  action: "custom" as const,
-});
+const useConsentFallback = inertState;
 
 export function useCategory(id: string): boolean {
   return useConsent().categories[id] === true;
@@ -197,16 +195,15 @@ function useVisibility(initial: boolean) {
 }
 
 export function useBanner() {
-  const runtime = useConsentContext()?.consent;
+  const value = useConsentContext();
   useConsent();
-  const visibility = useVisibility(runtime?.needsDecision ?? false);
+  const visibility = value?.banner ?? inertPreferences;
   return {
     ...visibility,
-    open: visibility.open && (runtime?.needsDecision ?? false),
+    open: visibility.open && (value?.consent.needsDecision ?? false),
   };
 }
 
 export function usePreferences() {
-  useConsentContext();
-  return useVisibility(false);
+  return useConsentContext()?.preferences ?? inertPreferences;
 }

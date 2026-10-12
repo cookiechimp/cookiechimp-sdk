@@ -308,7 +308,7 @@ describe("createConsent", () => {
       if (notified.services) notified.services.metrics = false;
     }).toThrow();
     expect(runtime.get().services).toEqual({ metrics: true });
-    expect(runtime.get()).not.toBe(notified);
+    expect(runtime.get()).toBe(notified);
   });
 
   it("accepts a validated server initial state", () => {

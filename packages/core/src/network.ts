@@ -1,10 +1,11 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
 import type { BlockedInfo } from "./internal/blocked";
-import { findService } from "./internal/blocker";
+import { prepareServiceFinder } from "./internal/blocker";
 import { fail } from "./internal/dev";
 import { normalizeLight } from "./internal/normalize-light";
 import { acquire, type PatchFactory } from "./internal/patch";
+import { resolveHttp } from "./internal/url";
 
 export type { BlockedInfo } from "./internal/blocked";
 
@@ -47,19 +48,34 @@ export function blockNetwork(
     | undefined;
   if (!win) return noop;
   const config = normalizeLight(options.config);
+  const findService = prepareServiceFinder(config);
   const reports: BlockedInfo[] = [];
   const releases: Array<() => void> = [];
+  let matchWarned = false;
   const patch = (target: object, key: PropertyKey, factory: PatchFactory) => {
     const owner = descriptorOwner(target, key);
     if (owner) releases.push(acquire(owner, key, factory));
   };
 
   const match = (source: unknown) => {
-    const found = findService(
-      config,
-      source instanceof win.Request ? source.url : String(source),
-      win.document.baseURI,
-    );
+    let value: string;
+    try {
+      value = source instanceof win.Request ? source.url : String(source);
+    } catch {
+      return;
+    }
+    let found: ReturnType<typeof findService>;
+    try {
+      found = findService(value, win.document.baseURI);
+    } catch {
+      const url = resolveHttp(value, win.document.baseURI);
+      if (!url) return;
+      if (!matchWarned) {
+        matchWarned = true;
+        console.warn("CookieChimp matcher failed");
+      }
+      return { url: url.href };
+    }
     if (!found) return;
     const [url, { id, category }] = found;
     if (consent.hasService(id)) return;
@@ -70,7 +86,7 @@ export function blockNetwork(
     };
   };
   const report = (
-    found: { url: string; service: string; category: string },
+    found: { url: string; service?: string; category?: string },
     kind: "fetch" | "xhr" | "beacon",
   ) => {
     const info: BlockedInfo = { ...found, kind, ts: Date.now() };
