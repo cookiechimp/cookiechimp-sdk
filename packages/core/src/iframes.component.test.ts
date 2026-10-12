@@ -69,7 +69,12 @@ describe("gateScripts", () => {
     vi.spyOn(
       HTMLScriptElement.prototype,
       "addEventListener",
-    ).mockImplementation(function (type, listener, options) {
+    ).mockImplementation(function (
+      this: HTMLScriptElement,
+      type,
+      listener,
+      options,
+    ) {
       if (type === "load" && !finishFirst) finishFirst = listener as () => void;
       else if (type !== "error") nativeAdd.call(this, type, listener, options);
     });
