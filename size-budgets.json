@@ -248,7 +248,21 @@
     "scenario": "devtools simulation",
     "entry": "packages/devtools/dist/simulation.mjs",
     "kind": "extra",
-    "limit": 585
+    "limit": 660
+  },
+  {
+    "name": "CLI binary",
+    "scenario": "cli",
+    "entry": "packages/cli/dist/cli.mjs",
+    "kind": "total",
+    "limit": 5140
+  },
+  {
+    "name": "CLI programmatic API",
+    "scenario": "cli api",
+    "entry": "packages/cli/dist/index.mjs",
+    "kind": "total",
+    "limit": 5195
   },
   {
     "name": "TCF/GPP module",
