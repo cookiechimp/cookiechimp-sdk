@@ -5,7 +5,9 @@
     "incremental": true,
     "jsx": "preserve",
     "paths": {
-      "@cookiechimp/core": ["../../packages/core/src/index.ts"]
+      "@cookiechimp/core": ["../../packages/core/src/index.ts"],
+      "@cookiechimp/core/gate": ["../../packages/core/src/gate.ts"],
+      "@cookiechimp/core/dynamic": ["../../packages/core/src/dynamic.ts"]
     },
     "plugins": [{ "name": "next" }]
   },

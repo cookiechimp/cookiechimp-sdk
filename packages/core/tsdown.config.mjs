@@ -11,7 +11,13 @@ export default defineConfig([
   { ...shared, entry: ["src/index.ts"] },
   {
     ...shared,
-    entry: ["src/sync.ts", "src/match.ts", "src/regions.ts"],
+    entry: [
+      "src/sync.ts",
+      "src/match.ts",
+      "src/regions.ts",
+      "src/gate.ts",
+      "src/dynamic.ts",
+    ],
     clean: false,
   },
 ]);

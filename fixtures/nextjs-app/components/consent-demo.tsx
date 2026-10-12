@@ -1,11 +1,19 @@
 "use client";
 
 import { createConsent } from "@cookiechimp/core";
+import { blockDynamic } from "@cookiechimp/core/dynamic";
+import { gateScripts } from "@cookiechimp/core/gate";
 import { useEffect, useState } from "react";
 
 const consent = createConsent({
   categories: { analytics: false },
-  services: [{ id: "analytics-demo", category: "analytics" }],
+  services: [
+    {
+      id: "analytics-demo",
+      category: "analytics",
+      domains: ["dynamic.cookiechimp.test"],
+    },
+  ],
 });
 
 export function ConsentDemo() {
@@ -13,12 +21,32 @@ export function ConsentDemo() {
   const [serviceAccepted, setServiceAccepted] = useState(false);
 
   useEffect(() => {
+    const gate = gateScripts(consent);
+    const dynamic = blockDynamic(consent, {
+      config: {
+        categories: ["analytics"],
+        services: [
+          {
+            id: "analytics-demo",
+            category: "analytics",
+            domains: ["dynamic.cookiechimp.test"],
+          },
+        ],
+      },
+    });
+    document.documentElement.dataset.ccDynamic = "ready";
     setAccepted(consent.has("analytics"));
     setServiceAccepted(consent.hasService("analytics-demo"));
-    return consent.subscribe((state) => {
+    const unsubscribe = consent.subscribe((state) => {
       setAccepted(state.categories.analytics === true);
       setServiceAccepted(consent.hasService("analytics-demo"));
     });
+    return () => {
+      delete document.documentElement.dataset.ccDynamic;
+      gate.stop();
+      dynamic.stop();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -46,6 +74,16 @@ export function ConsentDemo() {
       >
         Toggle analytics demo
       </button>
+      <div data-testid="gated-elements">
+        <script type="text/plain" data-cc-category="analytics">
+          {"window.__ccAnalyticsRan = true;"}
+        </script>
+        <iframe
+          title="Gated local frame"
+          data-cc-src="/frame"
+          data-cc-category="analytics"
+        />
+      </div>
     </section>
   );
 }

@@ -18,6 +18,8 @@ describe("built core entry points", () => {
       const sync = readFileSync(resolve(dist, "sync.mjs"), "utf8");
       const match = readFileSync(resolve(dist, "match.mjs"), "utf8");
       const regions = readFileSync(resolve(dist, "regions.mjs"), "utf8");
+      const gate = readFileSync(resolve(dist, "gate.mjs"), "utf8");
+      const dynamic = readFileSync(resolve(dist, "dynamic.mjs"), "utf8");
 
       for (const identifier of [
         "mergeConfig",
@@ -31,6 +33,13 @@ describe("built core entry points", () => {
       expect(sync).toContain("mergeConfig");
       expect(sync).toContain("categoriesHash");
       expect(match).toContain("matchService");
+      expect(index).not.toContain("gateScripts");
+      expect(index).not.toContain("data-cc-blocked");
+      expect(index).not.toContain("blockDynamic");
+      expect(gate).toContain("gateScripts");
+      expect(gate).toContain("data-cc-blocked");
+      expect(dynamic).toContain("blockDynamic");
+      expect(dynamic).toContain("insertAdjacentHTML");
       for (const token of [
         "x-vercel-ip-country",
         "cf-ipcountry",

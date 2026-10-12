@@ -1,5 +1,25 @@
 import { expect, test } from "@playwright/test";
 
+test("gated markup matches before consent hydration", async ({ browser }) => {
+  const serverContext = await browser.newContext({ javaScriptEnabled: false });
+  const serverPage = await serverContext.newPage();
+  await serverPage.goto("/");
+  const serverMarkup = await serverPage
+    .getByTestId("gated-elements")
+    .evaluate((element) => element.outerHTML);
+  const clientContext = await browser.newContext();
+  const clientPage = await clientContext.newPage();
+  await clientPage.goto("/");
+  await clientPage.waitForLoadState("networkidle");
+  expect(
+    await clientPage
+      .getByTestId("gated-elements")
+      .evaluate((element) => element.outerHTML),
+  ).toBe(serverMarkup);
+  await serverContext.close();
+  await clientContext.close();
+});
+
 for (const [name, extraHTTPHeaders] of [
   ["DE", { "x-vercel-ip-country": "DE" }],
   [

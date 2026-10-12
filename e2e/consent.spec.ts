@@ -48,3 +48,77 @@ test("a service decision persists after reload", async ({ page }) => {
     "Analytics demo accepted",
   );
 });
+
+test("gated script and frame activate with consent and after reload", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as typeof window & { __ccAnalyticsRan?: boolean })
+            .__ccAnalyticsRan,
+      ),
+    )
+    .toBeUndefined();
+  await expect(
+    page.locator("iframe[title='Gated local frame']"),
+  ).not.toHaveAttribute("src");
+  await page.getByRole("button", { name: "Accept all cookies" }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as typeof window & { __ccAnalyticsRan?: boolean })
+            .__ccAnalyticsRan,
+      ),
+    )
+    .toBe(true);
+  await expect(
+    page.locator("iframe[title='Gated local frame']"),
+  ).toHaveAttribute("src", "/frame");
+  await expect(
+    page
+      .frameLocator("iframe[title='Gated local frame']")
+      .getByTestId("frame-content"),
+  ).toBeVisible();
+  await page.reload();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as typeof window & { __ccAnalyticsRan?: boolean })
+            .__ccAnalyticsRan,
+      ),
+    )
+    .toBe(true);
+  await expect(
+    page.locator("iframe[title='Gated local frame']"),
+  ).toHaveAttribute("src", "/frame");
+});
+
+test("dynamic iframe src set after insertion makes no request before consent", async ({
+  page,
+}) => {
+  let requests = 0;
+  await page.route("https://dynamic.cookiechimp.test/**", async (route) => {
+    requests += 1;
+    await route.abort();
+  });
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-cc-dynamic",
+    "ready",
+  );
+  await page.evaluate(() => {
+    const frame = document.body.appendChild(document.createElement("iframe"));
+    frame.src = "https://dynamic.cookiechimp.test/embed";
+  });
+  await page.waitForTimeout(100);
+  expect(requests).toBe(0);
+  await expect(page.locator("iframe[data-cc-blocked='true']")).toHaveAttribute(
+    "data-cc-src",
+    "https://dynamic.cookiechimp.test/embed",
+  );
+});

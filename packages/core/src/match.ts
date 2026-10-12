@@ -1,11 +1,7 @@
-import {
-  type ConfigInput,
-  type NormalizedConfig,
-  normalizeConfig,
-} from "./config";
+import type { ConfigInput, NormalizedConfig } from "./config";
 
 const cache = new WeakMap<
-  NormalizedConfig,
+  object,
   readonly [string, readonly RegExp[], readonly RegExp[], readonly RegExp[]][]
 >();
 
@@ -16,19 +12,21 @@ function wildcard(pattern: string, host = false): RegExp {
   );
 }
 
-function compile(config: NormalizedConfig) {
+function compile(config: ConfigInput | NormalizedConfig) {
   let result = cache.get(config);
   if (!result) {
-    result = config.services.map(({ id, scripts, cookies, domains }) => [
-      id,
-      scripts.map((pattern) =>
-        pattern instanceof RegExp
-          ? new RegExp(pattern.source, pattern.flags)
-          : wildcard(pattern),
-      ),
-      cookies.map((pattern) => wildcard(pattern)),
-      domains.map((pattern) => wildcard(pattern, true)),
-    ]);
+    result = (config.services ?? []).map(
+      ({ id, scripts = [], cookies = [], domains = [] }) => [
+        id,
+        scripts.map((pattern) =>
+          pattern instanceof RegExp
+            ? new RegExp(pattern.source, pattern.flags)
+            : wildcard(pattern),
+        ),
+        cookies.map((pattern) => wildcard(pattern)),
+        domains.map((pattern) => wildcard(pattern, true)),
+      ],
+    );
     cache.set(config, result);
   }
   return result;
@@ -45,10 +43,7 @@ export function matchService(
   config: ConfigInput | NormalizedConfig,
   target: ServiceMatch,
 ): string | null {
-  const normalized = Object.isFrozen(config)
-    ? (config as NormalizedConfig)
-    : normalizeConfig(config);
-  for (const [id, scripts, cookies, domains] of compile(normalized)) {
+  for (const [id, scripts, cookies, domains] of compile(config)) {
     if (
       (target.url &&
         scripts.some((pattern) => pattern.test(target.url as string))) ||

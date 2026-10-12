@@ -1,5 +1,23 @@
 [
   {
+    "name": "declarative script and iframe gating",
+    "scenario": "gate",
+    "entry": "packages/core/dist/gate.mjs",
+    "kind": "extra",
+    "limit": 2048,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["gateScripts", "data-cc-blocked"]
+  },
+  {
+    "name": "runtime script and iframe blocking",
+    "scenario": "dynamic",
+    "entry": "packages/core/dist/dynamic.mjs",
+    "kind": "extra",
+    "limit": 2560,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["blockDynamic", "insertAdjacentHTML"]
+  },
+  {
     "name": "core initial",
     "scenario": "core",
     "entry": "packages/core/dist/index.mjs",
