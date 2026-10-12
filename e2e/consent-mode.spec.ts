@@ -8,11 +8,18 @@ test("Consent Mode default precedes tags and acceptance sends an update", async 
     "data-cc-consent-mode",
     "ready",
   );
-  const entries = await page.evaluate(() =>
-    (
+  const result = await page.evaluate(() => {
+    const layer = (
       window as typeof window & { dataLayer: ArrayLike<unknown>[] }
-    ).dataLayer.map((entry) => Array.from(entry)),
-  );
+    ).dataLayer;
+    return {
+      entries: layer.map((entry) => Array.from(entry)),
+      kinds: layer.map((entry) => Object.prototype.toString.call(entry)),
+    };
+  });
+  const { entries, kinds } = result;
+  expect(entries.filter((entry) => entry[1] === "default")).toHaveLength(1);
+  expect(kinds[0]).toBe("[object Arguments]");
   expect(entries[0]).toMatchObject([
     "consent",
     "default",

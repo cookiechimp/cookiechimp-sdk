@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { installConsentMode } from "./consent-mode";
+import { consentModeInlineScript, installConsentMode } from "./consent-mode";
 
 function runtime(categories: Record<string, boolean>, needsDecision = true) {
   type State = { categories: Record<string, boolean> };
@@ -22,6 +22,8 @@ function runtime(categories: Record<string, boolean>, needsDecision = true) {
 afterEach(() => {
   delete (window as typeof window & { dataLayer?: unknown[] }).dataLayer;
   delete (window as typeof window & { gtag?: unknown }).gtag;
+  delete (window as typeof window & { __ccConsentModeDefault?: boolean })
+    .__ccConsentModeDefault;
   vi.restoreAllMocks();
 });
 
@@ -38,6 +40,7 @@ describe("installConsentMode", () => {
       "default",
       { analytics_storage: "denied" },
     ]);
+    expect(Object.prototype.toString.call(layer[0])).toBe("[object Arguments]");
     consent.set({ analytics: true });
     consent.set({ analytics: false });
     expect(layer.map((entry) => Array.from(entry)[1])).toEqual([
@@ -81,5 +84,37 @@ describe("installConsentMode", () => {
       ["consent", "default"],
       ["consent", "update"],
     ]);
+  });
+
+  it("does not repeat an inline default and still updates returning visitors", () => {
+    // biome-ignore lint/security/noGlobalEval: exercises the generated browser script in happy-dom.
+    window.eval(consentModeInlineScript());
+    const layer = (
+      window as typeof window & { dataLayer: ArrayLike<unknown>[] }
+    ).dataLayer;
+    layer.push(["event", "tag"]);
+    installConsentMode(runtime({ analytics: true }, false));
+    const entries = layer.map((entry) => Array.from(entry));
+    expect(entries.filter((entry) => entry[1] === "default")).toHaveLength(1);
+    expect(entries.findIndex((entry) => entry[1] === "default")).toBeLessThan(
+      entries.findIndex((entry) => entry[0] === "event"),
+    );
+    expect(entries.slice(2).some((entry) => entry[1] === "default")).toBe(
+      false,
+    );
+    expect(entries.at(-1)).toMatchObject([
+      "consent",
+      "update",
+      { analytics_storage: "granted" },
+    ]);
+    for (const entry of [layer[0], layer.at(-1)])
+      expect(Object.prototype.toString.call(entry)).toBe("[object Arguments]");
+  });
+
+  it("can suppress the runtime default", () => {
+    installConsentMode(runtime({ analytics: false }), { default: false });
+    expect(
+      (window as typeof window & { dataLayer: unknown[] }).dataLayer,
+    ).toHaveLength(0);
   });
 });

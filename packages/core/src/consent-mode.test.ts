@@ -41,11 +41,39 @@ describe("consentModeDefault", () => {
     });
   });
 
-  it("never emits a script-closing sequence in inline scripts", () => {
+  it("can replace and remove built-in mappings", () => {
+    expect(
+      consentModeDefault({
+        categories: { analytics: true, measurement: true },
+        mapping: { measurement: ["ad_storage"] },
+        replace: true,
+      }),
+    ).toMatchObject({ ad_storage: "granted", analytics_storage: "denied" });
+    expect(
+      consentModeDefault({
+        categories: { analytics: true },
+        mapping: { analytics: null },
+      }).analytics_storage,
+    ).toBe("denied");
+  });
+
+  it("escapes HTML and JavaScript separators while preserving values", () => {
+    const region = "</script>\u2028x\u2029";
     const script = consentModeInlineScript({
-      mapping: { "</script><script>alert(1)</script>": ["ad_storage"] },
+      region: [region],
     });
     expect(script).not.toContain("</script>");
+    expect(script).not.toContain("\u2028");
+    expect(script).not.toContain("\u2029");
+    expect(script).toContain("\\u003c/script>");
+    expect(script).toContain("\\u2028");
+    expect(script).toContain("\\u2029");
+    expect(() => new Function("window", script)).not.toThrow();
+    const dataLayer: ArrayLike<unknown>[] = [];
+    new Function("window", script)({ dataLayer });
+    expect(Array.from(dataLayer[0] ?? [])[2]).toMatchObject({
+      region: [region],
+    });
   });
 
   it("throws for invalid options in development", () => {

@@ -9,19 +9,26 @@ export type ConsentModeSignal =
   | "personalization_storage"
   | "security_storage";
 export type ConsentModeValue = "granted" | "denied";
-export type ConsentModeMapping = Record<string, readonly ConsentModeSignal[]>;
+export type ConsentModeMapping = Record<
+  string,
+  readonly ConsentModeSignal[] | null
+>;
 export interface ConsentModeOptions {
   wait_for_update?: number;
-  region?: string[];
+  region?: readonly string[];
   ads_data_redaction?: boolean;
   url_passthrough?: boolean;
+  /** Set false when another integration already establishes the default. */
+  default?: boolean;
+  /** Replace the built-in category mapping instead of extending it. */
+  replace?: boolean;
   mapping?: ConsentModeMapping;
   /** Category values used by the standalone default and inline helpers. */
   categories?: Readonly<Record<string, boolean>>;
 }
 export type ConsentModeDefault = Record<ConsentModeSignal, ConsentModeValue> & {
   wait_for_update: number;
-  region?: string[];
+  region?: readonly string[];
 };
 export interface ConsentModeController {
   stop(): void;
@@ -65,13 +72,9 @@ function normalize(
   if (
     region !== undefined &&
     (!Array.isArray(region) ||
-      region.some(
-        (code) =>
-          typeof code !== "string" ||
-          !/^[A-Z]{2}(?:-[A-Z0-9]{1,3})?$/.test(code),
-      ))
+      region.some((code) => typeof code !== "string" || code.length === 0))
   ) {
-    invalid("region must contain ISO region codes");
+    invalid("region must contain non-empty strings");
     region = undefined;
   }
   for (const key of ["ads_data_redaction", "url_passthrough"] as const) {
@@ -89,8 +92,9 @@ function normalize(
       Object.entries(mapping).some(
         ([category, values]) =>
           !category ||
-          !Array.isArray(values) ||
-          values.some((value) => !signalSet.has(value)),
+          (values !== null &&
+            (!Array.isArray(values) ||
+              values.some((value) => !signalSet.has(value)))),
       ))
   ) {
     invalid("mapping must map category names to Consent Mode signal arrays");
@@ -107,12 +111,16 @@ function normalize(
 function values(
   categories: Readonly<Record<string, boolean>>,
   mapping?: ConsentModeMapping,
+  replace?: boolean,
 ) {
   const result = Object.fromEntries(
     signals.map((signal) => [signal, "denied"]),
   ) as Record<ConsentModeSignal, ConsentModeValue>;
-  const effective = { ...defaultMapping, ...mapping };
+  const effective = replace
+    ? { ...mapping }
+    : { ...defaultMapping, ...mapping };
   for (const [category, mapped] of Object.entries(effective)) {
+    if (!mapped) continue;
     const granted = category === "necessary" || categories[category] === true;
     if (granted) for (const signal of mapped) result[signal] = "granted";
   }
@@ -126,7 +134,7 @@ export function consentModeDefault(
 ): ConsentModeDefault {
   const checked = normalize(options);
   return {
-    ...values(checked.categories ?? {}, checked.mapping),
+    ...values(checked.categories ?? {}, checked.mapping, checked.replace),
     wait_for_update: checked.wait_for_update,
     ...(checked.region ? { region: [...checked.region] } : {}),
   };
@@ -158,6 +166,7 @@ export function installConsentMode(
   const target = window as typeof window & {
     dataLayer?: unknown[][];
     gtag?: Gtag;
+    __ccConsentModeDefault?: boolean;
   };
   target.dataLayer ??= [];
   target.gtag ??= function () {
@@ -169,18 +178,26 @@ export function installConsentMode(
   let last = values(
     returning ? consent.get().categories : (checked.categories ?? {}),
     checked.mapping,
+    checked.replace,
   );
-  gtag("consent", "default", {
-    ...last,
-    wait_for_update: checked.wait_for_update,
-    ...(checked.region ? { region: checked.region } : {}),
-  });
+  if (checked.default !== false && !target.__ccConsentModeDefault) {
+    gtag("consent", "default", {
+      ...last,
+      wait_for_update: checked.wait_for_update,
+      ...(checked.region ? { region: checked.region } : {}),
+    });
+    target.__ccConsentModeDefault = true;
+  }
   if (checked.ads_data_redaction !== undefined)
     gtag("set", "ads_data_redaction", checked.ads_data_redaction);
   if (checked.url_passthrough !== undefined)
     gtag("set", "url_passthrough", checked.url_passthrough);
   const update = (next: ConsentSource) => {
-    const nextValues = values(next.categories, checked.mapping);
+    const nextValues = values(
+      next.categories,
+      checked.mapping,
+      checked.replace,
+    );
     if (signals.every((signal) => nextValues[signal] === last[signal])) return;
     last = nextValues;
     gtag("consent", "update", nextValues);
@@ -210,6 +227,9 @@ export function consentModeInlineScript(
     commands.push(["set", "ads_data_redaction", checked.ads_data_redaction]);
   if (checked.url_passthrough !== undefined)
     commands.push(["set", "url_passthrough", checked.url_passthrough]);
-  const json = JSON.stringify(commands).replaceAll("<", "\\u003c");
-  return `(function(w){w.dataLayer=w.dataLayer||[];w.gtag=w.gtag||function(){w.dataLayer.push(arguments)};var c=${json};for(var i=0;i<c.length;i++)w.gtag.apply(w,c[i])})(window);`;
+  const json = JSON.stringify(commands)
+    .replaceAll("<", "\\u003c")
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
+  return `(function(w){w.dataLayer=w.dataLayer||[];w.gtag=w.gtag||function(){w.dataLayer.push(arguments)};var c=${json};for(var i=0;i<c.length;i++)w.gtag.apply(w,c[i]);w.__ccConsentModeDefault=true})(window);`;
 }
