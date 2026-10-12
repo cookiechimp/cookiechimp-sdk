@@ -179,6 +179,7 @@ describe("dynamic src interception", () => {
     document.body.append(frame);
     expect(frame.dataset.ccService).toBeUndefined();
     expect(frame.dataset.ccSrc).toBe("https://other.test/embed");
+    expect(controllers.at(-1)?.blocked()[0]?.service).toBeUndefined();
 
     consent.allowCategory("analytics");
 

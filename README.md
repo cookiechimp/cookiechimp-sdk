@@ -102,3 +102,18 @@ for it).
 
 A prebuilt inline (IIFE) head snippet and a Next.js `beforeInteractive`
 helper are planned with the M3 Next.js package.
+
+## Network blocking
+
+The opt-in `@cookiechimp/core/network` subpath blocks `fetch`, XMLHttpRequest,
+and `navigator.sendBeacon` calls whose URL or host matches a configured service
+without consent. Install `blockNetwork(consent, { config })` before tracker code
+runs. Consent is checked for every request, so later grants take effect and
+later revocations block again. Relative URLs resolve against `document.baseURI`.
+Non-HTTP URLs and URLs that cannot be parsed are left alone.
+
+Blocked fetch calls reject with `ConsentBlockedError`. Blocked XHR sends emit
+`error` and `loadend` with status 0. Blocked beacons return `false`. Requests are
+dropped and are never queued or replayed. The returned controller provides
+`blocked()` reports and `stop()` to release its shared, reference-counted
+patches.

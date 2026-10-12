@@ -3,6 +3,7 @@
 import { createConsent } from "@cookiechimp/core";
 import { blockDynamic } from "@cookiechimp/core/dynamic";
 import { gateScripts } from "@cookiechimp/core/gate";
+import { blockNetwork } from "@cookiechimp/core/network";
 import { useEffect, useState } from "react";
 
 const consent = createConsent({
@@ -34,7 +35,20 @@ export function ConsentDemo() {
         ],
       },
     });
+    const network = blockNetwork(consent, {
+      config: {
+        categories: ["analytics"],
+        services: [
+          {
+            id: "analytics-demo",
+            category: "analytics",
+            domains: ["dynamic.cookiechimp.test"],
+          },
+        ],
+      },
+    });
     document.documentElement.dataset.ccDynamic = "ready";
+    document.documentElement.dataset.ccNetwork = "ready";
     setAccepted(consent.has("analytics"));
     setServiceAccepted(consent.hasService("analytics-demo"));
     const unsubscribe = consent.subscribe((state) => {
@@ -43,8 +57,10 @@ export function ConsentDemo() {
     });
     return () => {
       delete document.documentElement.dataset.ccDynamic;
+      delete document.documentElement.dataset.ccNetwork;
       gate.stop();
       dynamic.stop();
+      network.stop();
       unsubscribe();
     };
   }, []);
@@ -75,6 +91,19 @@ export function ConsentDemo() {
         Toggle analytics demo
       </button>
       <div data-testid="gated-elements">
+        <button
+          type="button"
+          onClick={() => {
+            const url = "https://dynamic.cookiechimp.test/collect";
+            void fetch(url).catch(() => {});
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", url);
+            xhr.send();
+            navigator.sendBeacon(url, "demo");
+          }}
+        >
+          Send tracker requests
+        </button>
         <script type="text/plain" data-cc-category="analytics">
           {"window.__ccAnalyticsRan = true;"}
         </script>

@@ -17,6 +17,7 @@ export default defineConfig([
       "src/regions.ts",
       "src/gate.ts",
       "src/dynamic.ts",
+      "src/network.ts",
     ],
     clean: false,
   },
