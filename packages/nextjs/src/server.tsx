@@ -30,6 +30,8 @@ export interface LanguageOptions {
 export interface GetServerConsentOptions {
   cookieName?: string;
   provider?: RegionHeaderOptions["provider"];
+  /** Trust the region header set by CookieChimp middleware. */
+  trustForwardedRegion?: boolean;
   /** Already-resolved request region. No location lookup is performed. */
   region?: Region | null;
   languages?: LanguageOptions | readonly string[];
@@ -71,6 +73,11 @@ function invalid(message: string): void {
 
 function validate(options: GetServerConsentOptions): void {
   if (
+    options.trustForwardedRegion !== undefined &&
+    typeof options.trustForwardedRegion !== "boolean"
+  )
+    invalid("trustForwardedRegion must be a boolean");
+  if (
     options.cookieName !== undefined &&
     !/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(options.cookieName)
   )
@@ -98,6 +105,7 @@ export function getServerConsent(
     (
       | { provider: NonNullable<GetServerConsentOptions["provider"]> }
       | { region: Region | null }
+      | { trustForwardedRegion: boolean }
       | {
           languages: NonNullable<GetServerConsentOptions["languages"]>;
         }
@@ -117,14 +125,19 @@ export async function getServerConsent(
     : null;
   if (
     !consent ||
-    (!options.provider && options.region === undefined && !options.languages)
+    (!options.provider &&
+      options.region === undefined &&
+      !options.trustForwardedRegion &&
+      !options.languages)
   )
     return consent;
   const requestHeaders = await headers();
   const region =
     options.region !== undefined
       ? options.region
-      : (forwardedRegion(requestHeaders) ??
+      : ((options.trustForwardedRegion
+          ? forwardedRegion(requestHeaders)
+          : null) ??
         (options.provider
           ? resolveRegion(requestHeaders, { provider: options.provider })
           : null));
@@ -159,19 +172,25 @@ export interface CookieChimpProviderProps
 export async function CookieChimpProvider({
   config,
   provider,
+  trustForwardedRegion,
   region: suppliedRegion,
   languages,
   translations,
   children,
 }: CookieChimpProviderProps) {
   const resolvedCookieName = config.cookie?.name ?? CONSENT_COOKIE_NAME;
-  validate({ cookieName: resolvedCookieName, provider, languages });
+  validate({
+    cookieName: resolvedCookieName,
+    provider,
+    trustForwardedRegion,
+    languages,
+  });
   const languageConfig = languageOptions(languages);
   const requestHeaders = await headers();
   const region =
     suppliedRegion !== undefined
       ? suppliedRegion
-      : (forwardedRegion(requestHeaders) ??
+      : ((trustForwardedRegion ? forwardedRegion(requestHeaders) : null) ??
         (provider ? resolveRegion(requestHeaders, { provider }) : null));
   const regulation = regulationFor(region);
   const language = languageConfig

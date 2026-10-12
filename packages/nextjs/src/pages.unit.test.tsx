@@ -1,5 +1,5 @@
 import { type ConsentState, encodeConsentCookie } from "@cookiechimp/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getPagesConsentProps, withConsent } from "./pages";
 
 const config = { categories: { analytics: false } };
@@ -36,16 +36,47 @@ describe("Pages Router consent", () => {
     ).toEqual(state);
   });
 
-  it("uses forwarded region and resolves language", () => {
-    expect(
-      getPagesConsentProps(
-        { headers: { "x-cc-region": "US-CA", "accept-language": "de-DE" } },
-        { config, languages: { available: ["en", "de"], fallback: "en" } },
-      ),
-    ).toMatchObject({
-      region: { country: "US", region: "CA" },
-      language: "de",
+  it("ignores a spoofed forwarded region by default", async () => {
+    const wrapped = withConsent({ config });
+    await expect(
+      wrapped({ req: { headers: { "x-cc-region": "US-CA" } } }),
+    ).resolves.toMatchObject({ props: { cookiechimp: { region: null } } });
+  });
+
+  it("uses forwarded region when explicitly trusted and resolves language", async () => {
+    const wrapped = withConsent({
+      config,
+      trustForwardedRegion: true,
+      languages: { available: ["en", "de"], fallback: "en" },
     });
+    expect(
+      await wrapped({
+        req: {
+          headers: { "x-cc-region": "US-CA", "accept-language": "de-DE" },
+        },
+      }),
+    ).toMatchObject({
+      props: {
+        cookiechimp: {
+          region: { country: "US", region: "CA" },
+          language: "de",
+        },
+      },
+    });
+  });
+
+  it("throws in development and warns in production for non-boolean forwarded trust", () => {
+    expect(() =>
+      withConsent({ config, trustForwardedRegion: "yes" } as never),
+    ).toThrow("trustForwardedRegion must be a boolean");
+    vi.stubEnv("NODE_ENV", "production");
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+    withConsent({ config, trustForwardedRegion: "yes" } as never);
+    expect(warning).toHaveBeenCalledWith(
+      expect.stringContaining("trustForwardedRegion must be a boolean"),
+    );
+    warning.mockRestore();
+    vi.unstubAllEnvs();
   });
 
   it("merges getServerSideProps", async () => {

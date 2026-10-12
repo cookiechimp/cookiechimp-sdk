@@ -87,8 +87,11 @@ export function middleware(request) {
 }
 ```
 
-`getServerConsent`, `CookieChimpProvider`, and the Pages helpers automatically
-read the forwarded `x-cc-region` request header. Use
+`getServerConsent`, `CookieChimpProvider`, and the Pages helpers ignore the
+forwarded `x-cc-region` request header by default. Pass
+`trustForwardedRegion: true` to opt in. Only enable trustForwardedRegion when
+the CookieChimp middleware runs on every route, since otherwise a visitor can
+send the header and choose their region. Use
 `provider: { header: "x-host-country", regionHeader: "x-host-region" }` to opt
 in to host-specific headers. Vercel mode reads only Vercel headers, Cloudflare
 mode reads only `cf-ipcountry`, and custom mode reads only the named headers.

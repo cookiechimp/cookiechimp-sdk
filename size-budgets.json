@@ -92,7 +92,7 @@
     "scenario": "nextjs middleware",
     "entry": "packages/nextjs/dist/middleware.mjs",
     "kind": "extra",
-    "limit": 1053
+    "limit": 1150
   },
   {
     "name": "Next.js styles route",

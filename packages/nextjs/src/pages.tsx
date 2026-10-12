@@ -20,6 +20,8 @@ import { ClientProvider } from "./index";
 export interface PagesConsentOptions {
   config: ConsentConfig;
   provider?: RegionHeaderOptions["provider"];
+  /** Trust the region header set by CookieChimp middleware. */
+  trustForwardedRegion?: boolean;
   header?: string;
   region?: Region | null;
   languages?: { available: readonly string[]; fallback: string };
@@ -48,6 +50,11 @@ function getHeader(headers: IncomingHttpHeaders | Headers, name: string) {
 
 function validate(options: PagesConsentOptions) {
   if (!options.config) invalid("config is required");
+  if (
+    options.trustForwardedRegion !== undefined &&
+    typeof options.trustForwardedRegion !== "boolean"
+  )
+    invalid("trustForwardedRegion must be a boolean");
   if (options.provider === "custom" && !options.header)
     invalid("header is required for the custom provider");
 }
@@ -61,20 +68,20 @@ export function getPagesConsentProps(
   const cookieName = options.config.cookie?.name ?? CONSENT_COOKIE_NAME;
   const cookie = getHeader(req.headers, "cookie") ?? "";
   const consent = readConsentCookie(cookie, cookieName);
-  const forwardedValue = getHeader(req.headers, "x-cc-region");
-  const forwardedMatch = /^([A-Z]{2})(?:-([A-Z0-9]{1,3}))?$/.exec(
-    forwardedValue?.trim().toUpperCase() ?? "",
-  );
-  const forwarded = forwardedMatch
-    ? {
-        country: forwardedMatch[1] as string,
-        ...(forwardedMatch[2] ? { region: forwardedMatch[2] } : {}),
-      }
+  const forwardedMatch = options.trustForwardedRegion
+    ? /^([A-Z]{2})(?:-([A-Z0-9]{1,3}))?$/.exec(
+        getHeader(req.headers, "x-cc-region")?.trim().toUpperCase() ?? "",
+      )
     : null;
   const region =
     options.region !== undefined
       ? options.region
-      : (forwarded ??
+      : ((forwardedMatch
+          ? {
+              country: forwardedMatch[1] as string,
+              ...(forwardedMatch[2] ? { region: forwardedMatch[2] } : {}),
+            }
+          : null) ??
         (options.provider
           ? resolveRegion(req.headers, {
               provider: options.provider,

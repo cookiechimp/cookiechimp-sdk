@@ -16,5 +16,6 @@ export default function LegacyPage() {
 export const getServerSideProps = withConsent({
   config: consentConfig,
   provider: "cloudflare",
+  trustForwardedRegion: true,
   languages: { available: ["en", "de", "fr"], fallback: "en" },
 });

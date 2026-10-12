@@ -46,6 +46,7 @@ export default async function RootLayout({
         <CookieChimpProvider
           config={consentConfig}
           provider="vercel"
+          trustForwardedRegion={true}
           languages={languages}
           translations={(locale) => messages[locale as keyof typeof messages]}
         >
