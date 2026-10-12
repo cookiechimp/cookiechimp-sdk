@@ -1,9 +1,12 @@
+import { StylesLink } from "@cookiechimp/nextjs/styles-route";
+import { headers } from "next/headers";
 import { ConsentDemo } from "../../components/consent-demo";
 
-export default function StrictCspPage() {
+export default async function StrictCspPage() {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <main>
-      <link rel="stylesheet" href="/cookiechimp.css" />
+      <StylesLink nonce={nonce} />
       <h1>Strict CSP styles</h1>
       <ConsentDemo />
     </main>

@@ -74,11 +74,10 @@ more convenient.
 
 ## Middleware region forwarding
 
-The middleware helper only parses headers already provided by the selected
-host. It does not perform geo-IP, fetch, or any external lookup. Selecting a
-provider is required, which prevents arbitrary provider headers from being
-trusted by accident. Any incoming `x-cc-region` is removed before the trusted
-value is written.
+The middleware helper only parses headers already provided by the explicitly
+selected host. It does not perform geo-IP, fetch, or any external lookup. With
+no `provider`, it ignores every location header and forwards no region. It
+always removes an incoming `x-cc-region`, including when no provider is set.
 
 ```ts
 import { consentMiddleware } from "@cookiechimp/nextjs/middleware";
@@ -89,30 +88,10 @@ export function middleware(request) {
 ```
 
 `getServerConsent`, `CookieChimpProvider`, and the Pages helpers automatically
-read the forwarded `x-cc-region` request header. Use `provider: "custom"` with
-`header` to opt in to a host-specific country header.
-
-## Strict CSP stylesheet
-
-For a policy such as `style-src 'self'`, expose a same-origin Route Handler and
-load it with a stylesheet link instead of rendering `CookieChimpStyles`.
-
-```ts
-// app/cookiechimp.css/route.ts
-import { stylesRoute } from "@cookiechimp/nextjs/styles-route";
-export const GET = stylesRoute;
-```
-
-`CookieChimpStyles` and `GoogleConsentMode` accept a `nonce` prop for CSP
-policies that allow nonce-bearing inline styles or scripts. For a policy that
-does not allow inline styles, use `stylesRoute` and link to the route instead.
-
-```tsx
-<link rel="stylesheet" href="/cookiechimp.css" />
-```
-
-The response includes `text/css`, immutable one-year caching, and a stable
-ETag. Conditional requests return 304.
+read the forwarded `x-cc-region` request header. Use
+`provider: { header: "x-host-country", regionHeader: "x-host-region" }` to opt
+in to host-specific headers. Vercel mode reads only Vercel headers, Cloudflare
+mode reads only `cf-ipcountry`, and custom mode reads only the named headers.
 
 ## Strict Content Security Policy
 
@@ -143,8 +122,22 @@ export function middleware(request: NextRequest) {
 }
 ```
 
-Read the middleware header in the App Router layout and pass the nonce to each
-inline element:
+Expose the stylesheet from a Route Handler. The factory can derive a nonce
+from the request and use it to build a response policy:
+
+```ts
+// app/cookiechimp.css/route.ts
+import { createStylesRoute } from "@cookiechimp/nextjs/styles-route";
+
+export const GET = createStylesRoute({
+  nonce: (request) => request.headers.get("x-nonce") ?? undefined,
+  contentSecurityPolicy: (nonce) =>
+    `default-src 'none'; style-src 'self' 'nonce-${nonce}'`,
+});
+```
+
+Read the middleware header in the App Router layout. Use `StylesLink` for the
+external stylesheet, and pass the same nonce to inline elements:
 
 ```tsx
 // app/layout.tsx
@@ -153,6 +146,7 @@ import {
   CookieChimpStyles,
   GoogleConsentMode,
 } from "@cookiechimp/nextjs/server";
+import { StylesLink } from "@cookiechimp/nextjs/styles-route";
 import { headers } from "next/headers";
 
 export default async function RootLayout({ children }) {
@@ -160,6 +154,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <StylesLink href="/cookiechimp.css" nonce={nonce} />
         <CookieChimpStyles nonce={nonce} />
         <GoogleConsentMode nonce={nonce} />
       </head>
@@ -172,3 +167,10 @@ export default async function RootLayout({ children }) {
   );
 }
 ```
+
+Omit `CookieChimpStyles` when the policy forbids inline styles entirely. The
+stylesheet response includes `text/css`, `X-Content-Type-Options: nosniff`, a
+stable ETag, and supports conditional 304 responses. The default static route
+uses immutable one-year caching. Configuring a per-request nonce or CSP uses
+`private, no-cache` instead, because a response whose policy varies by request
+must not be reused as an immutable shared response.

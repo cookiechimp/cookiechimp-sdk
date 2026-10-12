@@ -20,17 +20,20 @@ const messages = { en, de, fr };
 export default async function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  const requestHeaders = await headers();
+  const nonce = requestHeaders.get("x-nonce") ?? undefined;
   const language = resolveLanguage(
-    (await headers()).get("accept-language"),
+    requestHeaders.get("accept-language"),
     languages.available,
     languages.fallback,
   );
   return (
     <html lang={language} dir={dirFor(language, rtlLocales)}>
       <head>
-        <CookieChimpStyles />
-        <GoogleConsentMode />
+        <CookieChimpStyles nonce={nonce} />
+        <GoogleConsentMode nonce={nonce} />
         <script
+          nonce={nonce}
           data-testid="fake-gtag"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: this fixed fixture script contains no user input.
           dangerouslySetInnerHTML={{

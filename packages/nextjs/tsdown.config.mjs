@@ -6,7 +6,7 @@ export default defineConfig({
     "src/server.tsx",
     "src/pages.tsx",
     "src/middleware.ts",
-    "src/styles-route.ts",
+    "src/styles-route.tsx",
   ],
   dts: true,
   format: ["esm", "cjs"],
