@@ -11,7 +11,7 @@ export default defineConfig([
   { ...shared, entry: ["src/index.ts"] },
   {
     ...shared,
-    entry: ["src/sync.ts", "src/match.ts", "src/regions.ts"],
+    entry: ["src/sync.ts", "src/match.ts", "src/regions.ts", "src/iframes.ts"],
     clean: false,
   },
 ]);

@@ -12,6 +12,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./iframes": {
+      "types": "./dist/iframes.d.ts",
+      "import": "./dist/iframes.mjs",
+      "require": "./dist/iframes.cjs"
+    },
     "./sync": {
       "types": "./dist/sync.d.ts",
       "import": "./dist/sync.mjs",
@@ -32,7 +37,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts",
+    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts && cp dist/iframes.d.mts dist/iframes.d.ts",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"

@@ -58,3 +58,19 @@ The compact built-in country and state table is available from
 `@cookiechimp/core/regions`. No network lookup occurs. Server applications can
 pass the resolved `region` and `gpc` into `createConsent` so server and browser
 rendering use the same context.
+
+## Script and iframe gating
+
+The opt-in `@cookiechimp/core/iframes` subpath contains both script gating and
+iframe blocking. Call `gateScripts(consent)` after creating a consent runtime.
+Declarative scripts use `type="text/plain"` with `data-cc-category` and optional
+`data-cc-service`; gated frames use `data-cc-src` instead of `src`. The
+controller scans later DOM additions and exposes `scan()`, `blocked()`, and
+`stop()`.
+
+Set `blockDynamic: true` and provide the normalized consent `config` to block
+runtime-added resources that match a configured service. Revocation cannot undo
+code that has already run. By default it leaves activated resources in place.
+Use `onRevoke` to notify the application, or `reloadOnRevoke: true` when a page
+reload is the desired policy. Core invokes the optional iframe `placeholder`
+hook but deliberately provides no placeholder styling.

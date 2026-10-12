@@ -1,5 +1,14 @@
 [
   {
+    "name": "script and iframe gating",
+    "scenario": "iframes",
+    "entry": "packages/core/dist/iframes.mjs",
+    "kind": "extra",
+    "limit": 4096,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["gateScripts", "data-cc-blocked"]
+  },
+  {
     "name": "core initial",
     "scenario": "core",
     "entry": "packages/core/dist/index.mjs",

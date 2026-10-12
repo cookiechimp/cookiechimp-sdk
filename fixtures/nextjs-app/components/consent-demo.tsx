@@ -1,6 +1,7 @@
 "use client";
 
 import { createConsent } from "@cookiechimp/core";
+import { gateScripts } from "@cookiechimp/core/iframes";
 import { useEffect, useState } from "react";
 
 const consent = createConsent({
@@ -13,12 +14,17 @@ export function ConsentDemo() {
   const [serviceAccepted, setServiceAccepted] = useState(false);
 
   useEffect(() => {
+    const gate = gateScripts(consent);
     setAccepted(consent.has("analytics"));
     setServiceAccepted(consent.hasService("analytics-demo"));
-    return consent.subscribe((state) => {
+    const unsubscribe = consent.subscribe((state) => {
       setAccepted(state.categories.analytics === true);
       setServiceAccepted(consent.hasService("analytics-demo"));
     });
+    return () => {
+      gate.stop();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -46,6 +52,16 @@ export function ConsentDemo() {
       >
         Toggle analytics demo
       </button>
+      <div data-testid="gated-elements">
+        <script type="text/plain" data-cc-category="analytics">
+          {"window.__ccAnalyticsRan = true;"}
+        </script>
+        <iframe
+          title="Gated local frame"
+          data-cc-src="/frame"
+          data-cc-category="analytics"
+        />
+      </div>
     </section>
   );
 }
