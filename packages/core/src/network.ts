@@ -59,8 +59,7 @@ export function blockNetwork(
   const releases: Array<() => void> = [];
 
   const match = (source: unknown) => {
-    const raw =
-      source instanceof win.Request ? source.url : String(source);
+    const raw = source instanceof win.Request ? source.url : String(source);
     if (!isHttpUrl(raw, win.document.baseURI)) return undefined;
     const url = new URL(raw, win.document.baseURI);
     const service = matchService(config, { url: url.href, host: url.hostname });
