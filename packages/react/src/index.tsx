@@ -6,6 +6,8 @@ import {
   type ConsentState,
   createConsent,
 } from "@cookiechimp/core";
+import type { MessageKey, Messages } from "@cookiechimp/translations";
+import en from "@cookiechimp/translations/en";
 import {
   createContext,
   type ReactNode,
@@ -18,12 +20,13 @@ import {
   useSyncExternalStore,
 } from "react";
 
-export type Translations = Readonly<Record<string, string>>;
+export type { MessageKey, Messages } from "@cookiechimp/translations";
 
 type ProviderValue = {
   consent: ConsentRuntime;
   serverState: ConsentState;
-  translations: Translations;
+  translations: Messages;
+  language: string;
   getSnapshot: () => ConsentState;
   subscribe: (listener: () => void) => () => void;
   preferences: ReturnType<typeof useVisibility>;
@@ -32,7 +35,6 @@ type ProviderValue = {
 };
 
 const Context = createContext<ProviderValue | null>(null);
-
 type RuntimeProviderProps = {
   consent: ConsentRuntime;
   config?: never;
@@ -47,7 +49,8 @@ export type ConsentProviderProps = (
 ) & {
   children: ReactNode;
   initialState?: ConsentState | null;
-  translations?: Translations;
+  translations?: Messages;
+  language?: string;
 };
 
 /** Supply one consent runtime to a React subtree. */
@@ -74,14 +77,15 @@ export function ConsentProvider(props: ConsentProviderProps) {
     return {
       consent,
       serverState,
-      translations: props.translations ?? {},
+      translations: props.translations ?? en,
+      language: props.language ?? consent.language,
       getSnapshot: () => consent.get(),
       subscribe: (listener: () => void) => consent.subscribe(listener),
       preferences,
       banner,
       preferencesTrigger,
     };
-  }, [serverState, props.translations, preferences, banner]);
+  }, [serverState, props.translations, props.language, preferences, banner]);
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }
 
@@ -185,12 +189,14 @@ export function useRegion() {
 }
 
 export function useTranslations() {
-  const translations = useConsentContext()?.translations ?? {};
-  const t = useCallback(
-    (key: string, fallback = key) => translations[key] ?? fallback,
-    [translations],
-  );
-  return useMemo(() => ({ translations, t }), [translations, t]);
+  const context = useConsentContext();
+  const translations = context?.translations ?? en;
+  const language = context?.language ?? "en";
+  return {
+    t: (key: MessageKey) => translations[key] || en[key],
+    language,
+    dir: /^(ar|he)(-|$)/i.test(language) ? "rtl" : "ltr",
+  };
 }
 
 function useVisibility(initial: boolean, onShow?: () => void) {

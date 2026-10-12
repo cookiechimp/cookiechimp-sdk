@@ -1,0 +1,43 @@
+import { copyFile } from "node:fs/promises";
+
+const locales = [
+  "index",
+  "en",
+  "de",
+  "fr",
+  "es",
+  "it",
+  "nl",
+  "pt",
+  "pt-BR",
+  "pl",
+  "sv",
+  "da",
+  "fi",
+  "no",
+  "cs",
+  "sk",
+  "hu",
+  "ro",
+  "bg",
+  "el",
+  "hr",
+  "sl",
+  "et",
+  "lv",
+  "lt",
+  "ga",
+  "mt",
+  "tr",
+  "ja",
+  "zh",
+  "ko",
+  "ar",
+  "he",
+  "uk",
+];
+await Promise.all(
+  locales.map((locale) =>
+    copyFile(`dist/${locale}.d.mts`, `dist/${locale}.d.ts`),
+  ),
+);

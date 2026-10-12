@@ -1,4 +1,5 @@
 import { type ConsentState, createConsent } from "@cookiechimp/core";
+import en from "@cookiechimp/translations/en";
 import { act, useRef } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
@@ -45,7 +46,7 @@ function Status({ changed }: { changed?: (state: ConsentState) => void }) {
     <div>
       <span data-state={state.action}>{String(accepted)}</span>
       <span>{region.regulation}</span>
-      <span>{t("title", "fallback")}</span>
+      <span>{t("banner.title")}</span>
       {banner.open && <b>banner</b>}
       {preferences.open && <i>preferences</i>}
       <button type="button" onClick={actions.acceptAll}>
@@ -65,6 +66,22 @@ function Status({ changed }: { changed?: (state: ConsentState) => void }) {
 }
 
 describe("ConsentProvider hooks", () => {
+  it("returns translated copy, English fallback, language, and RTL direction", () => {
+    function TranslationStatus() {
+      const { t, language, dir } = useTranslations();
+      return (
+        <p>{`${t("banner.title")}|${t("banner.close")}|${language}|${dir}`}</p>
+      );
+    }
+    const messages = { ...en, "banner.title": "الخصوصية", "banner.close": "" };
+    const html = renderToString(
+      <ConsentProvider config={config} translations={messages} language="ar">
+        <TranslationStatus />
+      </ConsentProvider>,
+    );
+    expect(html).toContain("الخصوصية|Close|ar|rtl");
+  });
+
   it("creates a runtime from config, updates hooks, and keeps actions stable", async () => {
     const target = document.body.appendChild(document.createElement("div"));
     const changed = vi.fn();
@@ -78,7 +95,13 @@ describe("ConsentProvider hooks", () => {
     const root = createRoot(target);
     await act(() =>
       root.render(
-        <ConsentProvider config={config} translations={{ title: "Cookies" }}>
+        <ConsentProvider
+          config={config}
+          translations={{
+            ...en,
+            "banner.title": "Cookies",
+          }}
+        >
           <Capture />
         </ConsentProvider>,
       ),

@@ -15,6 +15,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | runtime script and iframe blocking | extra | 2688 |
 | network blocking | extra | 2304 |
 | consent-mode | extra | 1560 |
+| language controller | extra | 954 |
 | core initial | initial | 4096 |
 | core total | total | 5120 |
 | react provider and hooks | extra | 4608 |
@@ -44,3 +45,4 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | react | 1536 B | 4608 B | Harness now counts imported package code (measurement change, no code growth) | fix(size) |
 | banner | PENDING | 11264 B | Styled banner entry is now enforced | M2 PR12 |
 | ui | PENDING | 13824 B initial, 16384 B total | Styled preferences and recall entry is now enforced | M2 PR12 |
+| language | none | 954 B | New opt-in controller with about 15 percent headroom over its measured size | M2 PR13 |

@@ -17,6 +17,7 @@ export default defineConfig([
       "src/regions.ts",
       "src/gate.ts",
       "src/consent-mode.ts",
+      "src/language.ts",
     ],
     clean: false,
   },
