@@ -188,6 +188,55 @@
     "limit": 890
   },
   {
+    "name": "Meta Pixel preset",
+    "scenario": "scripts meta pixel",
+    "entry": "packages/scripts/dist/meta-pixel.mjs",
+    "kind": "extra",
+    "limit": 895
+  },
+  {
+    "name": "Clarity preset",
+    "scenario": "scripts clarity",
+    "entry": "packages/scripts/dist/clarity.mjs",
+    "kind": "extra",
+    "limit": 880
+  },
+  {
+    "name": "PostHog preset",
+    "scenario": "scripts posthog",
+    "entry": "packages/scripts/dist/posthog.mjs",
+    "kind": "extra",
+    "limit": 1060
+  },
+  {
+    "name": "Segment preset",
+    "scenario": "scripts segment",
+    "entry": "packages/scripts/dist/segment.mjs",
+    "kind": "extra",
+    "limit": 1055
+  },
+  {
+    "name": "Hotjar preset",
+    "scenario": "scripts hotjar",
+    "entry": "packages/scripts/dist/hotjar.mjs",
+    "kind": "extra",
+    "limit": 935
+  },
+  {
+    "name": "LinkedIn Insight preset",
+    "scenario": "scripts linkedin",
+    "entry": "packages/scripts/dist/linkedin.mjs",
+    "kind": "extra",
+    "limit": 880
+  },
+  {
+    "name": "TikTok Pixel preset",
+    "scenario": "scripts tiktok",
+    "entry": "packages/scripts/dist/tiktok.mjs",
+    "kind": "extra",
+    "limit": 995
+  },
+  {
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",

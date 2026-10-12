@@ -37,6 +37,13 @@ The checked budgets are the source-of-truth values below. Region header provider
 | GA4 preset | extra | 830 |
 | GTM preset | extra | 915 |
 | Google Ads preset | extra | 890 |
+| Meta Pixel preset | extra | 895 |
+| Clarity preset | extra | 880 |
+| PostHog preset | extra | 1060 |
+| Segment preset | extra | 1055 |
+| Hotjar preset | extra | 935 |
+| LinkedIn Insight preset | extra | 880 |
+| TikTok Pixel preset | extra | 995 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -74,3 +81,10 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | scripts ga4 | 750 B | 830 B | ID encoding hardening and full Consent Mode default, measured 719 B (about 15% headroom) | M4 PR16 (lead approved) |
 | scripts gtm | 805 B | 915 B | ID encoding hardening and full Consent Mode default, measured 794 B (about 15% headroom) | M4 PR16 (lead approved) |
 | scripts google-ads | 810 B | 890 B | ID encoding hardening and full Consent Mode default, measured 772 B (about 15% headroom) | M4 PR16 (lead approved) |
+| scripts meta-pixel | none | 895 B | New preset, measured 776 B (about 15% headroom) | M4 PR17 |
+| scripts clarity | none | 880 B | New preset, measured 764 B (about 15% headroom) | M4 PR17 |
+| scripts posthog | none | 1060 B | New preset, measured 919 B (about 15% headroom) | M4 PR17 |
+| scripts segment | none | 1055 B | New preset, measured 914 B (about 15% headroom) | M4 PR17 |
+| scripts hotjar | none | 935 B | New preset, measured 811 B (about 15% headroom) | M4 PR17 |
+| scripts linkedin | none | 880 B | New preset, measured 764 B (about 15% headroom) | M4 PR17 |
+| scripts tiktok | none | 995 B | New preset, measured 861 B (about 16% headroom) | M4 PR17 |

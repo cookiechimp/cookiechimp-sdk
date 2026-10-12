@@ -16,7 +16,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && for f in index ga4 gtm google-ads; do cp dist/$f.d.mts dist/$f.d.ts; done",
+    "build": "tsdown --config-loader native && for f in index ga4 gtm google-ads meta-pixel clarity posthog segment hotjar linkedin tiktok; do cp dist/$f.d.mts dist/$f.d.ts; done",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
@@ -50,6 +50,41 @@
       "types": "./dist/google-ads.d.ts",
       "import": "./dist/google-ads.mjs",
       "require": "./dist/google-ads.cjs"
+    },
+    "./meta-pixel": {
+      "types": "./dist/meta-pixel.d.ts",
+      "import": "./dist/meta-pixel.mjs",
+      "require": "./dist/meta-pixel.cjs"
+    },
+    "./clarity": {
+      "types": "./dist/clarity.d.ts",
+      "import": "./dist/clarity.mjs",
+      "require": "./dist/clarity.cjs"
+    },
+    "./posthog": {
+      "types": "./dist/posthog.d.ts",
+      "import": "./dist/posthog.mjs",
+      "require": "./dist/posthog.cjs"
+    },
+    "./segment": {
+      "types": "./dist/segment.d.ts",
+      "import": "./dist/segment.mjs",
+      "require": "./dist/segment.cjs"
+    },
+    "./hotjar": {
+      "types": "./dist/hotjar.d.ts",
+      "import": "./dist/hotjar.mjs",
+      "require": "./dist/hotjar.cjs"
+    },
+    "./linkedin": {
+      "types": "./dist/linkedin.d.ts",
+      "import": "./dist/linkedin.mjs",
+      "require": "./dist/linkedin.cjs"
+    },
+    "./tiktok": {
+      "types": "./dist/tiktok.d.ts",
+      "import": "./dist/tiktok.mjs",
+      "require": "./dist/tiktok.cjs"
     }
   }
 }
