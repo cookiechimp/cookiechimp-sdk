@@ -1,0 +1,47 @@
+{
+  "name": "@cookiechimp/cli",
+  "version": "0.0.0",
+  "description": "Set up and check CookieChimp in your project",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "bin": {
+    "cookiechimp": "./dist/cli.mjs"
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts",
+    "lint": "biome check .",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cookiechimp/core": "workspace:*",
+    "@cookiechimp/react": "workspace:*",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tsdown": "0.23.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    }
+  }
+}
