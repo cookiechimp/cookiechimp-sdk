@@ -24,7 +24,7 @@ export interface ConsentModeOptions {
   /** Replace the built-in category mapping instead of extending it. */
   replace?: boolean;
   mapping?: ConsentModeMapping;
-  /** Category values used by the standalone default and inline helpers. */
+  /** Category values granted by the runtime's initial consent update. */
   categories?: Readonly<Record<string, boolean>>;
 }
 export type ConsentModeDefault = Record<ConsentModeSignal, ConsentModeValue> & {
@@ -148,7 +148,7 @@ export function consentModeDefault(
 ): ConsentModeDefault {
   const checked = normalize(options);
   return {
-    ...values(checked.categories ?? {}, checked.mapping, checked.replace),
+    ...deniedValues(),
     wait_for_update: checked.wait_for_update,
     ...(checked.region ? { region: [...checked.region] } : {}),
   };

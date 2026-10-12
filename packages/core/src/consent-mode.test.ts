@@ -7,18 +7,18 @@ afterEach(() => {
 });
 
 describe("consentModeDefault", () => {
-  it("maps categories to all Consent Mode v2 signals", () => {
+  it("denies all non-security signals regardless of category grants", () => {
     expect(
       consentModeDefault({
         categories: { analytics: true, marketing: true, functional: true },
       }),
     ).toEqual({
-      ad_storage: "granted",
-      ad_user_data: "granted",
-      ad_personalization: "granted",
-      analytics_storage: "granted",
-      functionality_storage: "granted",
-      personalization_storage: "granted",
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+      analytics_storage: "denied",
+      functionality_storage: "denied",
+      personalization_storage: "denied",
       security_storage: "granted",
       wait_for_update: 500,
     });
@@ -33,7 +33,7 @@ describe("consentModeDefault", () => {
         wait_for_update: 250,
       }),
     ).toMatchObject({
-      analytics_storage: "granted",
+      analytics_storage: "denied",
       ad_storage: "denied",
       security_storage: "granted",
       region: ["US-CA", "DE"],
@@ -48,7 +48,7 @@ describe("consentModeDefault", () => {
         mapping: { measurement: ["ad_storage"] },
         replace: true,
       }),
-    ).toMatchObject({ ad_storage: "granted", analytics_storage: "denied" });
+    ).toMatchObject({ ad_storage: "denied", analytics_storage: "denied" });
     expect(
       consentModeDefault({
         categories: { analytics: true },

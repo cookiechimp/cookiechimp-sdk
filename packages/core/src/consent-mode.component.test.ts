@@ -28,6 +28,30 @@ afterEach(() => {
 });
 
 describe("installConsentMode", () => {
+  it.each([
+    ["without category options", {}],
+    ["with granted category options", { categories: { analytics: true } }],
+  ])("matches the denied inline and runtime defaults %s", (_, options) => {
+    // biome-ignore lint/security/noGlobalEval: exercises the generated browser script in happy-dom.
+    window.eval(consentModeInlineScript(options));
+    const inlineDefault = Array.from(
+      (window as typeof window & { dataLayer: ArrayLike<unknown>[] })
+        .dataLayer[0] ?? [],
+    )[2];
+    expect(inlineDefault).toMatchObject({ analytics_storage: "denied" });
+
+    delete (window as typeof window & { dataLayer?: unknown[] }).dataLayer;
+    delete (window as typeof window & { gtag?: unknown }).gtag;
+    delete (window as typeof window & { __ccConsentModeDefault?: boolean })
+      .__ccConsentModeDefault;
+    installConsentMode(runtime({}, true), options);
+    const runtimeDefault = Array.from(
+      (window as typeof window & { dataLayer: ArrayLike<unknown>[] })
+        .dataLayer[0] ?? [],
+    )[2];
+    expect(inlineDefault).toEqual(runtimeDefault);
+  });
+
   it("uses a denied default without updating on a first visit", () => {
     installConsentMode(runtime({}, true));
     const entries = (
