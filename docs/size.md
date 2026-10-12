@@ -39,3 +39,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | consent-mode | none | 1560 B | New Consent Mode v2 entry | M1 PR9 |
 | react | none | 1536 B | New React provider and hooks entry | M2 PR10 |
 | react-headless | none | 3491 B | New headless primitives entry | M2 PR11 |
+| banner | PENDING | 11264 B | Styled banner entry is now enforced | M2 PR12 |
+| ui | PENDING | 13824 B initial, 16384 B total | Styled preferences and recall entry is now enforced | M2 PR12 |

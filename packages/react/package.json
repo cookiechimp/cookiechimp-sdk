@@ -17,19 +17,32 @@
       "types": "./dist/headless.d.ts",
       "import": "./dist/headless.mjs",
       "require": "./dist/headless.cjs"
-    }
+    },
+    "./banner": {
+      "types": "./dist/banner.d.ts",
+      "import": "./dist/banner.mjs",
+      "require": "./dist/banner.cjs"
+    },
+    "./ui": {
+      "types": "./dist/ui.d.ts",
+      "import": "./dist/ui.mjs",
+      "require": "./dist/ui.cjs"
+    },
+    "./styles.css": "./styles.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "styles.css"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/headless.d.mts dist/headless.d.ts",
+    "build": "tsdown --config-loader native && for name in index headless banner ui; do cp dist/$name.d.mts dist/$name.d.ts; done",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@cookiechimp/core": "workspace:*"
+    "@cookiechimp/core": "workspace:*",
+    "@cookiechimp/tokens": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18",
