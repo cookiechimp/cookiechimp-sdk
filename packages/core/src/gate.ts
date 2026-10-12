@@ -1,4 +1,5 @@
 import type { ConsentRuntime } from "./index";
+import { isHttpUrl } from "./internal/url";
 
 export interface GateOptions {
   onRevoke?: (category: string, service?: string) => void;
@@ -24,8 +25,6 @@ const noop = (): GateController => ({
   scan() {},
   blocked: () => [],
 });
-const unsafe = (url: string) =>
-  /^(?:javascript|data):/i.test(url.replace(/^[^\S!-~]+/, ""));
 const isDevelopment = () =>
   typeof process !== "undefined" && process.env.NODE_ENV !== "production";
 
@@ -85,7 +84,7 @@ export function gateScripts(
       return;
     }
     const source = el.dataset.ccSrc ?? el.getAttribute("src") ?? "";
-    if (source && unsafe(source)) {
+    if (source && !isHttpUrl(source, doc.baseURI)) {
       warn(`refused unsafe data-cc-src ${JSON.stringify(source)}`);
       pending.set(el, { el, category, ...(service ? { service } : {}) });
       return;
@@ -137,7 +136,7 @@ export function gateScripts(
       options.placeholder?.(el, category);
       return;
     }
-    if (unsafe(source)) {
+    if (!isHttpUrl(source, doc.baseURI)) {
       warn(`refused unsafe data-cc-src ${JSON.stringify(source)}`);
       pending.set(el, { el, category, ...(service ? { service } : {}) });
       return;

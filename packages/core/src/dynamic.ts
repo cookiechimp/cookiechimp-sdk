@@ -1,6 +1,7 @@
 import type { NormalizedConfig, normalizeConfig } from "./config";
 import type { ConsentRuntime } from "./index";
 import { acquire } from "./internal/patch";
+import { isHttpUrl } from "./internal/url";
 import { matchService } from "./match";
 
 export interface BlockedInfo {
@@ -67,7 +68,7 @@ export function blockDynamic(
       category &&
       !(service ? consent.hasService(service) : consent.has(category))
     )
-      return { category, service: service ?? "declarative" };
+      return { category, service };
     const found = definition(url);
     return found && !consent.hasService(found.id)
       ? { category: found.category, service: found.id }
@@ -91,7 +92,7 @@ export function blockDynamic(
     el.removeAttribute("src");
     el.setAttribute("data-cc-src", url);
     el.setAttribute("data-cc-category", match.category);
-    el.setAttribute("data-cc-service", match.service);
+    if (match.service) el.setAttribute("data-cc-service", match.service);
     el.setAttribute("data-cc-blocked", "true");
     if (el instanceof win.HTMLScriptElement) {
       el.dataset.ccType = el.type || "text/javascript";
@@ -102,7 +103,7 @@ export function blockDynamic(
       reported.add(el);
       const info: BlockedInfo = {
         url,
-        service: match.service,
+        service: match.service ?? "declarative",
         category: match.category,
         kind: el instanceof win.HTMLScriptElement ? "script" : "iframe",
         ts: Date.now(),
@@ -212,9 +213,15 @@ export function blockDynamic(
       "[data-cc-blocked][data-cc-src]",
     )) {
       const service = el.dataset.ccService;
-      if (!service || !consent.hasService(service)) continue;
+      const category = el.dataset.ccCategory;
+      if (
+        !(service
+          ? consent.hasService(service)
+          : category && consent.has(category))
+      )
+        continue;
       const url = el.dataset.ccSrc;
-      if (!url) continue;
+      if (!url || !isHttpUrl(url, doc.baseURI)) continue;
       bypass.add(el);
       if (el instanceof win.HTMLScriptElement) {
         const fresh = doc.createElement("script");

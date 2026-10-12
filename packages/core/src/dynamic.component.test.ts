@@ -3,9 +3,10 @@ import { blockDynamic } from "./dynamic";
 
 function runtime() {
   const services: Record<string, boolean> = {};
+  const categories: Record<string, boolean> = {};
   const listeners = new Set<(_state: never) => void>();
   return {
-    has: () => false,
+    has: (category: string) => categories[category] === true,
     hasService: (service: string) => services[service] === true,
     subscribe(fn: (_state: never) => void) {
       listeners.add(fn);
@@ -15,6 +16,10 @@ function runtime() {
     },
     allow(service: string) {
       services[service] = true;
+      for (const fn of listeners) fn(undefined as never);
+    },
+    allowCategory(category: string) {
+      categories[category] = true;
       for (const fn of listeners) fn(undefined as never);
     },
   };
@@ -163,6 +168,42 @@ describe("dynamic src interception", () => {
     controllers.push(next);
     next.scan();
     expect(frame.hasAttribute("src")).toBe(false);
+  });
+
+  it("restores a declarative block without a service after category consent", () => {
+    const consent = runtime();
+    install(consent);
+    const frame = document.createElement("iframe");
+    frame.dataset.ccCategory = "analytics";
+    frame.src = "https://other.test/embed";
+    document.body.append(frame);
+    expect(frame.dataset.ccService).toBeUndefined();
+    expect(frame.dataset.ccSrc).toBe("https://other.test/embed");
+
+    consent.allowCategory("analytics");
+
+    expect(frame.getAttribute("src")).toBe("https://other.test/embed");
+    expect(frame.dataset.ccSrc).toBeUndefined();
+  });
+
+  it.each([
+    "java\nscript:alert(1)",
+    "\x01javascript:alert(1)",
+    "da\nta:text/html,bad",
+    "java\tscript:alert(1)",
+    "\tdata:text/html,bad",
+  ])("does not restore a disguised non-HTTP URL %j", (source) => {
+    const consent = runtime();
+    install(consent);
+    const frame = document.createElement("iframe");
+    frame.dataset.ccCategory = "analytics";
+    frame.setAttribute("src", source);
+    document.body.append(frame);
+
+    consent.allowCategory("analytics");
+
+    expect(frame.hasAttribute("src")).toBe(false);
+    expect(frame.dataset.ccSrc).toBe(source);
   });
 });
 

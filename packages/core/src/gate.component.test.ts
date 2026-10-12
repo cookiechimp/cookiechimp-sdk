@@ -229,17 +229,32 @@ describe("gateScripts revocation and controller", () => {
 });
 
 describe("gateScripts URL safety", () => {
-  it("never activates javascript or data data-cc-src values and warns in development", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const consent = runtime({ analytics: true });
-    document.body.innerHTML =
-      '<script type="text/plain" data-cc-category="analytics" data-cc-src=" \njAvAsCrIpT:alert(1)"></script><iframe data-cc-category="analytics" data-cc-src="\tDaTa:text/html,bad"></iframe>';
-    const controller = gate(consent);
-    await tick();
-    expect(controller.blocked()).toHaveLength(2);
-    expect(document.querySelector("iframe")?.hasAttribute("src")).toBe(false);
-    expect(warn).toHaveBeenCalledTimes(2);
-  });
+  it.each([
+    "java\nscript:alert(1)",
+    "\x01javascript:alert(1)",
+    "da\nta:text/html,bad",
+    "java\tscript:alert(1)",
+    "\tdata:text/html,bad",
+  ])(
+    "never activates a disguised non-HTTP data-cc-src value %j",
+    async (source) => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const consent = runtime({ analytics: true });
+      const script = document.createElement("script");
+      script.type = "text/plain";
+      script.dataset.ccCategory = "analytics";
+      script.dataset.ccSrc = source;
+      const frame = document.createElement("iframe");
+      frame.dataset.ccCategory = "analytics";
+      frame.dataset.ccSrc = source;
+      document.body.append(script, frame);
+      const controller = gate(consent);
+      await tick();
+      expect(controller.blocked()).toHaveLength(2);
+      expect(frame.hasAttribute("src")).toBe(false);
+      expect(warn).toHaveBeenCalledTimes(2);
+    },
+  );
 
   it("warns when data-cc-category is combined with plain src", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
