@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Nederlands)",
-  "Choose which cookies this site may use. (Nederlands)",
-  "Accept all cookies (Nederlands)",
-  "Reject optional cookies (Nederlands)",
-  "Customize choices (Nederlands)",
-  "Save choices (Nederlands)",
-  "Close (Nederlands)",
-  "Cookie preferences (Nederlands)",
-  "Control cookies by purpose. (Nederlands)",
-  "Necessary (Nederlands)",
-  "Required for the site to work. (Nederlands)",
-  "Functional (Nederlands)",
-  "Remember settings and improve features. (Nederlands)",
-  "Analytics (Nederlands)",
-  "Help us understand site usage. (Nederlands)",
-  "Marketing (Nederlands)",
-  "Support relevant advertising. (Nederlands)",
-  "Opt out of sale or sharing (Nederlands)",
-  "Global Privacy Control has been honoured. (Nederlands)",
-  "Review cookie choices (Nederlands)",
-  "This content needs your permission. (Nederlands)",
-  "Allow content (Nederlands)",
-]);
+const messages = {
+  "banner.title": "Privacykeuzes",
+  "banner.description": "Kies welke cookies mogen worden gebruikt.",
+  "banner.acceptAll": "Alle cookies accepteren",
+  "banner.rejectAll": "Optionele cookies weigeren",
+  "banner.customize": "Aanpassen",
+  "banner.save": "Opslaan",
+  "banner.close": "Sluiten",
+  "preferences.title": "Cookievoorkeuren",
+  "preferences.description": "Beheer cookies per doel.",
+  "category.necessary.name": "Noodzakelijk",
+  "category.necessary.description": "Nodig voor deze site.",
+  "category.functional.name": "Functioneel",
+  "category.functional.description": "Onthoudt instellingen.",
+  "category.analytics.name": "Analytisch",
+  "category.analytics.description": "Meet het gebruik van de site.",
+  "category.marketing.name": "Marketing",
+  "category.marketing.description": "Ondersteunt advertenties.",
+  "optOut.label": "Verkoop of delen weigeren",
+  "gpc.honoured": "Global Privacy Control is gerespecteerd.",
+  "recall.label": "Cookiekeuzes bekijken",
+  "gated.placeholder": "Voor deze inhoud is je toestemming nodig.",
+  "gated.allow": "Inhoud toestaan",
+} as const satisfies Messages;
 export default messages;
 export { messages };

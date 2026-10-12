@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Slovenčina)",
-  "Choose which cookies this site may use. (Slovenčina)",
-  "Accept all cookies (Slovenčina)",
-  "Reject optional cookies (Slovenčina)",
-  "Customize choices (Slovenčina)",
-  "Save choices (Slovenčina)",
-  "Close (Slovenčina)",
-  "Cookie preferences (Slovenčina)",
-  "Control cookies by purpose. (Slovenčina)",
-  "Necessary (Slovenčina)",
-  "Required for the site to work. (Slovenčina)",
-  "Functional (Slovenčina)",
-  "Remember settings and improve features. (Slovenčina)",
-  "Analytics (Slovenčina)",
-  "Help us understand site usage. (Slovenčina)",
-  "Marketing (Slovenčina)",
-  "Support relevant advertising. (Slovenčina)",
-  "Opt out of sale or sharing (Slovenčina)",
-  "Global Privacy Control has been honoured. (Slovenčina)",
-  "Review cookie choices (Slovenčina)",
-  "This content needs your permission. (Slovenčina)",
-  "Allow content (Slovenčina)",
-]);
+const messages = {
+  "banner.title": "Voľby súkromia",
+  "banner.description": "Vyberte, ktoré súbory cookie sa môžu používať.",
+  "banner.acceptAll": "Prijať všetky súbory cookie",
+  "banner.rejectAll": "Odmietnuť voliteľné",
+  "banner.customize": "Prispôsobiť",
+  "banner.save": "Uložiť",
+  "banner.close": "Zavrieť",
+  "preferences.title": "Nastavenia súborov cookie",
+  "preferences.description": "Spravujte súbory cookie podľa účelu.",
+  "category.necessary.name": "Nevyhnutné",
+  "category.necessary.description": "Potrebné pre túto stránku.",
+  "category.functional.name": "Funkčné",
+  "category.functional.description": "Pamätajú si nastavenia.",
+  "category.analytics.name": "Analytické",
+  "category.analytics.description": "Merajú používanie stránky.",
+  "category.marketing.name": "Marketingové",
+  "category.marketing.description": "Podporujú reklamu.",
+  "optOut.label": "Odmietnuť predaj alebo zdieľanie",
+  "gpc.honoured": "Globálna kontrola súkromia bola rešpektovaná.",
+  "recall.label": "Skontrolovať voľby súborov cookie",
+  "gated.placeholder": "Tento obsah vyžaduje váš súhlas.",
+  "gated.allow": "Povoliť obsah",
+} as const satisfies Messages;
 export default messages;
 export { messages };

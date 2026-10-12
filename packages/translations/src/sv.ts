@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Svenska)",
-  "Choose which cookies this site may use. (Svenska)",
-  "Accept all cookies (Svenska)",
-  "Reject optional cookies (Svenska)",
-  "Customize choices (Svenska)",
-  "Save choices (Svenska)",
-  "Close (Svenska)",
-  "Cookie preferences (Svenska)",
-  "Control cookies by purpose. (Svenska)",
-  "Necessary (Svenska)",
-  "Required for the site to work. (Svenska)",
-  "Functional (Svenska)",
-  "Remember settings and improve features. (Svenska)",
-  "Analytics (Svenska)",
-  "Help us understand site usage. (Svenska)",
-  "Marketing (Svenska)",
-  "Support relevant advertising. (Svenska)",
-  "Opt out of sale or sharing (Svenska)",
-  "Global Privacy Control has been honoured. (Svenska)",
-  "Review cookie choices (Svenska)",
-  "This content needs your permission. (Svenska)",
-  "Allow content (Svenska)",
-]);
+const messages = {
+  "banner.title": "Integritetsval",
+  "banner.description": "Välj vilka kakor som får användas.",
+  "banner.acceptAll": "Godkänn alla kakor",
+  "banner.rejectAll": "Avvisa valfria",
+  "banner.customize": "Anpassa",
+  "banner.save": "Spara",
+  "banner.close": "Stäng",
+  "preferences.title": "Inställningar för kakor",
+  "preferences.description": "Styr kakor efter syfte.",
+  "category.necessary.name": "Nödvändiga",
+  "category.necessary.description": "Behövs för den här webbplatsen.",
+  "category.functional.name": "Funktionella",
+  "category.functional.description": "Kommer ihåg inställningar.",
+  "category.analytics.name": "Analys",
+  "category.analytics.description": "Mäter användningen av webbplatsen.",
+  "category.marketing.name": "Marknadsföring",
+  "category.marketing.description": "Stöder annonsering.",
+  "optOut.label": "Avstå från försäljning eller delning",
+  "gpc.honoured": "Global integritetskontroll har respekterats.",
+  "recall.label": "Granska val för kakor",
+  "gated.placeholder": "Det här innehållet kräver ditt tillstånd.",
+  "gated.allow": "Tillåt innehåll",
+} as const satisfies Messages;
 export default messages;
 export { messages };

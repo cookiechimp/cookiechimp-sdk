@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (中文)",
-  "Choose which cookies this site may use. (中文)",
-  "Accept all cookies (中文)",
-  "Reject optional cookies (中文)",
-  "Customize choices (中文)",
-  "Save choices (中文)",
-  "Close (中文)",
-  "Cookie preferences (中文)",
-  "Control cookies by purpose. (中文)",
-  "Necessary (中文)",
-  "Required for the site to work. (中文)",
-  "Functional (中文)",
-  "Remember settings and improve features. (中文)",
-  "Analytics (中文)",
-  "Help us understand site usage. (中文)",
-  "Marketing (中文)",
-  "Support relevant advertising. (中文)",
-  "Opt out of sale or sharing (中文)",
-  "Global Privacy Control has been honoured. (中文)",
-  "Review cookie choices (中文)",
-  "This content needs your permission. (中文)",
-  "Allow content (中文)",
-]);
+const messages = {
+  "banner.title": "隐私选项",
+  "banner.description": "选择可以使用的 Cookie。",
+  "banner.acceptAll": "接受所有 Cookie",
+  "banner.rejectAll": "拒绝可选 Cookie",
+  "banner.customize": "自定义",
+  "banner.save": "保存",
+  "banner.close": "关闭",
+  "preferences.title": "Cookie 偏好设置",
+  "preferences.description": "按用途管理 Cookie。",
+  "category.necessary.name": "必要",
+  "category.necessary.description": "本站运行所必需。",
+  "category.functional.name": "功能",
+  "category.functional.description": "记住您的设置。",
+  "category.analytics.name": "分析",
+  "category.analytics.description": "衡量网站使用情况。",
+  "category.marketing.name": "营销",
+  "category.marketing.description": "用于支持广告。",
+  "optOut.label": "拒绝出售或共享",
+  "gpc.honoured": "已遵循全球隐私控制信号。",
+  "recall.label": "查看 Cookie 选项",
+  "gated.placeholder": "此内容需要您的许可。",
+  "gated.allow": "允许内容",
+} as const satisfies Messages;
 export default messages;
 export { messages };

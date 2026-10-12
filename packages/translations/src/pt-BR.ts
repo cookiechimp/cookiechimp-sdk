@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Português do Brasil)",
-  "Choose which cookies this site may use. (Português do Brasil)",
-  "Accept all cookies (Português do Brasil)",
-  "Reject optional cookies (Português do Brasil)",
-  "Customize choices (Português do Brasil)",
-  "Save choices (Português do Brasil)",
-  "Close (Português do Brasil)",
-  "Cookie preferences (Português do Brasil)",
-  "Control cookies by purpose. (Português do Brasil)",
-  "Necessary (Português do Brasil)",
-  "Required for the site to work. (Português do Brasil)",
-  "Functional (Português do Brasil)",
-  "Remember settings and improve features. (Português do Brasil)",
-  "Analytics (Português do Brasil)",
-  "Help us understand site usage. (Português do Brasil)",
-  "Marketing (Português do Brasil)",
-  "Support relevant advertising. (Português do Brasil)",
-  "Opt out of sale or sharing (Português do Brasil)",
-  "Global Privacy Control has been honoured. (Português do Brasil)",
-  "Review cookie choices (Português do Brasil)",
-  "This content needs your permission. (Português do Brasil)",
-  "Allow content (Português do Brasil)",
-]);
+const messages = {
+  "banner.title": "Opções de privacidade",
+  "banner.description": "Escolha quais cookies podem ser usados.",
+  "banner.acceptAll": "Aceitar todos os cookies",
+  "banner.rejectAll": "Recusar opcionais",
+  "banner.customize": "Personalizar",
+  "banner.save": "Salvar",
+  "banner.close": "Fechar",
+  "preferences.title": "Preferências de cookies",
+  "preferences.description": "Controle os cookies por finalidade.",
+  "category.necessary.name": "Necessários",
+  "category.necessary.description": "Necessários para este site.",
+  "category.functional.name": "Funcionais",
+  "category.functional.description": "Lembram suas configurações.",
+  "category.analytics.name": "Analíticos",
+  "category.analytics.description": "Medem o uso do site.",
+  "category.marketing.name": "Marketing",
+  "category.marketing.description": "Apoiam a publicidade.",
+  "optOut.label": "Recusar venda ou compartilhamento",
+  "gpc.honoured": "O Controle Global de Privacidade foi respeitado.",
+  "recall.label": "Revisar opções de cookies",
+  "gated.placeholder": "Este conteúdo precisa da sua permissão.",
+  "gated.allow": "Permitir conteúdo",
+} as const satisfies Messages;
 export default messages;
 export { messages };

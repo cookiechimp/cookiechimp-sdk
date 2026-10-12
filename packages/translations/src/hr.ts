@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Hrvatski)",
-  "Choose which cookies this site may use. (Hrvatski)",
-  "Accept all cookies (Hrvatski)",
-  "Reject optional cookies (Hrvatski)",
-  "Customize choices (Hrvatski)",
-  "Save choices (Hrvatski)",
-  "Close (Hrvatski)",
-  "Cookie preferences (Hrvatski)",
-  "Control cookies by purpose. (Hrvatski)",
-  "Necessary (Hrvatski)",
-  "Required for the site to work. (Hrvatski)",
-  "Functional (Hrvatski)",
-  "Remember settings and improve features. (Hrvatski)",
-  "Analytics (Hrvatski)",
-  "Help us understand site usage. (Hrvatski)",
-  "Marketing (Hrvatski)",
-  "Support relevant advertising. (Hrvatski)",
-  "Opt out of sale or sharing (Hrvatski)",
-  "Global Privacy Control has been honoured. (Hrvatski)",
-  "Review cookie choices (Hrvatski)",
-  "This content needs your permission. (Hrvatski)",
-  "Allow content (Hrvatski)",
-]);
+const messages = {
+  "banner.title": "Odabir privatnosti",
+  "banner.description": "Odaberite koji se kolačići mogu upotrebljavati.",
+  "banner.acceptAll": "Prihvati sve kolačiće",
+  "banner.rejectAll": "Odbij neobavezne",
+  "banner.customize": "Prilagodi",
+  "banner.save": "Spremi",
+  "banner.close": "Zatvori",
+  "preferences.title": "Postavke kolačića",
+  "preferences.description": "Upravljajte kolačićima prema svrsi.",
+  "category.necessary.name": "Nužni",
+  "category.necessary.description": "Potrebni za ovu stranicu.",
+  "category.functional.name": "Funkcionalni",
+  "category.functional.description": "Pamte postavke.",
+  "category.analytics.name": "Analitički",
+  "category.analytics.description": "Mjere upotrebu stranice.",
+  "category.marketing.name": "Marketinški",
+  "category.marketing.description": "Podržavaju oglašavanje.",
+  "optOut.label": "Odbij prodaju ili dijeljenje",
+  "gpc.honoured": "Globalna kontrola privatnosti je poštovana.",
+  "recall.label": "Pregledaj odabir kolačića",
+  "gated.placeholder": "Za ovaj sadržaj potrebno je vaše dopuštenje.",
+  "gated.allow": "Dopusti sadržaj",
+} as const satisfies Messages;
 export default messages;
 export { messages };

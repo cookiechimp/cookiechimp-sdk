@@ -6,8 +6,11 @@ import {
   type ConsentState,
   createConsent,
 } from "@cookiechimp/core";
-import type { MessageKey, Messages } from "@cookiechimp/translations";
-import en from "@cookiechimp/translations/en";
+import {
+  type MessageKey,
+  type Messages,
+  rtlLocales,
+} from "@cookiechimp/translations";
 import {
   createContext,
   type ReactNode,
@@ -25,7 +28,7 @@ export type { MessageKey, Messages } from "@cookiechimp/translations";
 type ProviderValue = {
   consent: ConsentRuntime;
   serverState: ConsentState;
-  translations: Messages;
+  translations?: Messages;
   language: string;
   getSnapshot: () => ConsentState;
   subscribe: (listener: () => void) => () => void;
@@ -77,7 +80,7 @@ export function ConsentProvider(props: ConsentProviderProps) {
     return {
       consent,
       serverState,
-      translations: props.translations ?? en,
+      translations: props.translations,
       language: props.language ?? consent.language,
       getSnapshot: () => consent.get(),
       subscribe: (listener: () => void) => consent.subscribe(listener),
@@ -188,15 +191,26 @@ export function useRegion() {
   );
 }
 
-export function useTranslations() {
+export function useTranslations(fallback?: Messages) {
   const context = useConsentContext();
-  const translations = context?.translations ?? en;
+  const translations = context?.translations ?? fallback;
   const language = context?.language ?? "en";
-  return {
-    t: (key: MessageKey) => translations[key] || en[key],
-    language,
-    dir: /^(ar|he)(-|$)/i.test(language) ? "rtl" : "ltr",
-  };
+  const t = useCallback(
+    (key: MessageKey) => (translations?.[key] || fallback?.[key]) ?? key,
+    [translations, fallback],
+  );
+  return useMemo(
+    () => ({
+      t,
+      language,
+      dir: rtlLocales.some(
+        (locale) => locale === language.toLowerCase().split("-")[0],
+      )
+        ? ("rtl" as const)
+        : ("ltr" as const),
+    }),
+    [t, language],
+  );
 }
 
 function useVisibility(initial: boolean, onShow?: () => void) {

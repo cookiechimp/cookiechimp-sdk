@@ -274,7 +274,10 @@ export async function main(
   const results = await runBudgets(budgets, root);
   printTable(results);
   const pending = results.filter(({ status }) => status === "pending").length;
-  console.log(`\n${results.length - pending} enforced, ${pending} pending`);
+  const enforced = results.filter(({ status }) =>
+    ["pass", "fail"].includes(status),
+  ).length;
+  console.log(`\n${enforced} enforced, ${pending} pending`);
   return results.some(({ status }) => status === "fail") ? 1 : 0;
 }
 

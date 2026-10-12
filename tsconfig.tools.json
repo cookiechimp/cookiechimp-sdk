@@ -1,8 +1,20 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node", "vitest/globals"]
+    "jsx": "react-jsx",
+    "types": ["node", "vitest/globals"],
+    "paths": {
+      "@cookiechimp/core": ["./packages/core/src/index.ts"],
+      "@cookiechimp/core/*": ["./packages/core/src/*"],
+      "@cookiechimp/react": ["./packages/react/src/index.tsx"],
+      "@cookiechimp/react/*": ["./packages/react/src/*"],
+      "@cookiechimp/translations": ["./packages/translations/src/index.ts"],
+      "@cookiechimp/translations/*": ["./packages/translations/src/*"],
+      "react": ["./packages/react/node_modules/@types/react/index.d.ts"],
+      "react/jsx-runtime": [
+        "./packages/react/node_modules/@types/react/jsx-runtime.d.ts"
+      ]
+    }
   },
-  "include": ["scripts/**/*.ts"],
-  "exclude": ["scripts/size-scenarios/**"]
+  "include": ["scripts/**/*.ts"]
 }

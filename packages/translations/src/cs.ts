@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Čeština)",
-  "Choose which cookies this site may use. (Čeština)",
-  "Accept all cookies (Čeština)",
-  "Reject optional cookies (Čeština)",
-  "Customize choices (Čeština)",
-  "Save choices (Čeština)",
-  "Close (Čeština)",
-  "Cookie preferences (Čeština)",
-  "Control cookies by purpose. (Čeština)",
-  "Necessary (Čeština)",
-  "Required for the site to work. (Čeština)",
-  "Functional (Čeština)",
-  "Remember settings and improve features. (Čeština)",
-  "Analytics (Čeština)",
-  "Help us understand site usage. (Čeština)",
-  "Marketing (Čeština)",
-  "Support relevant advertising. (Čeština)",
-  "Opt out of sale or sharing (Čeština)",
-  "Global Privacy Control has been honoured. (Čeština)",
-  "Review cookie choices (Čeština)",
-  "This content needs your permission. (Čeština)",
-  "Allow content (Čeština)",
-]);
+const messages = {
+  "banner.title": "Volby soukromí",
+  "banner.description": "Zvolte, které soubory cookie lze používat.",
+  "banner.acceptAll": "Přijmout všechny soubory cookie",
+  "banner.rejectAll": "Odmítnout volitelné",
+  "banner.customize": "Přizpůsobit",
+  "banner.save": "Uložit",
+  "banner.close": "Zavřít",
+  "preferences.title": "Nastavení souborů cookie",
+  "preferences.description": "Spravujte soubory cookie podle účelu.",
+  "category.necessary.name": "Nezbytné",
+  "category.necessary.description": "Potřebné pro tento web.",
+  "category.functional.name": "Funkční",
+  "category.functional.description": "Pamatují si nastavení.",
+  "category.analytics.name": "Analytické",
+  "category.analytics.description": "Měří používání webu.",
+  "category.marketing.name": "Marketingové",
+  "category.marketing.description": "Podporují reklamu.",
+  "optOut.label": "Odmítnout prodej nebo sdílení",
+  "gpc.honoured": "Globální kontrola soukromí byla respektována.",
+  "recall.label": "Zkontrolovat volby souborů cookie",
+  "gated.placeholder": "Tento obsah vyžaduje váš souhlas.",
+  "gated.allow": "Povolit obsah",
+} as const satisfies Messages;
 export default messages;
 export { messages };

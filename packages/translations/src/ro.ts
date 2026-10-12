@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Română)",
-  "Choose which cookies this site may use. (Română)",
-  "Accept all cookies (Română)",
-  "Reject optional cookies (Română)",
-  "Customize choices (Română)",
-  "Save choices (Română)",
-  "Close (Română)",
-  "Cookie preferences (Română)",
-  "Control cookies by purpose. (Română)",
-  "Necessary (Română)",
-  "Required for the site to work. (Română)",
-  "Functional (Română)",
-  "Remember settings and improve features. (Română)",
-  "Analytics (Română)",
-  "Help us understand site usage. (Română)",
-  "Marketing (Română)",
-  "Support relevant advertising. (Română)",
-  "Opt out of sale or sharing (Română)",
-  "Global Privacy Control has been honoured. (Română)",
-  "Review cookie choices (Română)",
-  "This content needs your permission. (Română)",
-  "Allow content (Română)",
-]);
+const messages = {
+  "banner.title": "Opțiuni de confidențialitate",
+  "banner.description": "Alegeți ce module cookie pot fi utilizate.",
+  "banner.acceptAll": "Acceptă toate modulele cookie",
+  "banner.rejectAll": "Respinge opționalele",
+  "banner.customize": "Personalizează",
+  "banner.save": "Salvează",
+  "banner.close": "Închide",
+  "preferences.title": "Preferințe cookie",
+  "preferences.description": "Controlați modulele cookie după scop.",
+  "category.necessary.name": "Necesare",
+  "category.necessary.description": "Necesare pentru acest site.",
+  "category.functional.name": "Funcționale",
+  "category.functional.description": "Rețin setările.",
+  "category.analytics.name": "Analitice",
+  "category.analytics.description": "Măsoară utilizarea site-ului.",
+  "category.marketing.name": "Marketing",
+  "category.marketing.description": "Sprijină publicitatea.",
+  "optOut.label": "Refuză vânzarea sau partajarea",
+  "gpc.honoured": "Controlul global al confidențialității a fost respectat.",
+  "recall.label": "Revizuiește opțiunile cookie",
+  "gated.placeholder": "Acest conținut necesită permisiunea dvs.",
+  "gated.allow": "Permite conținutul",
+} as const satisfies Messages;
 export default messages;
 export { messages };

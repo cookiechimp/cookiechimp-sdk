@@ -66,7 +66,7 @@ function Status({ changed }: { changed?: (state: ConsentState) => void }) {
 }
 
 describe("ConsentProvider hooks", () => {
-  it("returns translated copy, English fallback, language, and RTL direction", () => {
+  it("returns translated copy, language, and RTL direction", () => {
     function TranslationStatus() {
       const { t, language, dir } = useTranslations();
       return (
@@ -79,7 +79,7 @@ describe("ConsentProvider hooks", () => {
         <TranslationStatus />
       </ConsentProvider>,
     );
-    expect(html).toContain("الخصوصية|Close|ar|rtl");
+    expect(html).toContain("الخصوصية|banner.close|ar|rtl");
   });
 
   it("creates a runtime from config, updates hooks, and keeps actions stable", async () => {

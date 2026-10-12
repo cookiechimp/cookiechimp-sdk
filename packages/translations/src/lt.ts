@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Lietuvių)",
-  "Choose which cookies this site may use. (Lietuvių)",
-  "Accept all cookies (Lietuvių)",
-  "Reject optional cookies (Lietuvių)",
-  "Customize choices (Lietuvių)",
-  "Save choices (Lietuvių)",
-  "Close (Lietuvių)",
-  "Cookie preferences (Lietuvių)",
-  "Control cookies by purpose. (Lietuvių)",
-  "Necessary (Lietuvių)",
-  "Required for the site to work. (Lietuvių)",
-  "Functional (Lietuvių)",
-  "Remember settings and improve features. (Lietuvių)",
-  "Analytics (Lietuvių)",
-  "Help us understand site usage. (Lietuvių)",
-  "Marketing (Lietuvių)",
-  "Support relevant advertising. (Lietuvių)",
-  "Opt out of sale or sharing (Lietuvių)",
-  "Global Privacy Control has been honoured. (Lietuvių)",
-  "Review cookie choices (Lietuvių)",
-  "This content needs your permission. (Lietuvių)",
-  "Allow content (Lietuvių)",
-]);
+const messages = {
+  "banner.title": "Privatumo pasirinkimai",
+  "banner.description": "Pasirinkite, kuriuos slapukus galima naudoti.",
+  "banner.acceptAll": "Priimti visus slapukus",
+  "banner.rejectAll": "Atmesti pasirenkamus",
+  "banner.customize": "Tinkinti",
+  "banner.save": "Išsaugoti",
+  "banner.close": "Uždaryti",
+  "preferences.title": "Slapukų nuostatos",
+  "preferences.description": "Valdykite slapukus pagal paskirtį.",
+  "category.necessary.name": "Būtinieji",
+  "category.necessary.description": "Reikalingi šiai svetainei.",
+  "category.functional.name": "Funkciniai",
+  "category.functional.description": "Įsimena nustatymus.",
+  "category.analytics.name": "Analitiniai",
+  "category.analytics.description": "Matuoja svetainės naudojimą.",
+  "category.marketing.name": "Rinkodaros",
+  "category.marketing.description": "Padeda rodyti reklamą.",
+  "optOut.label": "Atsisakyti pardavimo ar bendrinimo",
+  "gpc.honoured": "Visuotinio privatumo valdymo nuostata buvo gerbiama.",
+  "recall.label": "Peržiūrėti slapukų pasirinkimus",
+  "gated.placeholder": "Šiam turiniui reikia jūsų leidimo.",
+  "gated.allow": "Leisti turinį",
+} as const satisfies Messages;
 export default messages;
 export { messages };

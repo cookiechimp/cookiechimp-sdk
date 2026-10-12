@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Slovenščina)",
-  "Choose which cookies this site may use. (Slovenščina)",
-  "Accept all cookies (Slovenščina)",
-  "Reject optional cookies (Slovenščina)",
-  "Customize choices (Slovenščina)",
-  "Save choices (Slovenščina)",
-  "Close (Slovenščina)",
-  "Cookie preferences (Slovenščina)",
-  "Control cookies by purpose. (Slovenščina)",
-  "Necessary (Slovenščina)",
-  "Required for the site to work. (Slovenščina)",
-  "Functional (Slovenščina)",
-  "Remember settings and improve features. (Slovenščina)",
-  "Analytics (Slovenščina)",
-  "Help us understand site usage. (Slovenščina)",
-  "Marketing (Slovenščina)",
-  "Support relevant advertising. (Slovenščina)",
-  "Opt out of sale or sharing (Slovenščina)",
-  "Global Privacy Control has been honoured. (Slovenščina)",
-  "Review cookie choices (Slovenščina)",
-  "This content needs your permission. (Slovenščina)",
-  "Allow content (Slovenščina)",
-]);
+const messages = {
+  "banner.title": "Izbire zasebnosti",
+  "banner.description": "Izberite, kateri piškotki se lahko uporabljajo.",
+  "banner.acceptAll": "Sprejmi vse piškotke",
+  "banner.rejectAll": "Zavrni izbirne",
+  "banner.customize": "Prilagodi",
+  "banner.save": "Shrani",
+  "banner.close": "Zapri",
+  "preferences.title": "Nastavitve piškotkov",
+  "preferences.description": "Upravljajte piškotke glede na namen.",
+  "category.necessary.name": "Nujni",
+  "category.necessary.description": "Potrebni za to spletno mesto.",
+  "category.functional.name": "Funkcionalni",
+  "category.functional.description": "Zapomnijo si nastavitve.",
+  "category.analytics.name": "Analitični",
+  "category.analytics.description": "Merijo uporabo spletnega mesta.",
+  "category.marketing.name": "Trženjski",
+  "category.marketing.description": "Podpirajo oglaševanje.",
+  "optOut.label": "Zavrni prodajo ali deljenje",
+  "gpc.honoured": "Globalna nastavitev zasebnosti je bila upoštevana.",
+  "recall.label": "Preglej izbire piškotkov",
+  "gated.placeholder": "Ta vsebina potrebuje vaše dovoljenje.",
+  "gated.allow": "Dovoli vsebino",
+} as const satisfies Messages;
 export default messages;
 export { messages };

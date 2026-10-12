@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Italiano)",
-  "Choose which cookies this site may use. (Italiano)",
-  "Accept all cookies (Italiano)",
-  "Reject optional cookies (Italiano)",
-  "Customize choices (Italiano)",
-  "Save choices (Italiano)",
-  "Close (Italiano)",
-  "Cookie preferences (Italiano)",
-  "Control cookies by purpose. (Italiano)",
-  "Necessary (Italiano)",
-  "Required for the site to work. (Italiano)",
-  "Functional (Italiano)",
-  "Remember settings and improve features. (Italiano)",
-  "Analytics (Italiano)",
-  "Help us understand site usage. (Italiano)",
-  "Marketing (Italiano)",
-  "Support relevant advertising. (Italiano)",
-  "Opt out of sale or sharing (Italiano)",
-  "Global Privacy Control has been honoured. (Italiano)",
-  "Review cookie choices (Italiano)",
-  "This content needs your permission. (Italiano)",
-  "Allow content (Italiano)",
-]);
+const messages = {
+  "banner.title": "Scelte sulla privacy",
+  "banner.description": "Scegli quali cookie possono essere utilizzati.",
+  "banner.acceptAll": "Accetta tutti i cookie",
+  "banner.rejectAll": "Rifiuta quelli facoltativi",
+  "banner.customize": "Personalizza",
+  "banner.save": "Salva",
+  "banner.close": "Chiudi",
+  "preferences.title": "Preferenze sui cookie",
+  "preferences.description": "Gestisci i cookie in base allo scopo.",
+  "category.necessary.name": "Necessari",
+  "category.necessary.description": "Necessari per questo sito.",
+  "category.functional.name": "Funzionali",
+  "category.functional.description": "Memorizzano le impostazioni.",
+  "category.analytics.name": "Analitici",
+  "category.analytics.description": "Misurano l’utilizzo del sito.",
+  "category.marketing.name": "Marketing",
+  "category.marketing.description": "Supportano la pubblicità.",
+  "optOut.label": "Rifiuta vendita o condivisione",
+  "gpc.honoured": "Il Controllo globale della privacy è stato rispettato.",
+  "recall.label": "Rivedi le scelte sui cookie",
+  "gated.placeholder": "Questo contenuto richiede il tuo consenso.",
+  "gated.allow": "Consenti contenuto",
+} as const satisfies Messages;
 export default messages;
 export { messages };

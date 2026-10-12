@@ -27,10 +27,3 @@ export type MessageKey = (typeof messageKeys)[number];
 export type Messages = Readonly<Record<MessageKey, string>>;
 export const rtlLocales = ["ar", "he"] as const;
 export type RtlLocale = (typeof rtlLocales)[number];
-
-/** Internal locale authoring helper. */
-export function defineMessages(values: readonly string[]): Messages {
-  return Object.freeze(
-    Object.fromEntries(messageKeys.map((key, index) => [key, values[index]])),
-  ) as Messages;
-}

@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Gaeilge)",
-  "Choose which cookies this site may use. (Gaeilge)",
-  "Accept all cookies (Gaeilge)",
-  "Reject optional cookies (Gaeilge)",
-  "Customize choices (Gaeilge)",
-  "Save choices (Gaeilge)",
-  "Close (Gaeilge)",
-  "Cookie preferences (Gaeilge)",
-  "Control cookies by purpose. (Gaeilge)",
-  "Necessary (Gaeilge)",
-  "Required for the site to work. (Gaeilge)",
-  "Functional (Gaeilge)",
-  "Remember settings and improve features. (Gaeilge)",
-  "Analytics (Gaeilge)",
-  "Help us understand site usage. (Gaeilge)",
-  "Marketing (Gaeilge)",
-  "Support relevant advertising. (Gaeilge)",
-  "Opt out of sale or sharing (Gaeilge)",
-  "Global Privacy Control has been honoured. (Gaeilge)",
-  "Review cookie choices (Gaeilge)",
-  "This content needs your permission. (Gaeilge)",
-  "Allow content (Gaeilge)",
-]);
+const messages = {
+  "banner.title": "Roghanna príobháideachais",
+  "banner.description": "Roghnaigh na fianáin is féidir a úsáid.",
+  "banner.acceptAll": "Glac le gach fianán",
+  "banner.rejectAll": "Diúltaigh do na cinn roghnacha",
+  "banner.customize": "Saincheap",
+  "banner.save": "Sábháil",
+  "banner.close": "Dún",
+  "preferences.title": "Sainroghanna fianán",
+  "preferences.description": "Rialaigh fianáin de réir cuspóra.",
+  "category.necessary.name": "Riachtanach",
+  "category.necessary.description": "Riachtanach don suíomh seo.",
+  "category.functional.name": "Feidhmiúil",
+  "category.functional.description": "Cuimhníonn siad ar shocruithe.",
+  "category.analytics.name": "Anailísíocht",
+  "category.analytics.description": "Tomhaiseann siad úsáid an tsuímh.",
+  "category.marketing.name": "Margaíocht",
+  "category.marketing.description": "Tacaíonn siad le fógraíocht.",
+  "optOut.label": "Diúltaigh do dhíol nó do chomhroinnt",
+  "gpc.honoured": "Cloíodh leis an Rialú Príobháideachais Domhanda.",
+  "recall.label": "Athbhreithnigh roghanna fianán",
+  "gated.placeholder": "Teastaíonn do chead ón ábhar seo.",
+  "gated.allow": "Ceadaigh ábhar",
+} as const satisfies Messages;
 export default messages;
 export { messages };

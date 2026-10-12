@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (日本語)",
-  "Choose which cookies this site may use. (日本語)",
-  "Accept all cookies (日本語)",
-  "Reject optional cookies (日本語)",
-  "Customize choices (日本語)",
-  "Save choices (日本語)",
-  "Close (日本語)",
-  "Cookie preferences (日本語)",
-  "Control cookies by purpose. (日本語)",
-  "Necessary (日本語)",
-  "Required for the site to work. (日本語)",
-  "Functional (日本語)",
-  "Remember settings and improve features. (日本語)",
-  "Analytics (日本語)",
-  "Help us understand site usage. (日本語)",
-  "Marketing (日本語)",
-  "Support relevant advertising. (日本語)",
-  "Opt out of sale or sharing (日本語)",
-  "Global Privacy Control has been honoured. (日本語)",
-  "Review cookie choices (日本語)",
-  "This content needs your permission. (日本語)",
-  "Allow content (日本語)",
-]);
+const messages = {
+  "banner.title": "プライバシー設定",
+  "banner.description": "使用を許可するCookieを選択してください。",
+  "banner.acceptAll": "すべてのCookieを許可",
+  "banner.rejectAll": "任意のCookieを拒否",
+  "banner.customize": "カスタマイズ",
+  "banner.save": "保存",
+  "banner.close": "閉じる",
+  "preferences.title": "Cookieの設定",
+  "preferences.description": "目的別にCookieを管理します。",
+  "category.necessary.name": "必須",
+  "category.necessary.description": "このサイトに必要です。",
+  "category.functional.name": "機能",
+  "category.functional.description": "設定を記憶します。",
+  "category.analytics.name": "分析",
+  "category.analytics.description": "サイトの利用状況を測定します。",
+  "category.marketing.name": "マーケティング",
+  "category.marketing.description": "広告に使用します。",
+  "optOut.label": "販売または共有を拒否",
+  "gpc.honoured": "グローバルプライバシーコントロールを尊重しました。",
+  "recall.label": "Cookieの選択を確認",
+  "gated.placeholder": "このコンテンツには許可が必要です。",
+  "gated.allow": "コンテンツを許可",
+} as const satisfies Messages;
 export default messages;
 export { messages };

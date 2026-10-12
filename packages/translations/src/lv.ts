@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Latviešu)",
-  "Choose which cookies this site may use. (Latviešu)",
-  "Accept all cookies (Latviešu)",
-  "Reject optional cookies (Latviešu)",
-  "Customize choices (Latviešu)",
-  "Save choices (Latviešu)",
-  "Close (Latviešu)",
-  "Cookie preferences (Latviešu)",
-  "Control cookies by purpose. (Latviešu)",
-  "Necessary (Latviešu)",
-  "Required for the site to work. (Latviešu)",
-  "Functional (Latviešu)",
-  "Remember settings and improve features. (Latviešu)",
-  "Analytics (Latviešu)",
-  "Help us understand site usage. (Latviešu)",
-  "Marketing (Latviešu)",
-  "Support relevant advertising. (Latviešu)",
-  "Opt out of sale or sharing (Latviešu)",
-  "Global Privacy Control has been honoured. (Latviešu)",
-  "Review cookie choices (Latviešu)",
-  "This content needs your permission. (Latviešu)",
-  "Allow content (Latviešu)",
-]);
+const messages = {
+  "banner.title": "Privātuma izvēles",
+  "banner.description": "Izvēlieties, kuras sīkdatnes drīkst izmantot.",
+  "banner.acceptAll": "Pieņemt visas sīkdatnes",
+  "banner.rejectAll": "Noraidīt izvēles",
+  "banner.customize": "Pielāgot",
+  "banner.save": "Saglabāt",
+  "banner.close": "Aizvērt",
+  "preferences.title": "Sīkdatņu iestatījumi",
+  "preferences.description": "Pārvaldiet sīkdatnes pēc nolūka.",
+  "category.necessary.name": "Nepieciešamās",
+  "category.necessary.description": "Nepieciešamas šai vietnei.",
+  "category.functional.name": "Funkcionālās",
+  "category.functional.description": "Atceras iestatījumus.",
+  "category.analytics.name": "Analītiskās",
+  "category.analytics.description": "Mēra vietnes lietojumu.",
+  "category.marketing.name": "Mārketinga",
+  "category.marketing.description": "Atbalsta reklamēšanu.",
+  "optOut.label": "Atteikties no pārdošanas vai kopīgošanas",
+  "gpc.honoured": "Globālā privātuma kontrole ir ievērota.",
+  "recall.label": "Pārskatīt sīkdatņu izvēles",
+  "gated.placeholder": "Šim saturam nepieciešama jūsu atļauja.",
+  "gated.allow": "Atļaut saturu",
+} as const satisfies Messages;
 export default messages;
 export { messages };

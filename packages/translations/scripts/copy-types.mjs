@@ -2,6 +2,7 @@ import { copyFile } from "node:fs/promises";
 
 const locales = [
   "index",
+  "meta",
   "en",
   "de",
   "fr",

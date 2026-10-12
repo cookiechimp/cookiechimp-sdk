@@ -20,6 +20,7 @@ import l27 from "./ja";
 import l29 from "./ko";
 import l23 from "./lt";
 import l22 from "./lv";
+import { localeMeta } from "./meta";
 import l25 from "./mt";
 import l5 from "./nl";
 import l12 from "./no";
@@ -84,4 +85,33 @@ describe("translation locales", () => {
   });
   it("marks right-to-left locales", () =>
     expect(rtlLocales).toEqual(["ar", "he"]));
+  it("contains real locale copy rather than English placeholders", () => {
+    const permittedEnglish = new Set(["category.marketing.name:Marketing"]);
+    for (const [locale, messages] of locales.slice(1)) {
+      for (const key of messageKeys) {
+        const value = messages[key];
+        const source = l0[key];
+        expect(value, `${locale}:${key}`).not.toMatch(/\s\([^)]+\)$/u);
+        if (!permittedEnglish.has(`${key}:${source}`)) {
+          expect(value.toLocaleLowerCase(), `${locale}:${key}`).not.toBe(
+            source.toLocaleLowerCase(),
+          );
+          if (source.length >= 12)
+            expect(value.toLocaleLowerCase(), `${locale}:${key}`).not.toContain(
+              source.toLocaleLowerCase(),
+            );
+        }
+      }
+    }
+  });
+  it("tracks review status and direction for every locale", () => {
+    expect(Object.keys(localeMeta)).toEqual(locales.map(([locale]) => locale));
+    expect(
+      Object.entries(localeMeta)
+        .filter(([, metadata]) => metadata.reviewed)
+        .map(([locale]) => locale),
+    ).toEqual(["en", "de", "fr", "es"]);
+    expect(localeMeta.ar.dir).toBe("rtl");
+    expect(localeMeta.he.dir).toBe("rtl");
+  });
 });

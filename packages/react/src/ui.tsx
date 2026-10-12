@@ -1,6 +1,7 @@
 "use client";
 
 import { gateScripts } from "@cookiechimp/core/gate";
+import en from "@cookiechimp/translations/en";
 import type {
   IframeHTMLAttributes,
   ReactNode,
@@ -46,7 +47,7 @@ export function CookiePreferences({
   description,
   categories,
 }: CookiePreferencesProps) {
-  const { t } = useTranslations();
+  const { t } = useTranslations(en);
   if (!Array.isArray(categories)) {
     bad("CookiePreferences", "categories must be an array");
     categories = [];
@@ -97,7 +98,7 @@ export function CookiePreferences({
 }
 
 export function RecallButton({ children }: { children?: ReactNode }) {
-  const { t } = useTranslations();
+  const { t } = useTranslations(en);
   const preferences = usePreferences();
   const banner = useBanner();
   if (banner.open) return null;
@@ -121,7 +122,7 @@ export function CookieOptOut({
   category?: string;
   children?: ReactNode;
 }) {
-  const { t } = useTranslations();
+  const { t } = useTranslations(en);
   return (
     <OptOut.Root className="cc-opt-out" category={category}>
       <OptOut.Toggle
@@ -187,7 +188,7 @@ export function GatedFrame({
   allowLabel,
   ...props
 }: GatedFrameProps) {
-  const { t } = useTranslations();
+  const { t } = useTranslations(en);
   if (!category) bad("GatedFrame", "category is required");
   if (!src) bad("GatedFrame", "src is required");
   const consent = useConsent();

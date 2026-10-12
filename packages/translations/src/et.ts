@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Eesti)",
-  "Choose which cookies this site may use. (Eesti)",
-  "Accept all cookies (Eesti)",
-  "Reject optional cookies (Eesti)",
-  "Customize choices (Eesti)",
-  "Save choices (Eesti)",
-  "Close (Eesti)",
-  "Cookie preferences (Eesti)",
-  "Control cookies by purpose. (Eesti)",
-  "Necessary (Eesti)",
-  "Required for the site to work. (Eesti)",
-  "Functional (Eesti)",
-  "Remember settings and improve features. (Eesti)",
-  "Analytics (Eesti)",
-  "Help us understand site usage. (Eesti)",
-  "Marketing (Eesti)",
-  "Support relevant advertising. (Eesti)",
-  "Opt out of sale or sharing (Eesti)",
-  "Global Privacy Control has been honoured. (Eesti)",
-  "Review cookie choices (Eesti)",
-  "This content needs your permission. (Eesti)",
-  "Allow content (Eesti)",
-]);
+const messages = {
+  "banner.title": "Privaatsusvalikud",
+  "banner.description": "Valige, milliseid küpsiseid võib kasutada.",
+  "banner.acceptAll": "Nõustu kõigi küpsistega",
+  "banner.rejectAll": "Keeldu valikulistest",
+  "banner.customize": "Kohanda",
+  "banner.save": "Salvesta",
+  "banner.close": "Sulge",
+  "preferences.title": "Küpsiste eelistused",
+  "preferences.description": "Hallake küpsiseid eesmärgi järgi.",
+  "category.necessary.name": "Vajalikud",
+  "category.necessary.description": "Vajalikud selle saidi jaoks.",
+  "category.functional.name": "Funktsionaalsed",
+  "category.functional.description": "Jätavad seaded meelde.",
+  "category.analytics.name": "Analüütilised",
+  "category.analytics.description": "Mõõdavad saidi kasutamist.",
+  "category.marketing.name": "Turundus",
+  "category.marketing.description": "Toetavad reklaamimist.",
+  "optOut.label": "Keeldu müügist või jagamisest",
+  "gpc.honoured": "Üldist privaatsuskontrolli on järgitud.",
+  "recall.label": "Vaata küpsisevalikud üle",
+  "gated.placeholder": "See sisu vajab teie luba.",
+  "gated.allow": "Luba sisu",
+} as const satisfies Messages;
 export default messages;
 export { messages };

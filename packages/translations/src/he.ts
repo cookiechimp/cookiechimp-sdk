@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (עברית)",
-  "Choose which cookies this site may use. (עברית)",
-  "Accept all cookies (עברית)",
-  "Reject optional cookies (עברית)",
-  "Customize choices (עברית)",
-  "Save choices (עברית)",
-  "Close (עברית)",
-  "Cookie preferences (עברית)",
-  "Control cookies by purpose. (עברית)",
-  "Necessary (עברית)",
-  "Required for the site to work. (עברית)",
-  "Functional (עברית)",
-  "Remember settings and improve features. (עברית)",
-  "Analytics (עברית)",
-  "Help us understand site usage. (עברית)",
-  "Marketing (עברית)",
-  "Support relevant advertising. (עברית)",
-  "Opt out of sale or sharing (עברית)",
-  "Global Privacy Control has been honoured. (עברית)",
-  "Review cookie choices (עברית)",
-  "This content needs your permission. (עברית)",
-  "Allow content (עברית)",
-]);
+const messages = {
+  "banner.title": "אפשרויות פרטיות",
+  "banner.description": "בחרו באילו קובצי Cookie ניתן להשתמש.",
+  "banner.acceptAll": "קבלת כל קובצי ה-Cookie",
+  "banner.rejectAll": "דחיית קבצים אופציונליים",
+  "banner.customize": "התאמה אישית",
+  "banner.save": "שמירה",
+  "banner.close": "סגירה",
+  "preferences.title": "העדפות קובצי Cookie",
+  "preferences.description": "ניהול קובצי Cookie לפי מטרה.",
+  "category.necessary.name": "הכרחיים",
+  "category.necessary.description": "נדרשים לאתר זה.",
+  "category.functional.name": "פונקציונליים",
+  "category.functional.description": "זוכרים הגדרות.",
+  "category.analytics.name": "ניתוח",
+  "category.analytics.description": "מודדים את השימוש באתר.",
+  "category.marketing.name": "שיווק",
+  "category.marketing.description": "תומכים בפרסום.",
+  "optOut.label": "ביטול הסכמה למכירה או לשיתוף",
+  "gpc.honoured": "בקשת בקרת הפרטיות הגלובלית כובדה.",
+  "recall.label": "בדיקת אפשרויות קובצי Cookie",
+  "gated.placeholder": "תוכן זה דורש את רשותך.",
+  "gated.allow": "אישור תוכן",
+} as const satisfies Messages;
 export default messages;
 export { messages };

@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Türkçe)",
-  "Choose which cookies this site may use. (Türkçe)",
-  "Accept all cookies (Türkçe)",
-  "Reject optional cookies (Türkçe)",
-  "Customize choices (Türkçe)",
-  "Save choices (Türkçe)",
-  "Close (Türkçe)",
-  "Cookie preferences (Türkçe)",
-  "Control cookies by purpose. (Türkçe)",
-  "Necessary (Türkçe)",
-  "Required for the site to work. (Türkçe)",
-  "Functional (Türkçe)",
-  "Remember settings and improve features. (Türkçe)",
-  "Analytics (Türkçe)",
-  "Help us understand site usage. (Türkçe)",
-  "Marketing (Türkçe)",
-  "Support relevant advertising. (Türkçe)",
-  "Opt out of sale or sharing (Türkçe)",
-  "Global Privacy Control has been honoured. (Türkçe)",
-  "Review cookie choices (Türkçe)",
-  "This content needs your permission. (Türkçe)",
-  "Allow content (Türkçe)",
-]);
+const messages = {
+  "banner.title": "Gizlilik seçenekleri",
+  "banner.description": "Hangi çerezlerin kullanılabileceğini seçin.",
+  "banner.acceptAll": "Tüm çerezleri kabul et",
+  "banner.rejectAll": "İsteğe bağlı olanları reddet",
+  "banner.customize": "Özelleştir",
+  "banner.save": "Kaydet",
+  "banner.close": "Kapat",
+  "preferences.title": "Çerez tercihleri",
+  "preferences.description": "Çerezleri amaca göre yönetin.",
+  "category.necessary.name": "Gerekli",
+  "category.necessary.description": "Bu site için gereklidir.",
+  "category.functional.name": "İşlevsel",
+  "category.functional.description": "Ayarları hatırlar.",
+  "category.analytics.name": "Analiz",
+  "category.analytics.description": "Site kullanımını ölçer.",
+  "category.marketing.name": "Pazarlama",
+  "category.marketing.description": "Reklamları destekler.",
+  "optOut.label": "Satış veya paylaşımdan vazgeç",
+  "gpc.honoured": "Küresel Gizlilik Denetimi tercihine uyuldu.",
+  "recall.label": "Çerez seçimlerini gözden geçir",
+  "gated.placeholder": "Bu içerik için izniniz gerekiyor.",
+  "gated.allow": "İçeriğe izin ver",
+} as const satisfies Messages;
 export default messages;
 export { messages };

@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Suomi)",
-  "Choose which cookies this site may use. (Suomi)",
-  "Accept all cookies (Suomi)",
-  "Reject optional cookies (Suomi)",
-  "Customize choices (Suomi)",
-  "Save choices (Suomi)",
-  "Close (Suomi)",
-  "Cookie preferences (Suomi)",
-  "Control cookies by purpose. (Suomi)",
-  "Necessary (Suomi)",
-  "Required for the site to work. (Suomi)",
-  "Functional (Suomi)",
-  "Remember settings and improve features. (Suomi)",
-  "Analytics (Suomi)",
-  "Help us understand site usage. (Suomi)",
-  "Marketing (Suomi)",
-  "Support relevant advertising. (Suomi)",
-  "Opt out of sale or sharing (Suomi)",
-  "Global Privacy Control has been honoured. (Suomi)",
-  "Review cookie choices (Suomi)",
-  "This content needs your permission. (Suomi)",
-  "Allow content (Suomi)",
-]);
+const messages = {
+  "banner.title": "Tietosuojavalinnat",
+  "banner.description": "Valitse, mitä evästeitä voidaan käyttää.",
+  "banner.acceptAll": "Hyväksy kaikki evästeet",
+  "banner.rejectAll": "Hylkää valinnaiset",
+  "banner.customize": "Mukauta",
+  "banner.save": "Tallenna",
+  "banner.close": "Sulje",
+  "preferences.title": "Evästeasetukset",
+  "preferences.description": "Hallitse evästeitä käyttötarkoituksen mukaan.",
+  "category.necessary.name": "Välttämättömät",
+  "category.necessary.description": "Tarvitaan tällä sivustolla.",
+  "category.functional.name": "Toiminnalliset",
+  "category.functional.description": "Muistavat asetukset.",
+  "category.analytics.name": "Analytiikka",
+  "category.analytics.description": "Mittaavat sivuston käyttöä.",
+  "category.marketing.name": "Markkinointi",
+  "category.marketing.description": "Tukevat mainontaa.",
+  "optOut.label": "Estä myynti tai jakaminen",
+  "gpc.honoured": "Yleistä tietosuojavalintaa on noudatettu.",
+  "recall.label": "Tarkista evästevalinnat",
+  "gated.placeholder": "Tämä sisältö tarvitsee lupasi.",
+  "gated.allow": "Salli sisältö",
+} as const satisfies Messages;
 export default messages;
 export { messages };

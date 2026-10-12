@@ -6,6 +6,8 @@ export interface LanguageControllerOptions<Messages = unknown> {
   available: readonly string[];
   fallback: string;
   load?: (locale: string) => Promise<Messages>;
+  /** Locale tags whose writing direction is right-to-left. */
+  rtl?: readonly string[];
 }
 
 export interface LanguageController<Messages = unknown> {
@@ -41,17 +43,21 @@ export function parseAcceptLanguage(header: string): string[] {
       const [raw = "", ...parameters] = part.trim().split(";");
       const language = canonical(raw);
       let quality = 1;
+      let validQuality = true;
       for (const parameter of parameters) {
         const match = /^q\s*=\s*(0(?:\.\d{0,3})?|1(?:\.0{0,3})?)$/i.exec(
           parameter.trim(),
         );
-        if (match) quality = Number(match[1]);
+        if (/^q\s*=/i.test(parameter.trim())) {
+          validQuality &&= match !== null;
+          if (match) quality = Number(match[1]);
+        }
       }
-      return { language, quality, index };
+      return { language, quality, validQuality, index };
     })
     .filter(
-      (item): item is { language: string; quality: number; index: number } =>
-        item.language !== undefined && item.quality > 0,
+      (item): item is typeof item & { language: string } =>
+        item.language !== undefined && item.validQuality && item.quality > 0,
     )
     .sort((a, b) => b.quality - a.quality || a.index - b.index)
     .map(({ language }) => language);
@@ -96,8 +102,23 @@ export function resolveLanguage(
       ({ tag: availableTag }) => availableTag?.toLowerCase() === base,
     );
     if (baseMatch) return baseMatch.value;
+    const regionalMatch = supported.find(({ tag: availableTag }) =>
+      availableTag?.toLowerCase().startsWith(`${base}-`),
+    );
+    if (regionalMatch) return regionalMatch.value;
   }
   return fallbackMatch.value;
+}
+
+/** Return the writing direction for a locale using an explicit RTL locale list. */
+export function dirFor(
+  locale: string,
+  rtl: readonly string[] = [],
+): "ltr" | "rtl" {
+  const base = canonical(locale)?.split("-")[0]?.toLowerCase();
+  return rtl.some((item) => canonical(item)?.toLowerCase() === base)
+    ? "rtl"
+    : "ltr";
 }
 
 /** Create an independent, subscribable language selector. */
@@ -116,7 +137,7 @@ export function createLanguageController<Messages = unknown>(
       return language;
     },
     get dir() {
-      return /^(ar|he)(-|$)/i.test(language) ? "rtl" : "ltr";
+      return dirFor(language, options.rtl);
     },
     async set(candidate) {
       const next = resolveLanguage(

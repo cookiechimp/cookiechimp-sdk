@@ -1,5 +1,6 @@
 "use client";
 
+import en from "@cookiechimp/translations/en";
 import { Banner } from "./headless";
 import { useTranslations } from "./index";
 
@@ -53,7 +54,7 @@ export function CookieBanner({
     invalid("labels must be an object");
     labels = {};
   }
-  const { t } = useTranslations();
+  const { t } = useTranslations(en);
   title ??= t("banner.title");
   description ??= t("banner.description");
   return (

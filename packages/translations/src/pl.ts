@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Polski)",
-  "Choose which cookies this site may use. (Polski)",
-  "Accept all cookies (Polski)",
-  "Reject optional cookies (Polski)",
-  "Customize choices (Polski)",
-  "Save choices (Polski)",
-  "Close (Polski)",
-  "Cookie preferences (Polski)",
-  "Control cookies by purpose. (Polski)",
-  "Necessary (Polski)",
-  "Required for the site to work. (Polski)",
-  "Functional (Polski)",
-  "Remember settings and improve features. (Polski)",
-  "Analytics (Polski)",
-  "Help us understand site usage. (Polski)",
-  "Marketing (Polski)",
-  "Support relevant advertising. (Polski)",
-  "Opt out of sale or sharing (Polski)",
-  "Global Privacy Control has been honoured. (Polski)",
-  "Review cookie choices (Polski)",
-  "This content needs your permission. (Polski)",
-  "Allow content (Polski)",
-]);
+const messages = {
+  "banner.title": "Ustawienia prywatności",
+  "banner.description": "Wybierz, które pliki cookie mogą być używane.",
+  "banner.acceptAll": "Zaakceptuj wszystkie pliki cookie",
+  "banner.rejectAll": "Odrzuć opcjonalne",
+  "banner.customize": "Dostosuj",
+  "banner.save": "Zapisz",
+  "banner.close": "Zamknij",
+  "preferences.title": "Ustawienia plików cookie",
+  "preferences.description": "Zarządzaj plikami cookie według celu.",
+  "category.necessary.name": "Niezbędne",
+  "category.necessary.description": "Wymagane do działania tej witryny.",
+  "category.functional.name": "Funkcjonalne",
+  "category.functional.description": "Zapamiętują ustawienia.",
+  "category.analytics.name": "Analityczne",
+  "category.analytics.description": "Mierzą korzystanie z witryny.",
+  "category.marketing.name": "Marketingowe",
+  "category.marketing.description": "Wspierają reklamę.",
+  "optOut.label": "Zrezygnuj ze sprzedaży lub udostępniania",
+  "gpc.honoured": "Uszanowano Globalną Kontrolę Prywatności.",
+  "recall.label": "Sprawdź wybory dotyczące plików cookie",
+  "gated.placeholder": "Ta treść wymaga Twojej zgody.",
+  "gated.allow": "Zezwól na treść",
+} as const satisfies Messages;
 export default messages;
 export { messages };

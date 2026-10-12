@@ -1,5 +1,6 @@
 import { consentModeInlineScript } from "@cookiechimp/core/consent-mode";
-import { resolveLanguage } from "@cookiechimp/core/language";
+import { dirFor, resolveLanguage } from "@cookiechimp/core/language";
+import { rtlLocales } from "@cookiechimp/translations";
 import { headers } from "next/headers";
 import type { ReactNode } from "react";
 import "@cookiechimp/react/styles.css";
@@ -14,7 +15,7 @@ export default async function RootLayout({
     "en",
   );
   return (
-    <html lang={language} dir={language === "ar" ? "rtl" : "ltr"}>
+    <html lang={language} dir={dirFor(language, rtlLocales)}>
       <head>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: the helper returns a safely JSON-escaped static script.

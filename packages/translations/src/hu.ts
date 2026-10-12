@@ -1,28 +1,28 @@
-import { defineMessages } from "./index";
+import type { Messages } from "./index";
 
-const messages = defineMessages([
-  "Your privacy choices (Magyar)",
-  "Choose which cookies this site may use. (Magyar)",
-  "Accept all cookies (Magyar)",
-  "Reject optional cookies (Magyar)",
-  "Customize choices (Magyar)",
-  "Save choices (Magyar)",
-  "Close (Magyar)",
-  "Cookie preferences (Magyar)",
-  "Control cookies by purpose. (Magyar)",
-  "Necessary (Magyar)",
-  "Required for the site to work. (Magyar)",
-  "Functional (Magyar)",
-  "Remember settings and improve features. (Magyar)",
-  "Analytics (Magyar)",
-  "Help us understand site usage. (Magyar)",
-  "Marketing (Magyar)",
-  "Support relevant advertising. (Magyar)",
-  "Opt out of sale or sharing (Magyar)",
-  "Global Privacy Control has been honoured. (Magyar)",
-  "Review cookie choices (Magyar)",
-  "This content needs your permission. (Magyar)",
-  "Allow content (Magyar)",
-]);
+const messages = {
+  "banner.title": "Adatvédelmi beállítások",
+  "banner.description": "Válassza ki, mely sütik használhatók.",
+  "banner.acceptAll": "Összes süti elfogadása",
+  "banner.rejectAll": "Opcionálisak elutasítása",
+  "banner.customize": "Testreszabás",
+  "banner.save": "Mentés",
+  "banner.close": "Bezárás",
+  "preferences.title": "Sütibeállítások",
+  "preferences.description": "Kezelje a sütiket cél szerint.",
+  "category.necessary.name": "Szükséges",
+  "category.necessary.description": "Az oldal működéséhez szükséges.",
+  "category.functional.name": "Funkcionális",
+  "category.functional.description": "Megjegyzik a beállításokat.",
+  "category.analytics.name": "Analitikai",
+  "category.analytics.description": "Mérik az oldal használatát.",
+  "category.marketing.name": "Marketing",
+  "category.marketing.description": "Támogatják a hirdetéseket.",
+  "optOut.label": "Értékesítés vagy megosztás elutasítása",
+  "gpc.honoured": "A globális adatvédelmi jelzést tiszteletben tartottuk.",
+  "recall.label": "Sütiválasztások áttekintése",
+  "gated.placeholder": "Ehhez a tartalomhoz az engedélye szükséges.",
+  "gated.allow": "Tartalom engedélyezése",
+} as const satisfies Messages;
 export default messages;
 export { messages };
