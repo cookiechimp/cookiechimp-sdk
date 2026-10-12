@@ -84,6 +84,16 @@ describe("installConsentMode", () => {
       ["consent", "default"],
       ["consent", "update"],
     ]);
+    const entries = layer.map((entry) => Array.from(entry));
+    expect(entries[0]?.[2]).toMatchObject({
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+      analytics_storage: "denied",
+      functionality_storage: "denied",
+      personalization_storage: "denied",
+    });
+    expect(entries[1]?.[2]).toMatchObject({ analytics_storage: "granted" });
   });
 
   it("does not repeat an inline default and still updates returning visitors", () => {

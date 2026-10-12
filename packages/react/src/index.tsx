@@ -26,6 +26,10 @@ type ProviderValue = {
   translations: Translations;
   getSnapshot: () => ConsentState;
   subscribe: (listener: () => void) => () => void;
+  preferencesOpen: boolean;
+  showPreferences: () => void;
+  hidePreferences: () => void;
+  preferencesTrigger: { current: HTMLElement | null };
 };
 
 const Context = createContext<ProviderValue | null>(null);
@@ -49,6 +53,8 @@ export type ConsentProviderProps = (
 
 /** Supply one consent runtime to a React subtree. */
 export function ConsentProvider(props: ConsentProviderProps) {
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const preferencesTrigger = useRef<HTMLElement | null>(null);
   const runtime = useRef<ConsentRuntime | null>(null);
   if (!runtime.current)
     runtime.current =
@@ -73,8 +79,12 @@ export function ConsentProvider(props: ConsentProviderProps) {
           snapshot.current = state;
           listener();
         }),
+      preferencesOpen,
+      showPreferences: () => setPreferencesOpen(true),
+      hidePreferences: () => setPreferencesOpen(false),
+      preferencesTrigger,
     };
-  }, [serverState, props.translations]);
+  }, [serverState, props.translations, preferencesOpen]);
   return <Context.Provider value={value}>{props.children}</Context.Provider>;
 }
 
@@ -207,6 +217,18 @@ export function useBanner() {
 }
 
 export function usePreferences() {
-  useConsentContext();
-  return useVisibility(false);
+  const value = useConsentContext();
+  return useMemo(
+    () => ({
+      open: value?.preferencesOpen ?? false,
+      show: value?.showPreferences ?? (() => {}),
+      hide: value?.hidePreferences ?? (() => {}),
+    }),
+    [value],
+  );
+}
+
+/** Internal shared UI state used by the headless entry. */
+export function useHeadlessContext() {
+  return useConsentContext();
 }

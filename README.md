@@ -93,6 +93,15 @@ for cleanup. Options support regions, `wait_for_update`, ads data redaction,
 URL passthrough, and custom category-to-signal mappings. Set `default: false`
 to suppress the runtime default. Mapping entries set to `null` remove built-in
 categories, while `replace: true` replaces all built-in mappings.
+The inline script is required for correct consent ordering before tag scripts.
+
+## React headless primitives
+
+Import `Banner`, `Preferences`, and `OptOut` from
+`@cookiechimp/react/headless` for unstyled, accessible consent controls. The
+preferences dialog traps focus, closes on Escape, and restores focus to its
+trigger. Applications may add background inertness or `aria-hidden`; the
+headless primitives deliberately do not alter content outside the provider.
 
 ### Install order for runtime blocking
 

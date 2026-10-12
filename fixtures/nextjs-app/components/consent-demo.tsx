@@ -7,10 +7,10 @@ import { gateScripts } from "@cookiechimp/core/gate";
 import { blockNetwork } from "@cookiechimp/core/network";
 import {
   ConsentProvider,
-  useBanner,
   useCategory,
   useConsentActions,
 } from "@cookiechimp/react";
+import { Banner, Preferences } from "@cookiechimp/react/headless";
 import { useEffect, useState } from "react";
 
 const config = {
@@ -47,7 +47,6 @@ function ConsentDemoContent({
 }) {
   const accepted = useCategory("analytics");
   const { acceptAll, set } = useConsentActions();
-  const banner = useBanner();
 
   useEffect(() => {
     const gate = gateScripts(consent);
@@ -70,9 +69,27 @@ function ConsentDemoContent({
 
   return (
     <section aria-label="Consent demo">
-      {banner.open && (
-        <aside data-testid="consent-banner">Cookie preferences</aside>
-      )}
+      <Banner.Root data-testid="consent-banner">
+        <Banner.Title>Cookie preferences</Banner.Title>
+        <Banner.Description>
+          Choose how this site may use cookies.
+        </Banner.Description>
+        <Banner.Customize>Customize</Banner.Customize>
+        <Banner.RejectAll>Reject all</Banner.RejectAll>
+        <Banner.AcceptAll>Accept all cookies</Banner.AcceptAll>
+      </Banner.Root>
+      <Preferences.Root>
+        <Preferences.Title>Cookie preferences</Preferences.Title>
+        <Preferences.Description>
+          Choose the categories you allow.
+        </Preferences.Description>
+        <Preferences.Category id="necessary">Necessary</Preferences.Category>
+        <Preferences.Category id="analytics">Analytics</Preferences.Category>
+        <Preferences.Save>Save preferences</Preferences.Save>
+        <Preferences.AcceptAll>Accept all</Preferences.AcceptAll>
+        <Preferences.RejectAll>Reject all</Preferences.RejectAll>
+        <Preferences.Close>Close</Preferences.Close>
+      </Preferences.Root>
       <p data-testid="consent-status">
         {accepted ? "Analytics accepted" : "Analytics declined"}
       </p>

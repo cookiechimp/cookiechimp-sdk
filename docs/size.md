@@ -16,6 +16,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | core initial | initial | 4096 |
 | core total | total | 5120 |
 | react provider and hooks | extra | 1536 |
+| react headless primitives | extra | 3491 |
 | banner only | initial | 11264 |
 | banner, preferences, recall initial | initial | 13824 |
 | banner, preferences, recall total | total | 16384 |
@@ -37,3 +38,4 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | network | 2048 B | 2304 B | Headroom for fetch, XHR, and beacon interception (measured 2039 B at landing) | #10 |
 | consent-mode | none | 1560 B | New Consent Mode v2 entry | M1 PR9 |
 | react | none | 1536 B | New React provider and hooks entry | M2 PR10 |
+| react-headless | none | 3491 B | New headless primitives entry | M2 PR11 |

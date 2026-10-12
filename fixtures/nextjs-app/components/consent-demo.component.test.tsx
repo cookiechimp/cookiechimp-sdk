@@ -17,7 +17,9 @@ describe("ConsentDemo", () => {
     const root = createRoot(container);
     await act(() => root.render(<ConsentDemo />));
     expect(document.documentElement.dataset.ccDynamic).toBe("ready");
-    const button = document.querySelector("button");
+    const button = [...document.querySelectorAll("button")].find(
+      (element) => element.textContent === "Accept all cookies",
+    );
     await act(() => button?.click());
     expect(
       document.querySelector("[data-testid='consent-status']")?.textContent,

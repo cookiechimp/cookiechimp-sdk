@@ -12,13 +12,18 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./headless": {
+      "types": "./dist/headless.d.ts",
+      "import": "./dist/headless.mjs",
+      "require": "./dist/headless.cjs"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts",
+    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/headless.d.mts dist/headless.d.ts",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"

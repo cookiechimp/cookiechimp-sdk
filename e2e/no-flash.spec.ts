@@ -9,6 +9,24 @@ test("first visit shows the consent banner and accepting hides it", async ({
   await expect(page.getByTestId("consent-banner")).toHaveCount(0);
 });
 
+test("keyboard opens and closes the modal with restored focus", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const customize = page.getByRole("button", { name: "Customize" });
+  await customize.focus();
+  await page.keyboard.press("Enter");
+  const preferences = page.getByRole("dialog", { name: "Cookie preferences" });
+  await expect(preferences).toHaveAttribute("aria-modal", "true");
+  await page.keyboard.press("Shift+Tab");
+  await expect(
+    preferences.getByRole("button", { name: "Close" }),
+  ).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(preferences).toHaveCount(0);
+  await expect(customize).toBeFocused();
+});
+
 test("returning visitor has no consent banner before or after hydration", async ({
   browser,
 }) => {
