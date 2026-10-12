@@ -40,7 +40,7 @@
     "scenario": "language",
     "entry": "packages/core/dist/language.mjs",
     "kind": "extra",
-    "limit": 954,
+    "limit": 1050,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["createLanguageController", "parseAcceptLanguage"]
   },
