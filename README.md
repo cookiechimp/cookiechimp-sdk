@@ -77,3 +77,28 @@ code that has already run. By default it leaves activated resources in place.
 Use `onRevoke` to notify the application, or `reloadOnRevoke: true` when a page
 reload is the desired policy. Core invokes the optional iframe `placeholder`
 hook but deliberately provides no placeholder styling.
+
+### Install order for runtime blocking
+
+`blockDynamic` only protects requests that start after it is installed. Install
+it before any third-party code runs: as the first module script in `<head>`,
+before tag managers or embeds. Installing it from a React effect or after
+hydration leaves a window in which a plain `src` assignment can start a
+request. Interceptors are active as soon as `blockDynamic` returns (the test
+fixture then sets `data-cc-dynamic="ready"` on `<html>` so e2e tests can wait
+for it).
+
+```html
+<head>
+  <script type="module">
+    import { createConsent } from "/vendor/cookiechimp/core/index.mjs";
+    import { blockDynamic } from "/vendor/cookiechimp/core/dynamic.mjs";
+    const config = { categories: ["analytics"], services: [/* ... */] };
+    blockDynamic(createConsent(config), { config });
+  </script>
+  <!-- third-party scripts after this point -->
+</head>
+```
+
+A prebuilt inline (IIFE) head snippet and a Next.js `beforeInteractive`
+helper are planned with the M3 Next.js package.
