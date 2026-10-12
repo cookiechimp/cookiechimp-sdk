@@ -78,6 +78,22 @@ Use `onRevoke` to notify the application, or `reloadOnRevoke: true` when a page
 reload is the desired policy. Core invokes the optional iframe `placeholder`
 hook but deliberately provides no placeholder styling.
 
+## Google Consent Mode v2
+
+The opt-in `@cookiechimp/core/consent-mode` subpath keeps all seven Consent
+Mode v2 storage signals synchronized with CookieChimp categories. Render
+`consentModeInlineScript(options)` first in the document head, before Google or
+other tag scripts, to establish a synchronous denied default without a flash.
+For a strict Content Security Policy, place the returned string inside your
+application's own `<script nonce="...">` element. CookieChimp does not create
+or manage the nonce.
+Call `installConsentMode(consent, options)` in the browser to install the gtag
+shim and publish later consent updates. The returned controller has `stop()`
+for cleanup. Options support regions, `wait_for_update`, ads data redaction,
+URL passthrough, and custom category-to-signal mappings. Set `default: false`
+to suppress the runtime default. Mapping entries set to `null` remove built-in
+categories, while `replace: true` replaces all built-in mappings.
+
 ### Install order for runtime blocking
 
 `blockDynamic` only protects requests that start after it is installed. Install

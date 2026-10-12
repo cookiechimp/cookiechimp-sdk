@@ -20,6 +20,10 @@ describe("built core entry points", () => {
       const regions = readFileSync(resolve(dist, "regions.mjs"), "utf8");
       const gate = readFileSync(resolve(dist, "gate.mjs"), "utf8");
       const dynamic = readFileSync(resolve(dist, "dynamic.mjs"), "utf8");
+      const consentMode = readFileSync(
+        resolve(dist, "consent-mode.mjs"),
+        "utf8",
+      );
       const network = readFileSync(resolve(dist, "network.mjs"), "utf8");
 
       for (const identifier of [
@@ -43,6 +47,10 @@ describe("built core entry points", () => {
       expect(gate).toContain("data-cc-blocked");
       expect(dynamic).toContain("blockDynamic");
       expect(dynamic).toContain("insertAdjacentHTML");
+      expect(index).not.toContain("installConsentMode");
+      expect(index).not.toContain("wait_for_update");
+      expect(consentMode).toContain("installConsentMode");
+      expect(consentMode).toContain("wait_for_update");
       expect(network).toContain("blockNetwork");
       expect(network).toContain("ConsentBlockedError");
       for (const token of [

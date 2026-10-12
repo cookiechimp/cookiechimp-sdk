@@ -1,6 +1,7 @@
 "use client";
 
 import { createConsent } from "@cookiechimp/core";
+import { installConsentMode } from "@cookiechimp/core/consent-mode";
 import { blockDynamic } from "@cookiechimp/core/dynamic";
 import { gateScripts } from "@cookiechimp/core/gate";
 import { blockNetwork } from "@cookiechimp/core/network";
@@ -23,6 +24,7 @@ export function ConsentDemo() {
 
   useEffect(() => {
     const gate = gateScripts(consent);
+    const consentMode = installConsentMode(consent);
     const dynamic = blockDynamic(consent, {
       config: {
         categories: ["analytics"],
@@ -48,6 +50,7 @@ export function ConsentDemo() {
       },
     });
     document.documentElement.dataset.ccDynamic = "ready";
+    document.documentElement.dataset.ccConsentMode = "ready";
     document.documentElement.dataset.ccNetwork = "ready";
     setAccepted(consent.has("analytics"));
     setServiceAccepted(consent.hasService("analytics-demo"));
@@ -57,6 +60,8 @@ export function ConsentDemo() {
     });
     return () => {
       delete document.documentElement.dataset.ccDynamic;
+      delete document.documentElement.dataset.ccConsentMode;
+      consentMode.stop();
       delete document.documentElement.dataset.ccNetwork;
       gate.stop();
       dynamic.stop();

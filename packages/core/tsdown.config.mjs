@@ -18,6 +18,7 @@ export default defineConfig([
       "src/gate.ts",
       "src/dynamic.ts",
       "src/network.ts",
+      "src/consent-mode.ts",
     ],
     clean: false,
   },
