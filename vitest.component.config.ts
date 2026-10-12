@@ -1,6 +1,8 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  // The fixture tsconfig keeps Next.js "preserve" JSX, so transform JSX here for tests.
+  oxc: { jsx: { runtime: "automatic" } },
   test: {
     environment: "happy-dom",
     onConsoleLog(log) {
