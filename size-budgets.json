@@ -237,6 +237,20 @@
     "limit": 1095
   },
   {
+    "name": "Devtools panel",
+    "scenario": "devtools",
+    "entry": "packages/devtools/dist/index.mjs",
+    "kind": "extra",
+    "limit": 3295
+  },
+  {
+    "name": "Devtools simulation reader",
+    "scenario": "devtools simulation",
+    "entry": "packages/devtools/dist/simulation.mjs",
+    "kind": "extra",
+    "limit": 585
+  },
+  {
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",

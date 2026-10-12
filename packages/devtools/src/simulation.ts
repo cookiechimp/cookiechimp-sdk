@@ -1,0 +1,97 @@
+import type { Region } from "@cookiechimp/core";
+import { isDev } from "./dev";
+
+/** sessionStorage key holding the simulated region and GPC signal. */
+export const SIMULATION_KEY = "cc_devtools_simulation";
+
+export interface Simulation {
+  region?: Region | null;
+  gpc?: boolean;
+}
+
+type Reader = Pick<Storage, "getItem">;
+type Writer = Pick<Storage, "setItem" | "removeItem">;
+
+const COUNTRY = /^[A-Z]{2}$/;
+const SUBDIVISION = /^[A-Z0-9]{1,3}$/;
+
+function session(): Storage | undefined {
+  try {
+    return globalThis.sessionStorage;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Keep only well-formed fields, so stored or typed input can never smuggle other values. */
+export function cleanSimulation(input: unknown): Simulation | null {
+  if (!input || typeof input !== "object") return null;
+  const { region, gpc } = input as Record<string, unknown>;
+  const out: Simulation = {};
+  if (region === null) out.region = null;
+  else if (region && typeof region === "object") {
+    const { country, region: sub } = region as Record<string, unknown>;
+    if (typeof country !== "string" || !COUNTRY.test(country)) return null;
+    if (
+      sub !== undefined &&
+      (typeof sub !== "string" || !SUBDIVISION.test(sub))
+    )
+      return null;
+    out.region = sub === undefined ? { country } : { country, region: sub };
+  } else if (region !== undefined) return null;
+  if (gpc !== undefined) {
+    if (typeof gpc !== "boolean") return null;
+    out.gpc = gpc;
+  }
+  return out;
+}
+
+export interface ReadSimulationOptions {
+  /** Storage to read. Defaults to sessionStorage. */
+  storage?: Reader;
+  /**
+   * Read the simulation in a production build too. Off by default, so a
+   * visitor cannot edit sessionStorage to change the region or GPC signal.
+   */
+  allowProduction?: boolean;
+}
+
+/**
+ * Read the simulation saved by the devtools panel, for
+ * `createConsent({ ...config, ...readSimulation() })`. Returns null in a
+ * production build, and in any build without `process` (script tag or CDN),
+ * unless `allowProduction` is true; storage is not read in that case. Malformed stored data is
+ * ignored, never thrown.
+ */
+export function readSimulation({
+  storage,
+  allowProduction,
+}: ReadSimulationOptions = {}): Simulation | null {
+  if (!isDev() && allowProduction !== true) return null;
+  try {
+    const raw = (storage ?? session())?.getItem(SIMULATION_KEY);
+    return raw ? cleanSimulation(JSON.parse(raw)) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Save a simulation. Invalid input throws in development and warns in production. */
+export function writeSimulation(
+  simulation: Simulation,
+  storage: Writer | undefined = session(),
+): boolean {
+  const clean = cleanSimulation(simulation);
+  if (!clean) {
+    const message = `CookieChimp devtools simulation ${JSON.stringify(simulation)} is invalid`;
+    if (isDev()) throw new TypeError(message);
+    console.warn(message);
+    return false;
+  }
+  storage?.setItem(SIMULATION_KEY, JSON.stringify(clean));
+  return true;
+}
+
+export function clearSimulation(storage: Writer | undefined = session()) {
+  storage?.removeItem(SIMULATION_KEY);
+}
