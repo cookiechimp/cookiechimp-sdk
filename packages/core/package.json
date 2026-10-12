@@ -21,13 +21,18 @@
       "types": "./dist/match.d.ts",
       "import": "./dist/match.mjs",
       "require": "./dist/match.cjs"
+    },
+    "./regions": {
+      "types": "./dist/regions.d.ts",
+      "import": "./dist/regions.mjs",
+      "require": "./dist/regions.cjs"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/match.d.mts dist/match.d.ts",
+    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"

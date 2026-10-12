@@ -1,8 +1,7 @@
 import { defineConfig } from "tsdown";
 
-export default defineConfig({
+const shared = {
   dts: true,
-  entry: ["src/index.ts", "src/sync.ts", "src/match.ts"],
   format: ["esm", "cjs"],
   minify: true,
   sourcemap: true,
@@ -10,4 +9,13 @@ export default defineConfig({
     "process.env.NODE_ENV": '"production"',
     "typeof process": '"object"',
   },
-});
+};
+
+export default defineConfig([
+  { ...shared, entry: ["src/index.ts"] },
+  {
+    ...shared,
+    entry: ["src/sync.ts", "src/match.ts", "src/regions.ts"],
+    clean: false,
+  },
+]);

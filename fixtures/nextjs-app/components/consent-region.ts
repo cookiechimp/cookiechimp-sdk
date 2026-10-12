@@ -1,11 +1,53 @@
 "use client";
 
-import { createElement } from "react";
+import {
+  type ConsentState,
+  createConsent,
+  type Region,
+} from "@cookiechimp/core";
+import { createElement, useState } from "react";
 
-export function ConsentRegion() {
+export function ConsentRegion({
+  region = null,
+  gpc = false,
+  initial = null,
+}: {
+  region?: Region | null;
+  gpc?: boolean;
+  initial?: ConsentState | null;
+}) {
+  const [runtime] = useState(() =>
+    createConsent({
+      categories: ["analytics", "advertising"],
+      region,
+      gpc,
+      initial,
+    }),
+  );
+  const [state, setState] = useState(runtime.get());
+  const line = (testId: string, text: string) =>
+    createElement("p", { "data-testid": testId }, text);
   return createElement(
     "section",
-    { "aria-label": "Consent placeholder", "data-testid": "consent-region" },
-    "Consent controls will appear here.",
+    { "aria-label": "Regional consent", "data-testid": "consent-region" },
+    line("regulation", runtime.regulation),
+    line(
+      "decision",
+      runtime.needsDecision ? "decision needed" : "no decision needed",
+    ),
+    line(
+      "regional-analytics",
+      `analytics ${state.categories.analytics ? "on" : "off"}`,
+    ),
+    line(
+      "regional-advertising",
+      `advertising ${state.categories.advertising ? "on" : "off"}`,
+    ),
+    line("regional-action", state.action),
+    createElement(
+      "button",
+      { type: "button", onClick: () => setState(runtime.acceptAll()) },
+      "Accept regional cookies",
+    ),
   );
 }

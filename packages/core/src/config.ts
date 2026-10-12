@@ -1,3 +1,5 @@
+import type { Region, Regulation } from "./regions";
+
 export type ServicePattern = string | RegExp;
 
 export interface CategoryConfig {
@@ -39,6 +41,10 @@ export type CategoriesInput =
 export interface ConfigInput {
   categories?: CategoriesInput;
   services?: readonly ServiceConfig[];
+  regulation?: Regulation | ((region: Region | null) => Regulation);
+  /** Country (`US`) or country-subdivision (`US-CA`) regulation overrides. */
+  regions?: Readonly<Record<string, Regulation>>;
+  fallbackRegulation?: Regulation;
 }
 
 export interface NormalizedCategoryConfig {
@@ -63,6 +69,9 @@ export interface NormalizedServiceConfig {
 export interface NormalizedConfig {
   readonly categories: readonly NormalizedCategoryConfig[];
   readonly services: readonly NormalizedServiceConfig[];
+  readonly regulation?: Regulation | ((region: Region | null) => Regulation);
+  readonly regions: Readonly<Record<string, Regulation>>;
+  readonly fallbackRegulation: Regulation;
 }
 
 const ID = /^[a-z0-9_-]+$/;
@@ -127,6 +136,33 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
   const services = input.services ?? [];
   const problems: string[] = [];
   let invalid = false;
+  const regulations = new Set(["gdpr", "ccpa", "none"]);
+  if (
+    input.regulation !== undefined &&
+    typeof input.regulation !== "function" &&
+    !regulations.has(input.regulation)
+  ) {
+    invalid = true;
+    if (development)
+      problems.push(`regulation "${input.regulation}" is invalid`);
+  }
+  if (
+    input.fallbackRegulation !== undefined &&
+    !regulations.has(input.fallbackRegulation)
+  ) {
+    invalid = true;
+    if (development)
+      problems.push(
+        `fallback regulation "${input.fallbackRegulation}" is invalid`,
+      );
+  }
+  const validRegions: Record<string, Regulation> = {};
+  for (const [key, value] of Object.entries(input.regions ?? {})) {
+    if (!/^[A-Z]{2}(?:-[A-Z0-9]{1,3})?$/.test(key) || !regulations.has(value)) {
+      invalid = true;
+      if (development) problems.push(`region override "${key}" is invalid`);
+    } else validRegions[key] = value;
+  }
   const categoryIds = new Set<string>();
   const validCategories = categories.filter((category) => {
     if (typeof category.id !== "string" || !ID.test(category.id)) {
@@ -213,5 +249,13 @@ export function normalizeConfig(input: ConfigInput): NormalizedConfig {
         }),
       ),
     ),
+    ...(typeof input.regulation === "function" ||
+    regulations.has(input.regulation ?? "")
+      ? { regulation: input.regulation }
+      : {}),
+    regions: Object.freeze(validRegions),
+    fallbackRegulation: regulations.has(input.fallbackRegulation ?? "")
+      ? (input.fallbackRegulation as Regulation)
+      : "gdpr",
   });
 }
