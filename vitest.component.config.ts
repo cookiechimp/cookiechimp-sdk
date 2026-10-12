@@ -17,8 +17,8 @@ export default defineConfig({
       },
     },
     include: [
-      "fixtures/**/*.component.test.ts",
-      "packages/**/*.component.test.ts",
+      "fixtures/**/*.component.test.{ts,tsx}",
+      "packages/**/*.component.test.{ts,tsx}",
     ],
   },
 });
