@@ -4,6 +4,9 @@
     "allowJs": true,
     "incremental": true,
     "jsx": "preserve",
+    "paths": {
+      "@cookiechimp/core": ["../../packages/core/src/index.ts"]
+    },
     "plugins": [{ "name": "next" }]
   },
   "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"]
