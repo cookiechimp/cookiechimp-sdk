@@ -2,7 +2,9 @@
 
 Run `pnpm size` to build the packages and print every budget from `size-budgets.json`. The command exits with a non-zero status if an available entry exceeds its limit or if opt-in TCF/GPP code is found in the default core bundle.
 
-The harness uses Node's `zlib.gzip` with `level: 9`. Sizes are bytes, and limits use 1 KB = 1024 bytes. It sums the gzip size of each emitted JavaScript module, matching the bytes transferred as separately compressed files. `initial` follows static imports only. `total` follows static and dynamic imports. `extra` and `lazy` measure their opt-in entry and all reachable modules.
+The harness bundles each built distribution entry's full import graph with Rolldown, using ESM output and minification, and then uses Node's `zlib.gzip` with `level: 9`. Bare workspace imports are resolved through Node package resolution and package exports. React, React DOM, the React JSX runtimes, and every package-declared peer dependency remain external because peers are provided by the host application. Sizes are bytes, and limits use 1 KB = 1024 bytes.
+
+For `initial`, Rolldown emits separate dynamic chunks and the harness gzips only the entry chunk, so the measurement includes static imports but not dynamically imported code. For `total`, `extra`, and `lazy`, dynamic imports are inlined and the harness gzips the single complete bundle. This measures compression across the bundle instead of adding independently compressed source modules.
 
 The checked budgets are the source-of-truth values below. Region header providers and built-in regulation tables live only in `@cookiechimp/core/regions`. The `@cookiechimp/core/sync` entry is enforced separately and is excluded from the default entry. Declarative gating lives in `@cookiechimp/core/gate`, and runtime blocking lives in `@cookiechimp/core/dynamic`. Their budgets are CookieChimp guards (SPEC.md sets no number for them), and both stay out of the default entry. The fetch, XHR, and beacon blocker lives in `@cookiechimp/core/network`, has a 2304 B gzip budget, and also stays out of the default entry.
 
@@ -15,7 +17,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | consent-mode | extra | 1560 |
 | core initial | initial | 4096 |
 | core total | total | 5120 |
-| react provider and hooks | extra | 1536 |
+| react provider and hooks | extra | 4608 |
 | react headless primitives | extra | 3491 |
 | banner only | initial | 11264 |
 | banner, preferences, recall initial | initial | 13824 |
@@ -39,3 +41,4 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | consent-mode | none | 1560 B | New Consent Mode v2 entry | M1 PR9 |
 | react | none | 1536 B | New React provider and hooks entry | M2 PR10 |
 | react-headless | none | 3491 B | New headless primitives entry | M2 PR11 |
+| react | 1536 B | 4608 B | Harness now counts imported package code (measurement change, no code growth) | fix(size) |
