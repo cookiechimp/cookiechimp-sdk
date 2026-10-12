@@ -18,7 +18,10 @@ const state = (id = "abcdefghijklmnop"): ConsentState => ({
   action: "custom",
 });
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe("cookie codec", () => {
   it("round trips compact, Unicode category data", () => {
@@ -28,6 +31,16 @@ describe("cookie codec", () => {
     expect(encoded.startsWith("v1.")).toBe(true);
     expect(encoded.length).toBeLessThan(500);
     expect(decodeConsentCookie(encoded)).toEqual(input);
+  });
+
+  it("stores the schema version, consent id, and timestamp", () => {
+    const input = state();
+    const payload = decodeConsentCookie(encodeConsentCookie(input));
+    expect(payload).toMatchObject({
+      schemaVersion: 1,
+      consentId: "abcdefghijklmnop",
+      ts: "2026-10-12T12:00:00.000Z",
+    });
   });
 
   it.each(["", "v2.abc", "v1.!", "v1.e30", `v1.${"a".repeat(3800)}`])(
@@ -112,12 +125,66 @@ describe("createConsent", () => {
     expect(onConsent.mock.calls[0]?.[0]).not.toHaveProperty("schemaVersion");
   });
 
-  it("is SSR-safe and creates unique URL-safe identifiers", () => {
+  it("is SSR-safe and creates UUID v4 identifiers", () => {
     const first = createConsent({ categories: {} });
     const second = createConsent({ categories: {} });
-    expect(first.get().consentId).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(first.get().consentId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+    );
     expect(second.get().consentId).not.toBe(first.get().consentId);
     expect(() => first.acceptAll()).not.toThrow();
+  });
+
+  it("uses the RFC 4122 v4 getRandomValues fallback", () => {
+    vi.stubGlobal("crypto", {
+      getRandomValues: (bytes: Uint8Array) => bytes.fill(0xff),
+    });
+    expect(createConsent({ categories: {} }).get().consentId).toBe(
+      "ffffffff-ffff-4fff-bfff-ffffffffffff",
+    );
+  });
+
+  it.each(["example.com; Secure", "example .com", "example.com\u0001"])(
+    "rejects unsafe cookie domain %j",
+    (domain) =>
+      expect(() =>
+        createConsent({ categories: {}, cookie: { domain } }),
+      ).toThrow(/Invalid cookie\.domain/),
+  );
+
+  it.each(["example.com", ".example.com"])(
+    "accepts cookie domain %s",
+    (domain) =>
+      expect(() =>
+        createConsent({ categories: {}, cookie: { domain } }),
+      ).not.toThrow(),
+  );
+
+  it("returns isolated frozen snapshots to callers and subscribers", () => {
+    const runtime = createConsent({
+      categories: ["analytics"],
+      services: [{ id: "metrics", category: "analytics" }],
+    });
+    const initial = runtime.get();
+    expect(Object.isFrozen(initial)).toBe(true);
+    expect(Object.isFrozen(initial.categories)).toBe(true);
+    expect(() => {
+      initial.categories.analytics = true;
+    }).toThrow();
+    expect(runtime.has("analytics")).toBe(false);
+
+    const listener = vi.fn();
+    runtime.subscribe(listener);
+    runtime.set({ services: { metrics: true } });
+    const notified = listener.mock.calls[0]?.[0] as ConsentState;
+    expect(Object.isFrozen(notified)).toBe(true);
+    expect(Object.isFrozen(notified.categories)).toBe(true);
+    expect(Object.isFrozen(notified.services)).toBe(true);
+    expect(() => {
+      if (notified.services) notified.services.metrics = false;
+    }).toThrow();
+    expect(runtime.get().services).toEqual({ metrics: true });
+    expect(runtime.get()).not.toBe(notified);
   });
 
   it("accepts a validated server initial state", () => {
@@ -146,7 +213,7 @@ describe("createConsent", () => {
     expect(runtime.hasService("analytics-demo")).toBe(false);
   });
 
-  it("decodes old v1 cookies that omit service decisions", () => {
+  it("decodes old v1 cookies with non-UUID ids and no service decisions", () => {
     const encoded = encodeConsentCookie(state());
     expect(decodeConsentCookie(encoded)).toEqual(state());
     expect(decodeConsentCookie(encoded)?.services).toBeUndefined();

@@ -209,9 +209,38 @@ function categoryDefaults(config: NormalizedConfig): Record<string, boolean> {
 }
 
 function newConsentId(): string {
+  if (typeof globalThis.crypto.randomUUID === "function")
+    return globalThis.crypto.randomUUID();
   const bytes = new Uint8Array(16);
   globalThis.crypto.getRandomValues(bytes);
-  return toBase64Url(bytes);
+  bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40;
+  bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
+  const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0"));
+  return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`;
+}
+
+function snapshot(state: ConsentState): ConsentState {
+  return Object.freeze({
+    ...state,
+    categories: Object.freeze({ ...state.categories }),
+    ...(state.services
+      ? { services: Object.freeze({ ...state.services }) }
+      : {}),
+  });
+}
+
+function validateCookieOptions(options: ConsentCookieOptions): void {
+  if (
+    options.domain !== undefined &&
+    (/[;\s]/.test(options.domain) ||
+      [...options.domain].some((character) => {
+        const code = character.charCodeAt(0);
+        return code < 32 || code === 127;
+      }))
+  )
+    throw new TypeError(
+      "Invalid cookie.domain: domains cannot contain semicolons, whitespace, or control characters",
+    );
 }
 
 function persist(state: ConsentState, options: ConsentCookieOptions): void {
@@ -231,6 +260,7 @@ function persist(state: ConsentState, options: ConsentCookieOptions): void {
 }
 
 export function createConsent(config: ConsentConfig): ConsentRuntime {
+  validateCookieOptions(config.cookie ?? {});
   const normalized = normalizeConfig(config);
   const defaults = categoryDefaults(normalized);
   const serviceCategories = Object.fromEntries(
@@ -269,14 +299,15 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
       action,
     };
     persist(state, config.cookie ?? {});
-    emitter.emit(state);
+    const result = snapshot(state);
+    emitter.emit(result);
     const { schemaVersion: _, ...record } = state;
     config.onConsent?.(record);
-    return state;
+    return result;
   };
 
   return {
-    get: () => state,
+    get: () => snapshot(state),
     set: (partial) => {
       const structured =
         isRecord(partial.categories) || isRecord(partial.services);
