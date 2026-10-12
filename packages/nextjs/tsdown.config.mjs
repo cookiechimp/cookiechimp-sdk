@@ -1,17 +1,26 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.tsx", "src/server.tsx"],
+  entry: [
+    "src/index.tsx",
+    "src/server.tsx",
+    "src/pages.tsx",
+    "src/middleware.ts",
+    "src/styles-route.tsx",
+  ],
   dts: true,
   format: ["esm", "cjs"],
   minify: true,
   sourcemap: true,
   banner: ({ fileName }) =>
-    fileName.startsWith("index.") ? { js: '"use client";' } : undefined,
+    fileName.startsWith("index.") || fileName.startsWith("pages.")
+      ? { js: '"use client";' }
+      : undefined,
   external: [
     "server-only",
     "next",
     "next/headers",
+    "next/server",
     "react",
     "react-dom",
     "@cookiechimp/core",

@@ -47,6 +47,55 @@ available on the provider when it is preferable for the provider itself to
 read the request headers. Passing an explicit `region` keeps ownership visible
 in application code.
 
+## Pages Router
+
+Use `withConsent` to add the server cookie, normalized region, and negotiated
+language to `getServerSideProps`. Wrap the page in `PagesConsentProvider`,
+either locally or from `pages/_app`, so the browser hydrates the exact server
+snapshot.
+
+```tsx
+import { PagesConsentProvider, withConsent } from "@cookiechimp/nextjs/pages";
+
+export const getServerSideProps = withConsent({
+  config,
+  provider: "vercel",
+  languages: { available: ["en", "de"], fallback: "en" },
+});
+
+export default function Page({ cookiechimp }) {
+  return <PagesConsentProvider config={config} {...cookiechimp}>...</PagesConsentProvider>;
+}
+```
+
+An existing `getServerSideProps` can be passed as the second argument. The
+`withConsentPage` HOC is available when wrapping the individual component is
+more convenient.
+
+## Middleware region forwarding
+
+The middleware helper only parses headers already provided by the explicitly
+selected host. It does not perform geo-IP, fetch, or any external lookup. With
+no `provider`, it ignores every location header and forwards no region. It
+always removes an incoming `x-cc-region`, including when no provider is set.
+
+```ts
+import { consentMiddleware } from "@cookiechimp/nextjs/middleware";
+
+export function middleware(request) {
+  return consentMiddleware(request, { provider: "cloudflare" });
+}
+```
+
+`getServerConsent`, `CookieChimpProvider`, and the Pages helpers ignore the
+forwarded `x-cc-region` request header by default. Pass
+`trustForwardedRegion: true` to opt in. Only enable trustForwardedRegion when
+the CookieChimp middleware runs on every route, since otherwise a visitor can
+send the header and choose their region. Use
+`provider: { header: "x-host-country", regionHeader: "x-host-region" }` to opt
+in to host-specific headers. Vercel mode reads only Vercel headers, Cloudflare
+mode reads only `cf-ipcountry`, and custom mode reads only the named headers.
+
 ## Strict Content Security Policy
 
 `CookieChimpStyles` renders an inline style and `GoogleConsentMode` renders an
@@ -76,8 +125,22 @@ export function middleware(request: NextRequest) {
 }
 ```
 
-Read the middleware header in the App Router layout and pass the nonce to each
-inline element:
+Expose the stylesheet from a Route Handler. The factory can derive a nonce
+from the request and use it to build a response policy:
+
+```ts
+// app/cookiechimp.css/route.ts
+import { createStylesRoute } from "@cookiechimp/nextjs/styles-route";
+
+export const GET = createStylesRoute({
+  nonce: (request) => request.headers.get("x-nonce") ?? undefined,
+  contentSecurityPolicy: (nonce) =>
+    `default-src 'none'; style-src 'self' 'nonce-${nonce}'`,
+});
+```
+
+Read the middleware header in the App Router layout. Use `StylesLink` for the
+external stylesheet, and pass the same nonce to inline elements:
 
 ```tsx
 // app/layout.tsx
@@ -86,6 +149,7 @@ import {
   CookieChimpStyles,
   GoogleConsentMode,
 } from "@cookiechimp/nextjs/server";
+import { StylesLink } from "@cookiechimp/nextjs/styles-route";
 import { headers } from "next/headers";
 
 export default async function RootLayout({ children }) {
@@ -93,6 +157,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <StylesLink href="/cookiechimp.css" nonce={nonce} />
         <CookieChimpStyles nonce={nonce} />
         <GoogleConsentMode nonce={nonce} />
       </head>
@@ -105,3 +170,10 @@ export default async function RootLayout({ children }) {
   );
 }
 ```
+
+Omit `CookieChimpStyles` when the policy forbids inline styles entirely. The
+stylesheet response includes `text/css`, `X-Content-Type-Options: nosniff`, a
+stable ETag, and supports conditional 304 responses. The default static route
+uses immutable one-year caching. Configuring a per-request nonce or CSP uses
+`private, no-cache` instead, because a response whose policy varies by request
+must not be reused as an immutable shared response.

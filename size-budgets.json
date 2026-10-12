@@ -81,6 +81,27 @@
     "informational": true
   },
   {
+    "name": "Next.js Pages client wrapper",
+    "scenario": "nextjs pages",
+    "entry": "packages/nextjs/dist/pages.mjs",
+    "kind": "extra",
+    "limit": 6225
+  },
+  {
+    "name": "Next.js middleware region helper",
+    "scenario": "nextjs middleware",
+    "entry": "packages/nextjs/dist/middleware.mjs",
+    "kind": "extra",
+    "limit": 1150
+  },
+  {
+    "name": "Next.js styles route",
+    "scenario": "nextjs styles route",
+    "entry": "packages/nextjs/dist/styles-route.mjs",
+    "kind": "extra",
+    "informational": true
+  },
+  {
     "name": "react headless primitives",
     "scenario": "react-headless",
     "entry": "packages/react/dist/headless.mjs",

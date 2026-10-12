@@ -30,9 +30,23 @@ export interface LanguageOptions {
 export interface GetServerConsentOptions {
   cookieName?: string;
   provider?: RegionHeaderOptions["provider"];
+  /** Trust the region header set by CookieChimp middleware. */
+  trustForwardedRegion?: boolean;
   /** Already-resolved request region. No location lookup is performed. */
   region?: Region | null;
   languages?: LanguageOptions | readonly string[];
+}
+
+function forwardedRegion(requestHeaders: Headers): Region | null {
+  const match = /^([A-Z]{2})(?:-([A-Z0-9]{1,3}))?$/.exec(
+    requestHeaders.get("x-cc-region")?.trim().toUpperCase() ?? "",
+  );
+  return match
+    ? {
+        country: match[1] as string,
+        ...(match[2] ? { region: match[2] } : {}),
+      }
+    : null;
 }
 
 export type ServerConsentState = ConsentState & {
@@ -58,6 +72,11 @@ function invalid(message: string): void {
 }
 
 function validate(options: GetServerConsentOptions): void {
+  if (
+    options.trustForwardedRegion !== undefined &&
+    typeof options.trustForwardedRegion !== "boolean"
+  )
+    invalid("trustForwardedRegion must be a boolean");
   if (
     options.cookieName !== undefined &&
     !/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(options.cookieName)
@@ -86,6 +105,7 @@ export function getServerConsent(
     (
       | { provider: NonNullable<GetServerConsentOptions["provider"]> }
       | { region: Region | null }
+      | { trustForwardedRegion: boolean }
       | {
           languages: NonNullable<GetServerConsentOptions["languages"]>;
         }
@@ -105,16 +125,22 @@ export async function getServerConsent(
     : null;
   if (
     !consent ||
-    (!options.provider && options.region === undefined && !options.languages)
+    (!options.provider &&
+      options.region === undefined &&
+      !options.trustForwardedRegion &&
+      !options.languages)
   )
     return consent;
   const requestHeaders = await headers();
   const region =
     options.region !== undefined
       ? options.region
-      : options.provider
-        ? resolveRegion(requestHeaders, { provider: options.provider })
-        : null;
+      : ((options.trustForwardedRegion
+          ? forwardedRegion(requestHeaders)
+          : null) ??
+        (options.provider
+          ? resolveRegion(requestHeaders, { provider: options.provider })
+          : null));
   const languages = languageOptions(options.languages);
   const language = languages
     ? resolveLanguage(
@@ -135,7 +161,8 @@ export type TranslationLoader = (
   locale: string,
 ) => Messages | Promise<Messages>;
 
-export interface CookieChimpProviderProps extends GetServerConsentOptions {
+export interface CookieChimpProviderProps
+  extends Omit<GetServerConsentOptions, "cookieName"> {
   config: ConsentConfig;
   translations?: Messages | TranslationLoader;
   children: ReactNode;
@@ -145,23 +172,26 @@ export interface CookieChimpProviderProps extends GetServerConsentOptions {
 export async function CookieChimpProvider({
   config,
   provider,
+  trustForwardedRegion,
   region: suppliedRegion,
   languages,
   translations,
-  cookieName,
   children,
 }: CookieChimpProviderProps) {
-  const resolvedCookieName =
-    cookieName ?? config.cookie?.name ?? CONSENT_COOKIE_NAME;
-  validate({ cookieName: resolvedCookieName, provider, languages });
+  const resolvedCookieName = config.cookie?.name ?? CONSENT_COOKIE_NAME;
+  validate({
+    cookieName: resolvedCookieName,
+    provider,
+    trustForwardedRegion,
+    languages,
+  });
   const languageConfig = languageOptions(languages);
   const requestHeaders = await headers();
   const region =
     suppliedRegion !== undefined
       ? suppliedRegion
-      : provider
-        ? resolveRegion(requestHeaders, { provider })
-        : null;
+      : ((trustForwardedRegion ? forwardedRegion(requestHeaders) : null) ??
+        (provider ? resolveRegion(requestHeaders, { provider }) : null));
   const regulation = regulationFor(region);
   const language = languageConfig
     ? resolveLanguage(

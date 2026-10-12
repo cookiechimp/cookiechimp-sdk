@@ -105,6 +105,36 @@ describe("getServerConsent", () => {
     });
   });
 
+  it("ignores a spoofed forwarded region by default", async () => {
+    mocks.cookie = encodeConsentCookie(state);
+    mocks.values.set("x-cc-region", "US-CA");
+    await expect(
+      getServerConsent({ languages: ["en"] }),
+    ).resolves.toMatchObject({ region: null });
+  });
+
+  it("uses the forwarded region when explicitly trusted", async () => {
+    mocks.cookie = encodeConsentCookie(state);
+    mocks.values.set("x-cc-region", "US-CA");
+    await expect(
+      getServerConsent({ trustForwardedRegion: true }),
+    ).resolves.toMatchObject({
+      region: { country: "US", region: "CA" },
+      regulation: "ccpa",
+    });
+  });
+
+  it("does not derive request region from consent cookie state", async () => {
+    mocks.cookie = encodeConsentCookie({
+      ...state,
+      region: { country: "DE" },
+      regulation: "gdpr",
+    });
+    await expect(
+      getServerConsent({ languages: ["en"] }),
+    ).resolves.toMatchObject({ region: null });
+  });
+
   it("ignores a client-writable cookie region without an explicit source", async () => {
     mocks.cookie = encodeConsentCookie({
       ...state,
@@ -126,6 +156,22 @@ describe("getServerConsent", () => {
       getServerConsent({ cookieName: "bad name" }),
     ).resolves.toBeNull();
     expect(warning).toHaveBeenCalledOnce();
+    warning.mockRestore();
+    vi.unstubAllEnvs();
+  });
+
+  it("throws in development and warns in production for non-boolean forwarded trust", async () => {
+    await expect(
+      getServerConsent({ trustForwardedRegion: "yes" } as never),
+    ).rejects.toThrow("trustForwardedRegion must be a boolean");
+    vi.stubEnv("NODE_ENV", "production");
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await expect(
+      getServerConsent({ trustForwardedRegion: "yes" } as never),
+    ).resolves.toBeNull();
+    expect(warning).toHaveBeenCalledWith(
+      expect.stringContaining("trustForwardedRegion must be a boolean"),
+    );
     warning.mockRestore();
     vi.unstubAllEnvs();
   });
