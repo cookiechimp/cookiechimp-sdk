@@ -5,6 +5,7 @@ import { pages, skills } from "./pages.ts";
 import { resolveRequest } from "./serve.ts";
 import {
   buildPages,
+  docsBaseUrl,
   layout,
   llmsFull,
   llmsTxt,
@@ -125,4 +126,28 @@ describe("docs site", () => {
     expect(resolveRequest(dist, "/a%00b")).toBeNull();
     expect(resolveRequest(dist, "/%E0%A4%A")).toBeNull();
   });
+});
+
+it("rejects executable Markdown links and invalid deployment bases", () => {
+  const html = renderMarkdown(
+    "[unsafe](javascript:alert%281%29) [ok](https://example.com)",
+    "README.md",
+  );
+  expect(html).not.toContain("javascript:");
+  expect(html).toContain('href="https://example.com"');
+  expect(docsBaseUrl("")).toBe("");
+  expect(docsBaseUrl("https://docs.example.com/")).toBe(
+    "https://docs.example.com",
+  );
+  for (const value of [
+    "http://example.com",
+    "https://example.com/sdk",
+    "https://user:pass@example.com",
+    "https://example.com?q=x",
+    "https://example.com#fragment",
+    "https://",
+    "https://example.com?bad\nlink",
+  ]) {
+    expect(() => docsBaseUrl(value)).toThrow();
+  }
 });

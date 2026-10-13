@@ -44,7 +44,7 @@ async function exampleSources(): Promise<string[]> {
 
 const fence = /```(?:ts|tsx|js|jsx)\n([\s\S]*?)```/g;
 const importStatement =
-  /import\s+(type\s+)?([\s\S]*?)\s+from\s+["'](@cookiechimp\/[^"']+)["']/g;
+  /import\s+(type\s+)?([^;]*?)\s+from\s+["'](@cookiechimp\/[^"']+)["']/g;
 
 interface ImportUse {
   file: string;
@@ -68,8 +68,14 @@ function importsIn(code: string, file: string): ImportUse[] {
             .split(/\s+as\s+/)[0] ?? "",
       )
       .filter(Boolean);
+    if (/^[A-Za-z_$][\w$]*(?:\s*,|\s*$)/.test(clause.trim()))
+      names.unshift("default");
     uses.push({ file, specifier, names });
   }
+  for (const [, specifier = ""] of code.matchAll(
+    /import\s*["'](@cookiechimp\/[^"']+)["']/g,
+  ))
+    uses.push({ file, specifier, names: [] });
   return uses;
 }
 
@@ -114,8 +120,28 @@ describe("docs snippets", () => {
         "x",
       ),
     ).toEqual([
-      { file: "x", specifier: "@cookiechimp/core", names: ["b", "C", "d"] },
+      {
+        file: "x",
+        specifier: "@cookiechimp/core",
+        names: ["default", "b", "C", "d"],
+      },
       { file: "x", specifier: "@cookiechimp/react/ui", names: ["F"] },
+    ]);
+  });
+
+  it("checks side-effect imports without swallowing later declarations", () => {
+    expect(
+      importsIn(
+        'import "@cookiechimp/react/styles.css";\nimport en from "@cookiechimp/translations/en";',
+        "x",
+      ),
+    ).toEqual([
+      {
+        file: "x",
+        specifier: "@cookiechimp/translations/en",
+        names: ["default"],
+      },
+      { file: "x", specifier: "@cookiechimp/react/styles.css", names: [] },
     ]);
   });
 

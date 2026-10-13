@@ -1,5 +1,8 @@
 # Getting started
 
+Registry commands below apply after the first npm release. Until then use the
+workspace examples. See [release status](deployment.md).
+
 The quickest route is the CLI. It detects your framework, installs the right
 packages and writes starter files. It never edits files you already have.
 
@@ -41,10 +44,11 @@ export function CookieChimpBanner() {
 // app/layout.tsx
 import "@cookiechimp/react/styles.css";
 import { CookieChimpProvider } from "@cookiechimp/nextjs/server";
+import type { ReactNode } from "react";
 import { CookieChimpBanner } from "../components/cookiechimp-banner";
 import { consentConfig } from "../cookiechimp.config";
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
@@ -70,9 +74,10 @@ for regions, the Pages Router, connected mode and strict CSP.
 import "@cookiechimp/react/styles.css";
 import { ConsentProvider } from "@cookiechimp/react";
 import { CookieBanner } from "@cookiechimp/react/banner";
+import type { ReactNode } from "react";
 import { consentConfig } from "./cookiechimp.config";
 
-export function CookieChimp({ children }) {
+export function CookieChimp({ children }: { children: ReactNode }) {
   return (
     <ConsentProvider config={consentConfig}>
       {children}

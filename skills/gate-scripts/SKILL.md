@@ -35,9 +35,9 @@ import { GatedScript } from "@cookiechimp/react/ui";
 <GatedScript category={ga.category} service={ga.service.id} src={ga.script.src} async />;
 ```
 
-Keep each `GatedScript` as the only child of an element whose children never
-change (for example `<div hidden>`). Activation currently replaces the script
-node, and React fails if it later re-renders siblings next to it.
+`GatedScript` keeps its React-owned node stable and contains the activated script
+for unmount cleanup. It can have changing siblings and runs once per mount;
+revoking consent cannot undo third-party code that has already executed.
 
 Without React, render each preset's `script.attributes` on a `<script>` and
 call `gateScripts(consent)` from `@cookiechimp/core/gate`. Gated scripts use

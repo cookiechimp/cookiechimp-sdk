@@ -10,6 +10,7 @@ const types: Record<string, string> = {
   ".css": "text/css; charset=utf-8",
   ".md": "text/markdown; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
+  ".svg": "image/svg+xml",
 };
 
 /** Map a request URL into root, or null when it is malformed or would leave root. */

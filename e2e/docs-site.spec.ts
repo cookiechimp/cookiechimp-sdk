@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { pages as pageSpecs } from "../packages/docs/src/pages";
 
 const site = "http://127.0.0.1:3103";
 
@@ -36,7 +37,7 @@ test("every nav page and in-site link resolves", async ({ page, request }) => {
     .getByRole("navigation", { name: "Docs" })
     .getByRole("link")
     .evaluateAll((links) => links.map((a) => (a as HTMLAnchorElement).href));
-  expect(pages.length).toBe(11);
+  expect(pages.length).toBe(pageSpecs.length);
   const checked = new Set<string>();
   for (const href of pages) {
     const response = await request.get(href);

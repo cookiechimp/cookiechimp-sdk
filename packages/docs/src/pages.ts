@@ -67,6 +67,13 @@ export const pages: readonly PageSpec[] = [
     source: "packages/tokens/README.md",
   },
   {
+    slug: "deployment",
+    title: "Deployment and release status",
+    description:
+      "Build and validate the static docs artifact, and check launch prerequisites.",
+    source: "packages/docs/content/deployment.md",
+  },
+  {
     slug: "ai-skills",
     title: "AI skills",
     description:

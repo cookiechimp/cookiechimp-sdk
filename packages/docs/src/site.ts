@@ -15,6 +15,24 @@ const escapeHtml = (value: string) =>
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
 
+/** Validate deployment input before it enters Markdown links. */
+export function docsBaseUrl(value: string): string {
+  if (!value) return "";
+  const url = new URL(value);
+  if (
+    url.protocol !== "https:" ||
+    url.username ||
+    url.password ||
+    url.pathname !== "/" ||
+    url.search ||
+    url.hash
+  )
+    throw new Error(
+      "DOCS_BASE_URL must be an https origin without credentials, path, query or hash",
+    );
+  return `${url.origin}${url.pathname.replace(/\/+$/, "")}`;
+}
+
 export const slugify = (text: string) =>
   text
     .toLowerCase()
@@ -28,7 +46,9 @@ export const slugify = (text: string) =>
  * page; other repo-relative links point at GitHub; absolute and hash links stay.
  */
 export function rewriteLink(href: string, source: string): string {
-  if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith("#")) return href;
+  if (href.startsWith("#")) return href;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href))
+    return /^(?:https?:|mailto:)/i.test(href) ? href : "#";
   const [path = "", hash] = href.split("#");
   const target = posix.normalize(posix.join(posix.dirname(source), path));
   const page = pages.find((p) => p.source === target);
@@ -99,6 +119,7 @@ export function layout(page: PageSpec, body: string): string {
 <meta name="description" content="${escapeHtml(page.description)}">
 <title>${escapeHtml(page.slug === "index" ? page.title : `${page.title} | CookieChimp SDK`)}</title>
 <link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="text/markdown" href="${page.slug}.md">
 </head>
 <body>
@@ -136,7 +157,7 @@ export function llmsTxt(built: BuiltPage[], base = ""): string {
 
 > Open-source, lightweight consent SDK for React, Next.js and plain JavaScript. Local mode needs no account; connected mode syncs a CookieChimp project. Includes script and iframe gating, Google Consent Mode v2, IAB GPP and TCF, 33 locales and size budgets enforced in CI.
 
-Packages are published under the \`@cookiechimp\` npm scope. The SDK never looks up a visitor's location; applications pass trusted region context.
+Packages use the \`@cookiechimp\` npm scope. The SDK never looks up a visitor's location; applications pass trusted region context.
 
 ## Docs
 

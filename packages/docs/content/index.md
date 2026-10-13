@@ -27,4 +27,5 @@ their hosting platform's headers.
 - [AI skills](ai-skills.md) for coding agents, and [llms.txt](https://llmstxt.org)
   at `/llms.txt` and `/llms-full.txt` on this site.
 
-Status: pre-alpha. The API may change before 1.0.
+Status: pre-release. See [deployment and release status](deployment.md) before
+installing from npm or using connected mode in production.
