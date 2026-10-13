@@ -6,8 +6,11 @@ import { useEffect, useState } from "react";
 
 export function EndpointLogDemo({
   endpoint = "/api/consent",
+  baseDelayMs = 500,
 }: {
   endpoint?: string;
+  /** Retry delay; the page-hide test sets it high so only the hide flush can deliver. */
+  baseDelayMs?: number;
 }) {
   const consent = useHeadlessContext()?.consent;
   const [pending, setPending] = useState<number>();
@@ -15,8 +18,8 @@ export function EndpointLogDemo({
     if (!consent) return;
     const log = createEndpointLog({
       endpoint,
-      baseDelayMs: 500,
-      maxDelayMs: 1000,
+      baseDelayMs,
+      maxDelayMs: Math.max(1000, baseDelayMs),
     });
     const stop = logConsent(consent, log);
     const update = () => setPending(log.pending());
@@ -30,7 +33,7 @@ export function EndpointLogDemo({
       clearInterval(timer);
       log.destroy();
     };
-  }, [consent, endpoint]);
+  }, [consent, endpoint, baseDelayMs]);
   return (
     <p data-testid="endpoint-log">
       {pending === undefined ? "Endpoint log idle" : `Queued: ${pending}`}

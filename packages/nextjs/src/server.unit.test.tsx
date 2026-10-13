@@ -285,6 +285,40 @@ describe("CookieChimpProvider connected mode", () => {
     }
   });
 
+  it("reads consent under the dashboard cookie name and applies its expiry", async () => {
+    const bundle = JSON.parse(fixture);
+    const state: ConsentState = {
+      schemaVersion: 1,
+      consentId: "c0nsentIdAbcdefgh123",
+      ts: "2026-10-13T12:00:00.000Z",
+      categories: { necessary: true, analytics: true },
+      action: "custom",
+    };
+    mocks.cookies.set(bundle.cookie_settings.name, encodeConsentCookie(state));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(fixture)),
+    );
+    try {
+      const output = await CookieChimpProvider({
+        config: {
+          categories: { analytics: false },
+          cookie: { name: "code_name", maxAge: 60 },
+        },
+        projectId,
+        children: <Title />,
+      });
+      expect(output.props.config.cookie).toMatchObject({
+        name: bundle.cookie_settings.name,
+        maxAge: bundle.cookie_settings.expires_days * 86400,
+      });
+      expect(output.props.initialState?.consentId).toBe(state.consentId);
+    } finally {
+      vi.unstubAllGlobals();
+      mocks.cookies.delete(bundle.cookie_settings.name);
+    }
+  });
+
   it("renders the code config when the dashboard is unreachable", async () => {
     vi.stubGlobal(
       "fetch",
@@ -301,6 +335,65 @@ describe("CookieChimpProvider connected mode", () => {
       });
       expect(renderToStaticMarkup(output)).toContain(en["banner.title"]);
       expect(output.props.messages).toEqual(en);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("passes only serialisable props to the client, never the server fetch", async () => {
+    const platform = vi.fn(async () => new Response(fixture));
+    const output = await CookieChimpProvider({
+      config: { categories: { analytics: false } },
+      projectId,
+      fetch: platform,
+      children: null,
+    });
+    expect(platform).toHaveBeenCalledTimes(1);
+    expect(output.props).not.toHaveProperty("fetch");
+    // With a custom transport the browser cannot revalidate the same way.
+    expect(output.props.sync).toBeUndefined();
+    const functions: string[] = [];
+    const walk = (value: unknown, path: string) => {
+      if (typeof value === "function") functions.push(path);
+      else if (value && typeof value === "object")
+        for (const [key, item] of Object.entries(value))
+          walk(item, `${path}.${key}`);
+    };
+    const { children: _children, ...props } = output.props;
+    walk(props, "props");
+    expect(functions).toEqual([]);
+  });
+
+  it("seeds client revalidation with the rendered etag, region and locale", async () => {
+    mocks.values.set("x-vercel-ip-country", "DE");
+    mocks.values.set("accept-language", "de-DE");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(fixture)),
+    );
+    try {
+      const output = await CookieChimpProvider({
+        config: { categories: { analytics: false } },
+        provider: "vercel",
+        languages: { available: ["en", "de"], fallback: "en" },
+        projectId,
+        apiBase: "https://eu.cookiechimp.test",
+        children: null,
+      });
+      expect(output.props.sync).toEqual({
+        projectId,
+        apiBase: "https://eu.cookiechimp.test",
+        locale: "de",
+        region: "DE",
+        etag: expect.any(String),
+      });
+      const off = await CookieChimpProvider({
+        config: { categories: { analytics: false } },
+        projectId,
+        revalidateClient: false,
+        children: null,
+      });
+      expect(off.props.sync).toBeUndefined();
     } finally {
       vi.unstubAllGlobals();
     }

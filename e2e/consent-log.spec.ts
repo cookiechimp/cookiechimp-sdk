@@ -152,8 +152,16 @@ test("page hide flushes the queue as a cookie-less text/plain keepalive POST", a
     },
   ]);
   await page.route(SYNC, (route) => route.abort("internetdisconnected"));
-  await page.goto("/consent-log");
+  // A one-minute retry delay: only the page-hide flush can deliver below.
+  await page.goto("/consent-log?delay=60000");
+  // Wait for the first attempt to fail, not just for "Queued: 1", which is
+  // also true while it is in flight (a hide then reuses that request).
+  const failed = page.waitForEvent(
+    "requestfailed",
+    (request) => request.url() === SYNC,
+  );
   await accept(page);
+  await failed;
   await expect(page.getByTestId("consent-log")).toHaveText("Queued: 1");
   await page.unroute(SYNC);
   const hidden = page.waitForRequest(

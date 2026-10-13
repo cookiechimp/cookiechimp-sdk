@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
 
 test("SSR HTML already carries the dashboard copy before any JavaScript runs", async ({
@@ -67,4 +69,79 @@ test("production refuses a plain-http platform origin and renders the code confi
   const html = await response.text();
   expect(html).toContain("Connected guard fixture");
   expect(html).not.toContain("Wir respektieren");
+});
+
+test("the server-only fetch prop never reaches the HTML or the RSC payload", async ({
+  request,
+}) => {
+  const html = await (await request.get("/connected")).text();
+  const rsc = await (
+    await request.get("/connected", { headers: { RSC: "1" } })
+  ).text();
+  // Real payloads, not error pages: both carry the server-rendered copy.
+  expect(html).toContain("Alle akzeptieren");
+  expect(rsc).toContain("Alle akzeptieren");
+  for (const payload of [html, rsc]) {
+    expect(payload).not.toContain("server-only-transport-7f3a9c");
+    expect(payload).not.toContain('"fetch"');
+  }
+});
+
+test("consent is stored under the dashboard cookie name with its expiry", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/connected");
+  await page
+    .getByRole("button", { name: /Alle akzeptieren|Accept All/ })
+    .click();
+  await expect
+    .poll(async () =>
+      (await context.cookies()).some(
+        ({ name }) => name === "cookiechimp_pref_REDACTED",
+      ),
+    )
+    .toBe(true);
+  const cookie = (await context.cookies()).find(
+    ({ name }) => name === "cookiechimp_pref_REDACTED",
+  );
+  const days = ((cookie?.expires ?? 0) - Date.now() / 1000) / 86400;
+  expect(days).toBeGreaterThan(181);
+  expect(days).toBeLessThanOrEqual(182);
+  // A returning visit reads consent back under the same name on the server.
+  const html = await (await page.request.get("/connected")).text();
+  expect(html).toContain(
+    'data-category="analytics">analytics<!-- -->: <!-- -->on',
+  );
+});
+
+test("the browser revalidates after hydration and shows newer dashboard copy", async ({
+  page,
+}) => {
+  const bundle = JSON.parse(
+    readFileSync(
+      resolve("packages/core/src/fixtures/platform-offline-bundle.json"),
+      "utf8",
+    ),
+  );
+  bundle.cache_version = "live";
+  bundle.translations.bnrUS1.en.consent_modal.title =
+    "Fresh from the dashboard";
+  const calls: Record<string, string>[] = [];
+  await page.route(
+    "https://api.cookiechimp.test/api/v1/mobile-sdk/offline/acctREDACTED",
+    async (route) => {
+      calls.push(route.request().headers());
+      await route.fulfill({
+        json: bundle,
+        headers: { "access-control-allow-origin": "*" },
+      });
+    },
+  );
+  await page.goto("/connected-live");
+  await expect(page.getByTestId("banner-title")).toHaveText(
+    "Fresh from the dashboard",
+  );
+  expect(calls).toHaveLength(1);
+  expect(calls[0]?.cookie).toBeUndefined();
 });

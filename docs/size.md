@@ -21,9 +21,9 @@ The checked budgets are the source-of-truth values below. Region header provider
 | core initial | initial | 4096 |
 | core total | total | 5120 |
 | react provider and hooks | initial | 5320 |
-| Next.js client provider bridge | initial | 4800 |
+| Next.js client provider bridge | initial | 5270 |
 | Next.js server entry | extra | INFO |
-| Next.js Pages client wrapper | initial | 6585 |
+| Next.js Pages client wrapper | initial | 7045 |
 | Next.js middleware region helper | extra | 1150 |
 | Next.js styles route | extra | INFO |
 | react headless primitives | extra | 3491 |
@@ -113,6 +113,10 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | nextjs pages | 6225 B | 6585 B | `endpoint` passthrough, initial chunk: 5419 B to 5726 B (+307 B), about 15% headroom | M5 PR30 |
 | endpoint | 2135 B | 2450 B | Optional static `headers` with fail-closed validation: 1865 B to 2130 B (+265 B), about 15% headroom | M5 PR30 |
 | nextjs server | informational | informational | `getServerConfig` and `CookieChimpProvider` `projectId`: server fetch with `revalidate: 300`, reusing the `./sync` adapter. Server-only (never shipped to browsers): 10309 B to 11875 B (+1566 B). Browser rows unchanged: nextjs client 4176 B, nextjs pages 5726 B | M5 PR31 |
+| nextjs client | 4800 B | 5270 B | Client revalidation after hydration (`ClientProvider` `sync` seed, `./sync` loaded by dynamic import) and the plain-text copy mapping: 4176 B to 4580 B (+404 B), about 15% headroom | M5 PR32 |
+| nextjs pages | 6585 B | 7045 B | Same shared client provider code: 5726 B to 6126 B (+400 B), about 15% headroom | M5 PR32 |
+| sync | 4355 B | 4355 B | `etag` seed option and the idle-callback timeout: 3785 B to 3847 B (+62 B), 13% headroom, budget unchanged | M5 PR32 |
+| nextjs server | informational | informational | Dashboard cookie settings and the client sync seed: 11875 B to 13696 B (+1821 B; with code splitting off this row also inlines the client entry and its lazy `./sync`). Server-only | M5 PR32 |
 | sync | 2048 B | 4355 B | Connected config client for the shared platform offline bundle: adapter, fetch, cache, idle revalidation, untrusted payload validation and timeout. Standalone entry measured 3785 B (about 15% headroom); marginal cost over core 2395 B, above the SPEC 2 KB extra target (flagged for lead review) | M5 PR20 |
 | SPEC sync extra target | 2 KB | 2.5 KB | SPEC.md target only, no checked limit change: `./sync` marginal cost over core is 2395 B, accepted by the lead after M5 PR20 | M5 PR21 (lead approved) |
 | consent log | none | 2490 B | New opt-in consent record POST subpath: platform record mapping, persisted queue, capped backoff, untrusted response parsing, beacon on hide and fail-closed guards. Measured 2166 B (about 15% headroom) | M5 PR21 |
