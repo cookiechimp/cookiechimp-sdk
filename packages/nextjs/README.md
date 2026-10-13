@@ -72,6 +72,16 @@ An existing `getServerSideProps` can be passed as the second argument. The
 `withConsentPage` HOC is available when wrapping the individual component is
 more convenient.
 
+## Connected mode: server-side dashboard config
+
+```tsx
+<CookieChimpProvider projectId="acct123" config={{ categories: ["analytics"] }}>
+  {children}
+</CookieChimpProvider>
+```
+
+The provider fetches the dashboard config on the server (Next.js data cache, `revalidate: 300` by default), so the first HTML already carries the dashboard categories and banner copy for the visitor's region and language. `config` is the fallback under the dashboard; `override` wins over it. If the platform is unreachable or returns anything unexpected, the page renders from `config`. Use `getServerConfig` directly for custom layouts.
+
 ## Self-hosted consent records
 
 Pass `endpoint` to `CookieChimpProvider`, `ClientProvider` or `PagesConsentProvider` to POST each decision to your own route (local mode, no account):

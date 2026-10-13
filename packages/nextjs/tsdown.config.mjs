@@ -27,6 +27,7 @@ export default defineConfig({
     "@cookiechimp/core/consent-mode",
     "@cookiechimp/core/language",
     "@cookiechimp/core/regions",
+    "@cookiechimp/core/sync",
     "@cookiechimp/react",
   ],
 });
