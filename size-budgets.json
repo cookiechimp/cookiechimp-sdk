@@ -71,7 +71,7 @@
     "scenario": "nextjs client",
     "entry": "packages/nextjs/dist/index.mjs",
     "kind": "initial",
-    "limit": 4800
+    "limit": 5270
   },
   {
     "name": "Next.js server entry",
@@ -85,7 +85,7 @@
     "scenario": "nextjs pages",
     "entry": "packages/nextjs/dist/pages.mjs",
     "kind": "initial",
-    "limit": 6585
+    "limit": 7045
   },
   {
     "name": "Next.js middleware region helper",

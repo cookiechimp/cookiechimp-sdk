@@ -4,7 +4,13 @@ import bundle from "./bundle.json";
 
 // Serves the redacted platform bundle in place of https://cookiechimp.com,
 // so the real server fetch, validation and SSR path run without a network.
-const platform: typeof fetch = async (input) => {
+// The e2e suite checks this marker never reaches the HTML or RSC payload.
+const SERVER_ONLY_MARKER = "server-only-transport-7f3a9c";
+const platform: typeof fetch = async (input, init) => {
+  if (
+    (init?.headers as Record<string, string> | undefined)?.[SERVER_ONLY_MARKER]
+  )
+    throw new Error(SERVER_ONLY_MARKER);
   const url = String(input);
   return url.endsWith(`/api/v1/mobile-sdk/offline/${bundle.account_hashid}`)
     ? Response.json(bundle)

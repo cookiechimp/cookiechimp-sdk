@@ -22,9 +22,10 @@ import { cookies, headers } from "next/headers";
 import type { ReactNode } from "react";
 import { criticalCss } from "./critical-css.generated";
 import { ClientProvider, type ConsentEndpoint } from "./index";
-import { getServerConfig } from "./server-config";
+import { getServerConfig, regionKey } from "./server-config";
 
 export {
+  dashboardCookie,
   dashboardMessages,
   getServerConfig,
   type ServerConfig,
@@ -189,6 +190,12 @@ export interface CookieChimpProviderProps
   revalidate?: number;
   /** Server-only transport for the config request (tests, proxies). Never sent to the client. */
   fetch?: typeof fetch;
+  /**
+   * Revalidate the dashboard config in the browser after hydration, so copy
+   * newer than the server cache shows without a reload. Defaults to true;
+   * off when a custom server `fetch` is given (the browser cannot use it).
+   */
+  revalidateClient?: boolean;
   children: ReactNode;
 }
 
@@ -206,6 +213,7 @@ export async function CookieChimpProvider({
   override,
   revalidate,
   fetch,
+  revalidateClient,
   children,
 }: CookieChimpProviderProps) {
   const resolvedCookieName = config.cookie?.name ?? CONSENT_COOKIE_NAME;
@@ -248,9 +256,11 @@ export async function CookieChimpProvider({
         fetch,
       })
     : undefined;
-  const initialState = await getServerConsent({
-    cookieName: resolvedCookieName,
-  });
+  // The dashboard cookie settings win over the code defaults, and the
+  // visitor's existing consent is read under the resulting name.
+  const cookieName = server?.cookie?.name ?? resolvedCookieName;
+  const maxAge = server?.cookie?.maxAge ?? config.cookie?.maxAge;
+  const initialState = await getServerConsent({ cookieName });
   return (
     <ClientProvider
       config={{
@@ -261,7 +271,11 @@ export async function CookieChimpProvider({
               services: server.config.services,
             }
           : {}),
-        cookie: { ...config.cookie, name: resolvedCookieName },
+        cookie: {
+          ...config.cookie,
+          name: cookieName,
+          ...(maxAge ? { maxAge } : {}),
+        },
         region,
         regulation,
         gpc: readGpc(requestHeaders),
@@ -271,6 +285,17 @@ export async function CookieChimpProvider({
       language={language}
       messages={server ? { ...messages, ...server.messages } : messages}
       endpoint={endpoint}
+      sync={
+        projectId && server && !fetch && revalidateClient !== false
+          ? {
+              projectId,
+              ...(apiBase ? { apiBase } : {}),
+              ...(language ? { locale: language } : {}),
+              ...(regionKey(region) ? { region: regionKey(region) } : {}),
+              ...(server.dashboard ? { etag: server.dashboard.etag } : {}),
+            }
+          : undefined
+      }
     >
       {children}
     </ClientProvider>

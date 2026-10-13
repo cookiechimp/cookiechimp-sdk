@@ -7,6 +7,9 @@ import {
   safeJson,
 } from "@cookiechimp/core/sync";
 import type { Messages } from "@cookiechimp/react";
+import { dashboardMessages } from "./messages";
+
+export { dashboardMessages } from "./messages";
 
 const DEFAULT_API = "https://cookiechimp.com";
 const MAX_BYTES = 524288;
@@ -41,6 +44,8 @@ export interface ServerConfig {
   dashboard?: DashboardConfig;
   /** Plain-text dashboard banner copy as translation messages. */
   messages: Messages;
+  /** Dashboard cookie name and lifetime (seconds), when valid. */
+  cookie?: { name?: string; maxAge?: number };
   source: "dashboard" | "local";
   error?: string;
 }
@@ -58,7 +63,7 @@ function apiUrl(base: string): string | undefined {
   } catch {}
 }
 
-const regionKey = (region: ServerConfigOptions["region"]) =>
+export const regionKey = (region: ServerConfigOptions["region"]) =>
   !region
     ? undefined
     : typeof region === "string"
@@ -67,40 +72,32 @@ const regionKey = (region: ServerConfigOptions["region"]) =>
         ? `${region.country}-${region.region}`
         : region.country;
 
-// Dashboard fields that may hold HTML are only used when they are plain text,
-// because messages render as text.
-const plain = (value: unknown) =>
-  typeof value === "string" &&
-  value.trim() &&
-  value.length <= 500 &&
-  !/[<>]/.test(value)
-    ? value
+const COOKIE_NAME = /^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,64}$/;
+const days = (value: unknown) =>
+  Number.isInteger(value) && (value as number) >= 1 && (value as number) <= 730
+    ? (value as number)
+    : undefined;
+const field = (value: unknown, key: string): unknown =>
+  value && typeof value === "object" && Object.hasOwn(value, key)
+    ? (value as Record<string, unknown>)[key]
     : undefined;
 
-const MESSAGE_FIELDS: [string, string, string][] = [
-  ["consent_modal", "title", "banner.title"],
-  ["consent_modal", "description", "banner.description"],
-  ["consent_modal", "accept_btn", "banner.acceptAll"],
-  ["consent_modal", "reject_btn", "banner.rejectAll"],
-  ["consent_modal", "preferences_btn", "banner.customize"],
-  ["consent_modal", "close_btn", "banner.close"],
-  ["preferences_modal", "title", "preferences.title"],
-  ["preferences_modal", "description", "preferences.description"],
-  ["preferences_modal", "save_btn", "banner.save"],
-];
-
-/** Map the selected banner's plain-text dashboard copy to translation messages. */
-export function dashboardMessages(dashboard?: DashboardConfig): Messages {
-  const messages: Record<string, string> = {};
-  for (const [section, field, key] of MESSAGE_FIELDS) {
-    const group = dashboard?.copy[section];
-    const value =
-      group && typeof group === "object" && Object.hasOwn(group, field)
-        ? plain((group as Record<string, unknown>)[field])
-        : undefined;
-    if (value) messages[key] = value;
-  }
-  return messages as Messages;
+/**
+ * Dashboard cookie settings: `cookie_settings.name`, and the selected banner's
+ * `expires_days` before `cookie_settings.expires_days`. Invalid values are ignored.
+ */
+export function dashboardCookie(
+  dashboard?: DashboardConfig,
+): ServerConfig["cookie"] {
+  if (!dashboard) return;
+  const name = field(dashboard.cookie, "name");
+  const expiry =
+    days(field(dashboard.banner, "expires_days")) ??
+    days(field(dashboard.cookie, "expires_days"));
+  const cookie: NonNullable<ServerConfig["cookie"]> = {};
+  if (typeof name === "string" && COOKIE_NAME.test(name)) cookie.name = name;
+  if (expiry) cookie.maxAge = expiry * 86400;
+  return cookie.name || cookie.maxAge ? cookie : undefined;
 }
 
 /**
@@ -158,9 +155,14 @@ export async function getServerConfig(
       ),
       dashboard,
       messages: dashboardMessages(dashboard),
+      ...(dashboardCookie(dashboard)
+        ? { cookie: dashboardCookie(dashboard) }
+        : {}),
       source: "dashboard",
     };
   } catch (error) {
+    // Still render the code config, but never hide a bug behind "network error".
+    if (isDev()) console.warn("CookieChimp server config:", error);
     const name = (error as Error)?.name;
     return local(
       name === "TimeoutError"

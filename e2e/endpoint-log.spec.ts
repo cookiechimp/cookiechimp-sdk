@@ -104,8 +104,19 @@ test("page hide sends a cookie-less text/plain keepalive POST", async ({
   page,
 }) => {
   await page.request.delete(`${API}&fail=1`);
-  await page.goto(PAGE);
+  // A one-minute retry delay, so the only request that can deliver after the
+  // forced failure is the page-hide flush (with the default 500 ms the timer
+  // retry could win the race and send JSON).
+  await page.goto(`${PAGE}&delay=60000`);
+  // "Queued: 1" is also true while the first POST is still in flight, and a
+  // hide during it reuses that request; wait for its 503 before hiding.
+  const failed = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/consent") &&
+      response.request().method() === "POST",
+  );
   await accept(page);
+  expect((await failed).status()).toBe(503);
   await expect(page.getByTestId("endpoint-log")).toHaveText("Queued: 1");
   await page.evaluate(() => {
     Object.defineProperty(document, "visibilityState", {

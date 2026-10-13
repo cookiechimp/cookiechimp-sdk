@@ -4,9 +4,9 @@ import { EndpointLogDemo } from "../../components/endpoint-log-demo";
 export default async function EndpointLogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ run?: string }>;
+  searchParams: Promise<{ run?: string; delay?: string }>;
 }) {
-  const { run } = await searchParams;
+  const { run, delay } = await searchParams;
   const endpoint = run
     ? `/api/consent?run=${encodeURIComponent(run)}`
     : "/api/consent";
@@ -14,7 +14,10 @@ export default async function EndpointLogPage({
     <main>
       <h1>Self-hosted endpoint fixture</h1>
       <ConsentDemo />
-      <EndpointLogDemo endpoint={endpoint} />
+      <EndpointLogDemo
+        endpoint={endpoint}
+        baseDelayMs={delay ? Number(delay) : undefined}
+      />
     </main>
   );
 }

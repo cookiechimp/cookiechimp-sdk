@@ -55,6 +55,7 @@ export function categoriesHash(config: ConfigInput | NormalizedConfig): string {
 
 const DEFAULT_API = "https://cookiechimp.com";
 const MAX_BYTES = 524288;
+const IDLE_TIMEOUT = 2000;
 const ID = /^[\w-]{1,64}$/;
 const KEY = /^cc_pk_[\w-]{8,128}$/;
 
@@ -124,6 +125,12 @@ export interface SyncOptions {
   revalidate?: boolean;
   /** Report category and re-consent changes. Defaults to true. */
   reprompt?: boolean;
+  /**
+   * ETag of a config already rendered elsewhere (for example on the server),
+   * sent as `If-None-Match` when nothing newer is cached. A 304 then keeps
+   * the current state.
+   */
+  etag?: string;
 }
 
 export interface SyncClient {
@@ -384,7 +391,11 @@ export function createSync(options: SyncOptions): SyncClient {
     emit({ ...state, status: "loading" });
     const headers: Record<string, string> = {};
     if (key) headers.Authorization = `Bearer ${key}`;
-    if (current) headers["If-None-Match"] = current.etag;
+    const given = text(options.etag, 256);
+    const known =
+      current?.etag ??
+      (given && /^[\x20-\x7e]+$/.test(given) ? given : undefined);
+    if (known) headers["If-None-Match"] = known;
     const timeout = new AbortController();
     const abort = () => timeout.abort();
     const timer = setTimeout(abort, options.timeoutMs ?? 5000);
@@ -401,6 +412,8 @@ export function createSync(options: SyncOptions): SyncClient {
       );
       if (response.status === 304 && current)
         return emit({ ...state, source: "dashboard", status: "ready" });
+      if (response.status === 304 && known)
+        return emit({ ...state, status: "ready" });
       if (!response.ok) return failed(`HTTP ${response.status}`);
       const body = await response.text();
       if (body.length > MAX_BYTES) return failed("config too large");
@@ -445,10 +458,18 @@ export function createSync(options: SyncOptions): SyncClient {
     },
   };
   if (!problem && options.revalidate !== false) {
-    const idle =
-      (globalThis as { requestIdleCallback?: (fn: () => void) => void })
-        .requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 1));
-    idle(() => void client.revalidate());
+    // Without a timeout a busy page can postpone an idle callback
+    // indefinitely, and the config would never revalidate.
+    const host = globalThis as {
+      requestIdleCallback?: (
+        fn: () => void,
+        options?: { timeout: number },
+      ) => void;
+    };
+    const run = () => void client.revalidate();
+    if (host.requestIdleCallback)
+      host.requestIdleCallback(run, { timeout: IDLE_TIMEOUT });
+    else setTimeout(run, 1);
   }
   return client;
 }
