@@ -110,3 +110,64 @@ test("keyboard users can reach and toggle vendor checkboxes", async ({
     ),
   ).toBe(focused?.startsWith("Consent"));
 });
+
+test("vendor details disclose purposes, retention, links and storage", async ({
+  page,
+}) => {
+  await open(page);
+  const details = page.getByRole("button", {
+    name: "Details: Partner 3",
+    exact: true,
+  });
+  await details.click();
+  await expect(details).toHaveAttribute("aria-expanded", "true");
+  const panel = page.getByRole("region", { name: "Partner 3", exact: true });
+  await expect(panel).toBeFocused();
+  await expect(panel).toContainText("Purposes (consent)");
+  await expect(panel).toContainText(
+    "Store and/or access information on a device",
+  );
+  await expect(panel).toContainText("Measure advertising performance");
+  await expect(panel).toContainText("Standard retention: 30 days");
+  await expect(panel).toContainText("Cookies stored for up to 90 days");
+  await expect(panel).toContainText(
+    "Uses other device storage or access methods",
+  );
+  await expect(
+    panel.getByRole("link", { name: "Privacy policy" }),
+  ).toHaveAttribute("href", "https://partner3.example/privacy");
+  await expect(
+    panel.getByRole("link", { name: "Legitimate interest claim" }),
+  ).toHaveAttribute("href", "https://partner3.example/li");
+  await expect(
+    panel.getByRole("link", { name: "Storage disclosure" }),
+  ).toHaveAttribute("rel", "noopener noreferrer");
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeHidden();
+  await expect(details).toBeFocused();
+  await expect(page.locator('[data-cc-part="tcf"]')).toBeVisible();
+});
+
+test("keyboard focus survives scrolling the focused row out of view", async ({
+  page,
+}) => {
+  await open(page);
+  const box = page.getByRole("checkbox", {
+    name: "Consent: Partner 2",
+    exact: true,
+  });
+  await box.focus();
+  await page.locator('[data-cc-part="tcf-vendors"]').evaluate((el) => {
+    el.scrollTop = 40 * 900;
+    el.dispatchEvent(new Event("scroll"));
+  });
+  await expect(page.getByText("Partner 901", { exact: true })).toBeVisible();
+  await expect(box).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(box).toBeChecked();
+  // The vendor name (Details button) precedes its checkboxes in the row.
+  await page.keyboard.press("Shift+Tab");
+  await expect(
+    page.getByRole("button", { name: "Details: Partner 2", exact: true }),
+  ).toBeFocused();
+});

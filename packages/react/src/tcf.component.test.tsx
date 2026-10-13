@@ -23,6 +23,37 @@ for (let id = 1; id <= 400; id++)
     legIntPurposes: id % 3 === 0 ? [7] : [],
     specialFeatures: [],
   };
+vendors[1] = {
+  ...(vendors[1] as NonNullable<(typeof vendors)[1]>),
+  legIntPurposes: [7],
+  specialPurposes: [1],
+  features: [1],
+  specialFeatures: [1],
+  dataDeclaration: [1],
+  dataRetention: {
+    stdRetention: 30,
+    purposes: { "1": 90 },
+    specialPurposes: {},
+  },
+  urls: [
+    { langId: "fr", privacy: "https://v1.example/fr" },
+    {
+      langId: "en",
+      privacy: "https://v1.example/privacy",
+      legIntClaim: "https://v1.example/li",
+    },
+  ],
+  usesCookies: true,
+  cookieMaxAgeSeconds: 31536000,
+  cookieRefresh: true,
+  usesNonCookieAccess: true,
+  deviceStorageDisclosureUrl: "https://v1.example/storage.json",
+};
+vendors[2] = {
+  ...(vendors[2] as NonNullable<(typeof vendors)[2]>),
+  usesCookies: false,
+  urls: [{ langId: "en", privacy: "javascript:alert(1)" }],
+};
 const gvl = {
   vendorListVersion: 150,
   tcfPolicyVersion: 5,
@@ -32,6 +63,11 @@ const gvl = {
     "7": { name: "Measure advertising performance" },
   },
   specialFeatures: { "1": { name: "Use precise geolocation data" } },
+  specialPurposes: {
+    "1": { name: "Ensure security, prevent and detect fraud" },
+  },
+  features: { "1": { name: "Match and combine data from other data sources" } },
+  dataCategories: { "1": { name: "IP addresses" } },
   vendors,
 };
 
@@ -223,5 +259,134 @@ describe("TcfVendorList", () => {
       createRoot(host).render(<TcfVendorList controller={controller} />),
     );
     expect(host.innerHTML).toBe("");
+  });
+
+  describe("vendor details", () => {
+    const details = (host: HTMLElement, name: string) =>
+      host.querySelector(
+        `button[aria-label="Details: ${name}"]`,
+      ) as HTMLButtonElement;
+    const panel = (host: HTMLElement) =>
+      host.querySelector(
+        '[data-cc-part="tcf-vendor-details"]',
+      ) as HTMLElement | null;
+
+    it("discloses purposes, retention, policy links and device storage", async () => {
+      const { host } = await setup();
+      const open = details(host, "Vendor 001");
+      expect(open.getAttribute("aria-expanded")).toBe("false");
+      await act(async () => open.click());
+      const p = panel(host) as HTMLElement;
+      expect(open.getAttribute("aria-expanded")).toBe("true");
+      expect(open.getAttribute("aria-controls")).toBe(p.id);
+      expect(document.activeElement).toBe(p);
+      expect(p.getAttribute("aria-labelledby")).toBe(p.querySelector("h4")?.id);
+      const text = p.textContent ?? "";
+      for (const expected of [
+        "Purposes (consent)",
+        "Store and/or access information on a device (Data retention: 90 days)",
+        "Use limited data to select advertising",
+        "Purposes (legitimate interest)",
+        "Measure advertising performance",
+        "Ensure security, prevent and detect fraud",
+        "Match and combine data from other data sources",
+        "Use precise geolocation data",
+        "IP addresses",
+        "Standard retention: 30 days",
+        "Cookies stored for up to 365 days",
+        "Cookie expiry is refreshed on use",
+        "Uses other device storage or access methods",
+      ])
+        expect(text).toContain(expected);
+      const links = [...p.querySelectorAll("a")].map((a) => [
+        a.textContent,
+        a.getAttribute("href"),
+        a.getAttribute("rel"),
+      ]);
+      expect(links).toEqual([
+        [
+          "Storage disclosure",
+          "https://v1.example/storage.json",
+          "noopener noreferrer",
+        ],
+        ["Privacy policy", "https://v1.example/privacy", "noopener noreferrer"],
+        [
+          "Legitimate interest claim",
+          "https://v1.example/li",
+          "noopener noreferrer",
+        ],
+      ]);
+    });
+
+    it("drops unsafe links and says when a vendor uses no cookies", async () => {
+      const { host } = await setup();
+      await act(async () => details(host, "Vendor 002").click());
+      const p = panel(host) as HTMLElement;
+      expect(p.textContent).toContain("Does not use cookies");
+      expect(p.querySelectorAll("a").length).toBe(0);
+    });
+
+    it("Escape and Close return focus to the row's Details button", async () => {
+      const { host } = await setup();
+      await act(async () => details(host, "Vendor 001").click());
+      await act(async () => {
+        panel(host)?.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+        );
+      });
+      expect(panel(host)).toBeNull();
+      expect(document.activeElement).toBe(details(host, "Vendor 001"));
+      await act(async () => details(host, "Vendor 001").click());
+      await act(async () => button(host, "Close details").click());
+      expect(panel(host)).toBeNull();
+      expect(document.activeElement).toBe(details(host, "Vendor 001"));
+    });
+
+    it("accepts custom labels", async () => {
+      const { host, controller, root } = await setup();
+      await act(async () =>
+        root.render(
+          <TcfVendorList
+            controller={controller}
+            labels={{ details: "Mehr", noCookies: "Keine Cookies" }}
+          />,
+        ),
+      );
+      await act(async () =>
+        (
+          host.querySelector(
+            'button[aria-label="Mehr: Vendor 002"]',
+          ) as HTMLButtonElement
+        ).click(),
+      );
+      expect(panel(host)?.textContent).toContain("Keine Cookies");
+    });
+  });
+
+  it("keeps the focused row mounted when it scrolls out of the window", async () => {
+    const { host } = await setup();
+    const box = checkbox(host, "Consent: Vendor 002");
+    await act(async () => box.focus());
+    expect(document.activeElement).toBe(box);
+    const viewport = host.querySelector(
+      '[data-cc-part="tcf-vendors"]',
+    ) as HTMLDivElement;
+    await act(async () => {
+      viewport.scrollTop = 8000;
+      viewport.dispatchEvent(new Event("scroll"));
+    });
+    expect(box.isConnected).toBe(true);
+    expect(document.activeElement).toBe(box);
+    const positions = [...rows(host)].map((r) =>
+      Number(r.getAttribute("aria-posinset")),
+    );
+    expect(positions[0]).toBe(2);
+    expect(positions.length).toBeLessThanOrEqual(14);
+    // Once focus leaves the row it is windowed out again.
+    await act(async () => {
+      box.blur();
+    });
+    expect(box.isConnected).toBe(false);
+    expect(document.activeElement).toBe(document.body);
   });
 });

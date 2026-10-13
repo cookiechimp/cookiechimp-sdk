@@ -53,8 +53,8 @@ The checked budgets are the source-of-truth values below. Region header provider
 | GPP stub | extra | 925 |
 | GPP US sections module | lazy | 2810 |
 | TCF stub | extra | 645 |
-| TCF core module | lazy | 4010 |
-| TCF vendor list UI | extra | 2555 |
+| TCF core module | lazy | 4555 |
+| TCF vendor list UI | extra | 4295 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -62,7 +62,7 @@ Until the M3 Next.js package exists, `fixtures/nextjs-app` is the empty stand-in
 
 Entries planned for later milestones remain visible as `PENDING` only when their paths are on the harness's explicit allowlist. A missing path outside that allowlist fails with a non-zero exit, preventing a typo from remaining pending indefinitely. File existence controls the allowlisted state, so the same row becomes enforced automatically when its configured build output appears.
 
-GPP lives in two opt-in subpaths. `@cookiechimp/core/gpp-stub` is the `__gpp` stub that publishers inline before vendor tags (SPEC.md requires under 1 KB; the `gppStubScript` inline string measures 761 B gzip on its own). `@cookiechimp/core/gpp` is the lazy US sections encoder and full CMP API. TCF lives in `@cookiechimp/core/tcf-stub` (the inline `__tcfapi` stub; the `tcfStubScript()` string alone is 494 B gzip) and the lazy `@cookiechimp/core/tcf`. The TCF/GPP row is the SPEC.md 12 KB cap and now measures `tcf.mjs`; the GPP module (2430 B) plus the TCF module (3487 B) plus the TCF vendor list UI (2221 B with `tcf.css`) is 8138 B, inside that cap. The vendor list UI lives in `@cookiechimp/react/tcf` with its own `@cookiechimp/react/tcf.css`, so it stays out of the styled UI entry and the banner CSS budgets. The TCF core module row is the tighter guard with about 15% headroom.
+GPP lives in two opt-in subpaths. `@cookiechimp/core/gpp-stub` is the `__gpp` stub that publishers inline before vendor tags (SPEC.md requires under 1 KB; the `gppStubScript` inline string measures 761 B gzip on its own). `@cookiechimp/core/gpp` is the lazy US sections encoder and full CMP API. TCF lives in `@cookiechimp/core/tcf-stub` (the inline `__tcfapi` stub; the `tcfStubScript()` string alone is 494 B gzip) and the lazy `@cookiechimp/core/tcf`. The TCF/GPP row is the SPEC.md 12 KB cap and now measures `tcf.mjs`; the GPP module (2430 B) plus the TCF module (3960 B) plus the TCF vendor list UI (3733 B with `tcf.css`) is 10123 B, inside that cap with about 18% headroom. The vendor list UI lives in `@cookiechimp/react/tcf` with its own `@cookiechimp/react/tcf.css`, so it stays out of the styled UI entry and the banner CSS budgets. The TCF core module row is the tighter guard with about 15% headroom.
 
 The TCF/GPP exclusion guard always scans the default core entry and every statically or dynamically reachable emitted module for `__tcfapi` and `__gpp`. This guard runs even while the opt-in TCF/GPP entry is absent, and finding either token fails the size job.
 
@@ -139,3 +139,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | nextjs client | 5270 B | 5270 B | Limit unchanged. `gpp` passthrough: 4580 B to 4654 B (+74 B), about 12% headroom | M6 PR36 |
 | nextjs pages | 7045 B | 7045 B | Limit unchanged. `gpp` passthrough: 6126 B to 6204 B (+78 B), about 12% headroom | M6 PR36 |
 | nextjs server | informational | informational | `GppStub` inlines the stub source and `gpp` passthrough. Server-only (never shipped as a module to browsers; the inline stub itself is guarded by the gpp stub row): 13696 B to 15946 B (+2250 B) | M6 PR36 |
+| TCF core module | 4010 B | 4555 B | GVL parsing now keeps the vendor disclosures TCF policy requires in the CMP UI (special purposes, features, data categories, retention, https-only privacy and legitimate interest links, device storage fields): 3487 B to 3960 B (+473 B). Limit reset to about 15% headroom | M6 PR37 |
+| TCF vendor list UI | 2555 B | 4295 B | Vendor names become Details buttons opening a per-vendor details panel (purposes, retention, links, storage) with its CSS, and focused-row pinning so focus survives windowing, and rows no longer wrap at narrow widths: 2221 B to 3733 B (+1512 B). Limit reset to about 15% headroom. TCF/GPP total 10123 B of the 12288 B SPEC cap | M6 PR37 |

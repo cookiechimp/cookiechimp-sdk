@@ -207,6 +207,16 @@ IDs only, tied to that decision, and are dropped when the user makes a new
 decision through the banner. Vendor and purpose names come from the GVL and are
 rendered as text. Labels default to English; pass `labels` to translate.
 
+Each vendor's name is a button (labelled "Details: <name>") that opens a panel with the disclosures
+TCF policy requires: consent and legitimate interest purposes, special
+purposes, features, special features, data categories, retention periods,
+privacy policy and legitimate interest claim links, and device storage (cookie
+use and maximum age, refresh, other storage access, and the storage disclosure
+URL). Links from the GVL are accepted only as https and open with
+`rel="noopener noreferrer"`. Escape or Close returns focus to the Details
+button. A focused row stays mounted while it scrolls out of the window, so
+keyboard focus is never lost.
+
 ## React headless primitives
 
 Import `Banner`, `Preferences`, and `OptOut` from

@@ -11,7 +11,31 @@ export interface GvlVendor {
   flexiblePurposes?: number[];
   specialPurposes?: number[];
   specialFeatures?: number[];
+  features?: number[];
   deletedDate?: string;
+  /** Retention in days: standard, then per purpose or special purpose overrides. */
+  dataRetention?: GvlRetention;
+  /** Privacy policy and legitimate interest claim links (https only). */
+  urls?: GvlUrl[];
+  /** Device storage disclosure (TCF policy requires it in the CMP UI). */
+  usesCookies?: boolean;
+  /** Maximum cookie age in seconds; null when the vendor uses no expiry limit. */
+  cookieMaxAgeSeconds?: number | null;
+  cookieRefresh?: boolean;
+  usesNonCookieAccess?: boolean;
+  deviceStorageDisclosureUrl?: string;
+  /** Data category IDs collected. */
+  dataDeclaration?: number[];
+}
+export interface GvlRetention {
+  stdRetention?: number;
+  purposes: Record<string, number>;
+  specialPurposes: Record<string, number>;
+}
+export interface GvlUrl {
+  langId: string;
+  privacy: string;
+  legIntClaim?: string;
 }
 export interface GvlName {
   name: string;
@@ -23,6 +47,9 @@ export interface Gvl {
   /** Purpose and special feature names for the vendor UI. */
   purposes?: Record<string, GvlName>;
   specialFeatures?: Record<string, GvlName>;
+  specialPurposes?: Record<string, GvlName>;
+  features?: Record<string, GvlName>;
+  dataCategories?: Record<string, GvlName>;
   vendors: Record<string, GvlVendor>;
 }
 
@@ -149,6 +176,80 @@ const text = (value: unknown, max = 256): string | null =>
   typeof value === "string" && value.trim() && value.length <= max
     ? value.trim()
     : null;
+/** Only absolute https URLs survive, so a GVL cannot inject javascript: links. */
+const https = (value: unknown): string | null => {
+  const raw = text(value, 2048);
+  if (!raw) return null;
+  try {
+    return new URL(raw).protocol === "https:" ? raw : null;
+  } catch {
+    return null;
+  }
+};
+const days = (value: unknown): number | null =>
+  Number.isInteger(value) &&
+  (value as number) >= 0 &&
+  (value as number) <= 36500
+    ? (value as number)
+    : null;
+function dayMap(input: unknown, max: number): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (!input || typeof input !== "object") return out;
+  for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+    const id = Number(key);
+    const d = days(value);
+    if (Number.isInteger(id) && id >= 1 && id <= max && d !== null)
+      out[key] = d;
+  }
+  return out;
+}
+function details(v: Record<string, unknown>): Partial<GvlVendor> {
+  const out: Partial<GvlVendor> = {};
+  const specialPurposes = ids(v.specialPurposes ?? [], 24);
+  if (specialPurposes?.length) out.specialPurposes = specialPurposes;
+  const features = ids(v.features ?? [], 24);
+  if (features?.length) out.features = features;
+  const data = ids(v.dataDeclaration ?? [], 64);
+  if (data?.length) out.dataDeclaration = data;
+  const r = v.dataRetention as Record<string, unknown> | null | undefined;
+  if (r && typeof r === "object") {
+    const std = days(r.stdRetention);
+    out.dataRetention = {
+      ...(std !== null ? { stdRetention: std } : {}),
+      purposes: dayMap(r.purposes, 24),
+      specialPurposes: dayMap(r.specialPurposes, 24),
+    };
+  }
+  if (Array.isArray(v.urls)) {
+    const urls: GvlUrl[] = [];
+    for (const u of v.urls.slice(0, 64) as Record<string, unknown>[]) {
+      const privacy = https(u?.privacy);
+      if (!privacy) continue;
+      const claim = https(u?.legIntClaim);
+      urls.push({
+        langId: text(u.langId, 16)?.toLowerCase() ?? "en",
+        privacy,
+        ...(claim ? { legIntClaim: claim } : {}),
+      });
+    }
+    if (urls.length) out.urls = urls;
+  }
+  for (const key of [
+    "usesCookies",
+    "cookieRefresh",
+    "usesNonCookieAccess",
+  ] as const)
+    if (typeof v[key] === "boolean") out[key] = v[key] as boolean;
+  if (v.cookieMaxAgeSeconds === null) out.cookieMaxAgeSeconds = null;
+  else if (
+    Number.isInteger(v.cookieMaxAgeSeconds) &&
+    (v.cookieMaxAgeSeconds as number) >= 0
+  )
+    out.cookieMaxAgeSeconds = v.cookieMaxAgeSeconds as number;
+  const disclosure = https(v.deviceStorageDisclosureUrl);
+  if (disclosure) out.deviceStorageDisclosureUrl = disclosure;
+  return out;
+}
 function names(input: unknown, max: number): Record<string, GvlName> {
   const out: Record<string, GvlName> = {};
   if (!input || typeof input !== "object") return out;
@@ -198,6 +299,7 @@ export function parseGvl(input: unknown): Gvl | null {
       purposes,
       legIntPurposes,
       specialFeatures,
+      ...details(v),
       ...(typeof v.deletedDate === "string"
         ? { deletedDate: v.deletedDate }
         : {}),
@@ -208,6 +310,9 @@ export function parseGvl(input: unknown): Gvl | null {
     tcfPolicyVersion: policy as number,
     purposes: names(raw.purposes, 24),
     specialFeatures: names(raw.specialFeatures, 12),
+    specialPurposes: names(raw.specialPurposes, 24),
+    features: names(raw.features, 24),
+    dataCategories: names(raw.dataCategories, 64),
     vendors,
   };
 }
