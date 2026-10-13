@@ -274,4 +274,66 @@ describe("installTcf", () => {
     controller.stop();
     expect(tcf()).toBeUndefined();
   });
+
+  it("setChoices records a decision, emits one useractioncomplete and persists IDs only", async () => {
+    const store = new Map<string, string>();
+    const storage = {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, v),
+      removeItem: (k: string) => void store.delete(k),
+    };
+    const rt = runtime({ marketing: false }, { needsDecision: true });
+    (rt as unknown as { set: () => void }).set = () =>
+      rt.update({ marketing: false });
+    const controller = installTcf(rt, { cmpId: 300, gvl, storage });
+    await controller.ready;
+    const events: string[] = [];
+    tcf()?.("addEventListener", 2, (d) =>
+      events.push((d as { eventStatus: string }).eventStatus),
+    );
+    const watcher = vi.fn();
+    controller.subscribe(watcher);
+    expect(
+      controller.setChoices({
+        purposes: [1, 8],
+        vendors: [2],
+        specialFeatures: [],
+        purposeObjections: [],
+        vendorObjections: [1],
+      }),
+    ).toBe(true);
+    expect(events).toEqual(["cmpuishown", "useractioncomplete"]);
+    expect(watcher).toHaveBeenCalledTimes(1);
+    expect(TCString.decode(controller.tcString).vendorConsents.has(2)).toBe(
+      true,
+    );
+    expect(JSON.parse(store.get("cc_tcf_choices") ?? "")).toEqual({
+      ts: "2026-10-13T10:00:00.000Z",
+      choices: {
+        purposes: [1, 8],
+        vendors: [2],
+        specialFeatures: [],
+        purposeObjections: [],
+        vendorObjections: [1],
+      },
+    });
+    expect(controller.setChoices({ purposes: [99] } as never)).toBe(false);
+  });
+
+  it("ignores corrupt stored choices", async () => {
+    const storage = {
+      getItem: () => "{not json",
+      setItem: () => {},
+      removeItem: () => {},
+    };
+    const controller = installTcf(runtime({ marketing: true }), {
+      cmpId: 300,
+      gvl,
+      storage,
+    });
+    await controller.ready;
+    expect(TCString.decode(controller.tcString).vendorConsents.has(1)).toBe(
+      true,
+    );
+  });
 });

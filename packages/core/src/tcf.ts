@@ -4,6 +4,8 @@ import { isDev } from "./internal/dev";
 /** TCF v2.3 Global Vendor List subset used to build TC strings. */
 export interface GvlVendor {
   id: number;
+  /** Display name, rendered as text only. */
+  name?: string;
   purposes: number[];
   legIntPurposes: number[];
   flexiblePurposes?: number[];
@@ -11,9 +13,16 @@ export interface GvlVendor {
   specialFeatures?: number[];
   deletedDate?: string;
 }
+export interface GvlName {
+  name: string;
+  description?: string;
+}
 export interface Gvl {
   vendorListVersion: number;
   tcfPolicyVersion: number;
+  /** Purpose and special feature names for the vendor UI. */
+  purposes?: Record<string, GvlName>;
+  specialFeatures?: Record<string, GvlName>;
   vendors: Record<string, GvlVendor>;
 }
 
@@ -136,6 +145,24 @@ const ids = (value: unknown, max: number): number[] | null =>
     ? (value as number[])
     : null;
 
+const text = (value: unknown, max = 256): string | null =>
+  typeof value === "string" && value.trim() && value.length <= max
+    ? value.trim()
+    : null;
+function names(input: unknown, max: number): Record<string, GvlName> {
+  const out: Record<string, GvlName> = {};
+  if (!input || typeof input !== "object") return out;
+  for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+    const id = Number(key);
+    const v = value as Record<string, unknown> | null;
+    const name = text(v?.name);
+    if (!Number.isInteger(id) || id < 1 || id > max || !name) continue;
+    const description = text(v?.description, 2000);
+    out[key] = description ? { name, description } : { name };
+  }
+  return out;
+}
+
 /** Validate an untrusted GVL payload. Invalid vendors are dropped; an invalid list returns null. */
 export function parseGvl(input: unknown): Gvl | null {
   if (!input || typeof input !== "object") return null;
@@ -167,6 +194,7 @@ export function parseGvl(input: unknown): Gvl | null {
     if (!purposes || !legIntPurposes || !specialFeatures) continue;
     vendors[key] = {
       id,
+      ...(text(v.name) ? { name: text(v.name) as string } : {}),
       purposes,
       legIntPurposes,
       specialFeatures,
@@ -178,8 +206,49 @@ export function parseGvl(input: unknown): Gvl | null {
   return {
     vendorListVersion: version as number,
     tcfPolicyVersion: policy as number,
+    purposes: names(raw.purposes, 24),
+    specialFeatures: names(raw.specialFeatures, 12),
     vendors,
   };
+}
+
+/** Explicit per-purpose and per-vendor choices from the vendor UI. */
+export interface TcfChoices {
+  purposes: readonly number[];
+  vendors: readonly number[];
+  specialFeatures: readonly number[];
+  /** Right to object: purposes whose legitimate interest the user refused. */
+  purposeObjections: readonly number[];
+  /** Right to object: vendors whose legitimate interest the user refused. */
+  vendorObjections: readonly number[];
+}
+
+const choiceKeys = [
+  "purposes",
+  "vendors",
+  "specialFeatures",
+  "purposeObjections",
+  "vendorObjections",
+] as const;
+const choiceMax = {
+  purposes: 24,
+  vendors: 65535,
+  specialFeatures: 12,
+  purposeObjections: 24,
+  vendorObjections: 65535,
+};
+
+/** Validate untrusted choices (for example from storage). Returns null when malformed. */
+export function parseChoices(input: unknown): TcfChoices | null {
+  if (!input || typeof input !== "object") return null;
+  const raw = input as Record<string, unknown>;
+  const out = {} as Record<(typeof choiceKeys)[number], number[]>;
+  for (const key of choiceKeys) {
+    const list = ids(raw[key] ?? [], choiceMax[key]);
+    if (!list || list.length > 5000) return null;
+    out[key] = [...new Set(list)];
+  }
+  return out;
 }
 
 /** Default category to TCF purpose mapping. Necessary maps to nothing. */
@@ -207,6 +276,11 @@ export interface TcfOptions {
   purposes?: Readonly<Record<string, readonly number[] | null>>;
   /** Publisher country code (ISO 3166-1 alpha-2). Defaults to AA, the reference default. */
   publisherCC?: string;
+  /**
+   * Where explicit vendor UI choices persist (IDs only, tied to the consent
+   * decision timestamp). Defaults to localStorage; pass null to keep them in memory.
+   */
+  storage?: Pick<Storage, "getItem" | "setItem" | "removeItem"> | null;
   /** Category to special feature mapping (opt-in only; empty by default). */
   specialFeatures?: Readonly<Record<string, readonly number[]>>;
 }
@@ -266,6 +340,17 @@ export interface TcfController {
   readonly tcString: string;
   /** Resolves once the GVL is loaded (or TCF is disabled). */
   readonly ready: Promise<void>;
+  /** The validated GVL once loaded. */
+  readonly gvl: Gvl | null;
+  /** The current TC model (null before load or outside GDPR). */
+  readonly model: TcModel | null;
+  /**
+   * Save explicit vendor UI choices. Records a consent decision first when
+   * none exists, then emits useractioncomplete.
+   */
+  setChoices(choices: TcfChoices): boolean;
+  /** Notified whenever the model changes. */
+  subscribe(listener: () => void): () => void;
   stop(): void;
 }
 
@@ -290,6 +375,7 @@ export function tcModelFor(
   >,
   options: Pick<TcfOptions, "vendors" | "purposes" | "specialFeatures"> = {},
   now = Date.now(),
+  choices: TcfChoices | null = null,
 ): TcModel {
   const mapping: Record<string, readonly number[] | null> = {
     ...DEFAULT_PURPOSES,
@@ -321,6 +407,16 @@ export function tcModelFor(
     if (vendor.legIntPurposes.some((id) => LI_PURPOSES.includes(id)))
       li.add(vendor.id);
   }
+  if (state && choices) {
+    // Explicit choices replace the category mapping, limited to what was disclosed.
+    granted.clear();
+    for (const id of choices.purposes) granted.add(id);
+    features.clear();
+    for (const id of choices.specialFeatures) features.add(id);
+    consents.clear();
+    for (const id of choices.vendors) if (disclosed.has(id)) consents.add(id);
+    for (const id of choices.vendorObjections) li.delete(id);
+  }
   const ts = state ? Date.parse(state.ts) : Number.NaN;
   const time = Number.isFinite(ts) ? ts : now;
   const date = new Date(time);
@@ -335,7 +431,11 @@ export function tcModelFor(
     ),
     specialFeatureOptins: features,
     purposeConsents: granted,
-    purposeLegitimateInterests: new Set(LI_PURPOSES),
+    purposeLegitimateInterests: new Set(
+      LI_PURPOSES.filter(
+        (id) => !(state && choices?.purposeObjections.includes(id)),
+      ),
+    ),
     vendorConsents: consents,
     vendorLegitimateInterests: li,
     disclosedVendors: disclosed,
@@ -363,6 +463,29 @@ export function installTcf(
   let tcString = "";
   let eventStatus = "tcloaded";
   let stopped = false;
+  let choices: TcfChoices | null = null;
+  let saving = false;
+  const watchers = new Set<() => void>();
+  const KEY = "cc_tcf_choices";
+  const storage = (() => {
+    if (options.storage !== undefined) return options.storage;
+    try {
+      return globalThis.localStorage ?? null;
+    } catch {
+      return null;
+    }
+  })();
+  const load = (state: ConsentState | null) => {
+    choices = null;
+    if (!state || !storage) return;
+    try {
+      const raw = JSON.parse(storage.getItem(KEY) ?? "null");
+      if (raw?.ts === state.ts) choices = parseChoices(raw.choices);
+      else storage.removeItem(KEY);
+    } catch {
+      choices = null;
+    }
+  };
 
   const ping = () => ({
     gdprApplies,
@@ -422,6 +545,12 @@ export function installTcf(
   };
   const notify = () => {
     for (const [id, callback] of listeners) safe(callback, tcData(id), true);
+    for (const watcher of [...watchers])
+      try {
+        watcher();
+      } catch {
+        // UI watchers must not break the CMP.
+      }
   };
   const compute = (state: ConsentState | null) => {
     if (!gvl || cmpId === null) return;
@@ -441,6 +570,8 @@ export function installTcf(
         publisherCC: options.publisherCC ?? "AA",
       },
       options,
+      Date.now(),
+      choices,
     );
     tcString = encodeTcString(model);
   };
@@ -495,14 +626,20 @@ export function installTcf(
     gvl = loaded;
     eventStatus =
       gdprApplies && runtime.needsDecision ? "cmpuishown" : "tcloaded";
-    compute(runtime.needsDecision ? null : runtime.get());
+    const initial = runtime.needsDecision ? null : runtime.get();
+    load(initial);
+    compute(initial);
     status = "loaded";
     flush();
     unsubscribe = runtime.subscribe((state) => {
+      if (saving) return;
       eventStatus = "useractioncomplete";
+      // A new decision replaces earlier vendor choices unless they belong to it.
+      load(state);
       compute(state);
       notify();
     });
+    for (const watcher of [...watchers]) watcher();
   })();
 
   return {
@@ -513,10 +650,47 @@ export function installTcf(
       return tcString;
     },
     ready,
+    get gvl() {
+      return gvl;
+    },
+    get model() {
+      return model;
+    },
+    setChoices(input) {
+      const parsed = parseChoices(input);
+      if (!parsed || status !== "loaded" || !gdprApplies) return false;
+      if (runtime.needsDecision) {
+        saving = true;
+        try {
+          runtime.set(runtime.get().categories);
+        } finally {
+          saving = false;
+        }
+      }
+      const state = runtime.get();
+      choices = parsed;
+      try {
+        storage?.setItem(
+          KEY,
+          JSON.stringify({ ts: state.ts, choices: parsed }),
+        );
+      } catch {
+        // Storage full or blocked: keep the choices for this page view.
+      }
+      eventStatus = "useractioncomplete";
+      compute(state);
+      notify();
+      return true;
+    },
+    subscribe(listener) {
+      watchers.add(listener);
+      return () => watchers.delete(listener);
+    },
     stop() {
       stopped = true;
       unsubscribe();
       listeners.clear();
+      watchers.clear();
       if (win.__tcfapi === api) delete win.__tcfapi;
     },
   };

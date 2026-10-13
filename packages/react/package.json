@@ -28,14 +28,21 @@
       "import": "./dist/ui.mjs",
       "require": "./dist/ui.cjs"
     },
-    "./styles.css": "./styles.css"
+    "./tcf": {
+      "types": "./dist/tcf.d.ts",
+      "import": "./dist/tcf.mjs",
+      "require": "./dist/tcf.cjs"
+    },
+    "./styles.css": "./styles.css",
+    "./tcf.css": "./tcf.css"
   },
   "files": [
     "dist",
-    "styles.css"
+    "styles.css",
+    "tcf.css"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && for name in index headless banner ui; do cp dist/$name.d.mts dist/$name.d.ts; done",
+    "build": "tsdown --config-loader native && for name in index headless banner ui tcf; do cp dist/$name.d.mts dist/$name.d.ts; done",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"

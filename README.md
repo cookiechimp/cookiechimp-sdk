@@ -181,6 +181,26 @@ purposes is granted, and special features are opt-in through
 `specialFeatures`. TC strings are tested against the IAB reference decoder
 `@iabtcf/core`.
 
+### TCF vendor list UI
+
+`TcfVendorList` from `@cookiechimp/react/tcf` (styles in
+`@cookiechimp/react/tcf.css`) shows purposes with consent and legitimate
+interest (right to object) toggles, special features, and a searchable,
+windowed vendor list that stays fast with the full GVL. Render it as a child of
+`CookiePreferences`:
+
+```tsx
+<CookiePreferences categories={categories}>
+  <TcfVendorList controller={tcf} />
+</CookiePreferences>
+```
+
+Saving calls `controller.setChoices()`, which records a consent decision if
+none exists and emits `useractioncomplete`. Choices persist in localStorage as
+IDs only, tied to that decision, and are dropped when the user makes a new
+decision through the banner. Vendor and purpose names come from the GVL and are
+rendered as text. Labels default to English; pass `labels` to translate.
+
 ## React headless primitives
 
 Import `Banner`, `Preferences`, and `OptOut` from

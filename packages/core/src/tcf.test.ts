@@ -5,6 +5,7 @@ import {
   encodeTcString,
   encodeVendors,
   type Gvl,
+  parseChoices,
   parseGvl,
   resolveCmpId,
   type TcModel,
@@ -280,5 +281,86 @@ describe("resolveCmpId", () => {
     } finally {
       globalThis.process = original;
     }
+  });
+});
+
+describe("vendor UI choices", () => {
+  const ts = "2026-10-13T10:00:00.000Z";
+  const choices = {
+    purposes: [1, 2, 8],
+    vendors: [2, 4, 99],
+    specialFeatures: [1],
+    purposeObjections: [7],
+    vendorObjections: [1],
+  };
+
+  it("replace the category mapping, limited to disclosed vendors, and survive the reference decoder", () => {
+    const model = tcModelFor(
+      { categories: { marketing: true }, ts },
+      gvl,
+      base,
+      {},
+      0,
+      choices,
+    );
+    expect(sorted(model.purposeConsents)).toEqual([1, 2, 8]);
+    expect(sorted(model.vendorConsents)).toEqual([2]);
+    expect(sorted(model.specialFeatureOptins)).toEqual([1]);
+    expect(model.purposeLegitimateInterests.has(7)).toBe(false);
+    expect(model.vendorLegitimateInterests.has(1)).toBe(false);
+    const decoded = TCString.decode(encodeTcString(model));
+    expect(values(decoded.vendorConsents)).toEqual([2]);
+    expect(values(decoded.vendorLegitimateInterests)).toEqual([]);
+    expect(values(decoded.purposeLegitimateInterests)).toEqual([
+      2, 8, 9, 10, 11,
+    ]);
+  });
+
+  it("are ignored without a consent decision (fail-closed)", () => {
+    const model = tcModelFor(null, gvl, base, {}, 0, choices);
+    expect(model.vendorConsents.size).toBe(0);
+    expect(model.purposeConsents.size).toBe(0);
+  });
+
+  it("parseChoices rejects malformed input and dedupes", () => {
+    expect(parseChoices(null)).toBeNull();
+    expect(parseChoices({ purposes: [25] })).toBeNull();
+    expect(parseChoices({ vendors: ["1"] })).toBeNull();
+    expect(parseChoices({ vendors: Array(5001).fill(1) })).toBeNull();
+    expect(parseChoices({ vendors: [3, 3] })).toEqual({
+      purposes: [],
+      vendors: [3],
+      specialFeatures: [],
+      purposeObjections: [],
+      vendorObjections: [],
+    });
+  });
+
+  it("parseGvl keeps text names and drops invalid ones", () => {
+    const parsed = parseGvl({
+      vendorListVersion: 3,
+      tcfPolicyVersion: 5,
+      purposes: {
+        "1": { name: "Store", description: "Desc" },
+        "30": { name: "x" },
+        "2": { name: 5 },
+      },
+      specialFeatures: { "1": { name: "Geo" } },
+      vendors: {
+        "1": { id: 1, name: " Acme ", purposes: [1], legIntPurposes: [] },
+        "2": {
+          id: 2,
+          name: "x".repeat(300),
+          purposes: [1],
+          legIntPurposes: [],
+        },
+      },
+    });
+    expect(parsed?.purposes).toEqual({
+      "1": { name: "Store", description: "Desc" },
+    });
+    expect(parsed?.specialFeatures).toEqual({ "1": { name: "Geo" } });
+    expect(parsed?.vendors["1"]?.name).toBe("Acme");
+    expect(parsed?.vendors["2"]).not.toHaveProperty("name");
   });
 });
