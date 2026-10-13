@@ -15,6 +15,18 @@ export const packageNames = [
 ] as const;
 const root = resolve(import.meta.dirname, "..");
 const out = resolve(root, process.argv[2] ?? "release/artifacts");
+// Always build the exact current source before packing, including after rebases.
+execFileSync(
+  "pnpm",
+  [
+    "exec",
+    "turbo",
+    "run",
+    "build",
+    ...packageNames.map((name) => `--filter=@cookiechimp/${name}`),
+  ],
+  { cwd: root, stdio: "inherit" },
+);
 await mkdir(out, { recursive: true });
 const packages: {
   name: string;
