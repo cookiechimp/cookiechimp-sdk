@@ -93,7 +93,7 @@ test("a hanging API never blocks first render and times out to local config", as
   page,
 }) => {
   await api(page, () => new Promise(() => {}));
-  await page.goto("/sync");
+  await page.goto("/sync?timeout=1500");
   await expect(section(page)).toContainText("Local analytics");
   await expect(section(page)).toHaveAttribute("data-cc-sync-source", "local");
   await expect(page.getByTestId("sync-error")).toHaveText("timeout", {

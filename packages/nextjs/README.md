@@ -80,7 +80,7 @@ more convenient.
 </CookieChimpProvider>
 ```
 
-The provider fetches the dashboard config on the server (Next.js data cache, `revalidate: 300` by default), so the first HTML already carries the dashboard categories and banner copy for the visitor's region and language. `config` is the fallback under the dashboard; `override` wins over it. If the platform is unreachable or returns anything unexpected, the page renders from `config`. Use `getServerConfig` directly for custom layouts.
+The provider fetches the dashboard config on the server (Next.js data cache, `revalidate: 300` by default), so the first HTML already carries the dashboard categories and banner copy for the visitor's region and language. `config` is the fallback under the dashboard; `override` wins over it. If the platform is unreachable or returns anything unexpected, the page renders from `config`. The dashboard cookie name and expiry apply on the server too, and after hydration the browser revalidates once (a 304 when nothing changed) so newer copy shows without a reload; pass `revalidateClient={false}` to skip it. Use `getServerConfig` directly for custom layouts.
 
 ## Self-hosted consent records
 

@@ -11,7 +11,11 @@ export default defineConfig({
   },
   webServer: {
     command: "pnpm --filter @cookiechimp/fixture-nextjs start",
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a server: a leftover `next start` keeps serving an older
+    // `.next` build after `test:e2e` rebuilds the fixture, so client chunks
+    // stop matching and pages never hydrate (timeouts that look like flakes).
+    // A busy port now fails loudly instead.
+    reuseExistingServer: false,
     url: "http://127.0.0.1:3000",
   },
 });

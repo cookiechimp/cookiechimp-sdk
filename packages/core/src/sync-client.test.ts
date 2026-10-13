@@ -49,6 +49,11 @@ const respond = (body: unknown, init: ResponseInit = {}) =>
         { status: 200, ...init },
       ),
   );
+const sentHeaders = (fn: { mock: { calls: unknown[][] } }) =>
+  ((fn.mock.calls[0]?.[1] as RequestInit | undefined)?.headers ?? {}) as Record<
+    string,
+    string
+  >;
 const make = (options: Partial<SyncOptions> = {}) =>
   createSync({
     projectId: ACCOUNT,
@@ -327,6 +332,32 @@ describe("createSync fetch and cache", () => {
     expect(label(sync.get())).toBe("Dashboard analytics");
   });
 
+  it("revalidates even when the page never goes idle", async () => {
+    vi.useFakeTimers();
+    // A browser that is never idle only runs the callback at its timeout.
+    vi.stubGlobal(
+      "requestIdleCallback",
+      (fn: () => void, options?: { timeout?: number }) =>
+        options?.timeout ? setTimeout(fn, options.timeout) : 0,
+    );
+    try {
+      const fetch = respond(bundle());
+      const sync = createSync({
+        projectId: ACCOUNT,
+        storage: memoryStorage(),
+        fetch,
+      });
+      await vi.advanceTimersByTimeAsync(1999);
+      expect(fetch).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      sync.destroy();
+    } finally {
+      vi.unstubAllGlobals();
+      vi.useRealTimers();
+    }
+  });
+
   it("calls the shared platform endpoint without cookies or a key by default", async () => {
     const fetch = respond(bundle());
     await make({ fetch }).revalidate();
@@ -355,6 +386,40 @@ describe("createSync fetch and cache", () => {
       },
     });
     expect(sync.get()).toMatchObject({ source: "dashboard", status: "ready" });
+  });
+
+  it("sends a server-rendered etag when nothing is cached, and a 304 keeps state", async () => {
+    const fetch = respond(null, { status: 304 });
+    const sync = make({ fetch, etag: '"v-server"' });
+    const state = await sync.revalidate();
+    expect(sentHeaders(fetch)["If-None-Match"]).toBe('"v-server"');
+    expect(state).toMatchObject({ status: "ready", source: "local" });
+    expect(state.dashboard).toBeUndefined();
+  });
+
+  it("replaces a stale server etag with the newer config", async () => {
+    const sync = make({
+      fetch: respond(bundle({ cache_version: "v-new" })),
+      etag: '"v-old"',
+    });
+    const state = await sync.revalidate();
+    expect(state.source).toBe("dashboard");
+    expect(state.dashboard?.configVersion).toBe("v-new");
+  });
+
+  it("prefers the cached etag and ignores an unprintable one", async () => {
+    const cached = bundle({ cache_version: "v-cache" });
+    const fetch = respond(null, { status: 304 });
+    await make({
+      fetch,
+      storage: cachedStorage(cached),
+      etag: '"v-server"',
+    }).revalidate();
+    const sent = fetch.mock.calls[0]?.[1]?.headers as Record<string, string>;
+    expect(sent["If-None-Match"]).not.toBe('"v-server"');
+    const plain = respond(bundle());
+    await make({ fetch: plain, etag: '"x"\r\nCookie: a=1' }).revalidate();
+    expect(sentHeaders(plain)["If-None-Match"]).toBeUndefined();
   });
 
   it("re-adapts the cached bundle for the current region and locale", () => {

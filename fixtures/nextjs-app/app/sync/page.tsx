@@ -8,9 +8,10 @@ export default async function SyncPage({
     key?: string;
     region?: string;
     locale?: string;
+    timeout?: string;
   }>;
 }) {
-  const { base, key, region, locale } = await searchParams;
+  const { base, key, region, locale, timeout } = await searchParams;
   return (
     <main>
       <h1>Sync fixture</h1>
@@ -19,6 +20,7 @@ export default async function SyncPage({
         publishableKey={key}
         region={region}
         locale={locale}
+        timeoutMs={timeout ? Number(timeout) : undefined}
       />
     </main>
   );

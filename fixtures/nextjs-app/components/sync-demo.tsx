@@ -12,11 +12,14 @@ export function SyncDemo({
   publishableKey,
   region,
   locale,
+  timeoutMs = 5000,
 }: {
   apiBase?: string;
   publishableKey?: string;
   region?: string;
   locale?: string;
+  /** Only the hanging-API test shortens this; the others must not race it. */
+  timeoutMs?: number;
 }) {
   const [state, setState] = useState<SyncState>();
   useEffect(() => {
@@ -27,7 +30,7 @@ export function SyncDemo({
       region,
       locale,
       defaults,
-      timeoutMs: 1500,
+      timeoutMs,
     });
     setState(sync.get());
     const stop = sync.subscribe(setState);
@@ -35,7 +38,7 @@ export function SyncDemo({
       stop();
       sync.destroy();
     };
-  }, [apiBase, publishableKey, region, locale]);
+  }, [apiBase, publishableKey, region, locale, timeoutMs]);
   if (!state) return null;
   const title = (
     state.dashboard?.copy.consent_modal as { title?: string } | undefined

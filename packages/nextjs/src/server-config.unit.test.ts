@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { dashboardMessages, getServerConfig } from "./server-config";
+import {
+  dashboardCookie,
+  dashboardMessages,
+  getServerConfig,
+} from "./server-config";
 
 const fixture = readFileSync(
   resolve(__dirname, "../../core/src/fixtures/platform-offline-bundle.json"),
@@ -242,5 +246,49 @@ describe("dashboardMessages", () => {
       "banner.save": "Save it",
     });
     expect(dashboardMessages(undefined)).toEqual({});
+  });
+});
+
+describe("dashboardCookie", () => {
+  const dash = (cookie: unknown, banner: unknown = {}) =>
+    ({ cookie, banner }) as never;
+  it("uses cookie_settings and prefers the banner's expires_days", () => {
+    expect(
+      dashboardCookie(dash({ name: "cc_shop", expires_days: 182 })),
+    ).toEqual({
+      name: "cc_shop",
+      maxAge: 182 * 86400,
+    });
+    expect(
+      dashboardCookie(
+        dash({ name: "cc_shop", expires_days: 182 }, { expires_days: 30 }),
+      ),
+    ).toEqual({ name: "cc_shop", maxAge: 30 * 86400 });
+  });
+  it.each([
+    ["an invalid name", { name: "bad name;" }],
+    ["a long name", { name: "x".repeat(65) }],
+    ["zero days", { expires_days: 0 }],
+    ["fractional days", { expires_days: 1.5 }],
+    ["too many days", { expires_days: 731 }],
+    ["string days", { expires_days: "30" }],
+    ["nothing", {}],
+  ])("ignores %s", (_name, cookie) => {
+    expect(dashboardCookie(dash(cookie))).toBeUndefined();
+  });
+  it("is set on the server config from the platform bundle", async () => {
+    const result = await getServerConfig({
+      projectId,
+      fetch: respond(fixture),
+    });
+    expect(result.cookie).toEqual({
+      name: bundle.cookie_settings.name,
+      maxAge: bundle.cookie_settings.expires_days * 86400,
+    });
+    const local = await getServerConfig({
+      projectId,
+      fetch: respond("", { status: 500 }),
+    });
+    expect(local.cookie).toBeUndefined();
   });
 });
