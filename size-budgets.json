@@ -162,7 +162,7 @@
     "scenario": "sync",
     "entry": "packages/core/dist/sync.mjs",
     "kind": "extra",
-    "limit": 3760,
+    "limit": 4355,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["mergeConfig", "categoriesHash", "matchService"]
   },

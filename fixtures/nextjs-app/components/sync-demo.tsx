@@ -8,18 +8,24 @@ const defaults = {
 };
 
 export function SyncDemo({
-  apiBase = "https://api.cookiechimp.test/sdk/v1",
-  publishableKey = "cc_pk_fixture1234",
+  apiBase = "https://api.cookiechimp.test",
+  publishableKey,
+  region,
+  locale,
 }: {
   apiBase?: string;
   publishableKey?: string;
+  region?: string;
+  locale?: string;
 }) {
   const [state, setState] = useState<SyncState>();
   useEffect(() => {
     const sync = createSync({
-      projectId: "proj_fixture",
+      projectId: "acctREDACTED",
       publishableKey,
       apiBase,
+      region,
+      locale,
       defaults,
       timeoutMs: 1500,
     });
@@ -29,14 +35,18 @@ export function SyncDemo({
       stop();
       sync.destroy();
     };
-  }, [apiBase, publishableKey]);
+  }, [apiBase, publishableKey, region, locale]);
   if (!state) return null;
+  const title = (
+    state.dashboard?.copy.consent_modal as { title?: string } | undefined
+  )?.title;
   return (
     <section
       data-cc-sync={state.status}
       data-cc-sync-source={state.source}
-      data-cc-sync-changed={String(state.categoriesChanged)}
+      data-cc-sync-banner={state.dashboard?.bannerId ?? ""}
     >
+      <h2>{title ?? "Local copy"}</h2>
       <ul>
         {state.config.categories
           .filter((category) => !category.required)

@@ -1,17 +1,20 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { expect, type Page, type Route, test } from "@playwright/test";
 
-const API = "https://api.cookiechimp.test/sdk/v1/projects/proj_fixture/config";
-const config = (version: string, label: string) => ({
-  schemaVersion: 1,
-  configVersion: version,
-  etag: `"${version}"`,
-  categories: [{ id: "analytics", label }],
-  services: [],
-  copy: {},
-  translations: {},
-  regions: {},
-  theme: {},
-});
+const API =
+  "https://api.cookiechimp.test/api/v1/mobile-sdk/offline/acctREDACTED";
+// Platform offline bundle fixture (redacted), shared with the core unit tests.
+const FIXTURE = readFileSync(
+  resolve("packages/core/src/fixtures/platform-offline-bundle.json"),
+  "utf8",
+);
+const config = (version: string, label: string) => {
+  const value = JSON.parse(FIXTURE);
+  value.cache_version = version;
+  value.categories[1].translations.en.name = label;
+  return value;
+};
 const section = (page: Page) => page.locator("section[data-cc-sync]");
 
 async function api(page: Page, handler: (route: Route) => Promise<void>) {
@@ -39,7 +42,8 @@ test("dashboard config arrives after first render and is cached for the next loa
     "dashboard",
   );
   await expect(section(page)).toContainText("Dashboard analytics");
-  expect(calls[0]?.headers.authorization).toBe("Bearer cc_pk_fixture1234");
+  await expect(section(page)).toContainText("We value your privacy");
+  expect(calls[0]?.headers.authorization).toBeUndefined();
   expect(calls[0]?.headers.cookie).toBeUndefined();
 
   await page.unroute(`${API}**`);
@@ -71,6 +75,20 @@ test("a revalidation sends If-None-Match and a 304 keeps the cache", async ({
   expect(calls[1]?.headers["if-none-match"]).toBe('"7"');
 });
 
+test("the region selects the GDPR banner with German copy", async ({
+  page,
+}) => {
+  await api(page, (route) =>
+    route.fulfill({ contentType: "application/json", body: FIXTURE }),
+  );
+  await page.goto("/sync?region=DE&locale=de-DE");
+  await expect(section(page)).toHaveAttribute("data-cc-sync-banner", "bnrEU1");
+  await expect(section(page)).toContainText(
+    "Wir respektieren Ihre Privatsphäre",
+  );
+  await expect(section(page)).toContainText("Statistik");
+});
+
 test("a hanging API never blocks first render and times out to local config", async ({
   page,
 }) => {
@@ -87,7 +105,13 @@ test("a hostile config is ignored and pollutes nothing", async ({ page }) => {
   await api(page, (route) =>
     route.fulfill({
       contentType: "application/json",
-      body: '{"schemaVersion":1,"configVersion":"1","__proto__":{"polluted":true},"categories":[{"id":"analytics","label":"<img src=x onerror=alert(1)>","constructor":{"prototype":{"polluted":true}}}],"services":[{"id":"s","category":"missing"}]}',
+      body: FIXTURE.replace(
+        '"version": 4,',
+        '"version": 4, "__proto__": {"polluted": true}, "constructor": {"prototype": {"polluted": true}},',
+      ).replaceAll(
+        '"name": "Analytics"',
+        '"name": "<img src=x onerror=alert(1)>"',
+      ),
     }),
   );
   let dialog = false;
@@ -95,10 +119,10 @@ test("a hostile config is ignored and pollutes nothing", async ({ page }) => {
     dialog = true;
   });
   await page.goto("/sync");
-  // Production normalisation drops the service with an unknown category.
   await expect(section(page)).toHaveAttribute("data-cc-sync", "ready");
   await expect(section(page).locator("li")).toHaveText([
     "<img src=x onerror=alert(1)>",
+    "Marketing",
   ]);
   await expect(section(page).locator("img")).toHaveCount(0);
   const polluted = await page.evaluate(
@@ -106,8 +130,9 @@ test("a hostile config is ignored and pollutes nothing", async ({ page }) => {
   );
   expect(polluted).toBeUndefined();
   const stored = await page.evaluate(() =>
-    localStorage.getItem("cc_config:proj_fixture:1"),
+    localStorage.getItem("cc_config:acctREDACTED:a1b2c3d4"),
   );
+  expect(stored).toBeTruthy();
   expect(stored).not.toContain("__proto__");
   expect(stored).not.toContain("constructor");
   expect(dialog).toBe(false);

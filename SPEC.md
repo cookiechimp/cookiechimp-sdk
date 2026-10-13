@@ -45,27 +45,43 @@ npm scope `@cookiechimp`. pnpm + turbo monorepo, TypeScript, rollup/tsdown ESM +
 ## 4. Local vs connected mode
 
 - Local (default, no account): config in code; consent stored in first-party cookie `cc_consent` (versioned, compact). Optional `onConsent` callback or `endpoint` for self-hosted record POST.
-- Connected: `projectId` + publishable key. Adds consent log, scanner categories, dashboard copy, translations, regional rules, styling, TCF/GPP, multi-site. Code config acts as fallback and override (explicit precedence: code `override` > dashboard > code defaults).
+- Connected: `projectId` (the platform account hashid) plus an optional publishable key. Adds consent log, scanner categories, dashboard copy, translations, regional rules, styling, TCF/GPP, multi-site. Code config acts as fallback and override (explicit precedence: code `override` > dashboard > code defaults).
 - Tier gating is enforced server-side only. Hobby free up to 150 visitors/month, Small Business $10, Pro $40, Enterprise. Over quota: banner keeps working from cached config, logging degrades to sampled, devtools and dashboard show upgrade prompt. The SDK never breaks a site because of billing.
 
 ## 5. Sync protocol (connected mode)
 
-Base `https://api.cookiechimp.com/sdk/v1`. Publishable key `cc_pk_...` (origin-restricted, safe in browser). Secret key `cc_sk_...` only for server and CLI.
+Connected mode uses the same per-account config endpoint as the CookieChimp web banner and the mobile SDKs, so one format serves all three. The platform is the Rails app in IdentitySquare/CookieChimp (`Api::V1::MobileSdkController`, `MobileSdk::OfflineBundleBuilder`, documented in its `docs/mobile_sdk.md` and `docs/schemas/sdk-config.v1.json`).
 
-- `GET /projects/{projectId}/config?locale=&region=` returns `{ schemaVersion, configVersion, etag, categories[], services[], copy{}, translations{}, regions{}, theme{}, tcf?{}, gpp?{} }`. Headers: `Authorization: Bearer cc_pk_...`, `If-None-Match`. Served via CDN, `Cache-Control: public, max-age=300, stale-while-revalidate=86400`.
-- SDK caching: last good config in localStorage keyed by projectId+configVersion; render from cache immediately, revalidate in idle time. Next.js server fetch uses `revalidate: 300` so SSR markup already has dashboard copy.
-- `POST /projects/{projectId}/consents` body `{ consentId, ts, region, regulation, gpc, categories{}, services{}?, tcString?, gppString?, configVersion, sdkVersion, url, action: accept_all|reject_all|custom|gpc_auto }`. Returns `202 { receiptId }`. Idempotent on `consentId+ts`. Sent with `fetch keepalive`, falling back to `sendBeacon`.
+- Identity: `projectId` is the platform account hashid, a public identifier by design. No key is required. An optional publishable key `cc_pk_...` is sent as `Authorization: Bearer` when given. Secret keys `cc_sk_...` are for server and CLI only, and the browser SDK refuses them.
+- Config: `GET {origin}/api/v1/mobile-sdk/offline/{account_hashid}`, default origin `https://cookiechimp.com`. It is the offline bundle: `{ schema_version?, version, account_hashid, cache_version, generated_at, country_banner_map{}, default_banner, banners{}, translations{banner: {lang: {consent_modal, preferences_modal, privacy_policy_url}}}, categories[{slug, name, description, required, translations{}, services[{id, name, accepted_by_default, translations{}, storage_items[]}], storage_items[]}], services_index{}, default_services{}, integrations{google_consent_mode, global_privacy_control}, rtl_languages[], cookie_settings{name, expires_days}, updated_at, reconsent_required_at }`.
+  - Responses: `404 {error}` for an unknown account or when no banners are configured.
+  - Headers: `ETag: "<cache_version>"`, `If-None-Match` gives `304`, and `Cache-Control: public, max-age=300, stale-while-revalidate=86400`. CORS is `*` without credentials and exposes ETag.
+  - Website accounts are served once the platform change in IdentitySquare/CookieChimp#2772 ships (before that, the endpoint returns 403 for website accounts).
+- SDK adapter (`adaptPlatformConfig` in `./sync`):
+  - The banner is chosen by region: `country_banner_map[region]`, then the country part, then `default_banner`. The language is the base of the locale if that banner has it, otherwise the first available language.
+  - Categories: `slug` maps to `id`, the translated name and description to `label` and `description`, `required` stays `required`, and `default` is `required || consent_mode === "opt_out"`. Regulation rules still apply on top of that.
+  - Services: the slug of the (unique) service name becomes `id`, the category `slug` becomes `category`, `accepted_by_default` becomes `default`, and cookie `storage_items` names become `cookies`. `serviceIds` maps SDK ids back to platform service hashids for consent records.
+  - The selected banner's copy, translations, theme and settings, plus `integrations`, `cookie_settings` and `reconsent_required_at`, are exposed on the dashboard state.
+- Validation (untrusted input):
+  - JSON is parsed with `__proto__`, `constructor` and `prototype` keys dropped at every depth, and the body is capped at 512 KB.
+  - `schema_version`, when present, must be 1. `account_hashid` must equal `projectId`, and `cache_version` must be a string.
+  - Lookups use own properties only, only known well-typed fields are kept with length caps, and unknown fields are ignored.
+- Origin: https only, with no credentials, query or hash. `http://localhost` is allowed in development only (isDev, so a missing `process` counts as production).
+- SDK caching: the sanitised bundle is kept in localStorage under `cc_config:{projectId}:{cache_version}`, with a pointer at `cc_config:{projectId}` and only the current version kept. The SDK renders from the cache immediately, revalidates in idle time with `If-None-Match`, and times out after 5 s. A 304 keeps the cache; a hostile or failed response keeps the cache or the code config.
+- Precedence: code `override` > dashboard > code defaults. If the categories hash or `reconsent_required_at` changes, `categoriesChanged` is set so the user can be re-prompted (configurable).
+- Next.js server fetch uses `revalidate: 300` against the same endpoint so SSR markup already has the dashboard copy.
+- Consent records (item 21) target the platform consent ingest (`POST /api/v1/mobile-sdk/sync/{account_hashid}` batch format: `consents[{client_id, uuid, platform, visitor_action, url, gpc_preference, language_code, consent_banner_hashid, created_at, user_preferences{}}]`), sent with `fetch keepalive`, falling back to `sendBeacon`.
 - Offline queue: IndexedDB (fallback localStorage), max 50 records, exponential backoff, flush on `online` / `visibilitychange`, drop after 30 days.
-- Versioning: `schemaVersion` major in URL path; SDK ignores unknown fields; if `configVersion` changes the categories hash, re-prompt the user (configurable).
+- Versioning: `schema_version` major; the SDK ignores unknown fields.
 - Server-to-server: `GET /consents/{consentId}` with secret key for DSAR and proof of consent.
 - Errors never block rendering; all sync is fire-and-forget with devtools visibility.
 
 ## 6. CookieChimp backend additions
 
-1. SDK config endpoint with CDN caching, etag, per-origin key validation.
+1. SDK config endpoint: the shared offline bundle endpoint (section 5) serving website and mobile accounts, with ETag/304 and `max-age=300, stale-while-revalidate=86400` (IdentitySquare/CookieChimp#2772). Per-origin key validation is deferred: the account hashid is public by design.
 2. Publishable/secret key management in dashboard, per site.
 3. Consent ingest endpoint (queue-backed), idempotency, quota metering by unique consentId per month.
-4. Config schema versioning and a JSON schema published for the SDK.
+4. Config schema versioning and a JSON schema published for the SDK (`schema_version` and `docs/schemas/sdk-config.v1.json`, IdentitySquare/CookieChimp#2772).
 5. Map scanner results to SDK `services` (script URL patterns, cookie names, category) for network and script blocking.
 6. Dashboard "SDK" tab: install snippet, mode, last seen SDK version, live consent stream.
 7. CMP ID registration with IAB for TCF; GVL proxy/cache endpoint.
