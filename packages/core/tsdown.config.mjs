@@ -13,6 +13,7 @@ export default defineConfig([
     ...shared,
     entry: [
       "src/sync.ts",
+      "src/consent-log.ts",
       "src/match.ts",
       "src/regions.ts",
       "src/gate.ts",
