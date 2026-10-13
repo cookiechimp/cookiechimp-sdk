@@ -30,10 +30,15 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
    GPP state formats with reference conformance and browser persistence. The SDK
    supports all 16 US sections in the published IAB reference. Local validation passes;
    all seven standard CI checks and benchmark smoke are green.
-5. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
+5. [#45](https://github.com/cookiechimp/cookiechimp-sdk/pull/45): optional TCF
+   provider wiring, lazy core loading, readiness/error handling and a Next.js head
+   stub. Requires the application's registered CMP ID, GVL and server-owned feature
+   decision. Local lifecycle and production browser tests pass; all seven standard
+   CI checks and benchmark smoke are green.
+6. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
    metadata, licenses, changelogs, typed stylesheet exports and a reviewed publication
    workflow. Local packaging and a fresh npm-installed Next.js consumer pass:
-   113 entries, ESM/CJS, CSS, acceptance, persistence and React reconciliation.
+   114 entries, ESM/CJS, CSS, acceptance, persistence and React reconciliation.
    See [release validation](release-validation.md) and [release procedure](release.md).
    Publication is blocked by the actual prerequisites below.
 
@@ -65,9 +70,9 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
 
 ## Integration gaps and intentional limitations
 
-- TCF provider wiring still needs the real cmpId and vendor-list source. A GVL
-  CDN/proxy and connected Pro entitlement enforcement need platform support.
-  Apps currently supply a vendor list to the opt-in controller.
+- TCF provider wiring is built in #45. Real CMP registration, a GVL CDN/proxy
+  and connected Pro entitlement enforcement remain external/platform requirements.
+  Apps supply a vendor list or bounded loader to the optional provider.
 - GPP now covers 15 state formats plus national. The newer MN/MD/IN/KY/RI
   formats (IDs 23 to 27) are absent from the published IAB reference and still use
   the national fallback. See [conformance and coverage](gpp-conformance.md).
@@ -78,7 +83,9 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
   records retry on the next visit and require receiver deduplication.
 - Sync is 2395 B, inside the revised 2.5 KB SPEC target. Provider headroom is about
   12%, below the 15% watch target; every enforced budget passes.
-- TCF/GPP combined size is 10366 B of 12288 B. Preserve the combined size check.
+- The conservative TCF/GPP component sum is 10366 B of 12288 B. The provider
+  bootstrap is 666 B and the deduplicated full IAB graph plus vendor CSS is 10127 B
+  of 12288 B. All 41 enforced budgets pass, including default-bundle exclusion.
 - The old unexplained e2e failure has not recurred. Failure traces are now retained
   and uploaded by CI so any recurrence can be investigated.
 

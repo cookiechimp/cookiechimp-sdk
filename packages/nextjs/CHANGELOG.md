@@ -8,6 +8,8 @@
 
 ### Minor Changes
 
+- f50f834: Bind the optional TCF controller to the existing consent runtime through a dedicated React provider entry and a Next.js TcfStub helper. Fail closed on invalid CMP/GVL input and clean up replaced controllers and pending loads.
+
 - 768f6f8: Next.js connected mode now applies the dashboard cookie name and expiry on the server and revalidates the config in the browser after hydration. `createSync` gains an `etag` seed option and no longer lets a busy page postpone revalidation indefinitely (idle callback timeout).
 - 59b9425: Add an opt-in `gpp` prop to `ConsentProvider`, `ClientProvider`, `PagesConsentProvider` and `CookieChimpProvider` that lazily installs IAB GPP US sections after hydration, and a `GppStub` head component in `@cookiechimp/nextjs/server`.
 - 22dfc25: Add App Router server consent, no-flash hydration, generated critical CSS, and Google Consent Mode defaults.

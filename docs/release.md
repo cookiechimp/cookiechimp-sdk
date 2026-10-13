@@ -21,7 +21,7 @@ The React stylesheet exports include types and are marked as side effects so
 consumer bundlers retain CSS. Package installs must also be tested outside this
 workspace before publication.
 
-PR CI also installs the tarballs in an isolated consumer, checks 113 public entries,
+PR CI also installs the tarballs in an isolated consumer, checks 114 public entries,
 validates standalone declarations strictly, and exercises the Next.js production
 app in Chromium. Next.js declaration dependencies use its normal `skipLibCheck`
 setting; the standalone SDK declarations are checked with it disabled.

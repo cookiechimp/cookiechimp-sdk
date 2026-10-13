@@ -132,11 +132,12 @@ execFileSync(
 await writeFile(
   join(directory, "app/layout.tsx"),
   `import "@cookiechimp/react/styles.css";
-import { CookieChimpProvider } from "@cookiechimp/nextjs/server";
+import "@cookiechimp/react/tcf.css";
+import { CookieChimpProvider, TcfStub } from "@cookiechimp/nextjs/server";
 import { CookieBanner } from "@cookiechimp/react/banner";
 import type { ReactNode } from "react";
 export default function Layout({ children }: { children: ReactNode }) {
-  return <html lang="en"><body><CookieChimpProvider config={{ categories: { analytics: false }, regulation: "gdpr" }}>
+  return <html lang="en"><head><TcfStub nonce="consumer-fixture" /></head><body><CookieChimpProvider config={{ categories: { analytics: false }, regulation: "gdpr" }}>
     {children}<CookieBanner />
   </CookieChimpProvider></body></html>;
 }
@@ -147,15 +148,29 @@ await writeFile(
   `"use client";
 import { useCategory } from "@cookiechimp/react";
 import { GatedScript, CookiePreferences, RecallButton } from "@cookiechimp/react/ui";
+import { TcfProvider } from "@cookiechimp/react/tcf-provider";
+import { TcfVendorList } from "@cookiechimp/react/tcf";
 import { useState } from "react";
+// Fixture-only CMP ID and vendor data, never production registration.
+const tcf = { cmpId: 123, gvl: {
+  vendorListVersion: 151, tcfPolicyVersion: 5,
+  vendors: { "1": { id: 1, name: "Packed fixture vendor", purposes: [1, 8], legIntPurposes: [], specialFeatures: [] } }
+} };
 export default function Page() {
   const allowed = useCategory("analytics");
   const [sibling, setSibling] = useState(false);
+  const [tcfEnabled, setTcfEnabled] = useState(true);
   return <main><h1>Packed SDK consumer</h1><p data-testid="state">{allowed ? "allowed" : "blocked"}</p>
     <button type="button" onClick={() => setSibling(value => !value)}>Toggle sibling</button>
     {sibling ? <p>Sibling inserted</p> : null}
     <GatedScript category="analytics">{"window.__packedRuns = (window.__packedRuns || 0) + 1;"}</GatedScript>
-    <CookiePreferences categories={[{ id: "analytics", label: "Analytics" }]} /><RecallButton />
+    <TcfProvider enabled={tcfEnabled} options={tcf}>{({controller, status}) => <>
+      <p data-testid="tcf-status">{status}</p>
+      <CookiePreferences categories={[{ id: "analytics", label: "Analytics" }]}>
+        {controller ? <TcfVendorList controller={controller} /> : null}
+      </CookiePreferences>
+    </>}</TcfProvider>
+    <button type="button" onClick={() => setTcfEnabled(false)}>Disable TCF</button><RecallButton />
   </main>;
 }
 `,
@@ -206,6 +221,27 @@ try {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto(url);
+  await expect(page.getByTestId("tcf-status")).toHaveText("ready");
+  const tcfData = () =>
+    page.evaluate(
+      () =>
+        new Promise<{ vendor: { consents: Record<string, boolean> } }>(
+          (resolve) => {
+            (
+              window as typeof window & {
+                __tcfapi: (
+                  command: string,
+                  version: number,
+                  callback: (data: {
+                    vendor: { consents: Record<string, boolean> };
+                  }) => void,
+                ) => void;
+              }
+            ).__tcfapi("addEventListener", 2, resolve);
+          },
+        ),
+    );
+  expect((await tcfData()).vendor.consents["1"]).not.toBe(true);
   const banner = page.locator('[data-cc-part="banner"]');
   await expect(banner).toBeVisible();
   expect(
@@ -219,12 +255,15 @@ try {
   await page.getByRole("button", { name: "Accept all cookies" }).click();
   await expect(page.getByTestId("state")).toHaveText("allowed");
   await expect.poll(runs).toBe(1);
+  expect((await tcfData()).vendor.consents["1"]).toBe(true);
   await page.getByRole("button", { name: "Toggle sibling" }).click();
   await expect(page.getByText("Sibling inserted")).toBeVisible();
   await page.getByRole("button", { name: "Toggle sibling" }).click();
   await expect(page.getByText("Sibling inserted")).toHaveCount(0);
   expect(await runs()).toBe(1);
   await page.reload();
+  await expect(page.getByTestId("tcf-status")).toHaveText("ready");
+  expect((await tcfData()).vendor.consents["1"]).toBe(true);
   await expect(banner).toHaveCount(0);
   await expect(page.getByTestId("state")).toHaveText("allowed");
   await expect.poll(runs).toBe(1);
@@ -232,11 +271,29 @@ try {
   await expect(
     page.getByRole("dialog", { name: "Cookie preferences" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Partners and purposes" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("checkbox", {
+      name: "Consent: Packed fixture vendor",
+      exact: true,
+    }),
+  ).toBeChecked();
   expect(errors).toEqual([]);
   await page.screenshot({
     path: join(directory, "verified.png"),
     fullPage: true,
   });
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Disable TCF" }).click();
+  await expect(page.getByTestId("tcf-status")).toHaveText("disabled");
+  expect(
+    await page.evaluate(
+      () => typeof (window as typeof window & { __tcfapi?: unknown }).__tcfapi,
+    ),
+  ).toBe("undefined");
+  expect(errors).toEqual([]);
   await writeFile(
     join(artifacts, "consumer-validation.json"),
     JSON.stringify(
@@ -250,6 +307,7 @@ try {
         nextjsProductionBuild: "passed",
         consentAndPersistence: "passed",
         reactReconciliation: "passed",
+        tcfProvider: "passed",
         css: "passed",
       },
       null,
