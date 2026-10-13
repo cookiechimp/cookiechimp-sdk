@@ -52,6 +52,8 @@ The checked budgets are the source-of-truth values below. Region header provider
 | CLI programmatic API | total | 8905 |
 | GPP stub | extra | 925 |
 | GPP US sections module | lazy | 2810 |
+| TCF stub | extra | 645 |
+| TCF core module | lazy | 3300 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -59,7 +61,7 @@ Until the M3 Next.js package exists, `fixtures/nextjs-app` is the empty stand-in
 
 Entries planned for later milestones remain visible as `PENDING` only when their paths are on the harness's explicit allowlist. A missing path outside that allowlist fails with a non-zero exit, preventing a typo from remaining pending indefinitely. File existence controls the allowlisted state, so the same row becomes enforced automatically when its configured build output appears.
 
-GPP lives in two opt-in subpaths. `@cookiechimp/core/gpp-stub` is the `__gpp` stub that publishers inline before vendor tags (SPEC.md requires under 1 KB; the `gppStubScript` inline string measures 761 B gzip on its own). `@cookiechimp/core/gpp` is the lazy US sections encoder and full CMP API. The planned TCF/GPP row keeps the SPEC.md 12 KB cap for the combined module once TCF lands; the GPP rows plus TCF must stay inside it.
+GPP lives in two opt-in subpaths. `@cookiechimp/core/gpp-stub` is the `__gpp` stub that publishers inline before vendor tags (SPEC.md requires under 1 KB; the `gppStubScript` inline string measures 761 B gzip on its own). `@cookiechimp/core/gpp` is the lazy US sections encoder and full CMP API. TCF lives in `@cookiechimp/core/tcf-stub` (the inline `__tcfapi` stub; the `tcfStubScript()` string alone is 494 B gzip) and the lazy `@cookiechimp/core/tcf`. The TCF/GPP row is the SPEC.md 12 KB cap and now measures `tcf.mjs`; the GPP module (2430 B) plus the TCF module (2868 B) is 5298 B, inside that cap. The TCF core module row is the tighter guard with about 15% headroom.
 
 The TCF/GPP exclusion guard always scans the default core entry and every statically or dynamically reachable emitted module for `__tcfapi` and `__gpp`. This guard runs even while the opt-in TCF/GPP entry is absent, and finding either token fails the size job.
 
@@ -128,3 +130,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | consent log | 2490 B | 2490 B | Limit unchanged. Queue moved into a shared chunk and the page-hide flush switched from sendBeacon to a cookie-less keepalive fetch: measured 2166 B to 2215 B (about 12% headroom) | M5 PR22 |
 | gpp stub | none | 925 B | New opt-in `__gpp` stub subpath (ping, listener registration, queue, `__gppLocator` frame, postMessage bridge). Measured 809 B (about 14% headroom), inside the SPEC.md 1 KB stub target | M6 PR33 |
 | gpp | none | 2810 B | New opt-in lazy GPP module: header and usnat, usca, usva, usco, usut, usct encoders with GPC segment, consent mapping and full CMP API. Measured 2430 B (about 16% headroom), inside the SPEC.md 12 KB TCF/GPP cap | M6 PR33 |
+| tcf stub | none | 645 B | New opt-in `__tcfapi` stub subpath (ping, queue, `__tcfapiLocator` frame, postMessage bridge). Measured 560 B (about 15% headroom) | M6 PR34 |
+| tcf | none | 3300 B | New opt-in lazy TCF v2.3 module: TC string encoder with the mandatory disclosed vendors segment, GVL validation, cmpId rules and the CMP API. Measured 2868 B (about 15% headroom). The TCF/GPP 12 KB SPEC cap row was pending and now measures this entry (2868 B) | M6 PR34 |

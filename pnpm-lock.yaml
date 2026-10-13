@@ -120,6 +120,9 @@ importers:
       '@iabgpp/cmpapi':
         specifier: 3.2.0
         version: 3.2.0
+      '@iabtcf/core':
+        specifier: 1.5.6
+        version: 1.5.6
       tsdown:
         specifier: 0.23.1
         version: 0.23.1(typescript@7.0.2)
@@ -394,6 +397,9 @@ packages:
 
   '@iabgpp/cmpapi@3.2.0':
     resolution: {integrity: sha512-p7qO2vhSZ/dzfRrWUbDWSXIl3rkvdAA+dQdoScDdbyf+HJBNqBuCuM4MsddTwT2QIQYsjb0F9ES6+Cx/KncxrQ==}
+
+  '@iabtcf/core@1.5.6':
+    resolution: {integrity: sha512-u2q9thI9vLurYZdGtyJsDYOqoeLc4EgQsYGSc+UVibYII61B/ENJPZS6eFlML1F0hSoTR/goptpo5nGRDkKd2w==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1676,6 +1682,8 @@ snapshots:
     optional: true
 
   '@iabgpp/cmpapi@3.2.0': {}
+
+  '@iabtcf/core@1.5.6': {}
 
   '@img/colour@1.1.0':
     optional: true

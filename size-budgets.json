@@ -301,6 +301,24 @@
     "forbiddenTokens": ["installGpp", "MspaCoveredTransaction"]
   },
   {
+    "name": "TCF stub",
+    "scenario": "tcf stub",
+    "entry": "packages/core/dist/tcf-stub.mjs",
+    "kind": "extra",
+    "limit": 645,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["installTcfStub", "__tcfapiLocator"]
+  },
+  {
+    "name": "TCF core module",
+    "scenario": "tcf",
+    "entry": "packages/core/dist/tcf.mjs",
+    "kind": "lazy",
+    "limit": 3300,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["installTcf", "encodeTcString"]
+  },
+  {
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",
