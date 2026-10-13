@@ -25,4 +25,6 @@ export default defineConfig([
   },
   { ...shared, entry: ["src/dynamic.ts"], clean: false },
   { ...shared, entry: ["src/network.ts"], clean: false },
+  { ...shared, entry: ["src/gpp.ts"], clean: false },
+  { ...shared, entry: ["src/gpp-stub.ts"], clean: false },
 ]);

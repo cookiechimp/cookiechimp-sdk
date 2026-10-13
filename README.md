@@ -116,6 +116,43 @@ to suppress the runtime default. Mapping entries set to `null` remove built-in
 categories, while `replace: true` replaces all built-in mappings.
 The inline script is required for correct consent ordering before tag scripts.
 
+## IAB GPP (US sections)
+
+Two opt-in subpaths implement IAB Global Privacy Platform v1.1 for US
+privacy laws. Neither is part of the default `@cookiechimp/core` bundle.
+
+- `@cookiechimp/core/gpp-stub`: render `gppStubScript` in an inline
+  `<script>` before any vendor tag (place it inside your own
+  `<script nonce="...">` under a strict CSP). The stub answers `ping`, registers
+  event listeners, returns `null` for section reads, queues other commands and
+  adds the `__gppLocator` frame so iframed vendors can call it through
+  `postMessage`. It is under 1 KB gzip.
+- `@cookiechimp/core/gpp`: load it lazily in the browser and call
+  `installGpp(consent, options)`. It replaces the stub, adopts its listeners,
+  replays queued calls and keeps the GPP string in sync with consent, firing
+  `signalStatus`, the section event and `signalStatus` again on every change.
+
+Sections: `usnat` (7), `usca` (8), `usva` (9), `usco` (10), `usut` (11) and
+`usct` (12). With `approach: "state"` (the default) a visitor in CA, VA, CO,
+UT or CT gets that state section and every other US visitor gets `usnat`;
+`approach: "national"` always uses `usnat`. Outside the US no section applies
+(`applicableSections: [-1]`).
+
+Sale, sharing and targeted advertising opt-outs come from consent for
+`optOutCategories` (default `["advertising", "marketing"]`, matching
+`saleShareCategories`). This is fail-closed: no decision yet, a refused
+category, or no matching category configured all count as opted out. Global
+Privacy Control always forces the opt-out and sets the GPC segment. Notices,
+sensitive data and MSPA fields are publisher assertions and are passed per
+section through `values`, for example
+`values: { usnat: { SaleOptOutNotice: 1, MspaServiceProviderMode: 2 } }`.
+Invalid values encode as 0 (not applicable).
+
+`cmpId` defaults to 0, which the GPP CMP API allows while a CMP has no IAB
+assigned ID. Set it once CookieChimp's IAB CMP registration (M6 item 26) is
+complete. The encoder is tested for byte-identical output against the IAB
+reference implementation, `@iabgpp/cmpapi`.
+
 ## React headless primitives
 
 Import `Banner`, `Preferences`, and `OptOut` from

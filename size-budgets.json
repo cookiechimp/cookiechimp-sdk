@@ -283,6 +283,24 @@
     "limit": 8905
   },
   {
+    "name": "GPP stub",
+    "scenario": "gpp stub",
+    "entry": "packages/core/dist/gpp-stub.mjs",
+    "kind": "extra",
+    "limit": 925,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["installGppStub", "__gppLocator"]
+  },
+  {
+    "name": "GPP US sections module",
+    "scenario": "gpp",
+    "entry": "packages/core/dist/gpp.mjs",
+    "kind": "lazy",
+    "limit": 2810,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["installGpp", "MspaCoveredTransaction"]
+  },
+  {
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",

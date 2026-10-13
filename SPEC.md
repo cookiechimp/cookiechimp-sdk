@@ -111,6 +111,7 @@ Connected mode uses the same per-account config endpoint as the CookieChimp web 
 - Phase 1: GPP with US state sections (usnat, usca, etc.) and GPC mapping, `__gpp` stub inlined (< 1 KB), lazy encoder.
 - Phase 2: TCF v2.2 in `@cookiechimp/core/tcf`: `__tcfapi` stub, TC string encode, vendor list UI in `CookiePreferences` (virtualised), GVL from CookieChimp CDN. Requires CookieChimp CMP ID and IAB validation; connected mode and Pro tier only.
 - Test against IAB CMP validator and GPP test suite in CI.
+- Phase 1 status (M6 item 25): `@cookiechimp/core/gpp-stub` and `@cookiechimp/core/gpp` cover usnat, usca, usva, usco, usut and usct. CI checks byte-identical encoding and decoding against the IAB reference implementation `@iabgpp/cmpapi` (dev dependency only) and runs the stub, CMP API and cross-frame locator in Playwright. The IAB CMP validator is a browser extension with no CI mode, so it is a manual pre-release check. Later state sections (DE, IA, NE, NH, NJ, TN and others) and the CMP ID wait for later work and item 26.
 
 ## 8. Benchmark plan
 
