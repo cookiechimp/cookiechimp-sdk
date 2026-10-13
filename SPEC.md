@@ -24,7 +24,7 @@ Status: draft v0.1 (2026-10-12). Clean-room build. The CookieYes SDK (MIT) was i
   - `core` initial <= 7 KB, total <= 9 KB
   - banner only <= 11 KB
   - banner + preferences + recall <= 13.5 KB initial, <= 16 KB total
-  - connected mode sync client lazy loaded, <= 2 KB extra
+  - connected mode sync client lazy loaded, <= 2.5 KB extra (raised from 2 KB in M5 PR21, see docs/size.md)
   - network blocker opt-in, <= 2.25 KB extra
   - TCF/GPP module opt-in, lazy, <= 12 KB, never in the default bundle
 - Perf: zero CLS, banner interactive in < 50 ms after hydration, no blocking network request on the critical path (connected config is cached and revalidated).
@@ -70,7 +70,17 @@ Connected mode uses the same per-account config endpoint as the CookieChimp web 
 - SDK caching: the sanitised bundle is kept in localStorage under `cc_config:{projectId}:{cache_version}`, with a pointer at `cc_config:{projectId}` and only the current version kept. The SDK renders from the cache immediately, revalidates in idle time with `If-None-Match`, and times out after 5 s. A 304 keeps the cache; a hostile or failed response keeps the cache or the code config.
 - Precedence: code `override` > dashboard > code defaults. If the categories hash or `reconsent_required_at` changes, `categoriesChanged` is set so the user can be re-prompted (configurable).
 - Next.js server fetch uses `revalidate: 300` against the same endpoint so SSR markup already has the dashboard copy.
-- Consent records (item 21) target the platform consent ingest (`POST /api/v1/mobile-sdk/sync/{account_hashid}` batch format: `consents[{client_id, uuid, platform, visitor_action, url, gpc_preference, language_code, consent_banner_hashid, created_at, user_preferences{}}]`), sent with `fetch keepalive`, falling back to `sendBeacon`.
+- Consent records (item 21) live in the opt-in `@cookiechimp/core/consent-log` subpath (`createConsentLog`, `logConsent`) and target the platform consent ingest `POST /api/v1/mobile-sdk/sync/{account_hashid}` in its batch format `{"consents": [...]}`. Each record sends exactly:
+  - `client_id`: `{consentId}:{ts}`, unique per decision, used to confirm delivery.
+  - `uuid`: the random consent id from the `cc_consent` cookie.
+  - `platform`: `"web"`; `visitor_action`: `"consent"`.
+  - `url`: the page origin only (no path, query or hash).
+  - `gpc_preference`: the GPC signal at decision time.
+  - `language_code` (when known), `consent_banner_hashid` (when configured), `created_at` (the decision `ts`).
+  - `user_preferences`: `acceptType` (`all`, `necessary` or `custom`), `action`, `acceptedCategories`, `rejectedCategories`, `acceptedServices` and `rejectedServices` (category slug to SDK service ids, unknown services under `other`), and `regulation` when resolved.
+  - Never sent: `device_identifier`, `visitor_user_id`, cookies, IP (the platform masks it from the connection), user agent fields or the page path.
+- Delivery: `fetch` with `keepalive`, `credentials: "omit"`, `redirect: "error"` and a 10 s timeout. On `visibilitychange` to hidden the queue goes out as a `text/plain` `sendBeacon` (CORS-safelisted, no preflight, no cookies) and is cleared only if the browser accepts it. The response is untrusted: only `client_id`s listed in `synced`, or in `failed` with a validation error, leave the queue; `Batch limit exceeded` retries; a 2xx without a readable result counts as delivered; anything else backs off. Recording is synchronous, never throws and never delays the local cookie.
+- Guards: an invalid `projectId` or a non-https `apiBase` (localhost allowed in development) throws in development and turns the log into a no-op in production (a missing `process` counts as production).
 - Offline queue: IndexedDB (fallback localStorage), max 50 records, exponential backoff, flush on `online` / `visibilitychange`, drop after 30 days.
 - Versioning: `schema_version` major; the SDK ignores unknown fields.
 - Server-to-server: `GET /consents/{consentId}` with secret key for DSAR and proof of consent.

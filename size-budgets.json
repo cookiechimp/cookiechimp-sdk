@@ -167,6 +167,15 @@
     "forbiddenTokens": ["mergeConfig", "categoriesHash", "matchService"]
   },
   {
+    "name": "consent log",
+    "scenario": "consent-log",
+    "entry": "packages/core/dist/consent-log.mjs",
+    "kind": "extra",
+    "limit": 2490,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["toPlatformConsent", "cc_consent_queue"]
+  },
+  {
     "name": "GA4 preset",
     "scenario": "scripts ga4",
     "entry": "packages/scripts/dist/ga4.mjs",
