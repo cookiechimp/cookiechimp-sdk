@@ -69,6 +69,8 @@ export function createRecordQueue<R>(
     key: string;
     problem: string | undefined;
     label: string;
+    /** Static request headers, already validated by the caller. */
+    headers?: Record<string, string>;
     build(consent: ConsentRecord, language?: string): R;
     id(record: R): string;
     ts(record: R): string;
@@ -146,9 +148,12 @@ export function createRecordQueue<R>(
     item.next = Math.ceil(now() + delay * (0.5 + random() / 2));
   };
 
-  // `plain` sends everything as text/plain: CORS-safelisted, so a hidden page
-  // needs no preflight. keepalive lets it outlive the page, and unlike
-  // sendBeacon the request carries no cookies.
+  // `plain` (page hide) sends everything as text/plain: CORS-safelisted, so a
+  // hidden page needs no preflight. keepalive lets it outlive the page, and
+  // unlike sendBeacon the request carries no cookies. Custom headers always
+  // need a preflight, so with them the hidden-page flush keeps the headers and
+  // JSON; if the browser drops it, the records are already persisted and are
+  // retried on the next visit (stable ids make the retry safe to deduplicate).
   const send = async (plain?: boolean): Promise<number> => {
     prune();
     const due = queue.filter((item) => plain || item.next <= now());
@@ -168,9 +173,11 @@ export function createRecordQueue<R>(
       const response = await doFetch(endpoint, {
         method: "POST",
         headers: {
-          "Content-Type": plain
-            ? "text/plain;charset=UTF-8"
-            : "application/json",
+          ...options.headers,
+          "Content-Type":
+            plain && !options.headers
+              ? "text/plain;charset=UTF-8"
+              : "application/json",
         },
         body: JSON.stringify(options.body(due.map((item) => item.record))),
         credentials: "omit",

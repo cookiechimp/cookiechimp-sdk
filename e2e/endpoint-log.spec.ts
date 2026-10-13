@@ -140,3 +140,48 @@ test("a hostile response does not break the page", async ({ page }) => {
   ).toBeUndefined();
   expect(errors).toEqual([]);
 });
+
+test("the provider endpoint prop sends static headers and still no cookies", async ({
+  page,
+}) => {
+  await page.goto(PAGE.replace("/endpoint-log", "/endpoint-prop"));
+  const preflights: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "OPTIONS") preflights.push(request.url());
+  });
+  await accept(page);
+  await expect.poll(async () => (await stored(page)).length).toBe(1);
+  const [entry] = (await stored(page)) as [Stored & { site: string | null }];
+  expect(entry.site).toBe("fixture");
+  expect(entry.cookie).toBeNull();
+  expect(entry.contentType).toBe("application/json");
+  // Same-origin, so the custom header needs no CORS preflight.
+  expect(preflights).toEqual([]);
+});
+
+test("with static headers, a page-hide flush keeps the headers and nothing is lost", async ({
+  page,
+}) => {
+  await page.request.delete(`${API}&fail=1`);
+  await page.goto(PAGE.replace("/endpoint-log", "/endpoint-prop"));
+  const failed = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/consent") &&
+      response.request().method() === "POST",
+  );
+  await accept(page);
+  expect((await failed).status()).toBe(503);
+  // The first POST fails (503); hiding the page flushes the retry at once.
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      value: "hidden",
+      configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect.poll(async () => (await stored(page)).length).toBe(1);
+  const [entry] = (await stored(page)) as [Stored & { site: string | null }];
+  expect(entry.site).toBe("fixture");
+  expect(entry.contentType).toBe("application/json");
+  expect(entry.cookie).toBeNull();
+});

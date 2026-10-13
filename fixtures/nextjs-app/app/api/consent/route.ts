@@ -6,6 +6,7 @@ type Stored = {
   record: unknown;
   contentType: string | null;
   cookie: string | null;
+  site: string | null;
 };
 
 // Keyed by the `run` query parameter so parallel tests never share state.
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
         record,
         contentType: request.headers.get("content-type"),
         cookie: request.headers.get("cookie"),
+        site: request.headers.get("x-site"),
       });
     accepted.push(id);
   }

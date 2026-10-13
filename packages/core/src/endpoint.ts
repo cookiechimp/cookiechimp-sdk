@@ -40,6 +40,16 @@ export interface EndpointLogOptions extends RecordQueueOptions {
    * localhost in development only.
    */
   endpoint: string;
+  /**
+   * Optional static request headers, such as `{"X-Site": "shop"}`. They are
+   * public: every visitor can read them, so never put a secret here. Cookie,
+   * Authorization, Proxy-Authorization and Content-Type are refused, and
+   * requests still never send cookies or credentials. Any custom header makes
+   * a cross-origin endpoint answer a CORS preflight (OPTIONS) first, which
+   * costs a round trip and must allow the header names; a same-origin path
+   * needs no preflight.
+   */
+  headers?: Record<string, string>;
 }
 
 const MAX_RESPONSE = 65536;
@@ -93,6 +103,32 @@ function resolve(endpoint: unknown): URL | undefined {
   return /^https?:\/\//i.test(endpoint) ? secureUrl(endpoint) : undefined;
 }
 
+const TOKEN = /^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,64}$/;
+const REFUSED =
+  /^(cookie2?|set-cookie|authorization|proxy-authorization|content-type)$/i;
+
+// Static, small, printable, and never a cookie or credential; anything else
+// disables the log (fail closed).
+function checkHeaders(
+  headers: unknown,
+): Record<string, string> | undefined | false {
+  if (headers === undefined) return;
+  if (!headers || typeof headers !== "object" || Array.isArray(headers))
+    return false;
+  const entries = Object.entries(headers);
+  if (entries.length > 8) return false;
+  for (const [name, value] of entries)
+    if (
+      !TOKEN.test(name) ||
+      REFUSED.test(name) ||
+      typeof value !== "string" ||
+      value.length > 256 ||
+      !/^[\x20-\x7e]*$/.test(value)
+    )
+      return false;
+  return entries.length ? Object.fromEntries(entries) : undefined;
+}
+
 /**
  * Queue consent records and POST them to your own endpoint (local mode,
  * no CookieChimp account) with the same retries, persistence and
@@ -100,12 +136,16 @@ function resolve(endpoint: unknown): URL | undefined {
  */
 export function createEndpointLog(options: EndpointLogOptions): ConsentLog {
   const url = resolve(options.endpoint);
+  const headers = checkHeaders(options.headers);
   return createRecordQueue<EndpointRecord>({
     ...options,
+    headers: headers || undefined,
     label: "endpoint log",
-    problem: url
-      ? undefined
-      : "endpoint must be an https URL or a same-origin path",
+    problem: !url
+      ? "endpoint must be an https URL or a same-origin path"
+      : headers === false
+        ? "headers must be at most 8 static printable values, without cookies or credentials"
+        : undefined,
     endpoint: url?.href ?? "",
     key: `cc_consent_queue:@${url?.href ?? ""}`,
     build: (consent, language) =>

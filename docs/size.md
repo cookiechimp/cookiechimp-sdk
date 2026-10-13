@@ -20,10 +20,10 @@ The checked budgets are the source-of-truth values below. Region header provider
 | language controller | extra | 1050 |
 | core initial | initial | 4096 |
 | core total | total | 5120 |
-| react provider and hooks | extra | 4608 |
-| Next.js client provider bridge | extra | 4370 |
+| react provider and hooks | initial | 5320 |
+| Next.js client provider bridge | initial | 4800 |
 | Next.js server entry | extra | INFO |
-| Next.js Pages client wrapper | extra | 6225 |
+| Next.js Pages client wrapper | initial | 6585 |
 | Next.js middleware region helper | extra | 1150 |
 | Next.js styles route | extra | INFO |
 | react headless primitives | extra | 3491 |
@@ -35,7 +35,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | UI distribution entry total | total | 16384 |
 | connected sync client | extra | 4355 |
 | consent log | extra | 2490 |
-| self-hosted endpoint log | extra | 2135 |
+| self-hosted endpoint log | extra | 2450 |
 | GA4 preset | extra | 830 |
 | GTM preset | extra | 915 |
 | Google Ads preset | extra | 890 |
@@ -108,6 +108,10 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | cli api | none | 5195 B | New programmatic CLI entry, Node builtins external, measured 4514 B (about 15% headroom) | M4 PR19 |
 | cli | 5140 B | 8800 B | `link` and `pull` added: token from env or stdin only, paginated accounts API, offline bundle validation, `.env.local` upsert. Network code lives in a remote chunk (about 2.7 kB gzip) loaded by dynamic import, so `init` and `doctor` never load it. Total including every chunk measured 7648 B (about 15% headroom). Node-only tool, never shipped to browsers | M5 PR23 |
 | cli api | 5195 B | 8905 B | Same `link` and `pull` code, re-exported from the programmatic entry. Measured 7743 B (about 15% headroom) | M5 PR23 |
+| react | 4608 B | 5320 B | `endpoint` prop. Row now measures the initial chunk (what every app downloads); `@cookiechimp/core/endpoint` loads by dynamic import only when the prop is set and is guarded by its own row. Initial 4334 B to 4624 B (+290 B), about 15% headroom. With the lazy chunk inlined it is 6484 B | M5 PR30 |
+| nextjs client | 4370 B | 4800 B | `endpoint` passthrough, initial chunk as above: 3868 B to 4176 B (+308 B, from the React provider), about 15% headroom | M5 PR30 |
+| nextjs pages | 6225 B | 6585 B | `endpoint` passthrough, initial chunk: 5419 B to 5726 B (+307 B), about 15% headroom | M5 PR30 |
+| endpoint | 2135 B | 2450 B | Optional static `headers` with fail-closed validation: 1865 B to 2130 B (+265 B), about 15% headroom | M5 PR30 |
 | sync | 2048 B | 4355 B | Connected config client for the shared platform offline bundle: adapter, fetch, cache, idle revalidation, untrusted payload validation and timeout. Standalone entry measured 3785 B (about 15% headroom); marginal cost over core 2395 B, above the SPEC 2 KB extra target (flagged for lead review) | M5 PR20 |
 | SPEC sync extra target | 2 KB | 2.5 KB | SPEC.md target only, no checked limit change: `./sync` marginal cost over core is 2395 B, accepted by the lead after M5 PR20 | M5 PR21 (lead approved) |
 | consent log | none | 2490 B | New opt-in consent record POST subpath: platform record mapping, persisted queue, capped backoff, untrusted response parsing, beacon on hide and fail-closed guards. Measured 2166 B (about 15% headroom) | M5 PR21 |
