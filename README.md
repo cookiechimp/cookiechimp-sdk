@@ -153,6 +153,12 @@ assigned ID. Set it once CookieChimp's IAB CMP registration (M6 item 26) is
 complete. The encoder is tested for byte-identical output against the IAB
 reference implementation, `@iabgpp/cmpapi`.
 
+In React, pass `gpp` (`true` or serialisable `GppOptions`) to
+`ConsentProvider` instead of calling `installGpp` yourself: the module is
+imported lazily after hydration only when the prop is set, and removed on
+unmount. In Next.js, use the same prop on `CookieChimpProvider` or
+`PagesConsentProvider` and render `GppStub` in the head.
+
 ## IAB TCF (EU)
 
 Two opt-in subpaths implement the IAB TCF CMP API (apiVersion 2.2) and TC

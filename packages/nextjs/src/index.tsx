@@ -3,6 +3,7 @@
 import type { ConsentConfig, ConsentState } from "@cookiechimp/core";
 import {
   type ConsentEndpoint,
+  type ConsentGpp,
   ConsentProvider,
   type ConsentProviderProps,
   type Messages,
@@ -33,6 +34,8 @@ export type ClientProviderProps = {
   endpoint?: ConsentEndpoint;
   /** Revalidate the dashboard config after hydration (connected mode). */
   sync?: ClientSync;
+  /** Opt-in IAB GPP US sections; see `ConsentProvider`. */
+  gpp?: ConsentGpp;
 };
 
 /** Client boundary used by the App Router server provider. */
@@ -44,6 +47,7 @@ export function ClientProvider({
   messages,
   endpoint,
   sync,
+  gpp,
 }: ClientProviderProps) {
   const [fresh, setFresh] = useState<Messages>();
   const syncKey = sync ? JSON.stringify(sync) : undefined;
@@ -103,6 +107,7 @@ export function ClientProvider({
       language={language}
       translations={translations}
       endpoint={endpoint}
+      gpp={gpp}
     >
       {children}
     </ConsentProvider>
@@ -111,4 +116,4 @@ export function ClientProvider({
 
 export { ConsentProvider } from "@cookiechimp/react";
 export { dashboardMessages } from "./messages";
-export type { ConsentEndpoint, ConsentProviderProps, Messages };
+export type { ConsentEndpoint, ConsentGpp, ConsentProviderProps, Messages };

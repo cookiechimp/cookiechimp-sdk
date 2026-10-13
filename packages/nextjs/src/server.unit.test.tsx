@@ -32,7 +32,7 @@ vi.mock("next/headers", () => ({
   }),
 }));
 
-import { CookieChimpProvider, getServerConsent } from "./server";
+import { CookieChimpProvider, GppStub, getServerConsent } from "./server";
 
 const state: ConsentState = {
   schemaVersion: 1,
@@ -411,5 +411,34 @@ describe("CookieChimpProvider connected mode", () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe("GPP wiring", () => {
+  it("forwards a serialisable gpp prop to the client provider, and omits it by default", async () => {
+    const gpp = {
+      approach: "national" as const,
+      values: { usnat: { SaleOptOutNotice: 1 } },
+    };
+    const on = await CookieChimpProvider({
+      config: { categories: { advertising: false } },
+      region: { country: "US", region: "CA" },
+      gpp,
+      children: <span />,
+    });
+    expect(on.props.gpp).toEqual(gpp);
+    expect(JSON.parse(JSON.stringify(on.props.gpp))).toEqual(gpp);
+    const off = await CookieChimpProvider({
+      config: { categories: { advertising: false } },
+      children: <span />,
+    });
+    expect(off.props.gpp).toBeUndefined();
+  });
+
+  it("GppStub renders the inline stub with the nonce", () => {
+    const html = renderToStaticMarkup(<GppStub nonce="n0nce" />);
+    expect(html).toMatch(/^<script nonce="n0nce" data-cookiechimp-gpp="">/);
+    expect(html).toContain("__gpp");
+    expect(html).toContain("__gppLocator");
   });
 });

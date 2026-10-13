@@ -19,6 +19,7 @@ export default defineConfig({
     "@cookiechimp/core",
     "@cookiechimp/core/gate",
     "@cookiechimp/core/endpoint",
+    "@cookiechimp/core/gpp",
     "@cookiechimp/core/tcf",
   ],
 });
