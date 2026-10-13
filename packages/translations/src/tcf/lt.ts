@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Partneriai ir tikslai",
+  purposes: "Tikslai",
+  specialFeatures: "Specialiosios funkcijos",
+  vendors: "Tiekėjai",
+  search: "Ieškoti tiekėjų",
+  consent: "Sutikimas",
+  legitimateInterest: "Teisėtas interesas",
+  acceptAll: "Priimti viską",
+  rejectAll: "Atmesti viską",
+  save: "Išsaugoti pasirinkimus",
+  saved: "Pasirinkimai išsaugoti",
+  empty: "Atitinkančių tiekėjų nėra",
+  details: "Išsami informacija",
+  close: "Uždaryti išsamią informaciją",
+  consentPurposes: "Tikslai (sutikimas)",
+  legIntPurposes: "Tikslai (teisėtas interesas)",
+  specialPurposes: "Specialieji tikslai",
+  features: "Funkcijos",
+  dataCategories: "Duomenų kategorijos",
+  retention: "Duomenų saugojimas",
+  retentionDays: "{days} d.",
+  standardRetention: "Įprastas saugojimo laikotarpis",
+  privacyPolicy: "Privatumo politika",
+  legIntClaim: "Pareiškimas dėl teisėto intereso",
+  storage: "Saugojimas įrenginyje",
+  cookieMaxAge: "Slapukai saugomi iki {days} d.",
+  cookieSession: "Slapukai be nustatyto galiojimo",
+  cookieRefresh: "Slapuko galiojimas atnaujinamas naudojant",
+  noCookies: "Nenaudoja slapukų",
+  nonCookieAccess: "Naudoja kitus saugojimo ar prieigos įrenginyje būdus",
+  storageDisclosure: "Informacija apie saugojimą",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

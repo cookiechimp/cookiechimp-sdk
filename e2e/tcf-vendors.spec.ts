@@ -171,3 +171,31 @@ test("keyboard focus survives scrolling the focused row out of view", async ({
     page.getByRole("button", { name: "Details: Partner 2", exact: true }),
   ).toBeFocused();
 });
+
+test("TCF labels from @cookiechimp/translations render in German", async ({
+  page,
+}) => {
+  await page.goto("/tcf-vendors?lang=de");
+  await expect(page.locator("html")).toHaveAttribute("data-cc-tcf", "ready");
+  await page.getByRole("button", { name: "Manage vendors" }).click();
+  const tcf = page.getByRole("region", { name: "Partner und Zwecke" });
+  await expect(tcf).toBeVisible();
+  await expect(tcf.getByText("Anbieter (1200)")).toBeVisible();
+  await expect(
+    tcf.getByRole("searchbox", { name: "Anbieter suchen" }),
+  ).toBeVisible();
+  await tcf
+    .getByRole("button", { name: "Details: Partner 3", exact: true })
+    .click();
+  const panel = page.getByRole("region", { name: "Partner 3", exact: true });
+  await expect(panel).toContainText("Standardspeicherdauer: 30 Tage");
+  await expect(panel).toContainText(
+    "Cookies werden bis zu 90 Tage gespeichert",
+  );
+  await expect(
+    panel.getByRole("link", { name: "Datenschutzerklärung" }),
+  ).toHaveAttribute("href", "https://partner3.example/privacy");
+  await page.keyboard.press("Escape");
+  await tcf.getByRole("button", { name: "Alle akzeptieren" }).click();
+  await expect(tcf.getByRole("status")).toHaveText("Auswahl gespeichert");
+});

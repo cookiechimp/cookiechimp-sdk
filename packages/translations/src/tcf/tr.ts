@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Ortaklar ve amaçlar",
+  purposes: "Amaçlar",
+  specialFeatures: "Özel özellikler",
+  vendors: "Sağlayıcılar",
+  search: "Sağlayıcı ara",
+  consent: "Onay",
+  legitimateInterest: "Meşru menfaat",
+  acceptAll: "Tümünü kabul et",
+  rejectAll: "Tümünü reddet",
+  save: "Seçimleri kaydet",
+  saved: "Seçimler kaydedildi",
+  empty: "Eşleşen sağlayıcı yok",
+  details: "Ayrıntılar",
+  close: "Ayrıntıları kapat",
+  consentPurposes: "Amaçlar (onay)",
+  legIntPurposes: "Amaçlar (meşru menfaat)",
+  specialPurposes: "Özel amaçlar",
+  features: "Özellikler",
+  dataCategories: "Veri kategorileri",
+  retention: "Veri saklama",
+  retentionDays: "{days} gün",
+  standardRetention: "Standart saklama süresi",
+  privacyPolicy: "Gizlilik politikası",
+  legIntClaim: "Meşru menfaat beyanı",
+  storage: "Cihazda depolama",
+  cookieMaxAge: "Çerezler en fazla {days} gün saklanır",
+  cookieSession: "Sabit süresi olmayan çerezler",
+  cookieRefresh: "Çerez süresi kullanımda yenilenir",
+  noCookies: "Çerez kullanmaz",
+  nonCookieAccess: "Cihazda başka depolama veya erişim yöntemleri kullanır",
+  storageDisclosure: "Depolama açıklaması",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

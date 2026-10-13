@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "파트너 및 목적",
+  purposes: "목적",
+  specialFeatures: "특수 기능",
+  vendors: "공급업체",
+  search: "공급업체 검색",
+  consent: "동의",
+  legitimateInterest: "정당한 이익",
+  acceptAll: "모두 수락",
+  rejectAll: "모두 거부",
+  save: "선택 저장",
+  saved: "선택이 저장됨",
+  empty: "일치하는 공급업체 없음",
+  details: "세부 정보",
+  close: "세부 정보 닫기",
+  consentPurposes: "목적(동의)",
+  legIntPurposes: "목적(정당한 이익)",
+  specialPurposes: "특수 목적",
+  features: "기능",
+  dataCategories: "데이터 범주",
+  retention: "데이터 보존",
+  retentionDays: "{days}일",
+  standardRetention: "표준 보존 기간",
+  privacyPolicy: "개인정보 처리방침",
+  legIntClaim: "정당한 이익 고지",
+  storage: "기기 저장",
+  cookieMaxAge: "쿠키 최대 {days}일 저장",
+  cookieSession: "만료 기간이 정해지지 않은 쿠키",
+  cookieRefresh: "사용 시 쿠키 만료 기간 갱신",
+  noCookies: "쿠키를 사용하지 않음",
+  nonCookieAccess: "기기에서 다른 저장 또는 접근 방식 사용",
+  storageDisclosure: "저장 정보 공개",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

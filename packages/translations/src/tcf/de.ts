@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Partner und Zwecke",
+  purposes: "Zwecke",
+  specialFeatures: "Besondere Merkmale",
+  vendors: "Anbieter",
+  search: "Anbieter suchen",
+  consent: "Einwilligung",
+  legitimateInterest: "Berechtigtes Interesse",
+  acceptAll: "Alle akzeptieren",
+  rejectAll: "Alle ablehnen",
+  save: "Auswahl speichern",
+  saved: "Auswahl gespeichert",
+  empty: "Keine passenden Anbieter",
+  details: "Details",
+  close: "Details schließen",
+  consentPurposes: "Zwecke (Einwilligung)",
+  legIntPurposes: "Zwecke (berechtigtes Interesse)",
+  specialPurposes: "Besondere Zwecke",
+  features: "Funktionen",
+  dataCategories: "Datenkategorien",
+  retention: "Speicherdauer",
+  retentionDays: "{days} Tage",
+  standardRetention: "Standardspeicherdauer",
+  privacyPolicy: "Datenschutzerklärung",
+  legIntClaim: "Erklärung zum berechtigten Interesse",
+  storage: "Speicherung auf dem Gerät",
+  cookieMaxAge: "Cookies werden bis zu {days} Tage gespeichert",
+  cookieSession: "Cookies ohne feste Ablaufzeit",
+  cookieRefresh: "Die Cookie-Laufzeit wird bei Nutzung verlängert",
+  noCookies: "Verwendet keine Cookies",
+  nonCookieAccess: "Nutzt andere Speicher- oder Zugriffsmethoden auf dem Gerät",
+  storageDisclosure: "Offenlegung der Speicherung",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

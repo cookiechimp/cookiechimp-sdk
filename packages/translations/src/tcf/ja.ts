@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "パートナーと目的",
+  purposes: "目的",
+  specialFeatures: "特別な機能",
+  vendors: "ベンダー",
+  search: "ベンダーを検索",
+  consent: "同意",
+  legitimateInterest: "正当な利益",
+  acceptAll: "すべて同意",
+  rejectAll: "すべて拒否",
+  save: "選択を保存",
+  saved: "選択を保存しました",
+  empty: "一致するベンダーはありません",
+  details: "詳細",
+  close: "詳細を閉じる",
+  consentPurposes: "目的（同意）",
+  legIntPurposes: "目的（正当な利益）",
+  specialPurposes: "特別な目的",
+  features: "機能",
+  dataCategories: "データの種類",
+  retention: "データ保持",
+  retentionDays: "{days} 日",
+  standardRetention: "標準の保持期間",
+  privacyPolicy: "プライバシーポリシー",
+  legIntClaim: "正当な利益に関する説明",
+  storage: "端末への保存",
+  cookieMaxAge: "Cookie の保存期間は最長 {days} 日",
+  cookieSession: "有効期限が固定されていない Cookie",
+  cookieRefresh: "Cookie の有効期限は使用時に更新されます",
+  noCookies: "Cookie を使用しません",
+  nonCookieAccess: "端末上で他の保存方法またはアクセス方法を使用します",
+  storageDisclosure: "保存に関する開示",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

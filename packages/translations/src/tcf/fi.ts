@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Kumppanit ja käyttötarkoitukset",
+  purposes: "Käyttötarkoitukset",
+  specialFeatures: "Erityisominaisuudet",
+  vendors: "Toimittajat",
+  search: "Hae toimittajia",
+  consent: "Suostumus",
+  legitimateInterest: "Oikeutettu etu",
+  acceptAll: "Hyväksy kaikki",
+  rejectAll: "Hylkää kaikki",
+  save: "Tallenna valinnat",
+  saved: "Valinnat tallennettu",
+  empty: "Ei vastaavia toimittajia",
+  details: "Tiedot",
+  close: "Sulje tiedot",
+  consentPurposes: "Käyttötarkoitukset (suostumus)",
+  legIntPurposes: "Käyttötarkoitukset (oikeutettu etu)",
+  specialPurposes: "Erityiset käyttötarkoitukset",
+  features: "Ominaisuudet",
+  dataCategories: "Tietoluokat",
+  retention: "Tietojen säilytys",
+  retentionDays: "{days} päivää",
+  standardRetention: "Tavallinen säilytysaika",
+  privacyPolicy: "Tietosuojakäytäntö",
+  legIntClaim: "Selvitys oikeutetusta edusta",
+  storage: "Tallennus laitteelle",
+  cookieMaxAge: "Evästeitä säilytetään enintään {days} päivää",
+  cookieSession: "Evästeet ilman kiinteää vanhenemisaikaa",
+  cookieRefresh: "Evästeen voimassaolo uusitaan käytössä",
+  noCookies: "Ei käytä evästeitä",
+  nonCookieAccess: "Käyttää muita tallennus- tai käyttötapoja laitteella",
+  storageDisclosure: "Tallennusta koskeva ilmoitus",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

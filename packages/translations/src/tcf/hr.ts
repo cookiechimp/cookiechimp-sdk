@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Partneri i svrhe",
+  purposes: "Svrhe",
+  specialFeatures: "Posebne značajke",
+  vendors: "Dobavljači",
+  search: "Pretraži dobavljače",
+  consent: "Privola",
+  legitimateInterest: "Legitimni interes",
+  acceptAll: "Prihvati sve",
+  rejectAll: "Odbij sve",
+  save: "Spremi odabir",
+  saved: "Odabir spremljen",
+  empty: "Nema odgovarajućih dobavljača",
+  details: "Pojedinosti",
+  close: "Zatvori pojedinosti",
+  consentPurposes: "Svrhe (privola)",
+  legIntPurposes: "Svrhe (legitimni interes)",
+  specialPurposes: "Posebne svrhe",
+  features: "Značajke",
+  dataCategories: "Kategorije podataka",
+  retention: "Čuvanje podataka",
+  retentionDays: "{days} dana",
+  standardRetention: "Standardno razdoblje čuvanja",
+  privacyPolicy: "Pravila o privatnosti",
+  legIntClaim: "Izjava o legitimnom interesu",
+  storage: "Pohrana na uređaju",
+  cookieMaxAge: "Kolačići se čuvaju do {days} dana",
+  cookieSession: "Kolačići bez fiksnog isteka",
+  cookieRefresh: "Istek kolačića obnavlja se pri korištenju",
+  noCookies: "Ne koristi kolačiće",
+  nonCookieAccess: "Koristi druge načine pohrane ili pristupa na uređaju",
+  storageDisclosure: "Informacije o pohrani",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

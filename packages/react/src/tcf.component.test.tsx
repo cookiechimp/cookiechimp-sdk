@@ -4,11 +4,14 @@ import {
   installTcf,
   type TcfController,
 } from "@cookiechimp/core/tcf";
+import type { TcfMessages } from "@cookiechimp/translations/tcf";
+import de from "@cookiechimp/translations/tcf/de";
+import en from "@cookiechimp/translations/tcf/en";
 import { act, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { ConsentProvider, usePreferences } from "./index";
-import { TcfVendorList } from "./tcf";
+import { type TcfLabels, TcfVendorList } from "./tcf";
 import { CookiePreferences } from "./ui";
 
 const vendors: Gvl["vendors"] = {};
@@ -83,7 +86,15 @@ afterEach(() => {
   localStorage.clear();
 });
 
-async function setup(options: { height?: number } = {}) {
+// Compile-time check: translation labels and TcfLabels have the same keys.
+const asLabels: TcfLabels = de;
+const asMessages: TcfMessages = {} as TcfLabels;
+void asLabels;
+void asMessages;
+
+async function setup(
+  options: { height?: number; labels?: Partial<TcfLabels> } = {},
+) {
   const runtime = createConsent({
     categories: { marketing: false },
     regulation: "gdpr",
@@ -107,6 +118,7 @@ async function setup(options: { height?: number } = {}) {
             controller={controller}
             height={options.height ?? 200}
             rowHeight={40}
+            labels={options.labels}
           />
         </CookiePreferences>
       </ConsentProvider>,
@@ -388,5 +400,41 @@ describe("TcfVendorList", () => {
     });
     expect(box.isConnected).toBe(false);
     expect(document.activeElement).toBe(document.body);
+  });
+
+  describe("translations", () => {
+    it("English translation labels match the built-in defaults", async () => {
+      const plain = await setup();
+      const text = plain.host.textContent;
+      plain.root.unmount();
+      document.body.replaceChildren();
+      const translated = await setup({ labels: en });
+      expect(translated.host.textContent).toBe(text);
+    });
+
+    it("renders German labels from @cookiechimp/translations/tcf/de", async () => {
+      const { host } = await setup({ labels: de });
+      expect(host.querySelector(".cc-tcf")?.getAttribute("aria-label")).toBe(
+        "Partner und Zwecke",
+      );
+      expect(host.textContent).toContain("Anbieter (400)");
+      expect(
+        host.querySelector('input[aria-label="Einwilligung: Vendor 001"]'),
+      ).not.toBeNull();
+      expect(button(host, "Auswahl speichern")).toBeDefined();
+      const open = host.querySelector(
+        'button[aria-label="Details: Vendor 001"]',
+      ) as HTMLButtonElement;
+      await act(async () => open.click());
+      const panel = host.querySelector(
+        '[data-cc-part="tcf-vendor-details"]',
+      ) as HTMLElement;
+      expect(panel.textContent).toContain("Speicherung auf dem Gerät");
+      expect(panel.textContent).toContain(
+        "Cookies werden bis zu 365 Tage gespeichert",
+      );
+      expect(panel.textContent).toContain("Standardspeicherdauer: 30 Tage");
+      expect(panel.textContent).toContain("Details schließen");
+    });
   });
 });

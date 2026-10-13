@@ -206,6 +206,19 @@ none exists and emits `useractioncomplete`. Choices persist in localStorage as
 IDs only, tied to that decision, and are dropped when the user makes a new
 decision through the banner. Vendor and purpose names come from the GVL and are
 rendered as text. Labels default to English; pass `labels` to translate.
+Translated labels for every core locale ship as opt-in entries, so the core
+per-locale bundles do not grow:
+
+```tsx
+import de from "@cookiechimp/translations/tcf/de";
+
+<TcfVendorList controller={tcf} labels={de} />;
+```
+
+Only the English TCF labels have had native-speaker review so far
+(`tcfReviewedLocales`); review the other locales before relying on them.
+Purpose, feature and vendor names still come from the GVL, so load the GVL
+in the same language.
 
 Each vendor's name is a button (labelled "Details: <name>") that opens a panel with the disclosures
 TCF policy requires: consent and legitimate interest purposes, special

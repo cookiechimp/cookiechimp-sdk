@@ -5,6 +5,7 @@ import type { TcfController } from "@cookiechimp/core/tcf";
 import { ConsentProvider, usePreferences } from "@cookiechimp/react";
 import { TcfVendorList } from "@cookiechimp/react/tcf";
 import { CookiePreferences } from "@cookiechimp/react/ui";
+import de from "@cookiechimp/translations/tcf/de";
 import { useEffect, useState } from "react";
 
 function Manage() {
@@ -19,6 +20,7 @@ function Manage() {
 export function TcfVendorsDemo() {
   const [consent, setConsent] = useState<ConsentRuntime | null>(null);
   const [controller, setController] = useState<TcfController | null>(null);
+  const [german, setGerman] = useState(false);
   useEffect(() => {
     const runtime = createConsent({
       categories: { marketing: false },
@@ -26,6 +28,7 @@ export function TcfVendorsDemo() {
       regulation: "gdpr",
     });
     setConsent(runtime);
+    setGerman(new URLSearchParams(location.search).get("lang") === "de");
     let stop = () => {};
     import("@cookiechimp/core/tcf").then(async ({ installTcf }) => {
       // 300 is a fixture-only placeholder, not an IAB assigned CMP ID.
@@ -50,7 +53,12 @@ export function TcfVendorsDemo() {
       <Manage />
       <CookiePreferences categories={[{ id: "marketing", label: "Marketing" }]}>
         {controller && (
-          <TcfVendorList controller={controller} height={240} rowHeight={40} />
+          <TcfVendorList
+            controller={controller}
+            height={240}
+            rowHeight={40}
+            labels={german ? de : undefined}
+          />
         )}
       </CookiePreferences>
     </ConsentProvider>
