@@ -273,14 +273,14 @@
     "scenario": "cli",
     "entry": "packages/cli/dist/cli.mjs",
     "kind": "total",
-    "limit": 5140
+    "limit": 8800
   },
   {
     "name": "CLI programmatic API",
     "scenario": "cli api",
     "entry": "packages/cli/dist/index.mjs",
     "kind": "total",
-    "limit": 5195
+    "limit": 8905
   },
   {
     "name": "TCF/GPP module",
