@@ -71,19 +71,30 @@
       "types": "./dist/gpp-stub.d.ts",
       "import": "./dist/gpp-stub.mjs",
       "require": "./dist/gpp-stub.cjs"
+    },
+    "./tcf": {
+      "types": "./dist/tcf.d.ts",
+      "import": "./dist/tcf.mjs",
+      "require": "./dist/tcf.cjs"
+    },
+    "./tcf-stub": {
+      "types": "./dist/tcf-stub.d.ts",
+      "import": "./dist/tcf-stub.mjs",
+      "require": "./dist/tcf-stub.cjs"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/consent-log.d.mts dist/consent-log.d.ts && cp dist/endpoint.d.mts dist/endpoint.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts && cp dist/gate.d.mts dist/gate.d.ts && cp dist/dynamic.d.mts dist/dynamic.d.ts && cp dist/network.d.mts dist/network.d.ts && cp dist/consent-mode.d.mts dist/consent-mode.d.ts && cp dist/language.d.mts dist/language.d.ts && cp dist/gpp.d.mts dist/gpp.d.ts && cp dist/gpp-stub.d.mts dist/gpp-stub.d.ts",
+    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/consent-log.d.mts dist/consent-log.d.ts && cp dist/endpoint.d.mts dist/endpoint.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts && cp dist/gate.d.mts dist/gate.d.ts && cp dist/dynamic.d.mts dist/dynamic.d.ts && cp dist/network.d.mts dist/network.d.ts && cp dist/consent-mode.d.mts dist/consent-mode.d.ts && cp dist/language.d.mts dist/language.d.ts && cp dist/gpp.d.mts dist/gpp.d.ts && cp dist/gpp-stub.d.mts dist/gpp-stub.d.ts && cp dist/tcf.d.mts dist/tcf.d.ts && cp dist/tcf-stub.d.mts dist/tcf-stub.d.ts",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@iabgpp/cmpapi": "3.2.0",
+    "@iabtcf/core": "1.5.6",
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
     "vitest": "5.0.4"

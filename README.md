@@ -153,6 +153,34 @@ assigned ID. Set it once CookieChimp's IAB CMP registration (M6 item 26) is
 complete. The encoder is tested for byte-identical output against the IAB
 reference implementation, `@iabgpp/cmpapi`.
 
+## IAB TCF (EU)
+
+Two opt-in subpaths implement the IAB TCF CMP API (apiVersion 2.2) and TC
+strings to the current TCF v2.3 format, with the mandatory Disclosed Vendors
+segment. Neither is part of the default bundle.
+
+- `@cookiechimp/core/tcf-stub`: render `tcfStubScript(gdprApplies)` in an
+  inline `<script>` before vendor tags. It answers `ping`, queues other
+  commands and adds the `__tcfapiLocator` frame and postMessage bridge.
+- `@cookiechimp/core/tcf`: load it lazily and call
+  `installTcf(consent, { cmpId, gvl, publisherCC })`. `gvl` is a validated
+  vendor list object or a loader for the untrusted GVL JSON. The API answers
+  `ping`, `addEventListener` and `removeEventListener`; the deprecated
+  `getTCData` returns `success: false`. Listeners receive `cmpuishown` before a
+  decision (legitimate interest transparency only, no consents),
+  `useractioncomplete` after one, or `tcloaded` when a stored decision exists.
+
+`cmpId` is required. In development a missing `cmpId` falls back to 0 with a
+console warning (0 is not a valid IAB ID; vendors reject it). In production a
+missing, 0 or invalid `cmpId` disables TCF: `__tcfapi` answers only `ping`
+with `cmpStatus: "error"` and the reason is logged with `console.error`. An
+invalid `cmpId` throws in development. A missing or invalid GVL also fails
+closed. Purposes come from categories through `DEFAULT_PURPOSES` (override
+with `purposes`), a vendor gets consent only when every one of its consent
+purposes is granted, and special features are opt-in through
+`specialFeatures`. TC strings are tested against the IAB reference decoder
+`@iabtcf/core`.
+
 ## React headless primitives
 
 Import `Banner`, `Preferences`, and `OptOut` from

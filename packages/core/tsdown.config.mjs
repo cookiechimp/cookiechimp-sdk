@@ -27,4 +27,6 @@ export default defineConfig([
   { ...shared, entry: ["src/network.ts"], clean: false },
   { ...shared, entry: ["src/gpp.ts"], clean: false },
   { ...shared, entry: ["src/gpp-stub.ts"], clean: false },
+  { ...shared, entry: ["src/tcf.ts"], clean: false },
+  { ...shared, entry: ["src/tcf-stub.ts"], clean: false },
 ]);
