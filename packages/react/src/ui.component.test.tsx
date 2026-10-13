@@ -101,3 +101,43 @@ describe("styled consent UI", () => {
     act(() => root.unmount());
   });
 });
+
+it("keeps React ownership through activation, sibling changes and unmount", async () => {
+  const runtime = createConsent({
+    categories: { analytics: false },
+    regulation: "gdpr",
+  });
+  const host = document.body.appendChild(document.createElement("div"));
+  const root = createRoot(host);
+  function Demo({
+    sibling,
+    script = true,
+  }: {
+    sibling: boolean;
+    script?: boolean;
+  }) {
+    return (
+      <ConsentProvider consent={runtime}>
+        {sibling ? <p>before</p> : null}
+        {script ? (
+          <GatedScript category="analytics">window.__ran = true</GatedScript>
+        ) : null}
+        {sibling ? <p>after</p> : null}
+        <GatedScript category="analytics">window.__other = true</GatedScript>
+      </ConsentProvider>
+    );
+  }
+  await act(async () => root.render(<Demo sibling={false} />));
+  const inert = host.querySelector('script[type="text/plain"]');
+  await act(async () => runtime.acceptAll());
+  expect(inert?.isConnected).toBe(true);
+  expect(host.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(2);
+  await act(async () => root.render(<Demo sibling={true} />));
+  expect(host.textContent).toContain("before");
+  expect(host.textContent).toContain("after");
+  expect(host.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(2);
+  await act(async () => root.render(<Demo sibling={false} script={false} />));
+  expect(host.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(1);
+  await act(async () => root.unmount());
+  expect(host.children).toHaveLength(0);
+});

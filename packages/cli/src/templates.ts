@@ -11,7 +11,6 @@ const config = `import type { ConsentConfig } from "@cookiechimp/core";
 /** Edit categories and services to match the cookies and scripts your site uses. */
 export const consentConfig = {
   categories: {
-    necessary: { required: true },
     analytics: false,
     marketing: false,
   },

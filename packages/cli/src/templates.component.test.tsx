@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+import { spawnSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { act, type ReactNode } from "react";
@@ -90,3 +91,28 @@ it("the vanilla scaffold keeps gated scripts blocked until consent", async () =>
   gate.stop();
   script.remove();
 });
+
+it.each(["react", "next-app", "next-pages", "vanilla"] as const)(
+  "the %s scaffold passes TypeScript against the actual package types",
+  (framework) => {
+    const dir = write(`typed-${framework}`, framework);
+    // Next.js and Vite supply stylesheet declarations in the target app.
+    writeFileSync(join(dir, "styles.d.ts"), 'declare module "*.css";\n');
+    writeFileSync(
+      join(dir, "tsconfig.json"),
+      JSON.stringify({
+        extends: resolve(__dirname, "../../../tsconfig.base.json"),
+        compilerOptions: { jsx: "react-jsx" },
+        include: ["**/*.ts", "**/*.tsx"],
+      }),
+    );
+    const result = spawnSync(
+      resolve(__dirname, "../node_modules/.bin/tsc"),
+      ["--noEmit", "--project", join(dir, "tsconfig.json")],
+      { encoding: "utf8" },
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.stdout + result.stderr).toBe("");
+    expect(result.status).toBe(0);
+  },
+);
