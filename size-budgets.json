@@ -323,7 +323,7 @@
     "scenario": "react tcf",
     "entry": "packages/react/dist/tcf.mjs",
     "kind": "extra",
-    "limit": 4175,
+    "limit": 4295,
     "css": ["packages/react/tcf.css"],
     "excludedFrom": "packages/react/dist/ui.mjs",
     "forbiddenTokens": ["TcfVendorList", "cc-tcf__viewport"]

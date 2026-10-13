@@ -207,7 +207,7 @@ IDs only, tied to that decision, and are dropped when the user makes a new
 decision through the banner. Vendor and purpose names come from the GVL and are
 rendered as text. Labels default to English; pass `labels` to translate.
 
-Each vendor row has a Details button that opens a panel with the disclosures
+Each vendor's name is a button (labelled "Details: <name>") that opens a panel with the disclosures
 TCF policy requires: consent and legitimate interest purposes, special
 purposes, features, special features, data categories, retention periods,
 privacy policy and legitimate interest claim links, and device storage (cookie

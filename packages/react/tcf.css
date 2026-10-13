@@ -24,11 +24,14 @@
   list-style: none;
 }
 .cc-tcf__vendor {
+  /* Fixed-height windowed rows must not wrap onto the next row. */
+  flex-wrap: nowrap;
+  overflow: hidden;
   padding: 0 var(--cc-spacing-2);
   border-bottom: 1px solid var(--cc-banner-separator-border);
 }
 .cc-tcf__name {
-  flex: 1 1 12rem;
+  flex: 1 1 4rem;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -47,7 +50,20 @@
 }
 .cc-tcf__more {
   font: inherit;
-  margin-inline-start: auto;
+  color: inherit;
+  text-align: start;
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.cc-tcf__vendor label {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .cc-tcf__details {
   display: grid;

@@ -513,7 +513,21 @@ export function TcfVendorList({
                     right: 0,
                   }}
                 >
-                  <span className="cc-tcf__name">{name}</span>
+                  <button
+                    type="button"
+                    className="cc-tcf__name cc-tcf__more"
+                    data-cc-vendor-details={vendor.id}
+                    aria-label={`${l.details}: ${name}`}
+                    aria-expanded={openId === vendor.id}
+                    aria-controls={panelId}
+                    onClick={() =>
+                      openId === vendor.id
+                        ? closeDetails()
+                        : setOpenId(vendor.id)
+                    }
+                  >
+                    {name}
+                  </button>
                   {vendor.purposes.length > 0 && (
                     <label>
                       <input
@@ -552,21 +566,6 @@ export function TcfVendorList({
                       {l.legitimateInterest}
                     </label>
                   )}
-                  <button
-                    type="button"
-                    className="cc-tcf__more"
-                    data-cc-vendor-details={vendor.id}
-                    aria-label={`${l.details}: ${name}`}
-                    aria-expanded={openId === vendor.id}
-                    aria-controls={panelId}
-                    onClick={() =>
-                      openId === vendor.id
-                        ? closeDetails()
-                        : setOpenId(vendor.id)
-                    }
-                  >
-                    {l.details}
-                  </button>
                 </li>
               );
             })}

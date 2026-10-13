@@ -165,8 +165,8 @@ test("keyboard focus survives scrolling the focused row out of view", async ({
   await expect(box).toBeFocused();
   await page.keyboard.press("Space");
   await expect(box).toBeChecked();
-  await page.keyboard.press("Tab");
-  // Partner 2 has no legitimate interest purposes, so Details is next.
+  // The vendor name (Details button) precedes its checkboxes in the row.
+  await page.keyboard.press("Shift+Tab");
   await expect(
     page.getByRole("button", { name: "Details: Partner 2", exact: true }),
   ).toBeFocused();
