@@ -83,7 +83,7 @@ export function renderReport(
     value === null ? "unavailable" : value.toFixed(decimals);
   return (
     `# CookieChimp SDK benchmark results\n\n` +
-    `Recorded ${String(metadata.recordedAt)}. ${expected} measured runs per fixture; ${String(metadata.warmups)} excluded warmup runs. ` +
+    `Recorded ${String(metadata.recordedAt)}. ${expected} measured runs per fixture. Excluded warmups per fixture: ${String(metadata.warmups)}. ` +
     `This is a local lab comparison of pinned versions, not field Core Web Vitals or a certification.\n\n` +
     `| Fixture | Passed | JS gzip bytes | JS overhead vs baseline | Native LCP ms | Native CLS | Banner observed ms | Consent interaction ms | Lighthouse LCP ms | Lighthouse CLS | Lighthouse TBT ms |\n` +
     `|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n` +
