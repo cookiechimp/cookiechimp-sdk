@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Partneři a účely",
+  purposes: "Účely",
+  specialFeatures: "Zvláštní funkce",
+  vendors: "Dodavatelé",
+  search: "Hledat dodavatele",
+  consent: "Souhlas",
+  legitimateInterest: "Oprávněný zájem",
+  acceptAll: "Přijmout vše",
+  rejectAll: "Odmítnout vše",
+  save: "Uložit volby",
+  saved: "Volby uloženy",
+  empty: "Žádní odpovídající dodavatelé",
+  details: "Podrobnosti",
+  close: "Zavřít podrobnosti",
+  consentPurposes: "Účely (souhlas)",
+  legIntPurposes: "Účely (oprávněný zájem)",
+  specialPurposes: "Zvláštní účely",
+  features: "Funkce",
+  dataCategories: "Kategorie údajů",
+  retention: "Doba uchovávání údajů",
+  retentionDays: "{days} dní",
+  standardRetention: "Standardní doba uchovávání",
+  privacyPolicy: "Zásady ochrany osobních údajů",
+  legIntClaim: "Prohlášení o oprávněném zájmu",
+  storage: "Ukládání v zařízení",
+  cookieMaxAge: "Soubory cookie uloženy až {days} dní",
+  cookieSession: "Soubory cookie bez pevné platnosti",
+  cookieRefresh: "Platnost souboru cookie se při použití obnovuje",
+  noCookies: "Nepoužívá soubory cookie",
+  nonCookieAccess: "Používá jiné metody ukládání nebo přístupu v zařízení",
+  storageDisclosure: "Informace o ukládání",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

@@ -329,6 +329,15 @@
     "forbiddenTokens": ["TcfVendorList", "cc-tcf__viewport"]
   },
   {
+    "name": "TCF labels (largest locale, el)",
+    "scenario": "tcf labels",
+    "entry": "packages/translations/dist/tcf/el.mjs",
+    "kind": "extra",
+    "limit": 940,
+    "excludedFrom": "packages/translations/dist/el.mjs",
+    "forbiddenTokens": ["legIntClaim", "storageDisclosure"]
+  },
+  {
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",

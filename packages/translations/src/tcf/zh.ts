@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "合作伙伴和目的",
+  purposes: "目的",
+  specialFeatures: "特殊功能",
+  vendors: "供应商",
+  search: "搜索供应商",
+  consent: "同意",
+  legitimateInterest: "合法利益",
+  acceptAll: "全部接受",
+  rejectAll: "全部拒绝",
+  save: "保存选择",
+  saved: "选择已保存",
+  empty: "没有匹配的供应商",
+  details: "详情",
+  close: "关闭详情",
+  consentPurposes: "目的（同意）",
+  legIntPurposes: "目的（合法利益）",
+  specialPurposes: "特殊目的",
+  features: "功能",
+  dataCategories: "数据类别",
+  retention: "数据保留",
+  retentionDays: "{days} 天",
+  standardRetention: "标准保留期限",
+  privacyPolicy: "隐私政策",
+  legIntClaim: "合法利益声明",
+  storage: "设备存储",
+  cookieMaxAge: "Cookie 最多存储 {days} 天",
+  cookieSession: "没有固定有效期的 Cookie",
+  cookieRefresh: "Cookie 有效期在使用时刷新",
+  noCookies: "不使用 Cookie",
+  nonCookieAccess: "使用其他设备存储或访问方式",
+  storageDisclosure: "存储披露",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

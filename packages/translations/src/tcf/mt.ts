@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Sħab u skopijiet",
+  purposes: "Skopijiet",
+  specialFeatures: "Karatteristiċi speċjali",
+  vendors: "Fornituri",
+  search: "Fittex fornituri",
+  consent: "Kunsens",
+  legitimateInterest: "Interess leġittimu",
+  acceptAll: "Aċċetta kollox",
+  rejectAll: "Irrifjuta kollox",
+  save: "Issejvja l-għażliet",
+  saved: "Għażliet issejvjati",
+  empty: "L-ebda fornitur ma jaqbel",
+  details: "Dettalji",
+  close: "Agħlaq id-dettalji",
+  consentPurposes: "Skopijiet (kunsens)",
+  legIntPurposes: "Skopijiet (interess leġittimu)",
+  specialPurposes: "Skopijiet speċjali",
+  features: "Karatteristiċi",
+  dataCategories: "Kategoriji ta’ data",
+  retention: "Żamma tad-data",
+  retentionDays: "{days} jiem",
+  standardRetention: "Żamma standard",
+  privacyPolicy: "Politika tal-privatezza",
+  legIntClaim: "Dikjarazzjoni ta’ interess leġittimu",
+  storage: "Ħażna fuq l-apparat",
+  cookieMaxAge: "Cookies maħżuna sa {days} jiem",
+  cookieSession: "Cookies mingħajr skadenza fissa",
+  cookieRefresh: "L-iskadenza tal-cookie tiġġedded mal-użu",
+  noCookies: "Ma jużax cookies",
+  nonCookieAccess: "Juża metodi oħra ta’ ħażna jew aċċess fuq l-apparat",
+  storageDisclosure: "Żvelar tal-ħażna",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

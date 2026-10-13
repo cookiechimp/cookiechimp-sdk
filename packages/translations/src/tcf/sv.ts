@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Partner och ändamål",
+  purposes: "Ändamål",
+  specialFeatures: "Särskilda funktioner",
+  vendors: "Leverantörer",
+  search: "Sök leverantörer",
+  consent: "Samtycke",
+  legitimateInterest: "Berättigat intresse",
+  acceptAll: "Godkänn alla",
+  rejectAll: "Avvisa alla",
+  save: "Spara val",
+  saved: "Valen har sparats",
+  empty: "Inga leverantörer matchar",
+  details: "Detaljer",
+  close: "Stäng detaljer",
+  consentPurposes: "Ändamål (samtycke)",
+  legIntPurposes: "Ändamål (berättigat intresse)",
+  specialPurposes: "Särskilda ändamål",
+  features: "Funktioner",
+  dataCategories: "Datakategorier",
+  retention: "Lagringstid",
+  retentionDays: "{days} dagar",
+  standardRetention: "Standardlagringstid",
+  privacyPolicy: "Integritetspolicy",
+  legIntClaim: "Redogörelse för berättigat intresse",
+  storage: "Lagring på enheten",
+  cookieMaxAge: "Kakor lagras i upp till {days} dagar",
+  cookieSession: "Kakor utan fast utgångstid",
+  cookieRefresh: "Kakans giltighetstid förnyas vid användning",
+  noCookies: "Använder inte kakor",
+  nonCookieAccess: "Använder andra lagrings- eller åtkomstmetoder på enheten",
+  storageDisclosure: "Lagringsredovisning",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

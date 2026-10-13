@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Partners and purposes",
+  purposes: "Purposes",
+  specialFeatures: "Special features",
+  vendors: "Vendors",
+  search: "Search vendors",
+  consent: "Consent",
+  legitimateInterest: "Legitimate interest",
+  acceptAll: "Accept all",
+  rejectAll: "Reject all",
+  save: "Save choices",
+  saved: "Choices saved",
+  empty: "No vendors match",
+  details: "Details",
+  close: "Close details",
+  consentPurposes: "Purposes (consent)",
+  legIntPurposes: "Purposes (legitimate interest)",
+  specialPurposes: "Special purposes",
+  features: "Features",
+  dataCategories: "Data categories",
+  retention: "Data retention",
+  retentionDays: "{days} days",
+  standardRetention: "Standard retention",
+  privacyPolicy: "Privacy policy",
+  legIntClaim: "Legitimate interest claim",
+  storage: "Device storage",
+  cookieMaxAge: "Cookies stored for up to {days} days",
+  cookieSession: "Cookies without a fixed expiry",
+  cookieRefresh: "Cookie expiry is refreshed on use",
+  noCookies: "Does not use cookies",
+  nonCookieAccess: "Uses other device storage or access methods",
+  storageDisclosure: "Storage disclosure",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

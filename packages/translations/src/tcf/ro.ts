@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Parteneri și scopuri",
+  purposes: "Scopuri",
+  specialFeatures: "Funcții speciale",
+  vendors: "Furnizori",
+  search: "Caută furnizori",
+  consent: "Consimțământ",
+  legitimateInterest: "Interes legitim",
+  acceptAll: "Acceptă tot",
+  rejectAll: "Respinge tot",
+  save: "Salvează opțiunile",
+  saved: "Opțiuni salvate",
+  empty: "Niciun furnizor nu corespunde",
+  details: "Detalii",
+  close: "Închide detaliile",
+  consentPurposes: "Scopuri (consimțământ)",
+  legIntPurposes: "Scopuri (interes legitim)",
+  specialPurposes: "Scopuri speciale",
+  features: "Funcții",
+  dataCategories: "Categorii de date",
+  retention: "Păstrarea datelor",
+  retentionDays: "{days} zile",
+  standardRetention: "Perioadă standard de păstrare",
+  privacyPolicy: "Politica de confidențialitate",
+  legIntClaim: "Declarație privind interesul legitim",
+  storage: "Stocare pe dispozitiv",
+  cookieMaxAge: "Cookie-uri stocate până la {days} zile",
+  cookieSession: "Cookie-uri fără expirare fixă",
+  cookieRefresh: "Expirarea cookie-ului se reînnoiește la utilizare",
+  noCookies: "Nu folosește cookie-uri",
+  nonCookieAccess: "Folosește alte metode de stocare sau acces pe dispozitiv",
+  storageDisclosure: "Informații despre stocare",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

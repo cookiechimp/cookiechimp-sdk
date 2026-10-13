@@ -55,6 +55,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | TCF stub | extra | 645 |
 | TCF core module | lazy | 4555 |
 | TCF vendor list UI | extra | 4295 |
+| TCF labels (largest locale, el) | extra | 940 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -141,3 +142,4 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | nextjs server | informational | informational | `GppStub` inlines the stub source and `gpp` passthrough. Server-only (never shipped as a module to browsers; the inline stub itself is guarded by the gpp stub row): 13696 B to 15946 B (+2250 B) | M6 PR36 |
 | TCF core module | 4010 B | 4555 B | GVL parsing now keeps the vendor disclosures TCF policy requires in the CMP UI (special purposes, features, data categories, retention, https-only privacy and legitimate interest links, device storage fields): 3487 B to 3960 B (+473 B). Limit reset to about 15% headroom | M6 PR37 |
 | TCF vendor list UI | 2555 B | 4295 B | Vendor names become Details buttons opening a per-vendor details panel (purposes, retention, links, storage) with its CSS, and focused-row pinning so focus survives windowing, and rows no longer wrap at narrow widths: 2221 B to 3733 B (+1512 B). Limit reset to about 15% headroom. TCF/GPP total 10123 B of the 12288 B SPEC cap | M6 PR37 |
+| TCF labels (largest locale, el) | n/a | 940 B | New opt-in `@cookiechimp/translations/tcf/<locale>` entries. Largest is el at 815 B; limit about 15% headroom over the largest. Every existing per-locale bundle (`dist/<locale>.mjs` and `.cjs`) is byte-identical to main, and the row asserts the TCF keys stay out of `dist/el.mjs` | M6 PR38 |

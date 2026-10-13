@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "שותפים ומטרות",
+  purposes: "מטרות",
+  specialFeatures: "תכונות מיוחדות",
+  vendors: "ספקים",
+  search: "חיפוש ספקים",
+  consent: "הסכמה",
+  legitimateInterest: "אינטרס לגיטימי",
+  acceptAll: "לקבל הכול",
+  rejectAll: "לדחות הכול",
+  save: "שמירת הבחירות",
+  saved: "הבחירות נשמרו",
+  empty: "אין ספקים תואמים",
+  details: "פרטים",
+  close: "סגירת הפרטים",
+  consentPurposes: "מטרות (הסכמה)",
+  legIntPurposes: "מטרות (אינטרס לגיטימי)",
+  specialPurposes: "מטרות מיוחדות",
+  features: "תכונות",
+  dataCategories: "קטגוריות נתונים",
+  retention: "שמירת נתונים",
+  retentionDays: "{days} ימים",
+  standardRetention: "תקופת שמירה רגילה",
+  privacyPolicy: "מדיניות פרטיות",
+  legIntClaim: "הצהרת אינטרס לגיטימי",
+  storage: "אחסון במכשיר",
+  cookieMaxAge: "קובצי Cookie נשמרים עד {days} ימים",
+  cookieSession: "קובצי Cookie ללא תפוגה קבועה",
+  cookieRefresh: "תוקף קובץ ה-Cookie מתחדש בשימוש",
+  noCookies: "לא משתמש בקובצי Cookie",
+  nonCookieAccess: "משתמש בשיטות אחסון או גישה אחרות במכשיר",
+  storageDisclosure: "גילוי אחסון",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

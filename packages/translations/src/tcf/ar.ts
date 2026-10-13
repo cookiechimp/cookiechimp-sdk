@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "الشركاء والأغراض",
+  purposes: "الأغراض",
+  specialFeatures: "الميزات الخاصة",
+  vendors: "المورّدون",
+  search: "البحث عن المورّدين",
+  consent: "الموافقة",
+  legitimateInterest: "المصلحة المشروعة",
+  acceptAll: "قبول الكل",
+  rejectAll: "رفض الكل",
+  save: "حفظ الاختيارات",
+  saved: "تم حفظ الاختيارات",
+  empty: "لا يوجد مورّدون مطابقون",
+  details: "التفاصيل",
+  close: "إغلاق التفاصيل",
+  consentPurposes: "الأغراض (الموافقة)",
+  legIntPurposes: "الأغراض (المصلحة المشروعة)",
+  specialPurposes: "الأغراض الخاصة",
+  features: "الميزات",
+  dataCategories: "فئات البيانات",
+  retention: "الاحتفاظ بالبيانات",
+  retentionDays: "{days} يوم",
+  standardRetention: "مدة الاحتفاظ القياسية",
+  privacyPolicy: "سياسة الخصوصية",
+  legIntClaim: "بيان المصلحة المشروعة",
+  storage: "التخزين على الجهاز",
+  cookieMaxAge: "تُخزَّن ملفات تعريف الارتباط لمدة تصل إلى {days} يوم",
+  cookieSession: "ملفات تعريف ارتباط بلا مدة انتهاء ثابتة",
+  cookieRefresh: "تتجدد مدة ملف تعريف الارتباط عند الاستخدام",
+  noCookies: "لا يستخدم ملفات تعريف الارتباط",
+  nonCookieAccess: "يستخدم طرقًا أخرى للتخزين أو الوصول على الجهاز",
+  storageDisclosure: "إفصاح التخزين",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

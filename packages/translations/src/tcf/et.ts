@@ -1,0 +1,37 @@
+import type { TcfMessages } from "./index";
+
+const labels = {
+  title: "Partnerid ja eesmärgid",
+  purposes: "Eesmärgid",
+  specialFeatures: "Erifunktsioonid",
+  vendors: "Teenusepakkujad",
+  search: "Otsi teenusepakkujaid",
+  consent: "Nõusolek",
+  legitimateInterest: "Õigustatud huvi",
+  acceptAll: "Nõustu kõigiga",
+  rejectAll: "Keeldu kõigist",
+  save: "Salvesta valikud",
+  saved: "Valikud salvestatud",
+  empty: "Sobivaid teenusepakkujaid pole",
+  details: "Üksikasjad",
+  close: "Sulge üksikasjad",
+  consentPurposes: "Eesmärgid (nõusolek)",
+  legIntPurposes: "Eesmärgid (õigustatud huvi)",
+  specialPurposes: "Erieesmärgid",
+  features: "Funktsioonid",
+  dataCategories: "Andmekategooriad",
+  retention: "Andmete säilitamine",
+  retentionDays: "{days} päeva",
+  standardRetention: "Tavapärane säilitusaeg",
+  privacyPolicy: "Privaatsuspoliitika",
+  legIntClaim: "Õigustatud huvi selgitus",
+  storage: "Salvestamine seadmes",
+  cookieMaxAge: "Küpsiseid säilitatakse kuni {days} päeva",
+  cookieSession: "Kindla aegumiseta küpsised",
+  cookieRefresh: "Küpsise aegumisaeg uueneb kasutamisel",
+  noCookies: "Ei kasuta küpsiseid",
+  nonCookieAccess: "Kasutab seadmes muid salvestus- või juurdepääsuviise",
+  storageDisclosure: "Salvestamise teave",
+} as const satisfies TcfMessages;
+export default labels;
+export { labels };

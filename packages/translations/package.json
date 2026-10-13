@@ -200,6 +200,176 @@
       "types": "./dist/uk.d.ts",
       "import": "./dist/uk.mjs",
       "require": "./dist/uk.cjs"
+    },
+    "./tcf": {
+      "types": "./dist/tcf/index.d.ts",
+      "import": "./dist/tcf/index.mjs",
+      "require": "./dist/tcf/index.cjs"
+    },
+    "./tcf/en": {
+      "types": "./dist/tcf/en.d.ts",
+      "import": "./dist/tcf/en.mjs",
+      "require": "./dist/tcf/en.cjs"
+    },
+    "./tcf/de": {
+      "types": "./dist/tcf/de.d.ts",
+      "import": "./dist/tcf/de.mjs",
+      "require": "./dist/tcf/de.cjs"
+    },
+    "./tcf/fr": {
+      "types": "./dist/tcf/fr.d.ts",
+      "import": "./dist/tcf/fr.mjs",
+      "require": "./dist/tcf/fr.cjs"
+    },
+    "./tcf/es": {
+      "types": "./dist/tcf/es.d.ts",
+      "import": "./dist/tcf/es.mjs",
+      "require": "./dist/tcf/es.cjs"
+    },
+    "./tcf/it": {
+      "types": "./dist/tcf/it.d.ts",
+      "import": "./dist/tcf/it.mjs",
+      "require": "./dist/tcf/it.cjs"
+    },
+    "./tcf/nl": {
+      "types": "./dist/tcf/nl.d.ts",
+      "import": "./dist/tcf/nl.mjs",
+      "require": "./dist/tcf/nl.cjs"
+    },
+    "./tcf/pt": {
+      "types": "./dist/tcf/pt.d.ts",
+      "import": "./dist/tcf/pt.mjs",
+      "require": "./dist/tcf/pt.cjs"
+    },
+    "./tcf/pt-BR": {
+      "types": "./dist/tcf/pt-BR.d.ts",
+      "import": "./dist/tcf/pt-BR.mjs",
+      "require": "./dist/tcf/pt-BR.cjs"
+    },
+    "./tcf/pl": {
+      "types": "./dist/tcf/pl.d.ts",
+      "import": "./dist/tcf/pl.mjs",
+      "require": "./dist/tcf/pl.cjs"
+    },
+    "./tcf/sv": {
+      "types": "./dist/tcf/sv.d.ts",
+      "import": "./dist/tcf/sv.mjs",
+      "require": "./dist/tcf/sv.cjs"
+    },
+    "./tcf/da": {
+      "types": "./dist/tcf/da.d.ts",
+      "import": "./dist/tcf/da.mjs",
+      "require": "./dist/tcf/da.cjs"
+    },
+    "./tcf/fi": {
+      "types": "./dist/tcf/fi.d.ts",
+      "import": "./dist/tcf/fi.mjs",
+      "require": "./dist/tcf/fi.cjs"
+    },
+    "./tcf/no": {
+      "types": "./dist/tcf/no.d.ts",
+      "import": "./dist/tcf/no.mjs",
+      "require": "./dist/tcf/no.cjs"
+    },
+    "./tcf/cs": {
+      "types": "./dist/tcf/cs.d.ts",
+      "import": "./dist/tcf/cs.mjs",
+      "require": "./dist/tcf/cs.cjs"
+    },
+    "./tcf/sk": {
+      "types": "./dist/tcf/sk.d.ts",
+      "import": "./dist/tcf/sk.mjs",
+      "require": "./dist/tcf/sk.cjs"
+    },
+    "./tcf/hu": {
+      "types": "./dist/tcf/hu.d.ts",
+      "import": "./dist/tcf/hu.mjs",
+      "require": "./dist/tcf/hu.cjs"
+    },
+    "./tcf/ro": {
+      "types": "./dist/tcf/ro.d.ts",
+      "import": "./dist/tcf/ro.mjs",
+      "require": "./dist/tcf/ro.cjs"
+    },
+    "./tcf/bg": {
+      "types": "./dist/tcf/bg.d.ts",
+      "import": "./dist/tcf/bg.mjs",
+      "require": "./dist/tcf/bg.cjs"
+    },
+    "./tcf/el": {
+      "types": "./dist/tcf/el.d.ts",
+      "import": "./dist/tcf/el.mjs",
+      "require": "./dist/tcf/el.cjs"
+    },
+    "./tcf/hr": {
+      "types": "./dist/tcf/hr.d.ts",
+      "import": "./dist/tcf/hr.mjs",
+      "require": "./dist/tcf/hr.cjs"
+    },
+    "./tcf/sl": {
+      "types": "./dist/tcf/sl.d.ts",
+      "import": "./dist/tcf/sl.mjs",
+      "require": "./dist/tcf/sl.cjs"
+    },
+    "./tcf/et": {
+      "types": "./dist/tcf/et.d.ts",
+      "import": "./dist/tcf/et.mjs",
+      "require": "./dist/tcf/et.cjs"
+    },
+    "./tcf/lv": {
+      "types": "./dist/tcf/lv.d.ts",
+      "import": "./dist/tcf/lv.mjs",
+      "require": "./dist/tcf/lv.cjs"
+    },
+    "./tcf/lt": {
+      "types": "./dist/tcf/lt.d.ts",
+      "import": "./dist/tcf/lt.mjs",
+      "require": "./dist/tcf/lt.cjs"
+    },
+    "./tcf/ga": {
+      "types": "./dist/tcf/ga.d.ts",
+      "import": "./dist/tcf/ga.mjs",
+      "require": "./dist/tcf/ga.cjs"
+    },
+    "./tcf/mt": {
+      "types": "./dist/tcf/mt.d.ts",
+      "import": "./dist/tcf/mt.mjs",
+      "require": "./dist/tcf/mt.cjs"
+    },
+    "./tcf/tr": {
+      "types": "./dist/tcf/tr.d.ts",
+      "import": "./dist/tcf/tr.mjs",
+      "require": "./dist/tcf/tr.cjs"
+    },
+    "./tcf/ja": {
+      "types": "./dist/tcf/ja.d.ts",
+      "import": "./dist/tcf/ja.mjs",
+      "require": "./dist/tcf/ja.cjs"
+    },
+    "./tcf/zh": {
+      "types": "./dist/tcf/zh.d.ts",
+      "import": "./dist/tcf/zh.mjs",
+      "require": "./dist/tcf/zh.cjs"
+    },
+    "./tcf/ko": {
+      "types": "./dist/tcf/ko.d.ts",
+      "import": "./dist/tcf/ko.mjs",
+      "require": "./dist/tcf/ko.cjs"
+    },
+    "./tcf/ar": {
+      "types": "./dist/tcf/ar.d.ts",
+      "import": "./dist/tcf/ar.mjs",
+      "require": "./dist/tcf/ar.cjs"
+    },
+    "./tcf/he": {
+      "types": "./dist/tcf/he.d.ts",
+      "import": "./dist/tcf/he.mjs",
+      "require": "./dist/tcf/he.cjs"
+    },
+    "./tcf/uk": {
+      "types": "./dist/tcf/uk.d.ts",
+      "import": "./dist/tcf/uk.mjs",
+      "require": "./dist/tcf/uk.cjs"
     }
   }
 }
