@@ -50,12 +50,16 @@ The checked budgets are the source-of-truth values below. Region header provider
 | Devtools simulation reader | extra | 660 |
 | CLI binary | total | 8800 |
 | CLI programmatic API | total | 8905 |
+| GPP stub | extra | 925 |
+| GPP US sections module | lazy | 2810 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
 Until the M3 Next.js package exists, `fixtures/nextjs-app` is the empty stand-in application. Its page is the baseline and contributes zero package bytes. Source scenario measurement avoids build identifiers and framework chunk allocation changing the result while measuring the complete CookieChimp graph used by a realistic render. Fixture-delta measurement is deferred to M7. The fixture no-flash test remains part of the required end-to-end job.
 
 Entries planned for later milestones remain visible as `PENDING` only when their paths are on the harness's explicit allowlist. A missing path outside that allowlist fails with a non-zero exit, preventing a typo from remaining pending indefinitely. File existence controls the allowlisted state, so the same row becomes enforced automatically when its configured build output appears.
+
+GPP lives in two opt-in subpaths. `@cookiechimp/core/gpp-stub` is the `__gpp` stub that publishers inline before vendor tags (SPEC.md requires under 1 KB; the `gppStubScript` inline string measures 761 B gzip on its own). `@cookiechimp/core/gpp` is the lazy US sections encoder and full CMP API. The planned TCF/GPP row keeps the SPEC.md 12 KB cap for the combined module once TCF lands; the GPP rows plus TCF must stay inside it.
 
 The TCF/GPP exclusion guard always scans the default core entry and every statically or dynamically reachable emitted module for `__tcfapi` and `__gpp`. This guard runs even while the opt-in TCF/GPP entry is absent, and finding either token fails the size job.
 
@@ -122,3 +126,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | consent log | none | 2490 B | New opt-in consent record POST subpath: platform record mapping, persisted queue, capped backoff, untrusted response parsing, beacon on hide and fail-closed guards. Measured 2166 B (about 15% headroom) | M5 PR21 |
 | endpoint | none | 2135 B | New opt-in self-hosted consent record subpath for local mode: endpoint validation, record mapping and the shared record queue chunk. Measured 1854 B (about 15% headroom) | M5 PR22 |
 | consent log | 2490 B | 2490 B | Limit unchanged. Queue moved into a shared chunk and the page-hide flush switched from sendBeacon to a cookie-less keepalive fetch: measured 2166 B to 2215 B (about 12% headroom) | M5 PR22 |
+| gpp stub | none | 925 B | New opt-in `__gpp` stub subpath (ping, listener registration, queue, `__gppLocator` frame, postMessage bridge). Measured 809 B (about 14% headroom), inside the SPEC.md 1 KB stub target | M6 PR33 |
+| gpp | none | 2810 B | New opt-in lazy GPP module: header and usnat, usca, usva, usco, usut, usct encoders with GPC segment, consent mapping and full CMP API. Measured 2430 B (about 16% headroom), inside the SPEC.md 12 KB TCF/GPP cap | M6 PR33 |
