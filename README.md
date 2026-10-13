@@ -323,3 +323,52 @@ Limitations of `./network`:
   globals.
 - Image pixels, WebSocket, and EventSource requests are not covered. An image
   pixel handler for `./dynamic` is on the backlog.
+
+
+### Opt-in React TCF provider
+
+`TcfProvider` from `@cookiechimp/react/tcf-provider` binds the TCF controller to
+an existing `ConsentProvider` or Next.js provider. It defaults to disabled and
+loads the core only after hydration when `enabled` is exactly `true`. Applications
+must supply their real registered CMP ID, valid GVL and server-owned connected/Pro
+feature decision. The boolean is not client-side entitlement enforcement.
+
+```tsx
+"use client";
+import type { TcfOptions } from "@cookiechimp/core/tcf";
+import { TcfProvider } from "@cookiechimp/react/tcf-provider";
+import { TcfVendorList } from "@cookiechimp/react/tcf";
+import { CookiePreferences } from "@cookiechimp/react/ui";
+
+export function VendorPreferences({ enabled, options }: {
+  enabled: boolean;
+  options: TcfOptions;
+}) {
+  return (
+    <TcfProvider enabled={enabled} options={options}>
+      {({ controller }) => (
+        <CookiePreferences categories={[{ id: "analytics", label: "Analytics" }]}>
+          {controller ? <TcfVendorList controller={controller} /> : null}
+        </CookiePreferences>
+      )}
+    </TcfProvider>
+  );
+}
+```
+
+Construct `options` in a client module (or memoize it), with either a GVL object
+or the existing asynchronous loader API. A changed options object reinstalls
+TCF, so keep it stable. A loader should bound its response and timeout and use
+only the intended trusted vendor-list source; the provider never picks a URL.
+Do not pass a loader function through a Server Component boundary.
+
+The render callback receives `status` (`disabled`, `loading`, `ready`, `error`)
+and a nullable `controller`. Invalid CMP/GVL data fails closed; the ordinary
+consent runtime keeps working. Replacing options immediately hides the old
+controller, and unmounting stops subscriptions and ignores late loads.
+
+In Next.js, render `TcfStub` from `@cookiechimp/nextjs/server` in the head before
+vendor tags, only when opting in. It supports `nonce` and an optional trusted
+`gdprApplies` value. Without the optional provider and stub, no TCF runs.
+The provider does not register CookieChimp, supply a GVL CDN or replace the
+platform's authoritative entitlement checks. Those remain launch prerequisites.

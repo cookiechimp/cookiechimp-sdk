@@ -350,5 +350,22 @@
     "limit": 12288,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["__tcfapi", "__gpp"]
+  },
+  {
+    "name": "TCF provider bootstrap",
+    "scenario": "react tcf provider",
+    "entry": "packages/react/dist/tcf-provider.mjs",
+    "kind": "initial",
+    "limit": 780,
+    "excludedFrom": "packages/react/dist/index.mjs",
+    "forbiddenTokens": ["TcfProvider", "installTcf"]
+  },
+  {
+    "name": "TCF/GPP with provider full import graph",
+    "scenario": "iab full graph",
+    "entry": "scripts/size-scenarios/iab.ts",
+    "kind": "total",
+    "limit": 12288,
+    "css": ["packages/react/tcf.css"]
   }
 ]

@@ -18,6 +18,7 @@ import {
   regulationFor,
   resolveRegion,
 } from "@cookiechimp/core/regions";
+import { tcfStubScript } from "@cookiechimp/core/tcf-stub";
 import type { Messages } from "@cookiechimp/react";
 import { cookies, headers } from "next/headers";
 import type { ReactNode } from "react";
@@ -346,6 +347,24 @@ export function GppStub({ nonce }: { nonce?: string }) {
       data-cookiechimp-gpp=""
       // biome-ignore lint/security/noDangerouslySetInnerHtml: package-owned static stub source with no user input.
       dangerouslySetInnerHTML={{ __html: gppStubScript }}
+    />
+  );
+}
+
+/** Render before vendor tags only when the application opts in to TCF. */
+export function TcfStub({
+  nonce,
+  gdprApplies,
+}: {
+  nonce?: string;
+  gdprApplies?: boolean;
+}) {
+  return (
+    <script
+      nonce={nonce}
+      data-cookiechimp-tcf=""
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: package-owned static stub source with no user input.
+      dangerouslySetInnerHTML={{ __html: tcfStubScript(gdprApplies) }}
     />
   );
 }

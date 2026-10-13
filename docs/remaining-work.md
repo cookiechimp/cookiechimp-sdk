@@ -13,10 +13,10 @@ Daniel resumed the SDK work on 13 Oct 2026. SPEC items 1 to 27 are merged, along
 - SDK runtime/setup fixes: PR #41, pending review. Fixes React script reconciliation, duplicate execution, ordered activation, the CLI's typed config and builds from paths containing spaces.
 - Item 28 (docs site, llms.txt, AI skills, examples): PR #39 now includes deployment preparation and release status. Stacked on #41 until it merges. CI publishes a static docs artifact; Daniel chose to decide hosting and domain later.
 
-## Still to build (SPEC section 9)
+## Release preparation (SPEC section 9)
 
-- Item 29: benchmark suite and raw results in `bench/`, recorded on 13 Oct 2026. All 40 measured attempts and four excluded warmups passed. Results identify the clean measured source commit. SDK PR review and external benchmark submission remain separate steps.
-- Item 30: 1.0 release, npm publish with provenance. Needs Daniel's npm org access and an explicit go-ahead before publishing.
+- Item 29: PR #42 contains the benchmark suite and raw results in `bench/`, recorded on 13 Oct 2026. All 40 measured attempts and four excluded warmups passed. Results identify the clean measured source commit. SDK PR review and external benchmark submission remain separate steps.
+- Item 30: PR #43 prepares eight coordinated 1.0 candidates, tarball validation, a fresh npm consumer and a publication workflow. No packages are published. Needs Daniel's review, actual launch prerequisites and explicit approval before publication.
 
 ## Blocked on Daniel
 
@@ -28,12 +28,12 @@ Daniel resumed the SDK work on 13 Oct 2026. SPEC items 1 to 27 are merged, along
 ## Known gaps and follow-ups
 
 - TCF:
-  - No provider wiring yet. It needs `cmpId` and a vendor list source.
+  - SDK provider wiring is built in the optional `@cookiechimp/react/tcf-provider` entry, with a Next.js `TcfStub` helper, pending review. It requires an explicit application-owned feature decision, registered `cmpId` and valid vendor-list source. The regular consent UI remains available when TCF is disabled or fails.
   - No vendor list (GVL) CDN or proxy URL yet, so apps pass the list themselves.
   - Limiting TCF to Pro and connected mode needs platform support.
   - IAB validator checks are manual only.
-  - TCF plus GPP is 10.1 KB of the 12 KB cap, so watch headroom.
-- GPP: the later US state sections (TX, NJ and others) fall back to usnat.
+  - The conservative TCF/GPP component sum is 10366 B of the 12288 B cap. The provider has separate bootstrap and full import-graph checks; all enforced budgets pass.
+- GPP: PR #44 adds ten state sections, covering all 16 US formats in the current published IAB reference. Newer MN/MD/IN/KY/RI formats still use the national fallback.
 - Translations: 29 base locales and 32 TCF label locales are machine drafts (`reviewed: false`). They need native-speaker review before 1.0.
 - Sync:
   - The sync extra is 2395 B, above the original 2 KB target. SPEC was raised to 2.5 KB; trim if easy.

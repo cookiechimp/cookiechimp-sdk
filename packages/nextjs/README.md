@@ -227,3 +227,18 @@ stable ETag, and supports conditional 304 responses. The default static route
 uses immutable one-year caching. Configuring a per-request nonce or CSP uses
 `private, no-cache` instead, because a response whose policy varies by request
 must not be reused as an immutable shared response.
+
+
+## Opt-in TCF
+
+Compose `TcfProvider` from `@cookiechimp/react/tcf-provider` inside either
+Next.js consent provider, in a client component. Pass stable `TcfOptions` and
+an explicit server-owned `enabled` decision. The controller uses that same
+server-seeded consent runtime, so returning consent and revalidation stay
+consistent. See the [React TCF provider reference](../../README.md#opt-in-react-tcf-provider).
+
+Render `TcfStub` from `@cookiechimp/nextjs/server` in `<head>` before vendor
+tags only when opting in. `nonce` supports a strict CSP; optional `gdprApplies`
+must come from trusted region policy. Production without a registered CMP ID
+fails closed, and applications still supply their GVL source. Connected Pro
+entitlement enforcement and CookieChimp registration remain platform/owner work.
