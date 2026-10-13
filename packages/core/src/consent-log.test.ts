@@ -60,8 +60,6 @@ const make = (options: Partial<ConsentLogOptions> = {}) =>
     fetch: async () => {
       throw new TypeError("offline");
     },
-    // happy-dom's sendBeacon performs a real request.
-    sendBeacon: () => false,
     ...options,
   });
 const body = (call: Call | undefined) =>
@@ -444,48 +442,52 @@ describe("queue", () => {
 });
 
 describe("page hide", () => {
-  it("sends a text/plain beacon with no cookies and clears the queue when accepted", async () => {
-    const sendBeacon = vi.fn((_url: string, _data: Blob) => true);
-    const log = make({
-      fetch: vi.fn(async () => new Response("", { status: 500 })),
-      sendBeacon,
-    });
-    log.record(consent());
-    await log.flush();
+  const hide = (state: "hidden" | "visible") => {
     Object.defineProperty(document, "visibilityState", {
-      value: "hidden",
+      value: state,
       configurable: true,
     });
     document.dispatchEvent(new Event("visibilitychange"));
-    const [url, blob] = sendBeacon.mock.calls[0] ?? [];
-    expect(url).toBe(ENDPOINT);
-    expect(blob?.type).toBe("text/plain;charset=utf-8");
-    expect(JSON.parse(await (blob as Blob).text()).consents).toHaveLength(1);
-    expect(log.pending()).toBe(0);
-    Object.defineProperty(document, "visibilityState", {
-      value: "visible",
-      configurable: true,
+  };
+  afterEach(() => hide("visible"));
+
+  it("sends the whole queue as a cookie-less text/plain keepalive POST, ignoring backoff", async () => {
+    const beacon = vi.fn();
+    vi.stubGlobal("navigator", { ...navigator, sendBeacon: beacon });
+    const fetch = vi.fn(async (url: RequestInfo | URL, init?: RequestInit) =>
+      fetch.mock.calls.length === 1
+        ? new Response("", { status: 500 })
+        : okSync()(url, init),
+    );
+    const log = make({ fetch, baseDelayMs: 60000 });
+    log.record(consent());
+    await log.flush();
+    expect(log.pending()).toBe(1);
+    hide("hidden");
+    await vi.waitFor(() => expect(log.pending()).toBe(0));
+    const [url, init] = fetch.mock.calls[1] as Call;
+    expect(String(url)).toBe(ENDPOINT);
+    expect(init).toMatchObject({
+      method: "POST",
+      credentials: "omit",
+      keepalive: true,
+      headers: { "Content-Type": "text/plain;charset=UTF-8" },
     });
+    expect(body(fetch.mock.calls[1] as Call).consents).toHaveLength(1);
+    // sendBeacon always sends cookies, so it is never used.
+    expect(beacon).not.toHaveBeenCalled();
     log.destroy();
   });
 
-  it("keeps the queue when the beacon is refused", async () => {
+  it("keeps the queue when the hidden POST fails", async () => {
     const log = make({
       fetch: vi.fn(async () => new Response("", { status: 500 })),
-      sendBeacon: () => false,
     });
     log.record(consent());
     await log.flush();
-    Object.defineProperty(document, "visibilityState", {
-      value: "hidden",
-      configurable: true,
-    });
-    document.dispatchEvent(new Event("visibilitychange"));
+    hide("hidden");
+    await log.flush();
     expect(log.pending()).toBe(1);
-    Object.defineProperty(document, "visibilityState", {
-      value: "visible",
-      configurable: true,
-    });
     log.destroy();
   });
 });

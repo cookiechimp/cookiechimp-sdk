@@ -87,10 +87,6 @@ test("a 500 keeps consent and retries with backoff", async ({ page }) => {
 });
 
 test("offline queue survives a reload and drains later", async ({ page }) => {
-  // Refuse the unload beacon so the queue must persist across the reload.
-  await page.addInitScript(() => {
-    navigator.sendBeacon = () => false;
-  });
   await page.route(SYNC, (route) => route.abort("internetdisconnected"));
   await page.goto("/consent-log");
   await accept(page);
@@ -139,15 +135,38 @@ test("a hostile response does not break the page", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("page hide flushes the queue as a text/plain beacon", async ({ page }) => {
+test("page hide flushes the queue as a cookie-less text/plain keepalive POST", async ({
+  page,
+  context,
+}) => {
+  // A cookie on the API host proves the request omits credentials: a
+  // sendBeacon would always attach it.
+  await context.addCookies([
+    {
+      name: "session",
+      value: "dashboard",
+      domain: "api.cookiechimp.test",
+      path: "/",
+      secure: true,
+      sameSite: "None",
+    },
+  ]);
   await page.route(SYNC, (route) => route.abort("internetdisconnected"));
   await page.goto("/consent-log");
   await accept(page);
   await expect(page.getByTestId("consent-log")).toHaveText("Queued: 1");
   await page.unroute(SYNC);
-  const beacon = page.waitForRequest(SYNC);
+  const hidden = page.waitForRequest(
+    (request) =>
+      request.url() === SYNC &&
+      /^text\/plain/.test(request.headers()["content-type"] ?? ""),
+  );
   await page.route(SYNC, (route) =>
-    route.fulfill({ headers: { "access-control-allow-origin": "*" } }),
+    route.fulfill({
+      contentType: "application/json",
+      headers: { "access-control-allow-origin": "*" },
+      body: confirmAll(route.request()),
+    }),
   );
   await page.evaluate(() => {
     Object.defineProperty(document, "visibilityState", {
@@ -156,9 +175,9 @@ test("page hide flushes the queue as a text/plain beacon", async ({ page }) => {
     });
     document.dispatchEvent(new Event("visibilitychange"));
   });
-  const request = await beacon;
+  const request = await hidden;
   const headers = await request.allHeaders();
-  expect(headers["content-type"]).toMatch(/^text\/plain/);
   expect(headers.cookie).toBeUndefined();
   expect(JSON.parse(request.postData() ?? "{}").consents).toHaveLength(1);
+  await expect(page.getByTestId("consent-log")).toHaveText("Queued: 0");
 });

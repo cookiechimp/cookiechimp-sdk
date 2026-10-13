@@ -14,6 +14,7 @@ export default defineConfig([
     entry: [
       "src/sync.ts",
       "src/consent-log.ts",
+      "src/endpoint.ts",
       "src/match.ts",
       "src/regions.ts",
       "src/gate.ts",
