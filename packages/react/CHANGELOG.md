@@ -9,7 +9,7 @@
 ### Minor Changes
 
 - 19a64bc: Add tree-shakeable locale modules, language negotiation and controller APIs, and translated React provider hooks.
-  
+
   `@cookiechimp/react` now uses the keyed `Messages` API. This removes the old
   `Translations` type and changes `t(key, fallback)` to `t(key: MessageKey)`, a
   breaking pre-1.0 API correction. Styled entry points provide English defaults,
@@ -24,7 +24,7 @@
 ### Patch Changes
 
 - a1ef889: Keep React-owned gated script nodes stable through activation and reconciliation. Prevent duplicate execution across gate controllers and recheck consent before queued scripts execute. Generate CLI configurations that pass TypeScript.
-  
+
   Decode filesystem URLs when generating Next.js critical CSS so builds work in paths with spaces.
 - Updated dependencies [64542f7]
 - Updated dependencies [19a64bc]
