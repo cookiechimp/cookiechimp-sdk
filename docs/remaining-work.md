@@ -35,7 +35,11 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
    stub. Requires the application's registered CMP ID, GVL and server-owned feature
    decision. Local lifecycle and production browser tests pass; all seven standard
    CI checks and benchmark smoke are green.
-6. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
+6. [#46](https://github.com/cookiechimp/cookiechimp-sdk/pull/46): plain React/Vite
+   example and static full-text docs search. Includes real section links, keyboard
+   and mobile support, safe result rendering and a visible no-JS fallback. Local
+   unit, typecheck, lint and all 115 browser tests pass. Final-head CI is checked separately.
+7. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
    metadata, licenses, changelogs, typed stylesheet exports and a reviewed publication
    workflow. Local packaging and a fresh npm-installed Next.js consumer pass:
    114 entries, ESM/CJS, CSS, acceptance, persistence and React reconciliation.

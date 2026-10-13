@@ -5,7 +5,7 @@ SHA-256 and npm integrity hashes are in `release/artifacts/manifest.json`;
 CI retains the candidates and consumer proof as an artifact.
 
 - Build, lint, typecheck and full unit suites passed.
-- Component suite: 228 passed. Browser suite: 110 passed.
+- Component suite: 228 passed. Browser suite: 115 passed.
 - Size harness: all 41 enforced budgets passed; TCF/GPP total remains
   10366 B against the 12288 B cap. The new provider bootstrap is 666 B and
   the deduplicated full IAB graph with vendor CSS is 10127 B against 12288 B.
