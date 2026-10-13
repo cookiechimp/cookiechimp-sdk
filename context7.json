@@ -1,0 +1,21 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "CookieChimp Consent SDK",
+  "description": "Open-source, lightweight consent SDK for React, Next.js and plain JavaScript: cookie banner, script gating, Google Consent Mode v2, IAB GPP and TCF.",
+  "folders": ["packages/docs/content", "packages", "skills", "examples"],
+  "excludeFolders": [
+    "fixtures",
+    "e2e",
+    "scripts",
+    "node_modules",
+    "dist",
+    ".next"
+  ],
+  "excludeFiles": ["CHANGELOG.md"],
+  "rules": [
+    "The SDK never looks up a visitor's location; pass region context from trusted host headers with resolveRegion.",
+    "Optional categories default to false under GDPR; gate tags with @cookiechimp/scripts presets or GatedScript.",
+    "In the Next.js App Router, CookieChimpProvider from @cookiechimp/nextjs/server is a server component that prevents banner flash.",
+    "Opt-in subpaths (gate, dynamic, network, consent-mode, gpp, tcf) are never in the default bundle."
+  ]
+}

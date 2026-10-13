@@ -341,7 +341,11 @@
     "name": "TCF/GPP module",
     "scenario": "tcf/gpp",
     "entry": "packages/core/dist/tcf.mjs",
-    "planned": true,
+    "alsoEntries": [
+      "packages/core/dist/gpp.mjs",
+      "packages/react/dist/tcf.mjs"
+    ],
+    "css": ["packages/react/tcf.css"],
     "kind": "lazy",
     "limit": 12288,
     "excludedFrom": "packages/core/dist/index.mjs",
