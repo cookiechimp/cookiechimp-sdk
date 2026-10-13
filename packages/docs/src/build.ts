@@ -1,8 +1,16 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { rolldown } from "rolldown";
 import { skills } from "./pages.ts";
-import { buildPages, docsBaseUrl, llmsFull, llmsTxt } from "./site.ts";
+import {
+  buildPages,
+  buildSearchIndex,
+  contentSecurityPolicy,
+  docsBaseUrl,
+  llmsFull,
+  llmsTxt,
+} from "./site.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "../../..");
@@ -18,6 +26,20 @@ for (const page of built) {
   await writeFile(join(out, `${page.slug}.html`), page.html);
   await writeFile(join(out, `${page.slug}.md`), page.markdown);
 }
+await writeFile(
+  join(out, "search-index.json"),
+  JSON.stringify(buildSearchIndex(built)),
+);
+const searchBundle = await rolldown({
+  input: resolve(here, "search.ts"),
+  platform: "browser",
+});
+await searchBundle.write({
+  file: join(out, "search.js"),
+  format: "es",
+  minify: true,
+});
+await searchBundle.close();
 await writeFile(join(out, "llms.txt"), llmsTxt(built, base));
 await writeFile(join(out, "llms-full.txt"), llmsFull(built));
 await cp(resolve(here, "style.css"), join(out, "style.css"));
@@ -28,7 +50,7 @@ await writeFile(
   `/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
-  Content-Security-Policy: default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: ${contentSecurityPolicy(true)}; frame-ancestors 'none'
 `,
 );
 for (const skill of skills) {

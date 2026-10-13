@@ -17,7 +17,8 @@ pnpm --filter @cookiechimp/docs start
 Preview at `http://127.0.0.1:3103`. Deploy the contents of
 `packages/docs/dist` as a static site when hosting and a domain have been chosen.
 The preview server is for local testing. No runtime Node service is needed for
-production. CI uploads a `docs-site` artifact after the unit job builds and tests it.
+production. Include `search.html`, `search.js` and `search-index.json`: search runs
+entirely in the browser from that static artifact. CI uploads a `docs-site` artifact after the unit job builds and tests it.
 
 The default build uses relative HTML links and root-relative llms.txt links.
 Deploy at the domain root. Once the domain is known, set `DOCS_BASE_URL` to its
@@ -61,3 +62,13 @@ Native speakers must review draft translations before launch. npm publication
 requires Daniel's explicit go-ahead and npm organization access. Hosting, npm
 publication, registry submission and IAB validation are separate completion steps.
 The [remaining-work checklist](../../../docs/remaining-work.md) records their status.
+
+## Search content policy
+
+The search page permits only its same-origin script and index (`script-src 'self'`
+and `connect-src 'self'`). Other HTML pages keep `default-src 'none'` with only
+styles/images permitted. The generated `_headers` uses the search policy as a
+shared ceiling; each HTML page's CSP meta policy further restricts that page.
+Preserve both when deploying. No inline script, third-party search host, analytics
+or query logging is added by the SDK. Hosting access logs remain the host's policy;
+queries can appear in the URL when a search page is reloaded or shared.

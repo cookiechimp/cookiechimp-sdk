@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname, extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { contentSecurityPolicy } from "./site.ts";
 
 // Minimal static server for local preview and e2e. Not for production hosting.
 const dist = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
@@ -11,6 +12,8 @@ const types: Record<string, string> = {
   ".md": "text/markdown; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".js": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
 };
 
 /** Map a request URL into root, or null when it is malformed or would leave root. */
@@ -39,6 +42,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url))
         .writeHead(200, {
           "content-type": types[extname(file)] ?? "application/octet-stream",
           "x-content-type-options": "nosniff",
+          "content-security-policy": `${contentSecurityPolicy(file.endsWith("/search.html"))}; frame-ancestors 'none'`,
         })
         .end(body);
     } catch {
