@@ -1,0 +1,51 @@
+# Remaining work (project paused 13 Oct 2026)
+
+Work on the SDK was paused by Daniel on 13 Oct 2026. Main is at `bfe7716`. SPEC items 1 to 27 are merged, along with the follow-ups listed below. This file records everything still to do so work can resume cleanly.
+
+## Done
+
+- M1 Core, M2 React, M3 Next.js, M4 Scripts and tooling: complete.
+- M5 Connected mode (items 20 to 24): #26 sync, #27 consent log, #28 self-hosted endpoint, #29 CLI `link` and `pull`, #30 provider `endpoint` prop, #31 Next.js server config, #32 follow-ups and flake fixes.
+- M6 Compliance extensions (items 25 to 27): #33 GPP, #34 TCF core and stub, #35 TCF vendor UI, #36 GPP provider wiring, #37 TCF vendor details, #38 TCF translations.
+
+## In progress
+
+- Item 28 (docs site, llms.txt, AI skills, examples): draft PR #39, unfinished. Review and finish it, or close it and restart.
+
+## Still to build (SPEC section 9)
+
+- Item 29: benchmark suite and published results.
+- Item 30: 1.0 release, npm publish with provenance. Needs Daniel's npm org access and an explicit go-ahead before publishing.
+
+## Blocked on Daniel
+
+- Platform PRs in IdentitySquare/CookieChimp, waiting for review (never merged by bots):
+  - #2773: consent sync idempotency (unique index on account and client_id). Merge first.
+  - #2772: serves the offline config and sync endpoints to website accounts, adds schema_version, 304 on If-None-Match, max-age=300 with stale-while-revalidate=86400, ETag exposed through CORS, and a JSON schema. Until it ships, website accounts get 403 and the SDK falls back to the cached or in-code config.
+- IAB Europe CMP registration. TCF is disabled in production until a real `cmpId` exists. The GPP CMP ID is also 0 until then.
+
+## Known gaps and follow-ups
+
+- TCF:
+  - No provider wiring yet. It needs `cmpId` and a vendor list source.
+  - No vendor list (GVL) CDN or proxy URL yet, so apps pass the list themselves.
+  - Limiting TCF to Pro and connected mode needs platform support.
+  - IAB validator checks are manual only.
+  - TCF plus GPP is 10.1 KB of the 12 KB cap, so watch headroom.
+- GPP: the later US state sections (TX, NJ and others) fall back to usnat.
+- Translations: 29 base locales and 32 TCF label locales are machine drafts (`reviewed: false`). They need native-speaker review before 1.0.
+- Sync:
+  - The sync extra is 2395 B, above the original 2 KB target. SPEC was raised to 2.5 KB; trim if easy.
+  - Records do not reach Tinybird.
+  - No `cc_pk_` key validation, since the platform treats account hashids as public.
+- Next.js: dashboard copy containing HTML falls back to the code message.
+- Endpoint: the page-hide flush with custom headers sends JSON and can be dropped by the browser. Records stay queued and are resent on the next visit.
+- Provider size headroom is about 12%, under the 15% target. See `docs/size.md`.
+- One unexplained local e2e failure (not seen in CI). Capture a trace if it recurs.
+- Commit 7b90f7c briefly included a Codex log containing a ChatGPT account ID (not a token). It was removed but remains in history.
+
+## How to resume
+
+- Codex builds through the Codex CLI teammate. PRs open as drafts, and the SDK lead merges after all 7 CI checks (lint, typecheck, unit, component, e2e, size, ci-required) pass on the head SHA.
+- Never copy CookieYes code. The SDK does no client-side geolocation.
+- The "Drive cookiechimp-sdk build" routine is paused; resume it to restart the daily safety check.
