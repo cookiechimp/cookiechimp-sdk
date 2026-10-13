@@ -1,0 +1,40 @@
+name: Packed SDK validation
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'release/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/package-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  packed-consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm release:pack
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Install the tarballs and test the production consumer
+        run: |
+          export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="$(node --input-type=module -e 'import { chromium } from "@playwright/test"; process.stdout.write(chromium.executablePath())')"
+          pnpm release:consumer
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-candidate-and-consumer-proof
+          path: release/artifacts/
+          if-no-files-found: error
+          retention-days: 14

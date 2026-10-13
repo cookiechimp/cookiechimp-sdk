@@ -1,6 +1,6 @@
 {
   "name": "@cookiechimp/nextjs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -34,7 +34,10 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "node scripts/generate-critical-css.mjs && tsdown --config-loader native && for name in index server pages middleware styles-route; do cp dist/$name.d.mts dist/$name.d.ts; done",
@@ -63,5 +66,20 @@
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
     "vitest": "5.0.4"
+  },
+  "description": "Server-rendered CookieChimp consent providers for Next.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cookiechimp/cookiechimp-sdk.git",
+    "directory": "packages/nextjs"
+  },
+  "homepage": "https://github.com/cookiechimp/cookiechimp-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/cookiechimp/cookiechimp-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   }
 }
