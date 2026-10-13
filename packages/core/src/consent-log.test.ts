@@ -56,6 +56,10 @@ const make = (options: Partial<ConsentLogOptions> = {}) =>
     storage: memoryStorage(),
     now: () => clock,
     random: () => 1,
+    // Never reach the real network, even from a timer that outlives its test.
+    fetch: async () => {
+      throw new TypeError("offline");
+    },
     ...options,
   });
 const body = (call: Call | undefined) =>
@@ -64,13 +68,6 @@ const body = (call: Call | undefined) =>
   };
 
 beforeEach(() => {
-  // Never reach the real network from a test that relies on the default fetch.
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () => {
-      throw new TypeError("offline");
-    }),
-  );
   clock = T0;
 });
 afterEach(() => {
