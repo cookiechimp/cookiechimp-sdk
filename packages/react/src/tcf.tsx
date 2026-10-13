@@ -1,7 +1,20 @@
 "use client";
 
-import type { TcfChoices, TcfController } from "@cookiechimp/core/tcf";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import type {
+  Gvl,
+  GvlVendor,
+  TcfChoices,
+  TcfController,
+} from "@cookiechimp/core/tcf";
+import {
+  type ReactNode,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 export type TcfVendorController = Pick<
   TcfController,
@@ -21,6 +34,27 @@ export interface TcfLabels {
   save: string;
   saved: string;
   empty: string;
+  details: string;
+  close: string;
+  consentPurposes: string;
+  legIntPurposes: string;
+  specialPurposes: string;
+  features: string;
+  dataCategories: string;
+  retention: string;
+  /** "{days}" is replaced with the number of days. */
+  retentionDays: string;
+  standardRetention: string;
+  privacyPolicy: string;
+  legIntClaim: string;
+  storage: string;
+  /** "{days}" is replaced with the number of days. */
+  cookieMaxAge: string;
+  cookieSession: string;
+  cookieRefresh: string;
+  noCookies: string;
+  nonCookieAccess: string;
+  storageDisclosure: string;
 }
 const defaults: TcfLabels = {
   title: "Partners and purposes",
@@ -35,6 +69,25 @@ const defaults: TcfLabels = {
   save: "Save choices",
   saved: "Choices saved",
   empty: "No vendors match",
+  details: "Details",
+  close: "Close details",
+  consentPurposes: "Purposes (consent)",
+  legIntPurposes: "Purposes (legitimate interest)",
+  specialPurposes: "Special purposes",
+  features: "Features",
+  dataCategories: "Data categories",
+  retention: "Data retention",
+  retentionDays: "{days} days",
+  standardRetention: "Standard retention",
+  privacyPolicy: "Privacy policy",
+  legIntClaim: "Legitimate interest claim",
+  storage: "Device storage",
+  cookieMaxAge: "Cookies stored for up to {days} days",
+  cookieSession: "Cookies without a fixed expiry",
+  cookieRefresh: "Cookie expiry is refreshed on use",
+  noCookies: "Does not use cookies",
+  nonCookieAccess: "Uses other device storage or access methods",
+  storageDisclosure: "Storage disclosure",
 };
 
 export interface TcfVendorListProps {
@@ -68,6 +121,131 @@ function useModel(controller: TcfVendorController) {
   );
 }
 
+const dayText = (template: string, days: number) =>
+  template.replace("{days}", String(days));
+
+function VendorDetails({
+  vendor,
+  gvl,
+  language,
+  labels: l,
+}: {
+  vendor: GvlVendor;
+  gvl: Gvl;
+  language: string;
+  labels: TcfLabels;
+}) {
+  const named = (
+    title: string,
+    list: number[] | undefined,
+    source: Gvl["purposes"],
+    fallback: string,
+    retention?: Record<string, number>,
+  ): ReactNode =>
+    list?.length ? (
+      <div className="cc-tcf__detail">
+        <h5>{title}</h5>
+        <ul>
+          {list.map((id) => (
+            <li key={id}>
+              {source?.[id]?.name ?? `${fallback} ${id}`}
+              {retention?.[id] !== undefined &&
+                ` (${l.retention}: ${dayText(l.retentionDays, retention[id] as number)})`}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
+  const r = vendor.dataRetention;
+  const url =
+    vendor.urls?.find((u) => u.langId === language) ?? vendor.urls?.[0];
+  const age = vendor.cookieMaxAgeSeconds;
+  return (
+    <>
+      {named(
+        l.consentPurposes,
+        vendor.purposes,
+        gvl.purposes,
+        "Purpose",
+        r?.purposes,
+      )}
+      {named(
+        l.legIntPurposes,
+        vendor.legIntPurposes,
+        gvl.purposes,
+        "Purpose",
+        r?.purposes,
+      )}
+      {named(
+        l.specialPurposes,
+        vendor.specialPurposes,
+        gvl.specialPurposes,
+        "Special purpose",
+        r?.specialPurposes,
+      )}
+      {named(l.features, vendor.features, gvl.features, "Feature")}
+      {named(
+        l.specialFeatures,
+        vendor.specialFeatures,
+        gvl.specialFeatures,
+        "Special feature",
+      )}
+      {named(
+        l.dataCategories,
+        vendor.dataDeclaration,
+        gvl.dataCategories,
+        "Data category",
+      )}
+      {r?.stdRetention !== undefined && (
+        <p className="cc-tcf__detail">
+          {l.standardRetention}: {dayText(l.retentionDays, r.stdRetention)}
+        </p>
+      )}
+      <div className="cc-tcf__detail">
+        <h5>{l.storage}</h5>
+        <ul>
+          {vendor.usesCookies === false ? (
+            <li>{l.noCookies}</li>
+          ) : vendor.usesCookies ? (
+            <li>
+              {typeof age === "number" && age > 0
+                ? dayText(l.cookieMaxAge, Math.ceil(age / 86400))
+                : l.cookieSession}
+            </li>
+          ) : null}
+          {vendor.usesCookies && vendor.cookieRefresh && (
+            <li>{l.cookieRefresh}</li>
+          )}
+          {vendor.usesNonCookieAccess && <li>{l.nonCookieAccess}</li>}
+          {vendor.deviceStorageDisclosureUrl && (
+            <li>
+              <a
+                href={vendor.deviceStorageDisclosureUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {l.storageDisclosure}
+              </a>
+            </li>
+          )}
+        </ul>
+      </div>
+      {url && (
+        <p className="cc-tcf__detail cc-tcf__links">
+          <a href={url.privacy} target="_blank" rel="noopener noreferrer">
+            {l.privacyPolicy}
+          </a>
+          {url.legIntClaim && (
+            <a href={url.legIntClaim} target="_blank" rel="noopener noreferrer">
+              {l.legIntClaim}
+            </a>
+          )}
+        </p>
+      )}
+    </>
+  );
+}
+
 function toggle(set: Set<number>, id: number, on: boolean): Set<number> {
   const next = new Set(set);
   if (on) next.add(id);
@@ -93,6 +271,15 @@ export function TcfVendorList({
   const [query, setQuery] = useState("");
   const [scrollTop, setScrollTop] = useState(0);
   const [saved, setSaved] = useState(false);
+  /** Vendor whose row holds focus; it stays mounted while scrolled away. */
+  const [focusedId, setFocusedId] = useState<number | null>(null);
+  const [openId, setOpenId] = useState<number | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const returnFocus = useRef<number | null>(null);
+  const uid = useId();
+  const panelId = `${uid}-details`;
+  const headingId = `${uid}-details-heading`;
 
   useEffect(() => {
     if (!model) return setDraft(null);
@@ -128,6 +315,17 @@ export function TcfVendorList({
       )
       .map((v) => v as NonNullable<typeof v>);
   }, [gvl, model, query]);
+
+  useEffect(() => {
+    if (openId !== null) panelRef.current?.focus();
+    else if (returnFocus.current !== null) {
+      const id = returnFocus.current;
+      returnFocus.current = null;
+      viewportRef.current
+        ?.querySelector<HTMLButtonElement>(`[data-cc-vendor-details="${id}"]`)
+        ?.focus();
+    }
+  }, [openId]);
 
   if (!gvl || !model || !draft) return null;
   const purposeIds = Object.keys(gvl.purposes ?? {}).length
@@ -176,6 +374,20 @@ export function TcfVendorList({
     vendors.length,
     Math.ceil((scrollTop + height) / rowHeight) + OVERSCAN,
   );
+  const rows: number[] = [];
+  for (let i = first; i < last; i++) rows.push(i);
+  for (const id of [focusedId, openId]) {
+    if (id === null) continue;
+    const i = vendors.findIndex((v) => v.id === id);
+    if (i >= 0 && (i < first || i >= last) && !rows.includes(i)) rows.push(i);
+  }
+  rows.sort((a, b) => a - b);
+  const openVendor =
+    openId === null ? undefined : vendors.find((v) => v.id === openId);
+  const closeDetails = () => {
+    returnFocus.current = openId;
+    setOpenId(null);
+  };
   const purposeName = (id: number) =>
     gvl.purposes?.[id]?.name ?? `Purpose ${id}`;
 
@@ -262,6 +474,7 @@ export function TcfVendorList({
       />
       <div
         className="cc-tcf__viewport"
+        ref={viewportRef}
         style={{ height, overflowY: "auto", position: "relative" }}
         onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
         data-cc-part="tcf-vendors"
@@ -278,8 +491,8 @@ export function TcfVendorList({
               position: "relative",
             }}
           >
-            {vendors.slice(first, last).map((vendor, offset) => {
-              const index = first + offset;
+            {rows.map((index) => {
+              const vendor = vendors[index] as GvlVendor;
               const name = vendor.name ?? `Vendor ${vendor.id}`;
               return (
                 <li
@@ -287,6 +500,11 @@ export function TcfVendorList({
                   className="cc-tcf__vendor"
                   aria-setsize={vendors.length}
                   aria-posinset={index + 1}
+                  onFocus={() => setFocusedId(vendor.id)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node))
+                      setFocusedId((id) => (id === vendor.id ? null : id));
+                  }}
                   style={{
                     position: "absolute",
                     top: index * rowHeight,
@@ -334,12 +552,60 @@ export function TcfVendorList({
                       {l.legitimateInterest}
                     </label>
                   )}
+                  <button
+                    type="button"
+                    className="cc-tcf__more"
+                    data-cc-vendor-details={vendor.id}
+                    aria-label={`${l.details}: ${name}`}
+                    aria-expanded={openId === vendor.id}
+                    aria-controls={panelId}
+                    onClick={() =>
+                      openId === vendor.id
+                        ? closeDetails()
+                        : setOpenId(vendor.id)
+                    }
+                  >
+                    {l.details}
+                  </button>
                 </li>
               );
             })}
           </ul>
         )}
       </div>
+      {openVendor && (
+        <section
+          id={panelId}
+          ref={panelRef}
+          tabIndex={-1}
+          aria-labelledby={headingId}
+          className="cc-tcf__details"
+          data-cc-part="tcf-vendor-details"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.stopPropagation();
+              closeDetails();
+            }
+          }}
+        >
+          <h4 id={headingId} className="cc-tcf__heading">
+            {openVendor.name ?? `Vendor ${openVendor.id}`}
+          </h4>
+          <VendorDetails
+            vendor={openVendor}
+            gvl={gvl}
+            language={model.consentLanguage.toLowerCase()}
+            labels={l}
+          />
+          <button
+            type="button"
+            className="cc-button cc-button--secondary"
+            onClick={closeDetails}
+          >
+            {l.close}
+          </button>
+        </section>
+      )}
       <div className="cc-actions">
         <button
           type="button"

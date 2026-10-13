@@ -12,6 +12,21 @@ export function GET(request: Request) {
         purposes: [1, 2],
         legIntPurposes: id % 2 ? [7] : [],
         specialFeatures: [],
+        dataRetention: { stdRetention: 30, purposes: {}, specialPurposes: {} },
+        urls: [
+          {
+            langId: "en",
+            privacy: `https://partner${id}.example/privacy`,
+            ...(id % 2
+              ? { legIntClaim: `https://partner${id}.example/li` }
+              : {}),
+          },
+        ],
+        usesCookies: true,
+        cookieMaxAgeSeconds: 86400 * 90,
+        cookieRefresh: false,
+        usesNonCookieAccess: id % 3 === 0,
+        deviceStorageDisclosureUrl: `https://partner${id}.example/storage.json`,
       };
     return Response.json({
       vendorListVersion: 151,

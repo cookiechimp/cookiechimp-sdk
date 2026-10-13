@@ -363,4 +363,84 @@ describe("vendor UI choices", () => {
     expect(parsed?.vendors["1"]?.name).toBe("Acme");
     expect(parsed?.vendors["2"]).not.toHaveProperty("name");
   });
+
+  it("keeps the vendor disclosures TCF policy requires and drops unsafe ones", () => {
+    const parsed = parseGvl({
+      vendorListVersion: 3,
+      tcfPolicyVersion: 5,
+      specialPurposes: { "1": { name: "Security" } },
+      features: { "1": { name: "Match data" } },
+      dataCategories: { "1": { name: "IP addresses" } },
+      vendors: {
+        "1": {
+          id: 1,
+          purposes: [1],
+          legIntPurposes: [2],
+          specialPurposes: [1],
+          features: [1, 99],
+          dataDeclaration: [1, 2],
+          dataRetention: {
+            stdRetention: 30,
+            purposes: { "1": 90, "99": 1, "2": -1 },
+            specialPurposes: { "1": 365 },
+          },
+          urls: [
+            {
+              langId: "EN",
+              privacy: "https://a.example/p",
+              legIntClaim: "https://a.example/li",
+            },
+            { langId: "fr", privacy: "javascript:alert(1)" },
+            { langId: "de", privacy: "http://a.example/p" },
+            {
+              langId: "es",
+              privacy: "https://a.example/es",
+              legIntClaim: "data:x",
+            },
+          ],
+          usesCookies: true,
+          cookieMaxAgeSeconds: 86400,
+          cookieRefresh: false,
+          usesNonCookieAccess: "yes",
+          deviceStorageDisclosureUrl: "https://a.example/ds.json",
+        },
+        "2": {
+          id: 2,
+          purposes: [1],
+          legIntPurposes: [],
+          cookieMaxAgeSeconds: null,
+          deviceStorageDisclosureUrl: "javascript:alert(1)",
+        },
+      },
+    });
+    const v = parsed?.vendors["1"];
+    expect(v?.specialPurposes).toEqual([1]);
+    expect(v?.features).toBeUndefined();
+    expect(v?.dataDeclaration).toEqual([1, 2]);
+    expect(v?.dataRetention).toEqual({
+      stdRetention: 30,
+      purposes: { "1": 90 },
+      specialPurposes: { "1": 365 },
+    });
+    expect(v?.urls).toEqual([
+      {
+        langId: "en",
+        privacy: "https://a.example/p",
+        legIntClaim: "https://a.example/li",
+      },
+      { langId: "es", privacy: "https://a.example/es" },
+    ]);
+    expect(v?.usesCookies).toBe(true);
+    expect(v?.cookieMaxAgeSeconds).toBe(86400);
+    expect(v?.cookieRefresh).toBe(false);
+    expect(v).not.toHaveProperty("usesNonCookieAccess");
+    expect(v?.deviceStorageDisclosureUrl).toBe("https://a.example/ds.json");
+    expect(parsed?.vendors["2"]?.cookieMaxAgeSeconds).toBeNull();
+    expect(parsed?.vendors["2"]).not.toHaveProperty(
+      "deviceStorageDisclosureUrl",
+    );
+    expect(parsed?.specialPurposes).toEqual({ "1": { name: "Security" } });
+    expect(parsed?.features).toEqual({ "1": { name: "Match data" } });
+    expect(parsed?.dataCategories).toEqual({ "1": { name: "IP addresses" } });
+  });
 });

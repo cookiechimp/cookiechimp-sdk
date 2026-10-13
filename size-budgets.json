@@ -314,7 +314,7 @@
     "scenario": "tcf",
     "entry": "packages/core/dist/tcf.mjs",
     "kind": "lazy",
-    "limit": 4010,
+    "limit": 4555,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["installTcf", "encodeTcString"]
   },
@@ -323,7 +323,7 @@
     "scenario": "react tcf",
     "entry": "packages/react/dist/tcf.mjs",
     "kind": "extra",
-    "limit": 2555,
+    "limit": 4175,
     "css": ["packages/react/tcf.css"],
     "excludedFrom": "packages/react/dist/ui.mjs",
     "forbiddenTokens": ["TcfVendorList", "cc-tcf__viewport"]

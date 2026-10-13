@@ -45,3 +45,30 @@
 .cc-tcf__status:empty {
   display: none;
 }
+.cc-tcf__more {
+  font: inherit;
+  margin-inline-start: auto;
+}
+.cc-tcf__details {
+  display: grid;
+  gap: var(--cc-spacing-2);
+  padding: var(--cc-spacing-3);
+  border: 1px solid var(--cc-banner-separator-border);
+  border-radius: var(--cc-radius-card);
+}
+.cc-tcf__detail h5 {
+  margin: 0;
+  font-size: inherit;
+}
+.cc-tcf__detail ul {
+  margin: 0;
+  padding-inline-start: var(--cc-spacing-4);
+}
+.cc-tcf__detail {
+  margin: 0;
+}
+.cc-tcf__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cc-spacing-3);
+}
