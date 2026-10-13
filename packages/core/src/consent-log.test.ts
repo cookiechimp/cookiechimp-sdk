@@ -60,6 +60,8 @@ const make = (options: Partial<ConsentLogOptions> = {}) =>
     fetch: async () => {
       throw new TypeError("offline");
     },
+    // happy-dom's sendBeacon performs a real request.
+    sendBeacon: () => false,
     ...options,
   });
 const body = (call: Call | undefined) =>
