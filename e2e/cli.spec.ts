@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -9,6 +9,8 @@ import {
   symlinkSync,
   writeFileSync,
 } from "node:fs";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, test } from "@playwright/test";
@@ -143,4 +145,85 @@ test("usage errors exit with 2", () => {
   const result = run(["init", "--unknown"], process.cwd());
   expect(result.status).toBe(2);
   expect(result.stderr).toContain("Unknown option: --unknown");
+});
+
+test("link and pull talk to the API with a token from the environment only", async () => {
+  const bundle = readFileSync(
+    resolve("packages/core/src/fixtures/platform-offline-bundle.json"),
+    "utf8",
+  );
+  const projectId = JSON.parse(bundle).account_hashid as string;
+  const seen: { url: string; auth?: string; cookie?: string }[] = [];
+  const server = createServer((request, response) => {
+    seen.push({
+      url: request.url ?? "",
+      auth: request.headers.authorization,
+      cookie: request.headers.cookie,
+    });
+    response.setHeader("content-type", "application/json");
+    if (request.url?.startsWith("/api/v1/accounts")) {
+      if (request.headers.authorization !== "Bearer e2e-token") {
+        response.statusCode = 401;
+        return response.end("{}");
+      }
+      return response.end(
+        JSON.stringify({
+          data: [{ id: projectId, name: "Shop", allowed_domains: [] }],
+          pagination: { next: null },
+        }),
+      );
+    }
+    if (request.url === `/api/v1/mobile-sdk/offline/${projectId}`)
+      return response.end(bundle);
+    response.statusCode = 404;
+    response.end("{}");
+  });
+  await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+  const api = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  const root = temp({
+    "package.json": JSON.stringify({
+      name: "app",
+      dependencies: { next: "16.4.0", react: "19.3.0" },
+    }),
+  });
+  const exec = (args: string[], env: Record<string, string> = {}) =>
+    new Promise<{ code: number | null; out: string }>((done) => {
+      const child = spawn(process.execPath, [cli, ...args, "--api", api], {
+        cwd: root,
+        env: { PATH: process.env.PATH ?? "", ...env },
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      let out = "";
+      child.stdout.on("data", (chunk) => {
+        out += chunk;
+      });
+      child.stderr.on("data", (chunk) => {
+        out += chunk;
+      });
+      child.on("close", (code) => done({ code, out }));
+    });
+  try {
+    const link = await exec(["link"], { COOKIECHIMP_API_TOKEN: "e2e-token" });
+    expect(link.code, link.out).toBe(0);
+    expect(link.out).not.toContain("e2e-token");
+    const env = readFileSync(join(root, ".env.local"), "utf8");
+    expect(env).toContain(`NEXT_PUBLIC_COOKIECHIMP_PROJECT_ID=${projectId}`);
+    expect(env).not.toContain("e2e-token");
+
+    const pull = await exec(["pull"]);
+    expect(pull.code, pull.out).toBe(0);
+    const saved = JSON.parse(
+      readFileSync(join(root, "cookiechimp.config.json"), "utf8"),
+    );
+    expect(saved.account_hashid).toBe(projectId);
+    const offline = seen.find((hit) => hit.url.includes("/offline/"));
+    expect(offline?.auth).toBeUndefined();
+    expect(seen.every((hit) => hit.cookie === undefined)).toBe(true);
+
+    const denied = await exec(["link"], { COOKIECHIMP_API_TOKEN: "wrong" });
+    expect(denied.code).not.toBe(0);
+    expect(denied.out).not.toContain("wrong");
+  } finally {
+    server.close();
+  }
 });

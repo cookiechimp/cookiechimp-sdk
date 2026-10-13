@@ -48,8 +48,8 @@ The checked budgets are the source-of-truth values below. Region header provider
 | TikTok Pixel preset | extra | 1095 |
 | Devtools panel | extra | 3295 |
 | Devtools simulation reader | extra | 660 |
-| CLI binary | total | 5140 |
-| CLI programmatic API | total | 5195 |
+| CLI binary | total | 8800 |
+| CLI programmatic API | total | 8905 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -106,6 +106,8 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | devtools simulation | 585 B | 660 B | isDev fail-closed guard, measured 574 B (about 15% headroom) | M4 PR19 (lead approved) |
 | cli | none | 5140 B | New `cookiechimp` init and doctor binary, Node builtins external, measured 4467 B (about 15% headroom) | M4 PR19 |
 | cli api | none | 5195 B | New programmatic CLI entry, Node builtins external, measured 4514 B (about 15% headroom) | M4 PR19 |
+| cli | 5140 B | 8800 B | `link` and `pull` added: token from env or stdin only, paginated accounts API, offline bundle validation, `.env.local` upsert. Network code lives in a remote chunk (about 2.7 kB gzip) loaded by dynamic import, so `init` and `doctor` never load it. Total including every chunk measured 7648 B (about 15% headroom). Node-only tool, never shipped to browsers | M5 PR23 |
+| cli api | 5195 B | 8905 B | Same `link` and `pull` code, re-exported from the programmatic entry. Measured 7743 B (about 15% headroom) | M5 PR23 |
 | sync | 2048 B | 4355 B | Connected config client for the shared platform offline bundle: adapter, fetch, cache, idle revalidation, untrusted payload validation and timeout. Standalone entry measured 3785 B (about 15% headroom); marginal cost over core 2395 B, above the SPEC 2 KB extra target (flagged for lead review) | M5 PR20 |
 | SPEC sync extra target | 2 KB | 2.5 KB | SPEC.md target only, no checked limit change: `./sync` marginal cost over core is 2395 B, accepted by the lead after M5 PR20 | M5 PR21 (lead approved) |
 | consent log | none | 2490 B | New opt-in consent record POST subpath: platform record mapping, persisted queue, capped backoff, untrusted response parsing, beacon on hide and fail-closed guards. Measured 2166 B (about 15% headroom) | M5 PR21 |

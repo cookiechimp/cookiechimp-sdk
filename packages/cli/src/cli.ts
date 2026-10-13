@@ -1,4 +1,6 @@
 #!/usr/bin/env node
 import { main } from "./main";
 
-process.exitCode = main(process.argv.slice(2));
+void Promise.resolve(main(process.argv.slice(2))).then((code) => {
+  process.exitCode = code;
+});

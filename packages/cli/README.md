@@ -38,6 +38,25 @@ Runs static checks and exits with 1 when any check fails:
 
 Pass `--json` for machine-readable output.
 
+## link
+
+```sh
+COOKIECHIMP_API_TOKEN=... npx @cookiechimp/cli link
+echo "$TOKEN" | npx @cookiechimp/cli link --token-stdin --project acct123
+```
+
+Uses a dashboard API token to list your sites and writes the chosen project id to `.env.local` (`NEXT_PUBLIC_COOKIECHIMP_PROJECT_ID`, `VITE_COOKIECHIMP_PROJECT_ID` or `COOKIECHIMP_PROJECT_ID`, picked from your dependencies). The token is read only from the environment or stdin, never from arguments, and is never written to disk or printed. Pass `--project` to skip the prompt and `--env-file` to pick another file.
+
+## pull
+
+```sh
+npx @cookiechimp/cli pull
+```
+
+Downloads the public dashboard config for the linked project (or `--project`) to `cookiechimp.config.json` (`--out` to change it) for offline builds. No token is sent. The bundle must match the project and schema version 1, and is capped at 2 MB.
+
+Both commands accept `--api` for another API origin (https only, or http on localhost). Only these two commands touch the network; `init` and `doctor` stay offline.
+
 ## Safety
 
 - No network access of its own. Only the package manager you chose runs, without a shell, and only with fixed arguments.
