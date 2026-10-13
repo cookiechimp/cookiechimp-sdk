@@ -493,6 +493,8 @@ try {
       "--headless=new",
       "--no-first-run",
       "--disable-background-networking",
+      // GitHub-hosted Linux runners restrict Chromium sandbox namespaces.
+      ...(process.platform === "linux" ? ["--no-sandbox"] : []),
     ],
     logLevel: "silent",
     handleSIGINT: false,
