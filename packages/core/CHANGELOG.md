@@ -8,6 +8,8 @@
 
 ### Minor Changes
 
+- Add GPP state formats for FL, MT, OR, TX, DE, IA, NE, NH, NJ and TN, with byte-identical IAB conformance and state-specific consent persistence.
+
 - 64542f7: `BlockedInfo.category` is now optional. Requests and elements blocked because matching failed (fail closed) are reported without a category or service.
 - 19a64bc: Add tree-shakeable locale modules, language negotiation and controller APIs, and translated React provider hooks.
 

@@ -5,9 +5,9 @@ SHA-256 and npm integrity hashes are in `release/artifacts/manifest.json`;
 CI retains the candidates and consumer proof as an artifact.
 
 - Build, lint, typecheck and full unit suites passed.
-- Component suite: 222 passed. Browser suite: 102 passed.
+- Component suite: 222 passed. Browser suite: 106 passed.
 - Size harness: all 39 enforced budgets passed; TCF/GPP total remains
-  10123 B against the 12288 B cap.
+  10366 B against the 12288 B cap.
 - Packaging: eight 1.0.0 tarballs with MIT licenses, READMEs and changelogs;
   all export/bin targets exist and workspace dependencies are converted.
 - Fresh npm consumer: all eight packages installed as real tarballs, with
