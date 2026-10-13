@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   CONSENT_COOKIE_NAME,
+  type ConfigInput,
   type ConsentConfig,
   type ConsentState,
   readConsentCookie,
@@ -21,6 +22,14 @@ import { cookies, headers } from "next/headers";
 import type { ReactNode } from "react";
 import { criticalCss } from "./critical-css.generated";
 import { ClientProvider, type ConsentEndpoint } from "./index";
+import { getServerConfig } from "./server-config";
+
+export {
+  dashboardMessages,
+  getServerConfig,
+  type ServerConfig,
+  type ServerConfigOptions,
+} from "./server-config";
 
 export interface LanguageOptions {
   available: readonly string[];
@@ -167,6 +176,19 @@ export interface CookieChimpProviderProps
   translations?: Messages | TranslationLoader;
   /** Self-hosted consent log endpoint; must be serialisable (no functions). */
   endpoint?: ConsentEndpoint;
+  /**
+   * Connected mode: fetch this account's dashboard config on the server
+   * (`revalidate` seconds, default 300) so SSR markup already has it.
+   * `config` acts as the defaults under the dashboard values.
+   */
+  projectId?: string;
+  /** Platform origin. Defaults to https://cookiechimp.com. */
+  apiBase?: string;
+  /** Code config that wins over the dashboard. */
+  override?: ConfigInput;
+  revalidate?: number;
+  /** Server-only transport for the config request (tests, proxies). Never sent to the client. */
+  fetch?: typeof fetch;
   children: ReactNode;
 }
 
@@ -179,6 +201,11 @@ export async function CookieChimpProvider({
   languages,
   translations,
   endpoint,
+  projectId,
+  apiBase,
+  override,
+  revalidate,
+  fetch,
   children,
 }: CookieChimpProviderProps) {
   const resolvedCookieName = config.cookie?.name ?? CONSENT_COOKIE_NAME;
@@ -209,6 +236,18 @@ export async function CookieChimpProvider({
       : typeof translations === "function"
         ? undefined
         : translations;
+  const server = projectId
+    ? await getServerConfig({
+        projectId,
+        apiBase,
+        locale: language,
+        region,
+        defaults: config,
+        override,
+        revalidate,
+        fetch,
+      })
+    : undefined;
   const initialState = await getServerConsent({
     cookieName: resolvedCookieName,
   });
@@ -216,6 +255,12 @@ export async function CookieChimpProvider({
     <ClientProvider
       config={{
         ...config,
+        ...(server
+          ? {
+              categories: server.config.categories,
+              services: server.config.services,
+            }
+          : {}),
         cookie: { ...config.cookie, name: resolvedCookieName },
         region,
         regulation,
@@ -224,7 +269,7 @@ export async function CookieChimpProvider({
       }}
       initialState={initialState}
       language={language}
-      messages={messages}
+      messages={server ? { ...messages, ...server.messages } : messages}
       endpoint={endpoint}
     >
       {children}

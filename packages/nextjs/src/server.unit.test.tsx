@@ -1,4 +1,7 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { type ConsentState, encodeConsentCookie } from "@cookiechimp/core";
+import { useTranslations } from "@cookiechimp/react";
 import en from "@cookiechimp/translations/en";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -232,5 +235,88 @@ describe("CookieChimpProvider", () => {
     });
     expect(output.props.config.cookie.name).toBe("custom_consent");
     expect(output.props.initialState).toEqual(state);
+  });
+});
+
+describe("CookieChimpProvider connected mode", () => {
+  const fixture = readFileSync(
+    resolve(__dirname, "../../core/src/fixtures/platform-offline-bundle.json"),
+    "utf8",
+  );
+  const projectId = JSON.parse(fixture).account_hashid as string;
+  function Title() {
+    const { t } = useTranslations(en);
+    return <h2>{t("banner.title")}</h2>;
+  }
+
+  it("renders dashboard copy and categories in SSR markup", async () => {
+    mocks.values.set("x-vercel-ip-country", "DE");
+    mocks.values.set("accept-language", "de-DE");
+    const fetch = vi.fn(async () => new Response(fixture));
+    vi.stubGlobal("fetch", fetch);
+    try {
+      const output = await CookieChimpProvider({
+        config: { categories: [{ id: "local-only", label: "Local" }] },
+        provider: "vercel",
+        languages: { available: ["en", "de"], fallback: "en" },
+        translations: en,
+        projectId,
+        override: { categories: [{ id: "marketing", label: "Ads (code)" }] },
+        children: <Title />,
+      });
+      const html = renderToStaticMarkup(output);
+      expect(html).toContain("Wir respektieren Ihre Privatsphäre");
+      const ids = output.props.config.categories.map(
+        (category: { id: string }) => category.id,
+      );
+      expect(ids).toEqual(
+        expect.arrayContaining(["local-only", "analytics", "marketing"]),
+      );
+      expect(
+        output.props.config.categories.find(
+          (category: { id: string }) => category.id === "marketing",
+        ).label,
+      ).toBe("Ads (code)");
+      // Unrelated code messages stay available under the dashboard copy.
+      expect(output.props.messages["gated.allow"]).toBe(en["gated.allow"]);
+      expect(fetch).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("renders the code config when the dashboard is unreachable", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new TypeError("fetch failed");
+      }),
+    );
+    try {
+      const output = await CookieChimpProvider({
+        config: { categories: { analytics: false } },
+        translations: en,
+        projectId,
+        children: <Title />,
+      });
+      expect(renderToStaticMarkup(output)).toContain(en["banner.title"]);
+      expect(output.props.messages).toEqual(en);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("makes no request without projectId", async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    try {
+      await CookieChimpProvider({
+        config: { categories: { analytics: false } },
+        children: <Title />,
+      });
+      expect(fetch).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
