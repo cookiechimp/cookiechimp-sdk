@@ -40,6 +40,8 @@ export interface GvlUrl {
 export interface GvlName {
   name: string;
   description?: string;
+  /** Standard user-facing examples, rendered as text. */
+  illustrations?: string[];
 }
 export interface Gvl {
   vendorListVersion: number;
@@ -50,6 +52,8 @@ export interface Gvl {
   specialPurposes?: Record<string, GvlName>;
   features?: Record<string, GvlName>;
   dataCategories?: Record<string, GvlName>;
+  /** TCF v2.4 GVL standard explanation of ordinary features. */
+  standardTexts?: { features?: string };
   vendors: Record<string, GvlVendor>;
 }
 
@@ -259,7 +263,17 @@ function names(input: unknown, max: number): Record<string, GvlName> {
     const name = text(v?.name);
     if (!Number.isInteger(id) || id < 1 || id > max || !name) continue;
     const description = text(v?.description, 2000);
-    out[key] = description ? { name, description } : { name };
+    const illustrations = Array.isArray(v?.illustrations)
+      ? v.illustrations
+          .slice(0, 32)
+          .map((value) => text(value, 2000))
+          .filter((value): value is string => value !== null)
+      : [];
+    out[key] = {
+      name,
+      ...(description ? { description } : {}),
+      ...(illustrations.length ? { illustrations } : {}),
+    };
   }
   return out;
 }
@@ -289,7 +303,7 @@ export function parseGvl(input: unknown): Gvl | null {
     const id = Number(key);
     if (!v || v.id !== id || !Number.isInteger(id) || id < 1 || id > 65535)
       continue;
-    const purposes = ids(v.purposes, 24);
+    const purposes = ids(v.purposes ?? [], 24);
     const legIntPurposes = ids(v.legIntPurposes ?? [], 24);
     const specialFeatures = ids(v.specialFeatures ?? [], 12);
     if (!purposes || !legIntPurposes || !specialFeatures) continue;
@@ -305,7 +319,12 @@ export function parseGvl(input: unknown): Gvl | null {
         : {}),
     };
   }
+  const featureText = text(
+    (raw.standardTexts as Record<string, unknown> | undefined)?.features,
+    2000,
+  );
   return {
+    ...(featureText ? { standardTexts: { features: featureText } } : {}),
     vendorListVersion: version as number,
     tcfPolicyVersion: policy as number,
     purposes: names(raw.purposes, 24),

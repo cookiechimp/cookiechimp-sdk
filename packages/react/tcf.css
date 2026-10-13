@@ -88,3 +88,12 @@
   flex-wrap: wrap;
   gap: var(--cc-spacing-3);
 }
+
+.cc-tcf__purpose .cc-tcf__name {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.cc-tcf__disclosure summary {
+  cursor: pointer;
+}

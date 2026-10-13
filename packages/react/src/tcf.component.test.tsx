@@ -93,7 +93,7 @@ void asLabels;
 void asMessages;
 
 async function setup(
-  options: { height?: number; labels?: Partial<TcfLabels> } = {},
+  options: { height?: number; labels?: Partial<TcfLabels>; gvl?: Gvl } = {},
 ) {
   const runtime = createConsent({
     categories: { marketing: false },
@@ -101,7 +101,7 @@ async function setup(
   });
   const controller = installTcf(runtime, {
     cmpId: 300,
-    gvl,
+    gvl: options.gvl ?? gvl,
     storage: localStorage,
   });
   await controller.ready;
@@ -437,4 +437,84 @@ describe("TcfVendorList", () => {
       expect(panel.textContent).toContain("Details schließen");
     });
   });
+});
+
+it("displays GVL descriptions, examples and standard feature text without ordinary feature controls", async () => {
+  const info = {
+    name: "Fixture feature",
+    description: "Feature description",
+    illustrations: ["Feature example"],
+  };
+  const { host } = await setup({
+    gvl: {
+      ...gvl,
+      standardTexts: { features: "Features support the chosen purposes." },
+      features: { "1": info },
+      purposes: {
+        "1": {
+          name: "Fixture purpose",
+          description: "Purpose description",
+          illustrations: ["Purpose example"],
+        },
+      },
+      specialFeatures: {
+        "1": {
+          name: "Updated special feature",
+          description: "Special feature description",
+          illustrations: ["Special feature example"],
+        },
+      },
+    },
+  });
+  const purpose = host.querySelector(".cc-tcf__purposes details");
+  expect(purpose?.textContent).toContain("Purpose description");
+  expect(purpose?.textContent).toContain("Purpose example");
+  const featureBox = checkbox(host, "Updated special feature");
+  expect(featureBox).not.toBeNull();
+  await act(async () =>
+    (
+      host.querySelector(
+        'button[aria-label="Details: Vendor 001"]',
+      ) as HTMLButtonElement
+    ).click(),
+  );
+  const panel = host.querySelector(
+    '[data-cc-part="tcf-vendor-details"]',
+  ) as HTMLElement;
+  const block = [...panel.querySelectorAll(".cc-tcf__detail")].find(
+    (node) => node.querySelector("h5")?.textContent === "Features",
+  );
+  expect(block?.textContent).toContain("Features support the chosen purposes.");
+  expect(block?.textContent).toContain("Feature description");
+  expect(block?.textContent).toContain("Feature example");
+  expect(block?.querySelector("input")).toBeNull();
+});
+it("renders supplied disclosure text without executing markup", async () => {
+  const hostile = '<img src=x onerror="alert(1)">';
+  const { host } = await setup({
+    gvl: {
+      ...gvl,
+      features: {
+        "1": {
+          name: "Fixture feature",
+          description: hostile,
+          illustrations: [hostile],
+        },
+      },
+      standardTexts: { features: hostile },
+    },
+  });
+  await act(async () =>
+    (
+      host.querySelector(
+        'button[aria-label="Details: Vendor 001"]',
+      ) as HTMLButtonElement
+    ).click(),
+  );
+  const panel = host.querySelector(
+    '[data-cc-part="tcf-vendor-details"]',
+  ) as HTMLElement;
+  expect(panel.textContent).toContain(hostile);
+  expect(panel.querySelector("img")).toBeNull();
+  expect(panel.querySelector("[onerror]")).toBeNull();
 });
