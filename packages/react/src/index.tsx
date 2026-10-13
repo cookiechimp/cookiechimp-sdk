@@ -2,10 +2,12 @@
 
 import {
   type ConsentConfig,
+  type ConsentRecord,
   type ConsentRuntime,
   type ConsentState,
   createConsent,
 } from "@cookiechimp/core";
+import type { ConsentLog } from "@cookiechimp/core/endpoint";
 import {
   type MessageKey,
   type Messages,
@@ -54,18 +56,81 @@ export type ConsentProviderProps = (
   initialState?: ConsentState | null;
   translations?: Messages;
   language?: string;
+  /**
+   * POST each consent decision to your own endpoint (local mode) through
+   * `@cookiechimp/core/endpoint`, loaded only when this is set. A same-origin
+   * path such as `/api/consent` or an https URL, optionally with static,
+   * public `headers`. Requires `config`; ignored with a `consent` runtime.
+   */
+  endpoint?: ConsentEndpoint;
 };
+
+export type ConsentEndpoint =
+  | string
+  | { url: string; headers?: Record<string, string> };
 
 /** Supply one consent runtime to a React subtree. */
 export function ConsentProvider(props: ConsentProviderProps) {
   const runtime = useRef<ConsentRuntime | null>(null);
-  if (!runtime.current)
-    runtime.current =
-      props.consent ??
-      createConsent({
-        ...props.config,
-        initial: props.initialState ?? props.config.initial,
+  const log = useRef<ConsentLog | null>(null);
+  const early = useRef<ConsentRecord[]>([]);
+  const endpoint = props.endpoint;
+  const endpointKey =
+    endpoint && props.config ? JSON.stringify(endpoint) : undefined;
+  if (!runtime.current) {
+    if (props.consent) {
+      runtime.current = props.consent;
+      if (endpoint && isDev())
+        console.warn(
+          "CookieChimp: endpoint needs config; pass onConsent to your own runtime instead.",
+        );
+    } else {
+      const config = props.config;
+      runtime.current = createConsent({
+        ...config,
+        initial: props.initialState ?? config.initial,
+        onConsent: endpointKey
+          ? (record) => {
+              config.onConsent?.(record);
+              if (log.current)
+                log.current.record(record, runtime.current?.language);
+              else early.current.push(record);
+            }
+          : config.onConsent,
       });
+    }
+  }
+  useEffect(() => {
+    if (!endpointKey) return;
+    const target = JSON.parse(endpointKey) as ConsentEndpoint;
+    let live = true;
+    let made: ConsentLog | undefined;
+    import("@cookiechimp/core/endpoint").then(
+      ({ createEndpointLog }) => {
+        if (!live) return;
+        try {
+          made = createEndpointLog(
+            typeof target === "string"
+              ? { endpoint: target }
+              : { endpoint: target.url, headers: target.headers },
+          );
+        } catch (error) {
+          // Invalid endpoint or headers: fail closed, loudly in development.
+          console.error(error);
+          return;
+        }
+        log.current = made;
+        for (const record of early.current.splice(0))
+          made.record(record, runtime.current?.language);
+      },
+      () => {},
+    );
+    return () => {
+      live = false;
+      made?.destroy();
+      if (log.current === made) log.current = null;
+    };
+  }, [endpointKey]);
   const serverState = useRef(
     props.initialState ?? runtime.current.get(),
   ).current;
@@ -94,6 +159,8 @@ export function ConsentProvider(props: ConsentProviderProps) {
 
 const production = () =>
   typeof process !== "undefined" && process.env.NODE_ENV === "production";
+const isDev = () =>
+  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
 const message = "CookieChimp hooks must be used within a <ConsentProvider>.";
 const inertState: ConsentState = Object.freeze({
   schemaVersion: 1,

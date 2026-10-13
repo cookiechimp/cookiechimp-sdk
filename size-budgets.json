@@ -62,16 +62,16 @@
     "name": "react provider and hooks",
     "scenario": "react",
     "entry": "packages/react/dist/index.mjs",
-    "kind": "extra",
-    "limit": 4608,
+    "kind": "initial",
+    "limit": 5320,
     "excludedFrom": "packages/core/dist/index.mjs"
   },
   {
     "name": "Next.js client provider bridge",
     "scenario": "nextjs client",
     "entry": "packages/nextjs/dist/index.mjs",
-    "kind": "extra",
-    "limit": 4370
+    "kind": "initial",
+    "limit": 4800
   },
   {
     "name": "Next.js server entry",
@@ -84,8 +84,8 @@
     "name": "Next.js Pages client wrapper",
     "scenario": "nextjs pages",
     "entry": "packages/nextjs/dist/pages.mjs",
-    "kind": "extra",
-    "limit": 6225
+    "kind": "initial",
+    "limit": 6585
   },
   {
     "name": "Next.js middleware region helper",
@@ -180,7 +180,7 @@
     "scenario": "endpoint",
     "entry": "packages/core/dist/endpoint.mjs",
     "kind": "extra",
-    "limit": 2135,
+    "limit": 2450,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["toEndpointRecord", "cc_consent_queue"]
   },

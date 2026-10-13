@@ -12,5 +12,6 @@ export default defineConfig({
     "react-dom",
     "@cookiechimp/core",
     "@cookiechimp/core/gate",
+    "@cookiechimp/core/endpoint",
   ],
 });

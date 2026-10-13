@@ -20,7 +20,7 @@ import type { Messages } from "@cookiechimp/react";
 import { cookies, headers } from "next/headers";
 import type { ReactNode } from "react";
 import { criticalCss } from "./critical-css.generated";
-import { ClientProvider } from "./index";
+import { ClientProvider, type ConsentEndpoint } from "./index";
 
 export interface LanguageOptions {
   available: readonly string[];
@@ -165,6 +165,8 @@ export interface CookieChimpProviderProps
   extends Omit<GetServerConsentOptions, "cookieName"> {
   config: ConsentConfig;
   translations?: Messages | TranslationLoader;
+  /** Self-hosted consent log endpoint; must be serialisable (no functions). */
+  endpoint?: ConsentEndpoint;
   children: ReactNode;
 }
 
@@ -176,6 +178,7 @@ export async function CookieChimpProvider({
   region: suppliedRegion,
   languages,
   translations,
+  endpoint,
   children,
 }: CookieChimpProviderProps) {
   const resolvedCookieName = config.cookie?.name ?? CONSENT_COOKIE_NAME;
@@ -222,6 +225,7 @@ export async function CookieChimpProvider({
       initialState={initialState}
       language={language}
       messages={messages}
+      endpoint={endpoint}
     >
       {children}
     </ClientProvider>

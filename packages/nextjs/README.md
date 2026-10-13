@@ -72,6 +72,22 @@ An existing `getServerSideProps` can be passed as the second argument. The
 `withConsentPage` HOC is available when wrapping the individual component is
 more convenient.
 
+## Self-hosted consent records
+
+Pass `endpoint` to `CookieChimpProvider`, `ClientProvider` or `PagesConsentProvider` to POST each decision to your own route (local mode, no account):
+
+```tsx
+<CookieChimpProvider config={config} endpoint="/api/consent">...</CookieChimpProvider>
+<CookieChimpProvider
+  config={config}
+  endpoint={{ url: "https://logs.example.com/consent", headers: { "X-Site": "shop" } }}
+>
+  ...
+</CookieChimpProvider>
+```
+
+Requests never carry cookies or credentials, and cookie or authorization headers are refused. Headers are public (they ship to the browser), so never put a secret in them. A custom header on a cross-origin URL triggers a CORS preflight, so that endpoint must answer `OPTIONS` and allow the header; a same-origin path avoids it. The endpoint code loads only when `endpoint` is set.
+
 ## Middleware region forwarding
 
 The middleware helper only parses headers already provided by the explicitly

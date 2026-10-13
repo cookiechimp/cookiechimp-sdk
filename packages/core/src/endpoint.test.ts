@@ -28,8 +28,11 @@ function memoryStorage(initial: Record<string, string> = {}) {
     removeItem: (key: string) => void data.delete(key),
   };
 }
-type Call = [RequestInfo | URL, RequestInit | undefined];
-const ok = (body = "") => vi.fn(async () => new Response(body));
+type Call = [RequestInfo | URL, (RequestInit | undefined)?];
+const ok = (body = "") =>
+  vi.fn(
+    async (_url: RequestInfo | URL, _init?: RequestInit) => new Response(body),
+  );
 const make = (options: Partial<EndpointLogOptions> = {}) =>
   createEndpointLog({
     endpoint: "/api/consent",
@@ -269,6 +272,121 @@ describe("delivery", () => {
       value: "visible",
       configurable: true,
     });
+    log.destroy();
+  });
+});
+
+describe("static headers", () => {
+  const hide = (state: "hidden" | "visible") => {
+    Object.defineProperty(document, "visibilityState", {
+      value: state,
+      configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  };
+
+  it("adds static headers to every POST, still without cookies or credentials", async () => {
+    const fetch = ok();
+    const log = make({
+      fetch,
+      headers: { "X-Site": "shop", "x-api-key": "pk_public" },
+    });
+    log.record(consent());
+    await log.flush();
+    expect(fetch.mock.calls[0]?.[1]).toMatchObject({
+      credentials: "omit",
+      redirect: "error",
+      headers: {
+        "X-Site": "shop",
+        "x-api-key": "pk_public",
+        "Content-Type": "application/json",
+      },
+    });
+    log.destroy();
+  });
+
+  it("keeps headers and JSON on the page-hide flush, and keeps records if it is dropped", async () => {
+    const storage = memoryStorage();
+    const fetch = vi.fn(
+      async (_url: RequestInfo | URL, _init?: RequestInit) => {
+        throw new TypeError("preflight dropped on unload");
+      },
+    );
+    const log = make({ fetch, storage, headers: { "X-Site": "shop" } });
+    log.record(consent());
+    await log.flush();
+    hide("hidden");
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    expect(fetch.mock.calls[1]?.[1]).toMatchObject({
+      keepalive: true,
+      credentials: "omit",
+      headers: { "X-Site": "shop", "Content-Type": "application/json" },
+    });
+    await log.flush();
+    expect(log.pending()).toBe(1);
+    hide("visible");
+    log.destroy();
+    // The next visit picks the persisted record up and sends it once.
+    const next = ok();
+    const again = make({
+      fetch: next,
+      storage,
+      now: () => T0 + 3600000,
+      headers: { "X-Site": "shop" },
+    });
+    expect(again.pending()).toBe(1);
+    await again.flush();
+    expect(sent(next.mock.calls[0] as Call | undefined).records).toHaveLength(
+      1,
+    );
+    expect(again.pending()).toBe(0);
+    again.destroy();
+  });
+
+  it.each([
+    ["a cookie", { Cookie: "a=1" }],
+    ["authorization", { authorization: "Bearer x" }],
+    ["proxy authorization", { "Proxy-Authorization": "x" }],
+    ["content type", { "Content-Type": "text/html" }],
+    ["a bad name", { "X Bad": "1" }],
+    ["a CRLF value", { "X-A": "1\r\nCookie: a=1" }],
+    ["a non-string value", { "X-A": 1 }],
+    ["a long value", { "X-A": "x".repeat(257) }],
+    [
+      "too many headers",
+      Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`X-${i}`, "1"])),
+    ],
+    ["an array", [["X-A", "1"]]],
+  ])(
+    "refuses %s: throws in development and stays inert in production",
+    async (_name, headers) => {
+      const bad = { headers: headers as Record<string, string> };
+      expect(() => make(bad)).toThrow(/headers/);
+      vi.stubEnv("NODE_ENV", "production");
+      const fetch = ok();
+      const log = make({ ...bad, fetch });
+      log.record(consent());
+      await log.flush();
+      expect(fetch).not.toHaveBeenCalled();
+      log.destroy();
+    },
+  );
+
+  it("treats empty headers like none, keeping the text/plain page-hide flush", async () => {
+    const fetch = vi.fn(async (_url: RequestInfo | URL, _init?: RequestInit) =>
+      fetch.mock.calls.length === 1
+        ? new Response("", { status: 503 })
+        : new Response(""),
+    );
+    const log = make({ fetch, headers: {}, baseDelayMs: 60000 });
+    log.record(consent());
+    await log.flush();
+    hide("hidden");
+    await vi.waitFor(() => expect(log.pending()).toBe(0));
+    expect(fetch.mock.calls.at(-1)?.[1]?.headers).toEqual({
+      "Content-Type": "text/plain;charset=UTF-8",
+    });
+    hide("visible");
     log.destroy();
   });
 });
