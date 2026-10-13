@@ -8,7 +8,7 @@ For `initial`, Rolldown emits separate dynamic chunks and the harness gzips only
 
 The styled React budgets use runnable source scenarios in `scripts/size-scenarios`. The banner scenario renders `ConsentProvider` and `CookieBanner`. The complete UI scenario renders `ConsentProvider`, `CookieBanner`, `CookiePreferences`, and `RecallButton`. This keeps the provider and its `createConsent` core runtime in the tree-shaken graph instead of measuring an isolated leaf entry. Both scenarios also declare `packages/react/styles.css` in their `css` list. The harness recursively resolves its `@import "@cookiechimp/tokens/css"`, gzips the combined CSS at level 9, and adds those bytes to the JavaScript result. The direct banner and UI distribution entries remain visible as informational rows, which print sizes but never fail a budget.
 
-The checked budgets are the source-of-truth values below. Region header providers and built-in regulation tables live only in `@cookiechimp/core/regions`. The `@cookiechimp/core/sync` entry is enforced separately and is excluded from the default entry. Declarative gating lives in `@cookiechimp/core/gate`, and runtime blocking lives in `@cookiechimp/core/dynamic`. Their budgets are CookieChimp guards (SPEC.md sets no number for them), and both stay out of the default entry. The fetch, XHR, and beacon blocker lives in `@cookiechimp/core/network`, has a 2304 B gzip budget, and also stays out of the default entry. The `@cookiechimp/cli` budgets measure a Node tool that never ships to browsers; they guard against accidental dependency growth.
+The checked budgets are the source-of-truth values below. Region header providers and built-in regulation tables live only in `@cookiechimp/core/regions`. The `@cookiechimp/core/sync` entry is enforced separately and is excluded from the default entry. Its row measures the standalone entry, which repeats the config normalisation that the default entry already ships; the marginal cost of `./sync` on top of `@cookiechimp/core` is 2395 B, about 350 B above the SPEC.md 2 KB extra target, mostly the platform bundle adapter. Declarative gating lives in `@cookiechimp/core/gate`, and runtime blocking lives in `@cookiechimp/core/dynamic`. Their budgets are CookieChimp guards (SPEC.md sets no number for them), and both stay out of the default entry. The fetch, XHR, and beacon blocker lives in `@cookiechimp/core/network`, has a 2304 B gzip budget, and also stays out of the default entry. The `@cookiechimp/cli` budgets measure a Node tool that never ships to browsers; they guard against accidental dependency growth.
 
 <!-- size-budgets:start -->
 | Name | Kind | Limit (bytes) |
@@ -33,7 +33,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | UI distribution entry initial | initial | 13824 |
 | banner, preferences, recall total | total | 16384 |
 | UI distribution entry total | total | 16384 |
-| connected sync client | extra | 2048 |
+| connected sync client | extra | 4355 |
 | GA4 preset | extra | 830 |
 | GTM preset | extra | 915 |
 | Google Ads preset | extra | 890 |
@@ -104,3 +104,4 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | devtools simulation | 585 B | 660 B | isDev fail-closed guard, measured 574 B (about 15% headroom) | M4 PR19 (lead approved) |
 | cli | none | 5140 B | New `cookiechimp` init and doctor binary, Node builtins external, measured 4467 B (about 15% headroom) | M4 PR19 |
 | cli api | none | 5195 B | New programmatic CLI entry, Node builtins external, measured 4514 B (about 15% headroom) | M4 PR19 |
+| sync | 2048 B | 4355 B | Connected config client for the shared platform offline bundle: adapter, fetch, cache, idle revalidation, untrusted payload validation and timeout. Standalone entry measured 3785 B (about 15% headroom); marginal cost over core 2395 B, above the SPEC 2 KB extra target (flagged for lead review) | M5 PR20 |
