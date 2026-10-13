@@ -1,0 +1,11 @@
+{
+  "name": "@cookiechimp/bench-shared",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  }
+}

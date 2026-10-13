@@ -2,3 +2,8 @@ packages:
   - packages/*
   - fixtures/*
   - examples/*
+  - bench/fixtures/baseline
+  - bench/fixtures/cookiechimp
+  - bench/fixtures/cookieyes
+  - bench/fixtures/vanilla
+  - bench/fixtures/shared

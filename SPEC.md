@@ -121,9 +121,9 @@ Connected mode uses the same per-account config endpoint as the CookieChimp web 
 
 ## 8. Benchmark plan
 
-- Reproduce cookiebannerbench.com methodology: identical empty Next.js app per CMP, measure gzip JS, LCP, CLS, INP, TBT, banner time to visible, via Playwright + Lighthouse on throttled profile, 10 runs median.
-- Publish `bench/` in repo with CookieChimp, CookieYes SDK, and other listed CMPs; CI comment on PRs.
-- Submit CookieChimp to cookiebannerbench.com once we beat CookieYes on size and CLS.
+- Use identical minimal Next.js apps per CMP, with separate production builds. Measure gzip body sizes, native LCP/CLS, observed banner visibility and native lab interaction timing, plus Lighthouse LCP/CLS/TBT on a declared throttled profile, 10-run medians. Field INP is unavailable from a navigation lab test and must not be claimed. See `bench/README.md` for the independent methodology and limits.
+- Publish `bench/` in the repo with a no-CMP baseline, CookieChimp, pinned CookieYes SDK and Vanilla CookieConsent. Retain raw attempts, effective settings and source provenance. CI runs a separate smoke check and comments on PRs. Account-based remote CMPs require real fixture configuration; do not invent results.
+- Submit CookieChimp to an external benchmark only after Daniel reviews the results and authorizes submission. Current CookieBench uses an article workload and a broader protocol; our empty-page results do not claim to reproduce it.
 
 ## 9. Milestones (Codex-sized PRs)
 

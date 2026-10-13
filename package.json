@@ -12,15 +12,20 @@
     "size": "pnpm build && node --experimental-strip-types scripts/size-harness.ts",
     "test:component": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs --filter @cookiechimp/scripts --filter @cookiechimp/devtools build && vitest run --config vitest.component.config.ts",
     "test:e2e": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs --filter @cookiechimp/scripts --filter @cookiechimp/devtools --filter @cookiechimp/cli build && pnpm --filter @cookiechimp/fixture-nextjs --filter \"./examples/*\" --filter @cookiechimp/docs build && playwright test",
-    "test:unit": "turbo run test:unit && vitest run scripts",
-    "typecheck": "tsc --noEmit --project tsconfig.tools.json && turbo run typecheck"
+    "test:unit": "turbo run test:unit && vitest run scripts bench",
+    "typecheck": "tsc --noEmit --project tsconfig.tools.json && tsc --noEmit --project bench/tsconfig.json && turbo run typecheck",
+    "bench:build": "turbo run build --filter=@cookiechimp/bench-*",
+    "bench:run": "node --experimental-strip-types bench/run.ts",
+    "bench": "pnpm bench:build && pnpm bench:run"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "@changesets/cli": "3.0.3",
     "@playwright/test": "1.64.0",
     "@types/node": "^22.0.0",
+    "chrome-launcher": "1.2.0",
     "happy-dom": "21.0.1",
+    "lighthouse": "13.5.0",
     "rolldown": "1.2.13",
     "tsdown": "0.23.1",
     "turbo": "2.11.7",

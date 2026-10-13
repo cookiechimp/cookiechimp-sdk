@@ -1,0 +1,48 @@
+name: Benchmark
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: Measured runs per fixture (10 for the full lab comparison)
+        type: choice
+        options: ['2', '10']
+        default: '10'
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm bench:build
+      - name: Collect raw evidence (PR runs are smoke checks)
+        env:
+          RUNS: ${{ github.event_name == 'workflow_dispatch' && inputs.runs || '2' }}
+        run: |
+          export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="$(node --input-type=module -e 'import { chromium } from "@playwright/test"; process.stdout.write(chromium.executablePath())')"
+          if [ "$RUNS" = 10 ]; then
+            pnpm bench:run --runs=10 --warmups=1 --output=bench/results/ci.json
+          else
+            pnpm bench:run --runs=2 --warmups=0 --no-lighthouse --output=bench/results/ci.json
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-evidence
+          path: bench/results/ci.*
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,25 @@
+{
+  "name": "@cookiechimp/bench-cookiechimp",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "start": "next start --hostname 127.0.0.1"
+  },
+  "dependencies": {
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "@cookiechimp/core": "workspace:*",
+    "@cookiechimp/react": "workspace:*",
+    "@cookiechimp/nextjs": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "7.0.2"
+  }
+}
