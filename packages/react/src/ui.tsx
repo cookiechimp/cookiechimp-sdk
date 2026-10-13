@@ -34,6 +34,8 @@ export interface CookiePreferencesProps {
   title?: string;
   description?: string;
   categories: readonly PreferenceCategory[];
+  /** Extra panels, for example `TcfVendorList`, rendered after the categories. */
+  children?: ReactNode;
 }
 const bad = (component: string, message: string) => {
   const text = `Invalid ${component} props: ${message}`;
@@ -46,6 +48,7 @@ export function CookiePreferences({
   title,
   description,
   categories,
+  children,
 }: CookiePreferencesProps) {
   const { t } = useTranslations(en);
   if (!Array.isArray(categories)) {
@@ -75,6 +78,7 @@ export function CookiePreferences({
             </Preferences.Category>
           ))}
         </div>
+        {children}
         <div className="cc-actions">
           <Preferences.RejectAll className="cc-button cc-button--secondary">
             {t("banner.rejectAll")}

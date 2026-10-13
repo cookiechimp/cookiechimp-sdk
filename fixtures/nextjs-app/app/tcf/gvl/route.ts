@@ -3,6 +3,27 @@
 export function GET(request: Request) {
   if (new URL(request.url).searchParams.has("invalid"))
     return Response.json({ vendorListVersion: "x" });
+  if (new URL(request.url).searchParams.has("large")) {
+    const vendors: Record<string, unknown> = {};
+    for (let id = 1; id <= 1200; id++)
+      vendors[id] = {
+        id,
+        name: `Partner ${id}`,
+        purposes: [1, 2],
+        legIntPurposes: id % 2 ? [7] : [],
+        specialFeatures: [],
+      };
+    return Response.json({
+      vendorListVersion: 151,
+      tcfPolicyVersion: 5,
+      purposes: {
+        "1": { name: "Store and/or access information on a device" },
+        "2": { name: "Use limited data to select advertising" },
+        "7": { name: "Measure advertising performance" },
+      },
+      vendors,
+    });
+  }
   return Response.json({
     vendorListVersion: 150,
     tcfPolicyVersion: 5,

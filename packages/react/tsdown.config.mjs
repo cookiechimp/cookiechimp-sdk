@@ -1,7 +1,13 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.tsx", "src/headless.tsx", "src/banner.tsx", "src/ui.tsx"],
+  entry: [
+    "src/index.tsx",
+    "src/headless.tsx",
+    "src/banner.tsx",
+    "src/ui.tsx",
+    "src/tcf.tsx",
+  ],
   dts: true,
   format: ["esm", "cjs"],
   minify: true,
@@ -13,5 +19,6 @@ export default defineConfig({
     "@cookiechimp/core",
     "@cookiechimp/core/gate",
     "@cookiechimp/core/endpoint",
+    "@cookiechimp/core/tcf",
   ],
 });

@@ -314,9 +314,19 @@
     "scenario": "tcf",
     "entry": "packages/core/dist/tcf.mjs",
     "kind": "lazy",
-    "limit": 3300,
+    "limit": 4010,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["installTcf", "encodeTcString"]
+  },
+  {
+    "name": "TCF vendor list UI",
+    "scenario": "react tcf",
+    "entry": "packages/react/dist/tcf.mjs",
+    "kind": "extra",
+    "limit": 2555,
+    "css": ["packages/react/tcf.css"],
+    "excludedFrom": "packages/react/dist/ui.mjs",
+    "forbiddenTokens": ["TcfVendorList", "cc-tcf__viewport"]
   },
   {
     "name": "TCF/GPP module",

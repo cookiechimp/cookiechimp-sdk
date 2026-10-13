@@ -53,7 +53,8 @@ The checked budgets are the source-of-truth values below. Region header provider
 | GPP stub | extra | 925 |
 | GPP US sections module | lazy | 2810 |
 | TCF stub | extra | 645 |
-| TCF core module | lazy | 3300 |
+| TCF core module | lazy | 4010 |
+| TCF vendor list UI | extra | 2555 |
 | TCF/GPP module | lazy | 12288 |
 <!-- size-budgets:end -->
 
@@ -61,7 +62,7 @@ Until the M3 Next.js package exists, `fixtures/nextjs-app` is the empty stand-in
 
 Entries planned for later milestones remain visible as `PENDING` only when their paths are on the harness's explicit allowlist. A missing path outside that allowlist fails with a non-zero exit, preventing a typo from remaining pending indefinitely. File existence controls the allowlisted state, so the same row becomes enforced automatically when its configured build output appears.
 
-GPP lives in two opt-in subpaths. `@cookiechimp/core/gpp-stub` is the `__gpp` stub that publishers inline before vendor tags (SPEC.md requires under 1 KB; the `gppStubScript` inline string measures 761 B gzip on its own). `@cookiechimp/core/gpp` is the lazy US sections encoder and full CMP API. TCF lives in `@cookiechimp/core/tcf-stub` (the inline `__tcfapi` stub; the `tcfStubScript()` string alone is 494 B gzip) and the lazy `@cookiechimp/core/tcf`. The TCF/GPP row is the SPEC.md 12 KB cap and now measures `tcf.mjs`; the GPP module (2430 B) plus the TCF module (2868 B) is 5298 B, inside that cap. The TCF core module row is the tighter guard with about 15% headroom.
+GPP lives in two opt-in subpaths. `@cookiechimp/core/gpp-stub` is the `__gpp` stub that publishers inline before vendor tags (SPEC.md requires under 1 KB; the `gppStubScript` inline string measures 761 B gzip on its own). `@cookiechimp/core/gpp` is the lazy US sections encoder and full CMP API. TCF lives in `@cookiechimp/core/tcf-stub` (the inline `__tcfapi` stub; the `tcfStubScript()` string alone is 494 B gzip) and the lazy `@cookiechimp/core/tcf`. The TCF/GPP row is the SPEC.md 12 KB cap and now measures `tcf.mjs`; the GPP module (2430 B) plus the TCF module (3487 B) plus the TCF vendor list UI (2221 B with `tcf.css`) is 8138 B, inside that cap. The vendor list UI lives in `@cookiechimp/react/tcf` with its own `@cookiechimp/react/tcf.css`, so it stays out of the styled UI entry and the banner CSS budgets. The TCF core module row is the tighter guard with about 15% headroom.
 
 The TCF/GPP exclusion guard always scans the default core entry and every statically or dynamically reachable emitted module for `__tcfapi` and `__gpp`. This guard runs even while the opt-in TCF/GPP entry is absent, and finding either token fails the size job.
 
@@ -132,3 +133,5 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | gpp | none | 2810 B | New opt-in lazy GPP module: header and usnat, usca, usva, usco, usut, usct encoders with GPC segment, consent mapping and full CMP API. Measured 2430 B (about 16% headroom), inside the SPEC.md 12 KB TCF/GPP cap | M6 PR33 |
 | tcf stub | none | 645 B | New opt-in `__tcfapi` stub subpath (ping, queue, `__tcfapiLocator` frame, postMessage bridge). Measured 560 B (about 15% headroom) | M6 PR34 |
 | tcf | none | 3300 B | New opt-in lazy TCF v2.3 module: TC string encoder with the mandatory disclosed vendors segment, GVL validation, cmpId rules and the CMP API. Measured 2868 B (about 15% headroom). The TCF/GPP 12 KB SPEC cap row was pending and now measures this entry (2868 B) | M6 PR34 |
+| tcf | 3300 B | 4010 B | Vendor UI support: explicit per-purpose and per-vendor choices with right to object, ID-only persistence tied to the consent decision, GVL purpose and vendor names, UI subscribe. 2868 B to 3487 B (+619 B), about 15% headroom | M6 PR35 |
+| react tcf | none | 2555 B | New `@cookiechimp/react/tcf` windowed vendor list, measured with `tcf.css`: 2221 B (about 15% headroom). `CookiePreferences` gains a `children` slot: banner + preferences + recall 9349 B to 9355 B initial, 11209 B to 11213 B total, budgets unchanged | M6 PR35 |
