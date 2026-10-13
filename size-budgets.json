@@ -176,6 +176,15 @@
     "forbiddenTokens": ["toPlatformConsent", "cc_consent_queue"]
   },
   {
+    "name": "self-hosted endpoint log",
+    "scenario": "endpoint",
+    "entry": "packages/core/dist/endpoint.mjs",
+    "kind": "extra",
+    "limit": 2135,
+    "excludedFrom": "packages/core/dist/index.mjs",
+    "forbiddenTokens": ["toEndpointRecord", "cc_consent_queue"]
+  },
+  {
     "name": "GA4 preset",
     "scenario": "scripts ga4",
     "entry": "packages/scripts/dist/ga4.mjs",
