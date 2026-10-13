@@ -39,7 +39,11 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
    example and static full-text docs search. Includes real section links, keyboard
    and mobile support, safe result rendering and a visible no-JS fallback. Local
    unit, typecheck, lint and all 115 browser tests pass. Final-head CI is checked separately.
-7. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
+7. [#47](https://github.com/cookiechimp/cookiechimp-sdk/pull/47): current TCF
+   GVL disclosures: supplied descriptions, illustrations and standard feature text,
+   plus special-purpose-only vendor support. Validated against the current official
+   GVL and desktop/mobile browser behavior. All 41 budgets pass without changes.
+8. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
    metadata, licenses, changelogs, typed stylesheet exports and a reviewed publication
    workflow. Local packaging and a fresh npm-installed Next.js consumer pass:
    114 entries, ESM/CJS, CSS, acceptance, persistence and React reconciliation.
@@ -58,8 +62,11 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
   may get 403 and use cached or in-code fallback. Fixture tests do not prove live delivery.
 - Native-speaker review: 29 draft base locales and 32 draft TCF locales.
   [Review map](translation-review.md). Existing review flags have not been invented.
-- Real CookieChimp IAB CMP registration/ID and manual validator checks. Production
-  TCF remains disabled without a valid cmpId; GPP's default CMP ID remains 0.
+- Confirm the existing CookieChimp IAB registration status and assigned CMP ID,
+  then complete current manual validator checks. Verify prior registration status
+  before starting another application. Production TCF remains disabled without a
+  valid cmpId; GPP's default CMP ID remains 0. Current GVL disclosure support is
+  prepared in #47 for the 23 October 2026 web deadline; formal approval is not claimed.
 - The GitHub source repository is private. Public source is needed for npm provenance.
   Review source history before any visibility change: removed error.log in commit
   7b90f7c contained a ChatGPT account ID, not a token. No history rewrite or visibility
@@ -87,8 +94,8 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
   records retry on the next visit and require receiver deduplication.
 - Sync is 2395 B, inside the revised 2.5 KB SPEC target. Provider headroom is about
   12%, below the 15% watch target; every enforced budget passes.
-- The conservative TCF/GPP component sum is 10366 B of 12288 B. The provider
-  bootstrap is 666 B and the deduplicated full IAB graph plus vendor CSS is 10127 B
+- The conservative TCF/GPP component sum is 10624 B of 12288 B. The provider
+  bootstrap is 663 B and the deduplicated full IAB graph plus vendor CSS is 10347 B
   of 12288 B. All 41 enforced budgets pass, including default-bundle exclusion.
 - The old unexplained e2e failure has not recurred. Failure traces are now retained
   and uploaded by CI so any recurrence can be investigated.

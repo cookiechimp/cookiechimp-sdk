@@ -8,7 +8,7 @@
   },
   "notes": {
     "platformDeployed": "Daniel reviews and merges platform PR #2773 then #2772, and verifies deployment and connected delivery.",
-    "iabValidated": "Real CMP registration and manual IAB validation remain external prerequisites.",
+    "iabValidated": "Confirm existing CMP registration/status and assigned ID, then complete current manual IAB validation.",
     "publicHistoryReviewed": "Review the removed error.log still present in Git history before making source public.",
     "npmOrganizationReady": "Configure npm org access and the trusted publisher for this SDK repository and release.yml workflow."
   }

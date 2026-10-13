@@ -154,7 +154,10 @@ import { useState } from "react";
 // Fixture-only CMP ID and vendor data, never production registration.
 const tcf = { cmpId: 123, gvl: {
   vendorListVersion: 151, tcfPolicyVersion: 5,
-  vendors: { "1": { id: 1, name: "Packed fixture vendor", purposes: [1, 8], legIntPurposes: [], specialFeatures: [] } }
+  standardTexts: { features: "Packed feature explanation." },
+  purposes: { "1": { name: "Packed purpose", description: "Packed purpose disclosure.", illustrations: ["Packed purpose example."] } },
+  features: { "1": { name: "Packed ordinary feature", description: "Packed feature disclosure.", illustrations: ["Packed feature example."] } },
+  vendors: { "1": { id: 1, name: "Packed fixture vendor", purposes: [1, 8], legIntPurposes: [], specialFeatures: [], features: [1] } }
 } };
 export default function Page() {
   const allowed = useCategory("analytics");
@@ -280,6 +283,37 @@ try {
       exact: true,
     }),
   ).toBeChecked();
+  const purpose = page.locator("summary").filter({ hasText: "Packed purpose" });
+  await purpose.click();
+  await expect(
+    page.getByText("Packed purpose disclosure.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Packed purpose example.", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", {
+      name: "Details: Packed fixture vendor",
+      exact: true,
+    })
+    .click();
+  const panel = page.getByRole("region", {
+    name: "Packed fixture vendor",
+    exact: true,
+  });
+  await expect(
+    panel.getByText("Packed feature explanation.", { exact: true }),
+  ).toBeVisible();
+  await panel
+    .locator("summary")
+    .filter({ hasText: "Packed ordinary feature" })
+    .click();
+  await expect(
+    panel.getByText("Packed feature disclosure.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    panel.getByText("Packed feature example.", { exact: true }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
   await page.screenshot({
     path: join(directory, "verified.png"),
@@ -308,6 +342,7 @@ try {
         consentAndPersistence: "passed",
         reactReconciliation: "passed",
         tcfProvider: "passed",
+        gvlDisclosures: "passed",
         css: "passed",
       },
       null,

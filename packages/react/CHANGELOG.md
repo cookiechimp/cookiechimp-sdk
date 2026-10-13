@@ -8,6 +8,8 @@
 
 ### Minor Changes
 
+- 7886b79: Preserve and display current TCF GVL descriptions, illustrations and the standard feature explanation, with safe text rendering and keyboard-accessible disclosures. Support valid special-purpose-only vendor records without fabricated consent or legitimate-interest signals.
+
 - f50f834: Bind the optional TCF controller to the existing consent runtime through a dedicated React provider entry and a Next.js TcfStub helper. Fail closed on invalid CMP/GVL input and clean up replaced controllers and pending loads.
 
 - 19a64bc: Add tree-shakeable locale modules, language negotiation and controller APIs, and translated React provider hooks.

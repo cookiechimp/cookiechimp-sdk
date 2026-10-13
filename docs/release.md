@@ -37,7 +37,8 @@ validation and saves the `sdk-1.0.0-candidate` artifact without publishing.
   substitute for it. Use [the translation review map](translation-review.md).
 - Daniel handles platform #2773 then #2772, and verifies deployment and actual
   connected config/consent delivery. SDK work never merges platform PRs.
-- CookieChimp obtains its real IAB CMP registration/ID and completes the manual
+- Confirm CookieChimp's existing IAB registration status and assigned CMP ID,
+  then complete the manual
   IAB validator checks. Do not advertise registration or enable TCF without them.
 - The source repository is currently private. npm provenance requires a public
   source repository. Before making it public, Daniel must review source history:

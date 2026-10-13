@@ -5,10 +5,10 @@ SHA-256 and npm integrity hashes are in `release/artifacts/manifest.json`;
 CI retains the candidates and consumer proof as an artifact.
 
 - Build, lint, typecheck and full unit suites passed.
-- Component suite: 228 passed. Browser suite: 115 passed.
+- Component suite: 230 passed. Browser suite: 117 passed.
 - Size harness: all 41 enforced budgets passed; TCF/GPP total remains
-  10366 B against the 12288 B cap. The new provider bootstrap is 666 B and
-  the deduplicated full IAB graph with vendor CSS is 10127 B against 12288 B.
+  10624 B against the 12288 B cap. The new provider bootstrap is 663 B and
+  the deduplicated full IAB graph with vendor CSS is 10347 B against 12288 B.
 - Packaging: eight 1.0.0 tarballs with MIT licenses, READMEs and changelogs;
   all export/bin targets exist and workspace dependencies are converted.
 - Fresh npm consumer: all eight packages installed as real tarballs, with
@@ -20,7 +20,8 @@ CI retains the candidates and consumer proof as an artifact.
   acceptance enables the gated script once, sibling insertion/removal does
   not crash React, consent survives reload without a banner, and preferences
   reopen. The packed TCF provider shares the same runtime, accepts/persists vendor
-  consent, displays the vendor UI and removes its API when disabled. No page errors
+  consent, displays the vendor UI and its supplied GVL descriptions/illustrations
+  and feature explanation, and removes its API when disabled. No page errors
   occurred. These checks cover the tested versions;
   they do not certify every declared peer version.
 - Publication guard: `release:check --publish` exits nonzero for the actual

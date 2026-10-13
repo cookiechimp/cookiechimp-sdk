@@ -8,6 +8,8 @@
 
 ### Minor Changes
 
+- 7886b79: Preserve and display current TCF GVL descriptions, illustrations and the standard feature explanation, with safe text rendering and keyboard-accessible disclosures. Support valid special-purpose-only vendor records without fabricated consent or legitimate-interest signals.
+
 - Add GPP state formats for FL, MT, OR, TX, DE, IA, NE, NH, NJ and TN, with byte-identical IAB conformance and state-specific consent persistence.
 
 - 64542f7: `BlockedInfo.category` is now optional. Requests and elements blocked because matching failed (fail closed) are reported without a category or service.
