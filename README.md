@@ -132,11 +132,36 @@ privacy laws. Neither is part of the default `@cookiechimp/core` bundle.
   replays queued calls and keeps the GPP string in sync with consent, firing
   `signalStatus`, the section event and `signalStatus` again on every change.
 
-Sections: `usnat` (7), `usca` (8), `usva` (9), `usco` (10), `usut` (11) and
-`usct` (12). With `approach: "state"` (the default) a visitor in CA, VA, CO,
-UT or CT gets that state section and every other US visitor gets `usnat`;
-`approach: "national"` always uses `usnat`. Outside the US no section applies
-(`applicableSections: [-1]`).
+Sections cover the US national string plus the 15 state formats in the current
+published IAB reference implementation:
+
+| Section | State | ID |
+|---|---|---:|
+| usnat | National | 7 |
+| usca | California | 8 |
+| usva | Virginia | 9 |
+| usco | Colorado | 10 |
+| usut | Utah | 11 |
+| usct | Connecticut | 12 |
+| usfl | Florida | 13 |
+| usmt | Montana | 14 |
+| usor | Oregon | 15 |
+| ustx | Texas | 16 |
+| usde | Delaware | 17 |
+| usia | Iowa | 18 |
+| usne | Nebraska | 19 |
+| usnh | New Hampshire | 20 |
+| usnj | New Jersey | 21 |
+| ustn | Tennessee | 22 |
+
+With `approach: "state"` (the default), those states get their own section;
+other US regions use `usnat`. `approach: "national"` always uses `usnat`.
+Outside the US no section applies (`applicableSections: [-1]`). The newer
+MN, MD, IN, KY and RI formats (IDs 23 to 27) are not in the current published
+IAB reference library; those states currently use the national fallback.
+Determine which string applies to your processing before enabling a section.
+[Section definitions](https://github.com/InteractiveAdvertisingBureau/Global-Privacy-Platform/blob/main/Sections/Section%20Information.md).
+
 
 Sale, sharing and targeted advertising opt-outs come from consent for
 `optOutCategories` (default `["advertising", "marketing"]`, matching

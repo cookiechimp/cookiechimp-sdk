@@ -141,7 +141,8 @@ and render `GppStub` at the start of the head so vendor tags find `__gpp`:
 
 `@cookiechimp/core/gpp` loads by dynamic import after hydration only when `gpp`
 is set, replaces the stub, and follows the visitor's region (state section for
-CA, VA, CO, UT and CT, `usnat` elsewhere in the US, none outside the US).
+CA, VA, CO, UT, CT, FL, MT, OR, TX, DE, IA, NE, NH, NJ and TN,
+`usnat` elsewhere in the US, none outside the US).
 `PagesConsentProvider` and the client `ClientProvider` accept the same prop.
 Without `gpp`, nothing GPP-related ships or runs.
 

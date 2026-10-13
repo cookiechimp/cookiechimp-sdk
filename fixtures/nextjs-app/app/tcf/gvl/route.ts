@@ -1,5 +1,5 @@
-// Fixture Global Vendor List subset. Real deployments load the GVL from the
-// CookieChimp CDN; this keeps the e2e suite offline.
+// Fixture Global Vendor List subset. Deployments must supply a valid GVL from their chosen source; the CookieChimp
+// CDN is not configured yet. This fixture keeps the e2e suite offline.
 export function GET(request: Request) {
   if (new URL(request.url).searchParams.has("invalid"))
     return Response.json({ vendorListVersion: "x" });

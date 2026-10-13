@@ -94,7 +94,7 @@ test("national approach and non-state regions use usnat; outside the US no secti
 }) => {
   await ready(page, "/gpp?region=CA&approach=national");
   expect(await gpp(page, "ping")).toMatchObject({ applicableSections: [7] });
-  await ready(page, "/gpp?region=TX");
+  await ready(page, "/gpp?region=OH");
   expect(await gpp(page, "hasSection", "usnat")).toBe(true);
   await ready(page, "/gpp");
   expect(await gpp(page, "ping")).toMatchObject({
@@ -133,3 +133,28 @@ test("iframed vendors reach the CMP through the __gppLocator frame", async ({
     returnValue: { cmpStatus: "loaded" },
   });
 });
+
+for (const [state, prefix, id] of [
+  ["TX", "ustx", 16],
+  ["NJ", "usnj", 21],
+  ["IA", "usia", 18],
+  ["FL", "usfl", 13],
+] as const) {
+  test(`${state} publishes its state section, updates consent and persists`, async ({
+    page,
+  }) => {
+    await ready(page, `/gpp?region=${state}`);
+    expect(await gpp(page, "ping")).toMatchObject({ applicableSections: [id] });
+    expect(await gpp(page, "hasSection", prefix)).toBe(true);
+    expect(await gpp(page, "hasSection", "usnat")).toBe(false);
+    await page.getByRole("button", { name: "Allow sale" }).click();
+    await expect
+      .poll(() => gpp(page, "getField", `${prefix}.SaleOptOut`))
+      .toBe(2);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-cc-gpp", "ready");
+    expect(await gpp(page, "getField", `${prefix}.SaleOptOut`)).toBe(2);
+    await page.getByRole("button", { name: "Opt out of sale" }).click();
+    expect(await gpp(page, "getField", `${prefix}.SaleOptOut`)).toBe(1);
+  });
+}
