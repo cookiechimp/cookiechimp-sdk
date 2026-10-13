@@ -122,11 +122,34 @@ send the header and choose their region. Use
 in to host-specific headers. Vercel mode reads only Vercel headers, Cloudflare
 mode reads only `cf-ipcountry`, and custom mode reads only the named headers.
 
+## IAB GPP (US privacy)
+
+Pass `gpp` to opt in to IAB GPP US sections (`true`, or serialisable options
+such as `{ approach: "national", values: { usnat: { SaleOptOutNotice: 1 } } }`)
+and render `GppStub` at the start of the head so vendor tags find `__gpp`:
+
+```tsx
+<head>
+  <GppStub nonce={nonce} />
+</head>
+<body>
+  <CookieChimpProvider config={config} provider="vercel" gpp>
+    {children}
+  </CookieChimpProvider>
+</body>
+```
+
+`@cookiechimp/core/gpp` loads by dynamic import after hydration only when `gpp`
+is set, replaces the stub, and follows the visitor's region (state section for
+CA, VA, CO, UT and CT, `usnat` elsewhere in the US, none outside the US).
+`PagesConsentProvider` and the client `ClientProvider` accept the same prop.
+Without `gpp`, nothing GPP-related ships or runs.
+
 ## Strict Content Security Policy
 
-`CookieChimpStyles` renders an inline style and `GoogleConsentMode` renders an
-inline script. Under a strict Content Security Policy, pass the same per-request
-nonce to both components. One approach is to generate the nonce in middleware,
+`CookieChimpStyles` renders an inline style, and `GoogleConsentMode` and
+`GppStub` render inline scripts. Under a strict Content Security Policy, pass the
+same per-request nonce to each component. One approach is to generate the nonce in middleware,
 include it in the policy, and copy it to a request header:
 
 ```ts

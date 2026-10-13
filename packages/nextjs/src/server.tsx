@@ -8,6 +8,7 @@ import {
   readConsentCookie,
 } from "@cookiechimp/core";
 import { consentModeInlineScript } from "@cookiechimp/core/consent-mode";
+import { gppStubScript } from "@cookiechimp/core/gpp-stub";
 import { resolveLanguage } from "@cookiechimp/core/language";
 import {
   type Region,
@@ -21,7 +22,7 @@ import type { Messages } from "@cookiechimp/react";
 import { cookies, headers } from "next/headers";
 import type { ReactNode } from "react";
 import { criticalCss } from "./critical-css.generated";
-import { ClientProvider, type ConsentEndpoint } from "./index";
+import { ClientProvider, type ConsentEndpoint, type ConsentGpp } from "./index";
 import { getServerConfig, regionKey } from "./server-config";
 
 export {
@@ -178,6 +179,11 @@ export interface CookieChimpProviderProps
   /** Self-hosted consent log endpoint; must be serialisable (no functions). */
   endpoint?: ConsentEndpoint;
   /**
+   * Opt-in IAB GPP US sections (serialisable). The GPP module loads lazily in
+   * the browser; render `<GppStub />` in the head before vendor tags.
+   */
+  gpp?: ConsentGpp;
+  /**
    * Connected mode: fetch this account's dashboard config on the server
    * (`revalidate` seconds, default 300) so SSR markup already has it.
    * `config` acts as the defaults under the dashboard values.
@@ -208,6 +214,7 @@ export async function CookieChimpProvider({
   languages,
   translations,
   endpoint,
+  gpp,
   projectId,
   apiBase,
   override,
@@ -285,6 +292,7 @@ export async function CookieChimpProvider({
       language={language}
       messages={server ? { ...messages, ...server.messages } : messages}
       endpoint={endpoint}
+      gpp={gpp}
       sync={
         projectId && server && !fetch && revalidateClient !== false
           ? {
@@ -323,6 +331,21 @@ export function GoogleConsentMode({ nonce }: { nonce?: string }) {
       data-cookiechimp-consent-mode=""
       // biome-ignore lint/security/noDangerouslySetInnerHtml: core safely JSON-escapes the static Consent Mode payload.
       dangerouslySetInnerHTML={{ __html: consentModeInlineScript() }}
+    />
+  );
+}
+
+/**
+ * Inline the IAB `__gpp` stub (under 1 KB) at the start of the document head,
+ * before any vendor tag, when the provider has `gpp` set.
+ */
+export function GppStub({ nonce }: { nonce?: string }) {
+  return (
+    <script
+      nonce={nonce}
+      data-cookiechimp-gpp=""
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: package-owned static stub source with no user input.
+      dangerouslySetInnerHTML={{ __html: gppStubScript }}
     />
   );
 }

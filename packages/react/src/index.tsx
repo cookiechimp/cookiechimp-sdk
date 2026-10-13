@@ -8,6 +8,7 @@ import {
   createConsent,
 } from "@cookiechimp/core";
 import type { ConsentLog } from "@cookiechimp/core/endpoint";
+import type { GppOptions } from "@cookiechimp/core/gpp";
 import {
   type MessageKey,
   type Messages,
@@ -25,6 +26,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
+export type { GppOptions } from "@cookiechimp/core/gpp";
 export type { MessageKey, Messages } from "@cookiechimp/translations";
 
 type ProviderValue = {
@@ -63,7 +65,16 @@ export type ConsentProviderProps = (
    * public `headers`. Requires `config`; ignored with a `consent` runtime.
    */
   endpoint?: ConsentEndpoint;
+  /**
+   * Publish IAB GPP US sections through `__gpp`. Opt-in: `@cookiechimp/core/gpp`
+   * loads by dynamic import after hydration only when this is set. Pass `true`
+   * for the defaults or serialisable `GppOptions`. Render the inline stub
+   * (`gppStubScript`, or `GppStub` in Next.js) in the head before vendor tags.
+   */
+  gpp?: ConsentGpp;
 };
+
+export type ConsentGpp = true | GppOptions;
 
 export type ConsentEndpoint =
   | string
@@ -131,6 +142,31 @@ export function ConsentProvider(props: ConsentProviderProps) {
       if (log.current === made) log.current = null;
     };
   }, [endpointKey]);
+  const gppKey = props.gpp
+    ? JSON.stringify(props.gpp === true ? {} : props.gpp)
+    : undefined;
+  useEffect(() => {
+    if (!gppKey) return;
+    const options = JSON.parse(gppKey) as GppOptions;
+    let live = true;
+    let stop: (() => void) | undefined;
+    import("@cookiechimp/core/gpp").then(
+      ({ installGpp }) => {
+        if (!live || !runtime.current) return;
+        try {
+          stop = installGpp(runtime.current, options).stop;
+        } catch (error) {
+          // Invalid options: fail closed (no __gpp signal), loudly in development.
+          console.error(error);
+        }
+      },
+      () => {},
+    );
+    return () => {
+      live = false;
+      stop?.();
+    };
+  }, [gppKey]);
   const serverState = useRef(
     props.initialState ?? runtime.current.get(),
   ).current;

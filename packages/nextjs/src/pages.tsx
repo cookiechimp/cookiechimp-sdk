@@ -15,7 +15,7 @@ import {
   resolveRegion,
 } from "@cookiechimp/core/regions";
 import type { ComponentType, ReactNode } from "react";
-import { ClientProvider, type ConsentEndpoint } from "./index";
+import { ClientProvider, type ConsentEndpoint, type ConsentGpp } from "./index";
 
 export interface PagesConsentOptions {
   config: ConsentConfig;
@@ -102,6 +102,8 @@ export interface PagesConsentProviderProps extends PagesConsentProps {
   config: ConsentConfig;
   /** Self-hosted consent log endpoint; see `ConsentProvider`. */
   endpoint?: ConsentEndpoint;
+  /** Opt-in IAB GPP US sections; see `ConsentProvider`. */
+  gpp?: ConsentGpp;
   children: ReactNode;
 }
 
@@ -112,6 +114,7 @@ export function PagesConsentProvider({
   region,
   language,
   endpoint,
+  gpp,
   children,
 }: PagesConsentProviderProps) {
   return (
@@ -125,6 +128,7 @@ export function PagesConsentProvider({
       initialState={consent}
       language={language}
       endpoint={endpoint}
+      gpp={gpp}
     >
       {children}
     </ClientProvider>

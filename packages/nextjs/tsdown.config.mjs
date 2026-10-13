@@ -32,6 +32,8 @@ export default defineConfig({
     "react-dom",
     "@cookiechimp/core",
     "@cookiechimp/core/consent-mode",
+    "@cookiechimp/core/gpp",
+    "@cookiechimp/core/gpp-stub",
     "@cookiechimp/core/language",
     "@cookiechimp/core/regions",
     "@cookiechimp/core/sync",
