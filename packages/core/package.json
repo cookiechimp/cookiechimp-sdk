@@ -1,7 +1,6 @@
 {
   "name": "@cookiechimp/core",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -84,7 +83,10 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts && cp dist/sync.d.mts dist/sync.d.ts && cp dist/consent-log.d.mts dist/consent-log.d.ts && cp dist/endpoint.d.mts dist/endpoint.d.ts && cp dist/match.d.mts dist/match.d.ts && cp dist/regions.d.mts dist/regions.d.ts && cp dist/gate.d.mts dist/gate.d.ts && cp dist/dynamic.d.mts dist/dynamic.d.ts && cp dist/network.d.mts dist/network.d.ts && cp dist/consent-mode.d.mts dist/consent-mode.d.ts && cp dist/language.d.mts dist/language.d.ts && cp dist/gpp.d.mts dist/gpp.d.ts && cp dist/gpp-stub.d.mts dist/gpp-stub.d.ts && cp dist/tcf.d.mts dist/tcf.d.ts && cp dist/tcf-stub.d.mts dist/tcf-stub.d.ts",
@@ -98,5 +100,20 @@
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
     "vitest": "5.0.4"
+  },
+  "description": "Consent state, cookie storage and opt-in script, network and IAB integrations",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cookiechimp/cookiechimp-sdk.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/cookiechimp/cookiechimp-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/cookiechimp/cookiechimp-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   }
 }

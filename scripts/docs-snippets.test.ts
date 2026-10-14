@@ -85,10 +85,13 @@ async function exportedNames(
   const [, name = "", ...rest] = specifier.split("/");
   const manifest = JSON.parse(
     await readFile(join(root, "packages", name, "package.json"), "utf8"),
-  ) as { exports: Record<string, string | { types?: string }> };
+  ) as {
+    exports: Record<string, string | { types?: string; default?: string }>;
+  };
   const target = manifest.exports[rest.length ? `./${rest.join("/")}` : "."];
   if (!target) return null;
   if (typeof target === "string") return target.endsWith(".css") ? "css" : null;
+  if (target.default?.endsWith(".css")) return "css";
   if (!target.types) return null;
   const types = await readFile(
     join(root, "packages", name, target.types),

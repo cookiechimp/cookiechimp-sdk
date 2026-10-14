@@ -1,9 +1,10 @@
 {
   "name": "@cookiechimp/react",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -33,8 +34,14 @@
       "import": "./dist/tcf.mjs",
       "require": "./dist/tcf.cjs"
     },
-    "./styles.css": "./styles.css",
-    "./tcf.css": "./tcf.css",
+    "./styles.css": {
+      "types": "./styles.d.ts",
+      "default": "./styles.css"
+    },
+    "./tcf.css": {
+      "types": "./styles.d.ts",
+      "default": "./tcf.css"
+    },
     "./tcf-provider": {
       "types": "./dist/tcf-provider.d.ts",
       "import": "./dist/tcf-provider.mjs",
@@ -44,7 +51,11 @@
   "files": [
     "dist",
     "styles.css",
-    "tcf.css"
+    "tcf.css",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "styles.d.ts"
   ],
   "scripts": {
     "build": "tsdown --config-loader native && for name in index headless banner ui tcf tcf-provider; do cp dist/$name.d.mts dist/$name.d.ts; done",
@@ -69,5 +80,20 @@
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
     "vitest": "5.0.4"
+  },
+  "description": "Accessible React consent UI and headless hooks for CookieChimp",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cookiechimp/cookiechimp-sdk.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/cookiechimp/cookiechimp-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/cookiechimp/cookiechimp-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   }
 }

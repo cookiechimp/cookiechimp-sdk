@@ -1,7 +1,6 @@
 {
   "name": "@cookiechimp/tokens",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -12,7 +11,10 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./css": "./dist/tokens.css",
+    "./css": {
+      "types": "./styles.d.ts",
+      "default": "./dist/tokens.css"
+    },
     "./tailwind": {
       "types": "./dist/tailwind.d.ts",
       "import": "./dist/tailwind.mjs",
@@ -22,7 +24,10 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "styles.d.ts"
   ],
   "scripts": {
     "build": "tsdown --config-loader native && node scripts/generate.mjs",
@@ -42,5 +47,23 @@
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
     "vitest": "5.0.4"
-  }
+  },
+  "description": "CookieChimp consent UI design tokens and Tailwind preset",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cookiechimp/cookiechimp-sdk.git",
+    "directory": "packages/tokens"
+  },
+  "homepage": "https://github.com/cookiechimp/cookiechimp-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/cookiechimp/cookiechimp-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
 }

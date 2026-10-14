@@ -9,3 +9,5 @@ test-results/
 .scaffold-test/
 next-env.d.ts
 bench/results/ci.*
+release/artifacts/
+release/consumer/

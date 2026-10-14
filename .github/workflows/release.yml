@@ -1,0 +1,108 @@
+name: SDK release
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Prepare artifacts, or publish after Daniel's review and explicit approval
+        type: choice
+        options: [prepare, publish]
+        default: prepare
+      approved_version:
+        description: Enter 1.0.0 only after approving publication of the reviewed release
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sdk-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      visibility: ${{ steps.repository.outputs.visibility }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:unit
+      - run: pnpm test:component
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - run: pnpm size
+      - run: pnpm release:pack
+      - name: Verify installed tarballs outside the workspace
+        run: |
+          export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="$(node --input-type=module -e 'import { chromium } from "@playwright/test"; process.stdout.write(chromium.executablePath())')"
+          pnpm release:consumer
+      - name: Read repository visibility
+        id: repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          visibility="$(gh api "repos/$GITHUB_REPOSITORY" --jq .visibility)"
+          echo "visibility=$visibility" >> "$GITHUB_OUTPUT"
+      - name: Report prerequisites (prepare does not publish)
+        env:
+          SDK_REPOSITORY_VISIBILITY: ${{ steps.repository.outputs.visibility }}
+        run: pnpm release:check
+      - name: Require publication prerequisites
+        if: inputs.operation == 'publish'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SDK_REPOSITORY_VISIBILITY: ${{ steps.repository.outputs.visibility }}
+          APPROVED_RELEASE_VERSION: ${{ inputs.approved_version }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main
+          pnpm release:check --publish
+          gh api "repos/$GITHUB_REPOSITORY/environments/npm-publish" > /tmp/npm-environment.json
+          node --input-type=module -e 'import fs from "node:fs"; const rules = JSON.parse(fs.readFileSync("/tmp/npm-environment.json", "utf8")).protection_rules; if (!rules?.some(r => r.type === "required_reviewers" && r.reviewers?.some(v => v.reviewer?.login === "danielpaul"))) throw new Error("npm-publish must require Daniel review");'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-1.0.0-candidate
+          path: release/artifacts/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    if: inputs.operation == 'publish'
+    needs: prepare
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+      - run: npm install --global npm@12.2.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdk-1.0.0-candidate
+          path: release/artifacts/
+      - name: Confirm the reviewed main SHA and required checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100" > /tmp/sdk-checks.json
+          node --input-type=module -e 'import fs from "node:fs"; const checks = JSON.parse(fs.readFileSync("/tmp/sdk-checks.json", "utf8")).check_runs; for (const name of ["lint", "typecheck", "unit", "component", "e2e", "size", "ci-required"]) { const check = checks.filter(c => c.name === name).sort((a, b) => b.id - a.id)[0]; if (check?.conclusion !== "success") throw new Error(`Required check not green: ${name}`); }'
+      - name: Publish exact reviewed tarballs with provenance
+        env:
+          SDK_REPOSITORY_VISIBILITY: ${{ needs.prepare.outputs.visibility }}
+          APPROVED_RELEASE_VERSION: ${{ inputs.approved_version }}
+        run: node --experimental-strip-types release/publish.ts

@@ -1,54 +1,110 @@
-# Remaining work (resumed 13 Oct 2026)
+# Remaining work and launch status (13 Oct 2026)
 
-Daniel resumed the SDK work on 13 Oct 2026. SPEC items 1 to 27 are merged, along with the follow-ups below. SDK PRs require Daniel's review before merge. Platform work remains limited to PR preparation and Daniel's review/action.
+Daniel resumed this project on 13 Oct 2026. SDK pull requests require his review
+before merge. Platform work is limited to PR preparation and Daniel's action;
+this SDK takeover has made no platform changes.
 
-## Done
+## Merged
 
 - M1 Core, M2 React, M3 Next.js, M4 Scripts and tooling: complete.
-- M5 Connected mode (items 20 to 24): #26 sync, #27 consent log, #28 self-hosted endpoint, #29 CLI `link` and `pull`, #30 provider `endpoint` prop, #31 Next.js server config, #32 follow-ups and flake fixes.
-- M6 Compliance extensions (items 25 to 27): #33 GPP, #34 TCF core and stub, #35 TCF vendor UI, #36 GPP provider wiring, #37 TCF vendor details, #38 TCF translations.
+- M5 Connected mode, items 20 to 24: #26 sync, #27 consent log, #28 self-hosted
+  endpoint, #29 CLI link/pull, #30 provider endpoint, #31 server config, #32 follow-ups.
+- M6, items 25 to 27: #33 GPP, #34 TCF core/stub, #35 vendor UI, #36 GPP
+  wiring, #37 vendor details and focus-safe windowing, #38 TCF translations.
 
-## In progress
+## Built and ready for Daniel review
 
-- SDK runtime/setup fixes: PR #41, pending review. Fixes React script reconciliation, duplicate execution, ordered activation, the CLI's typed config and builds from paths containing spaces.
-- Item 28 follow-up: the plain React/Vite example and static local docs search are built, pending review in a separate SDK PR. The generated index covers real section anchors; no search service or telemetry is required.
-- Item 28 (docs site, llms.txt, AI skills, examples): PR #39 now includes deployment preparation and release status. Stacked on #41 until it merges. CI publishes a static docs artifact; Daniel chose to decide hosting and domain later.
+Review in dependency order; none of these SDK PRs has been merged by this takeover.
 
-## Release preparation (SPEC section 9)
+1. [#41](https://github.com/cookiechimp/cookiechimp-sdk/pull/41): React gating
+   reconciliation, duplicate execution and ordered activation fixes, typed CLI
+   config, and CSS generation from paths containing spaces. All seven CI checks green.
+2. [#39](https://github.com/cookiechimp/cookiechimp-sdk/pull/39), item 28:
+   documentation site, llms files, four AI skills, examples for both Next.js
+   routers, snippet checks and a static deployment artifact. All seven CI checks green.
+3. [#42](https://github.com/cookiechimp/cookiechimp-sdk/pull/42), item 29:
+   reproducible benchmarks, raw 10-run results and CI smoke checks. All 40 measured
+   attempts and four excluded warmups passed locally. Seven standard CI checks and
+   benchmark smoke are green. Results identify the clean measured source commit.
+4. [#44](https://github.com/cookiechimp/cookiechimp-sdk/pull/44): ten additional
+   GPP state formats with reference conformance and browser persistence. The SDK
+   supports all 16 US sections in the published IAB reference. Local validation passes;
+   all seven standard CI checks and benchmark smoke are green.
+5. [#45](https://github.com/cookiechimp/cookiechimp-sdk/pull/45): optional TCF
+   provider wiring, lazy core loading, readiness/error handling and a Next.js head
+   stub. Requires the application's registered CMP ID, GVL and server-owned feature
+   decision. Local lifecycle and production browser tests pass; all seven standard
+   CI checks and benchmark smoke are green.
+6. [#46](https://github.com/cookiechimp/cookiechimp-sdk/pull/46): plain React/Vite
+   example and static full-text docs search. Includes real section links, keyboard
+   and mobile support, safe result rendering and a visible no-JS fallback. Local
+   unit, typecheck, lint and all 115 browser tests pass. Final-head CI is checked separately.
+7. [#47](https://github.com/cookiechimp/cookiechimp-sdk/pull/47): current TCF
+   GVL disclosures: supplied descriptions, illustrations and standard feature text,
+   plus special-purpose-only vendor support. Validated against the current official
+   GVL and desktop/mobile browser behavior. All 41 budgets pass without changes.
+8. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
+   metadata, licenses, changelogs, typed stylesheet exports and a reviewed publication
+   workflow. Local packaging and a fresh npm-installed Next.js consumer pass:
+   114 entries, ESM/CJS, CSS, acceptance, persistence and React reconciliation.
+   See [release validation](release-validation.md) and [release procedure](release.md).
+   Publication is blocked by the actual prerequisites below.
 
-- Item 29: PR #42 contains the benchmark suite and raw results in `bench/`, recorded on 13 Oct 2026. All 40 measured attempts and four excluded warmups passed. Results identify the clean measured source commit. SDK PR review and external benchmark submission remain separate steps.
-- Item 30: PR #43 prepares eight coordinated 1.0 candidates, tarball validation, a fresh npm consumer and a publication workflow. No packages are published. Needs Daniel's review, actual launch prerequisites and explicit approval before publication.
+## Launch gates requiring Daniel or external work
 
-## Blocked on Daniel
+- Review and merge the SDK PRs in order, after their final-head checks pass.
+- Platform [#2773](https://github.com/IdentitySquare/CookieChimp/pull/2773),
+  consent idempotency: Daniel merges first. Then
+  [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile
+  offline config, schema version, 304/ETag and caching/CORS headers. Verify deployment
+  and real connected config/record delivery. #2772 currently has a failed rspec
+  check; Daniel must resolve/review it before merging. Before deployment website accounts
+  may get 403 and use cached or in-code fallback. Fixture tests do not prove live delivery.
+- Native-speaker review: 29 draft base locales and 32 draft TCF locales.
+  [Review map](translation-review.md). Existing review flags have not been invented.
+- Confirm the existing CookieChimp IAB registration status and assigned CMP ID,
+  then complete current manual validator checks. Verify prior registration status
+  before starting another application. Production TCF remains disabled without a
+  valid cmpId; GPP's default CMP ID remains 0. Current GVL disclosure support is
+  prepared in #47 for the 23 October 2026 web deadline; formal approval is not claimed.
+- The GitHub source repository is private. Public source is needed for npm provenance.
+  Review source history before any visibility change: removed error.log in commit
+  7b90f7c contained a ChatGPT account ID, not a token. No history rewrite or visibility
+  change has been made. That file cannot enter the package allowlists.
+- npm organization access and trusted publishing setup. This machine was not
+  authenticated at takeover. Explicit approval of the exact version is required;
+  release:check --publish fails while requirements or locale reviews remain pending.
+- Docs hosting/domain: Daniel chose to prepare deployment and decide hosting later.
+  The static CI artifact is prepared; no deployment has been performed.
+- External skill/Context7 registry publication and benchmark submission require
+  review and explicit submission instructions. Files and the manifest are prepared.
 
-- Platform PRs in IdentitySquare/CookieChimp, waiting for review (never merged by bots):
-  - #2773: consent sync idempotency (unique index on account and client_id). Merge first.
-  - #2772: serves the offline config and sync endpoints to website accounts, adds schema_version, 304 on If-None-Match, max-age=300 with stale-while-revalidate=86400, ETag exposed through CORS, and a JSON schema. Until it ships, website accounts get 403 and the SDK falls back to the cached or in-code config.
-- IAB Europe CMP registration. TCF is disabled in production until a real `cmpId` exists. The GPP CMP ID is also 0 until then.
+## Integration gaps and intentional limitations
 
-## Known gaps and follow-ups
+- TCF provider wiring is built in #45. Real CMP registration, a GVL CDN/proxy
+  and connected Pro entitlement enforcement remain external/platform requirements.
+  Apps supply a vendor list or bounded loader to the optional provider.
+- GPP now covers 15 state formats plus national. The newer MN/MD/IN/KY/RI
+  formats (IDs 23 to 27) are absent from the published IAB reference and still use
+  the national fallback. See [conformance and coverage](gpp-conformance.md).
+- Consent records do not reach Tinybird; that remains platform-side work.
+- No cc_pk_ validation: the platform deliberately treats account hashids as public.
+- Dashboard copy with HTML uses the code message as a safe fallback.
+- Page-hide requests with custom headers can be dropped by the browser. Persisted
+  records retry on the next visit and require receiver deduplication.
+- Sync is 2395 B, inside the revised 2.5 KB SPEC target. Provider headroom is about
+  12%, below the 15% watch target; every enforced budget passes.
+- The conservative TCF/GPP component sum is 10624 B of 12288 B. The provider
+  bootstrap is 663 B and the deduplicated full IAB graph plus vendor CSS is 10347 B
+  of 12288 B. All 41 enforced budgets pass, including default-bundle exclusion.
+- The old unexplained e2e failure has not recurred. Failure traces are now retained
+  and uploaded by CI so any recurrence can be investigated.
 
-- TCF:
-  - Current TCF v2.4 GVL disclosures are built, pending review: descriptions, illustrations and the standard feature explanation, with keyboard/mobile and safe-text checks. No CMP registration or validator approval is claimed.
-  - SDK provider wiring is built in the optional `@cookiechimp/react/tcf-provider` entry, with a Next.js `TcfStub` helper, pending review. It requires an explicit application-owned feature decision, registered `cmpId` and valid vendor-list source. The regular consent UI remains available when TCF is disabled or fails.
-  - No vendor list (GVL) CDN or proxy URL yet, so apps pass the list themselves.
-  - Limiting TCF to Pro and connected mode needs platform support.
-  - IAB validator checks are manual only.
-  - The conservative TCF/GPP component sum is 10366 B of the 12288 B cap. The provider has separate bootstrap and full import-graph checks; all enforced budgets pass.
-- GPP: PR #44 adds ten state sections, covering all 16 US formats in the current published IAB reference. Newer MN/MD/IN/KY/RI formats still use the national fallback.
-- Translations: 29 base locales and 32 TCF label locales are machine drafts (`reviewed: false`). They need native-speaker review before 1.0.
-- Sync:
-  - The sync extra is 2395 B, above the original 2 KB target. SPEC was raised to 2.5 KB; trim if easy.
-  - Records do not reach Tinybird.
-  - No `cc_pk_` key validation, since the platform treats account hashids as public.
-- Next.js: dashboard copy containing HTML falls back to the code message.
-- Endpoint: the page-hide flush with custom headers sends JSON and can be dropped by the browser. Records stay queued and are resent on the next visit.
-- Provider size headroom is about 12%, under the 15% target. See `docs/size.md`.
-- One unexplained local e2e failure (not seen in CI). Capture a trace if it recurs.
-- Commit 7b90f7c briefly included a Codex log containing a ChatGPT account ID (not a token). It was removed but remains in history.
+## Working rules
 
-## How to resume
-
-- Ask Daniel to review SDK PRs before merge. All 7 CI checks (lint, typecheck, unit, component, e2e, size, ci-required) must pass on the current head SHA.
-- Never copy CookieYes code. The SDK does no client-side geolocation.
-- The "Drive cookiechimp-sdk build" routine is paused; resume it to restart the daily safety check.
+- Follow AGENTS.md and CONTRIBUTING.md. Never copy CookieYes code. No client-side geolocation.
+- All seven checks must pass on the current head. Packed-consumer and benchmark
+  checks provide additional validation. Separate local proof, CI, merge, deployment
+  and registry publication when reporting status.
+- The prior daily Drive cookiechimp-sdk build routine remains paused. No new recurring
+  automation was created by this takeover; the active goal is doing the work here.
