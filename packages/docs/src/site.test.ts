@@ -23,7 +23,9 @@ describe("docs site", () => {
     for (const page of built) {
       expect(page.html).toContain("Content-Security-Policy");
       expect(page.html).toContain(`href="${page.slug}.md"`);
-      expect(page.html).not.toContain("<script");
+      if (page.slug === "search")
+        expect(page.html).toContain('<script type="module" src="search.js">');
+      else expect(page.html).not.toContain("<script");
       expect(page.html).toMatch(/<h1 id=/);
       expect(page.markdown.trim().length).toBeGreaterThan(200);
     }
@@ -110,6 +112,7 @@ describe("docs site", () => {
       ...skills.map((s) => `skills/${s}/SKILL.md`),
       "examples/nextjs-app-router/README.md",
       "examples/nextjs-pages-router/README.md",
+      "examples/react-vite/README.md",
     ];
     for (const file of files)
       expect(await readFile(resolve(root, file), "utf8"), file).not.toContain(

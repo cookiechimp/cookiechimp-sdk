@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  background: #f7f7fa;
+  color: #21232b;
+  font:
+    1rem / 1.6 system-ui,
+    sans-serif;
+}
+main {
+  max-width: 42rem;
+  margin: 5rem auto;
+  padding: 0 1.5rem;
+}
+h1 {
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.eyebrow {
+  color: #5d6270;
+  font-size: 0.875rem;
+}
+main > button {
+  font: inherit;
+  border: 1px solid #c9cbd5;
+  border-radius: 0.5rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}

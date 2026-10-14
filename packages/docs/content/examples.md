@@ -1,11 +1,12 @@
 # Examples
 
 Runnable apps live in [`examples/`](../../../examples/nextjs-app-router/README.md).
-Both are built and tested end to end in CI on every pull request.
+All three are built and tested end to end in CI on every pull request.
 
 | Example | Shows |
 |---|---|
 | `examples/nextjs-app-router` | `CookieChimpProvider` (server), banner, preferences, recall button, a gated GA4 tag, `useCategory`. |
+| `examples/react-vite` | Plain React/Vite, one local runtime, StrictMode, consent-gated script, persistence, preferences and recall. |
 | `examples/nextjs-pages-router` | `withConsent` and `PagesConsentProvider` with the same UI. |
 
 ```sh

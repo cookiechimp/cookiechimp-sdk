@@ -14,6 +14,12 @@ export const pages: readonly PageSpec[] = [
     source: "packages/docs/content/index.md",
   },
   {
+    slug: "search",
+    title: "Search documentation",
+    description: "Search the local SDK reference and setup guides by section.",
+    source: "packages/docs/content/search.md",
+  },
+  {
     slug: "getting-started",
     title: "Getting started",
     description:
@@ -83,7 +89,8 @@ export const pages: readonly PageSpec[] = [
   {
     slug: "examples",
     title: "Examples",
-    description: "Runnable Next.js App Router and Pages Router examples.",
+    description:
+      "Runnable Next.js App Router, Pages Router and plain React/Vite examples.",
     source: "packages/docs/content/examples.md",
   },
 ];

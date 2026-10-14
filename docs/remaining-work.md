@@ -11,6 +11,7 @@ Daniel resumed the SDK work on 13 Oct 2026. SPEC items 1 to 27 are merged, along
 ## In progress
 
 - SDK runtime/setup fixes: PR #41, pending review. Fixes React script reconciliation, duplicate execution, ordered activation, the CLI's typed config and builds from paths containing spaces.
+- Item 28 follow-up: the plain React/Vite example and static local docs search are built, pending review in a separate SDK PR. The generated index covers real section anchors; no search service or telemetry is required.
 - Item 28 (docs site, llms.txt, AI skills, examples): PR #39 now includes deployment preparation and release status. Stacked on #41 until it merges. CI publishes a static docs artifact; Daniel chose to decide hosting and domain later.
 
 ## Release preparation (SPEC section 9)
