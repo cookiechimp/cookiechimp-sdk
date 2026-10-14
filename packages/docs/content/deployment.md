@@ -38,7 +38,7 @@ pnpm test:e2e
 The browser suite serves all examples and the docs locally, checks navigation
 and internal links, resolves llms.txt and skill files, and checks for external
 requests. Re-run those checks against the deployment URL before calling it live.
-The docs include no client-side JavaScript.
+Only the search page loads a local script and generated index; all other docs pages render without JavaScript.
 
 ## Connected mode dependencies
 

@@ -29,9 +29,12 @@ setting; the standalone SDK declarations are checked with it disabled.
 The manual **SDK release** workflow defaults to `prepare`. It reruns all
 validation and saves the `sdk-1.0.0-candidate` artifact without publishing.
 
+SDK PRs #41, #39, #42, #44, #45, #46, #47 and #43 were reviewed and merged
+on 14 Oct 2026 under Daniel's authorization. All seven required checks passed
+on each final reviewed head. Publication approval remains separate.
+
 ## Still required
 
-- Daniel reviews and merges SDK PRs, with all seven checks green on the final SHA.
 - Native speakers review 29 draft base locales and 32 draft TCF label locales.
   Update the actual review metadata only after review; an approval flag cannot
   substitute for it. Use [the translation review map](translation-review.md).

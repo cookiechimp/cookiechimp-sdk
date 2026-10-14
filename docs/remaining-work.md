@@ -1,8 +1,9 @@
-# Remaining work and launch status (13 Oct 2026)
+# Remaining work and launch status (14 Oct 2026)
 
-Daniel resumed this project on 13 Oct 2026. SDK pull requests require his review
-before merge. Platform work is limited to PR preparation and Daniel's action;
-this SDK takeover has made no platform changes.
+Daniel authorized Codex to review, fix and merge the SDK PRs on 14 Oct 2026.
+All eight SDK PRs below are now merged into main after review and green checks.
+Platform actions remain Daniel's responsibility; this SDK takeover has made
+no platform changes. The 1.0.0 packages are prepared, not published.
 
 ## Merged
 
@@ -12,47 +13,26 @@ this SDK takeover has made no platform changes.
 - M6, items 25 to 27: #33 GPP, #34 TCF core/stub, #35 vendor UI, #36 GPP
   wiring, #37 vendor details and focus-safe windowing, #38 TCF translations.
 
-## Built and ready for Daniel review
+## Reviewed and merged on 14 Oct 2026
 
-Review in dependency order; none of these SDK PRs has been merged by this takeover.
+| PR | Completed SDK work |
+|---|---|
+| [#41](https://github.com/cookiechimp/cookiechimp-sdk/pull/41) | React script ownership, duplicate prevention, ordered activation, typed CLI config and CSS generation from paths with spaces. Review also fixed queue ordering when a gate controller stops during an external load. |
+| [#39](https://github.com/cookiechimp/cookiechimp-sdk/pull/39) | Static docs, llms files, four AI skills, both Next.js examples and a deployment artifact. Review corrected example commands to build SDK dependencies on a fresh clone. |
+| [#42](https://github.com/cookiechimp/cookiechimp-sdk/pull/42) | Reproducible benchmarks, raw 10-run results and CI smoke checks. All 40 measured attempts and four excluded warmups passed on the recorded source commit. |
+| [#44](https://github.com/cookiechimp/cookiechimp-sdk/pull/44) | Ten additional GPP state formats, reference conformance and browser persistence. All 16 US formats from the published IAB reference are supported. |
+| [#45](https://github.com/cookiechimp/cookiechimp-sdk/pull/45) | Optional TCF provider, lazy loading, lifecycle/error handling and a Next.js head stub. Apps supply their CMP ID, GVL and authoritative feature decision. |
+| [#46](https://github.com/cookiechimp/cookiechimp-sdk/pull/46) | Plain React/Vite example and local static docs search, including keyboard/mobile support, section links and safe fallback rendering. |
+| [#47](https://github.com/cookiechimp/cookiechimp-sdk/pull/47) | Current GVL descriptions, illustrations, standard feature explanation and special-purpose-only vendor support. |
+| [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43) | Eight coordinated 1.0.0 candidates, licenses, changelogs, typed CSS exports, fresh-consumer validation and guarded provenance workflow. |
 
-1. [#41](https://github.com/cookiechimp/cookiechimp-sdk/pull/41): React gating
-   reconciliation, duplicate execution and ordered activation fixes, typed CLI
-   config, and CSS generation from paths containing spaces. All seven CI checks green.
-2. [#39](https://github.com/cookiechimp/cookiechimp-sdk/pull/39), item 28:
-   documentation site, llms files, four AI skills, examples for both Next.js
-   routers, snippet checks and a static deployment artifact. All seven CI checks green.
-3. [#42](https://github.com/cookiechimp/cookiechimp-sdk/pull/42), item 29:
-   reproducible benchmarks, raw 10-run results and CI smoke checks. All 40 measured
-   attempts and four excluded warmups passed locally. Seven standard CI checks and
-   benchmark smoke are green. Results identify the clean measured source commit.
-4. [#44](https://github.com/cookiechimp/cookiechimp-sdk/pull/44): ten additional
-   GPP state formats with reference conformance and browser persistence. The SDK
-   supports all 16 US sections in the published IAB reference. Local validation passes;
-   all seven standard CI checks and benchmark smoke are green.
-5. [#45](https://github.com/cookiechimp/cookiechimp-sdk/pull/45): optional TCF
-   provider wiring, lazy core loading, readiness/error handling and a Next.js head
-   stub. Requires the application's registered CMP ID, GVL and server-owned feature
-   decision. Local lifecycle and production browser tests pass; all seven standard
-   CI checks and benchmark smoke are green.
-6. [#46](https://github.com/cookiechimp/cookiechimp-sdk/pull/46): plain React/Vite
-   example and static full-text docs search. Includes real section links, keyboard
-   and mobile support, safe result rendering and a visible no-JS fallback. Local
-   unit, typecheck, lint and all 115 browser tests pass. Final-head CI is checked separately.
-7. [#47](https://github.com/cookiechimp/cookiechimp-sdk/pull/47): current TCF
-   GVL disclosures: supplied descriptions, illustrations and standard feature text,
-   plus special-purpose-only vendor support. Validated against the current official
-   GVL and desktop/mobile browser behavior. All 41 budgets pass without changes.
-8. [#43](https://github.com/cookiechimp/cookiechimp-sdk/pull/43), item 30 release preparation: eight coordinated 1.0.0 candidates, public npm
-   metadata, licenses, changelogs, typed stylesheet exports and a reviewed publication
-   workflow. Local packaging and a fresh npm-installed Next.js consumer pass:
-   114 entries, ESM/CJS, CSS, acceptance, persistence and React reconciliation.
-   See [release validation](release-validation.md) and [release procedure](release.md).
-   Publication is blocked by the actual prerequisites below.
+All seven required checks passed on each reviewed head. Benchmark smoke and
+packed-consumer checks also passed where present. The review record is in
+[SDK merge review](sdk-merge-review.md). Docs hosting/domain remain undecided,
+as requested. npm publication, deployment and external submission are separate.
 
 ## Launch gates requiring Daniel or external work
 
-- Review and merge the SDK PRs in order, after their final-head checks pass.
 - Platform [#2773](https://github.com/IdentitySquare/CookieChimp/pull/2773),
   consent idempotency: Daniel merges first. Then
   [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile
@@ -65,8 +45,8 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
 - Confirm the existing CookieChimp IAB registration status and assigned CMP ID,
   then complete current manual validator checks. Verify prior registration status
   before starting another application. Production TCF remains disabled without a
-  valid cmpId; GPP's default CMP ID remains 0. Current GVL disclosure support is
-  prepared in #47 for the 23 October 2026 web deadline; formal approval is not claimed.
+  valid cmpId; GPP's default CMP ID remains 0. Current GVL disclosure support was
+  merged in #47 for the 23 October 2026 web deadline; formal approval is not claimed.
 - The GitHub source repository is private. Public source is needed for npm provenance.
   Review source history before any visibility change: removed error.log in commit
   7b90f7c contained a ChatGPT account ID, not a token. No history rewrite or visibility
@@ -81,7 +61,7 @@ Review in dependency order; none of these SDK PRs has been merged by this takeov
 
 ## Integration gaps and intentional limitations
 
-- TCF provider wiring is built in #45. Real CMP registration, a GVL CDN/proxy
+- TCF provider wiring is merged in #45. Real CMP registration, a GVL CDN/proxy
   and connected Pro entitlement enforcement remain external/platform requirements.
   Apps supply a vendor list or bounded loader to the optional provider.
 - GPP now covers 15 state formats plus national. The newer MN/MD/IN/KY/RI
