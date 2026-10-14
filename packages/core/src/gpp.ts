@@ -9,7 +9,17 @@ export type UsSectionName =
   | "usva"
   | "usco"
   | "usut"
-  | "usct";
+  | "usct"
+  | "usfl"
+  | "usmt"
+  | "usor"
+  | "ustx"
+  | "usde"
+  | "usia"
+  | "usne"
+  | "usnh"
+  | "usnj"
+  | "ustn";
 /** 0 not applicable, 1 yes or opted out, 2 no or did not opt out. */
 export type Tristate = 0 | 1 | 2;
 export type UsSectionValues = Record<string, number | number[] | boolean>;
@@ -35,6 +45,35 @@ const MSPA: readonly FieldSpec[] = [
 ];
 const f = (...names: (string | FieldSpec)[]): FieldSpec[] =>
   names.map((name) => (typeof name === "string" ? [name] : name));
+
+// Later state strings share a layout, with the documented jurisdiction-specific
+// sensitive/child counts, notice name, additional consent and GPC differences.
+const stateSpec = (
+  id: number,
+  sensitive: number,
+  children = 0,
+  sharing = false,
+  gpc = true,
+  sensitiveNotice = false,
+): SectionSpec => ({
+  id,
+  version: 1,
+  gpc,
+  fields: [
+    ...f(
+      `${sharing ? "Sharing" : "Processing"}${N}`,
+      `${SALE}${N}`,
+      `${TA}${N}`,
+      ...(sensitiveNotice ? [`SensitiveDataOptOut${N}`] : []),
+      SALE,
+      TA,
+      [SDP, sensitive],
+      children ? [KIDS, children] : KIDS,
+      ...(sensitiveNotice ? [] : ["AdditionalDataProcessingConsent"]),
+    ),
+    ...MSPA,
+  ],
+});
 
 /** Field order and widths from the IAB GPP section specifications. */
 export const US_SECTIONS: Record<UsSectionName, SectionSpec> = {
@@ -131,6 +170,16 @@ export const US_SECTIONS: Record<UsSectionName, SectionSpec> = {
       ...MSPA,
     ],
   },
+  usfl: stateSpec(13, 8, 3, false, false),
+  usmt: stateSpec(14, 8, 3, true),
+  usor: stateSpec(15, 11, 3),
+  ustx: stateSpec(16, 8),
+  usde: stateSpec(17, 9, 5),
+  usia: stateSpec(18, 8, 0, false, true, true),
+  usne: stateSpec(19, 8),
+  usnh: stateSpec(20, 8, 3),
+  usnj: stateSpec(21, 10, 5),
+  ustn: stateSpec(22, 8),
 };
 
 const STATE_SECTIONS: Record<string, UsSectionName> = {
@@ -139,6 +188,16 @@ const STATE_SECTIONS: Record<string, UsSectionName> = {
   CO: "usco",
   UT: "usut",
   CT: "usct",
+  FL: "usfl",
+  MT: "usmt",
+  OR: "usor",
+  TX: "ustx",
+  DE: "usde",
+  IA: "usia",
+  NE: "usne",
+  NH: "usnh",
+  NJ: "usnj",
+  TN: "ustn",
 };
 const B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
@@ -261,7 +320,7 @@ export function encodeGpp(
   sections: Partial<Record<UsSectionName, UsSectionValues>>,
 ): string {
   const names = (Object.keys(sections) as UsSectionName[])
-    .filter((name) => name in US_SECTIONS)
+    .filter((name) => Object.hasOwn(US_SECTIONS, name))
     .sort((a, b) => US_SECTIONS[a].id - US_SECTIONS[b].id);
   return [
     encodeHeader(names.map((name) => US_SECTIONS[name].id)),
@@ -294,7 +353,10 @@ export function sectionFor(
   approach: "state" | "national" = "state",
 ): UsSectionName | null {
   if (region?.country !== "US") return null;
-  const state = region.region ? STATE_SECTIONS[region.region] : undefined;
+  const state =
+    region.region && Object.hasOwn(STATE_SECTIONS, region.region)
+      ? STATE_SECTIONS[region.region]
+      : undefined;
   return approach === "state" && state ? state : "usnat";
 }
 

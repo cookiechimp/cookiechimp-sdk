@@ -141,7 +141,7 @@ describe("installGpp", () => {
   it("signals not ready, the section, then ready on every consent change", () => {
     const rt = runtime(
       { marketing: true },
-      { region: { country: "US", region: "TX" } },
+      { region: { country: "US", region: "OH" } },
     );
     installGpp(rt);
     const events: string[] = [];

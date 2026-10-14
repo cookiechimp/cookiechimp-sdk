@@ -49,14 +49,14 @@ function reference(sections: Partial<Record<UsSectionName, UsSectionValues>>) {
 describe("GPP encoder conformance with the IAB reference library", () => {
   it("matches field layouts from @iabgpp/cmpapi", async () => {
     const lib = await import("@iabgpp/cmpapi");
-    const fieldNames: Record<UsSectionName, readonly string[]> = {
-      usnat: lib.USNAT_CORE_SEGMENT_FIELD_NAMES,
-      usca: lib.USCA_CORE_SEGMENT_FIELD_NAMES,
-      usva: lib.USVA_CORE_SEGMENT_FIELD_NAMES,
-      usco: lib.USCO_CORE_SEGMENT_FIELD_NAMES,
-      usut: lib.USUT_CORE_SEGMENT_FIELD_NAMES,
-      usct: lib.USCT_CORE_SEGMENT_FIELD_NAMES,
-    };
+    const fieldNames = Object.fromEntries(
+      names.map((name) => [
+        name,
+        lib[
+          `${name.toUpperCase()}_CORE_SEGMENT_FIELD_NAMES` as keyof typeof lib
+        ],
+      ]),
+    );
     for (const name of names)
       expect(["Version", ...US_SECTIONS[name].fields.map(([f]) => f)]).toEqual(
         fieldNames[name],
@@ -90,6 +90,18 @@ describe("GPP encoder conformance with the IAB reference library", () => {
       });
       expect(encodeGpp(sections)).toBe(reference(sections));
     }
+    const all = Object.fromEntries(
+      names.map((name) => [name, randomValues(name, next)]),
+    );
+    expect(encodeGpp(all)).toBe(reference(all));
+    for (const first of names)
+      for (const second of names) {
+        const pair = {
+          [first]: randomValues(first, next),
+          [second]: randomValues(second, next),
+        };
+        expect(encodeGpp(pair)).toBe(reference(pair));
+      }
     const lib = HeaderV1Ref;
     for (const ids of [
       [2],
@@ -141,7 +153,9 @@ describe("US section selection and consent mapping", () => {
   it("picks the state section, usnat elsewhere in the US, and none outside", () => {
     expect(sectionFor({ country: "US", region: "CA" })).toBe("usca");
     expect(sectionFor({ country: "US", region: "CT" })).toBe("usct");
-    expect(sectionFor({ country: "US", region: "TX" })).toBe("usnat");
+    expect(sectionFor({ country: "US", region: "TX" })).toBe("ustx");
+    expect(sectionFor({ country: "US", region: "NJ" })).toBe("usnj");
+    expect(sectionFor({ country: "US", region: "OH" })).toBe("usnat");
     expect(sectionFor({ country: "US" })).toBe("usnat");
     expect(sectionFor({ country: "US", region: "CA" }, "national")).toBe(
       "usnat",
@@ -226,4 +240,11 @@ describe("US section selection and consent mapping", () => {
       MspaServiceProviderMode: 2,
     });
   });
+});
+
+it("ignores inherited section names and unrecognised region keys", () => {
+  expect(encodeGpp(JSON.parse('{"__proto__":{},"constructor":{}}'))).toBe(
+    encodeHeader([]),
+  );
+  expect(sectionFor({ country: "US", region: "constructor" })).toBe("usnat");
 });
