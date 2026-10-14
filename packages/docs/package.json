@@ -1,0 +1,20 @@
+{
+  "name": "@cookiechimp/docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "CookieChimp SDK docs site, llms.txt and llms-full.txt",
+  "type": "module",
+  "scripts": {
+    "build": "node --experimental-strip-types src/build.ts",
+    "lint": "biome check .",
+    "start": "node --experimental-strip-types src/serve.ts",
+    "test:unit": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "marked": "18.0.14",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4"
+  }
+}

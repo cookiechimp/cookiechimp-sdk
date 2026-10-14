@@ -1,6 +1,6 @@
-# Remaining work (project paused 13 Oct 2026)
+# Remaining work (resumed 13 Oct 2026)
 
-Work on the SDK was paused by Daniel on 13 Oct 2026. Main is at `bfe7716`. SPEC items 1 to 27 are merged, along with the follow-ups listed below. This file records everything still to do so work can resume cleanly.
+Daniel resumed the SDK work on 13 Oct 2026. SPEC items 1 to 27 are merged, along with the follow-ups below. SDK PRs require Daniel's review before merge. Platform work remains limited to PR preparation and Daniel's review/action.
 
 ## Done
 
@@ -10,7 +10,8 @@ Work on the SDK was paused by Daniel on 13 Oct 2026. Main is at `bfe7716`. SPEC 
 
 ## In progress
 
-- Item 28 (docs site, llms.txt, AI skills, examples): draft PR #39, unfinished. Review and finish it, or close it and restart.
+- SDK runtime/setup fixes: PR #41, pending review. Fixes React script reconciliation, duplicate execution, ordered activation, the CLI's typed config and builds from paths containing spaces.
+- Item 28 (docs site, llms.txt, AI skills, examples): PR #39 now includes deployment preparation and release status. Stacked on #41 until it merges. CI publishes a static docs artifact; Daniel chose to decide hosting and domain later.
 
 ## Still to build (SPEC section 9)
 
@@ -46,6 +47,6 @@ Work on the SDK was paused by Daniel on 13 Oct 2026. Main is at `bfe7716`. SPEC 
 
 ## How to resume
 
-- Codex builds through the Codex CLI teammate. PRs open as drafts, and the SDK lead merges after all 7 CI checks (lint, typecheck, unit, component, e2e, size, ci-required) pass on the head SHA.
+- Ask Daniel to review SDK PRs before merge. All 7 CI checks (lint, typecheck, unit, component, e2e, size, ci-required) must pass on the current head SHA.
 - Never copy CookieYes code. The SDK does no client-side geolocation.
 - The "Drive cookiechimp-sdk build" routine is paused; resume it to restart the daily safety check.

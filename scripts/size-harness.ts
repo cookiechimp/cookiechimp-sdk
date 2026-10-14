@@ -18,6 +18,8 @@ export interface SizeBudget {
   excludedFrom?: string;
   forbiddenTokens?: string[];
   css?: string[];
+  /** Extra entries measured separately (same kind) and added to this row. */
+  alsoEntries?: string[];
   informational?: true;
 }
 export interface BudgetResult extends SizeBudget {
@@ -226,10 +228,16 @@ export async function runBudgets(
         resolve(root, budget.entry),
         budget.kind,
       );
+      const extra = await Promise.all(
+        (budget.alsoEntries ?? []).map((entry) =>
+          measureEntry(resolve(root, entry), budget.kind),
+        ),
+      );
       const bytes =
-        jsBytes === undefined
+        jsBytes === undefined || extra.some((size) => size === undefined)
           ? undefined
           : jsBytes +
+            extra.reduce<number>((sum, size) => sum + (size ?? 0), 0) +
             (budget.css
               ? await measureCss(
                   budget.css.map((entry) => resolve(root, entry)),

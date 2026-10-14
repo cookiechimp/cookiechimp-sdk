@@ -1,0 +1,28 @@
+{
+  "name": "@cookiechimp/example-nextjs-app-router",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "biome check .",
+    "start": "next start --hostname 127.0.0.1 --port 3101",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cookiechimp/core": "workspace:*",
+    "@cookiechimp/nextjs": "workspace:*",
+    "@cookiechimp/react": "workspace:*",
+    "@cookiechimp/scripts": "workspace:*",
+    "@cookiechimp/translations": "workspace:*",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "7.0.2"
+  }
+}

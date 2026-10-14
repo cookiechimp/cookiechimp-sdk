@@ -235,6 +235,25 @@ describe("size harness", () => {
     },
   );
 
+  it("adds alsoEntries to a row and fails closed when one is missing", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
+    await writeFile(join(root, "a.mjs"), "export const a = 'a'.repeat(1);");
+    await writeFile(join(root, "b.mjs"), "export const b = 'bbbbbbbbbb';");
+    const alone = (await runBudgets([budget("a.mjs")], root))[0]?.bytes ?? 0;
+    const other = (await runBudgets([budget("b.mjs")], root))[0]?.bytes ?? 0;
+    const combined = (
+      await runBudgets([{ ...budget("a.mjs"), alsoEntries: ["b.mjs"] }], root)
+    )[0];
+    expect(combined?.bytes).toBe(alone + other);
+    const missing = (
+      await runBudgets(
+        [{ ...budget("a.mjs"), alsoEntries: ["missing.mjs"] }],
+        root,
+      )
+    )[0];
+    expect(missing?.status).toBe("fail");
+  });
+
   it("passes the default-bundle guard for clean core output", async () => {
     const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-"));
     await writeFile(join(root, "index.mjs"), "export const clean = true;");

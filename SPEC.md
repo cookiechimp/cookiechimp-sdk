@@ -172,5 +172,6 @@ M6 Compliance extensions
 
 M7 Launch
 28. Docs site, llms.txt, AI skills, examples.
+   Status (M7 PR39): `@cookiechimp/docs` builds a static docs site (no scripts, strict CSP) from the package READMEs and `packages/docs/content`, plus `llms.txt`, `llms-full.txt` and per-page Markdown; four Agent Skills in `skills/`; `context7.json`; runnable `examples/nextjs-app-router` and `examples/nextjs-pages-router`, all tested in CI. A test checks every `@cookiechimp/*` import in docs, skills and examples against real package exports. Still open: hosting and the docs domain (needs a decision and credentials), a React-only (Vite) example, and search.
 29. Benchmark suite and published results.
 30. 1.0 release, npm publish, provenance.
