@@ -2,6 +2,7 @@
 
 import type {
   Gvl,
+  GvlName,
   GvlVendor,
   TcfChoices,
   TcfController,
@@ -124,6 +125,31 @@ function useModel(controller: TcfVendorController) {
 const dayText = (template: string, days: number) =>
   template.replace("{days}", String(days));
 
+function GvlDisclosure({
+  item,
+  fallback,
+}: {
+  item?: GvlName;
+  fallback: string;
+}) {
+  const name = item?.name ?? fallback;
+  return item?.description || item?.illustrations?.length ? (
+    <details className="cc-tcf__disclosure">
+      <summary>{name}</summary>
+      {item.description && <p>{item.description}</p>}
+      {item.illustrations?.length ? (
+        <ul>
+          {item.illustrations.map((value) => (
+            <li key={value}>{value}</li>
+          ))}
+        </ul>
+      ) : null}
+    </details>
+  ) : (
+    name
+  );
+}
+
 function VendorDetails({
   vendor,
   gvl,
@@ -141,14 +167,19 @@ function VendorDetails({
     source: Gvl["purposes"],
     fallback: string,
     retention?: Record<string, number>,
+    explanation?: string,
   ): ReactNode =>
     list?.length ? (
       <div className="cc-tcf__detail">
         <h5>{title}</h5>
+        {explanation && <p>{explanation}</p>}
         <ul>
           {list.map((id) => (
             <li key={id}>
-              {source?.[id]?.name ?? `${fallback} ${id}`}
+              <GvlDisclosure
+                item={source?.[id]}
+                fallback={`${fallback} ${id}`}
+              />
               {retention?.[id] !== undefined &&
                 ` (${l.retention}: ${dayText(l.retentionDays, retention[id] as number)})`}
             </li>
@@ -183,7 +214,14 @@ function VendorDetails({
         "Special purpose",
         r?.specialPurposes,
       )}
-      {named(l.features, vendor.features, gvl.features, "Feature")}
+      {named(
+        l.features,
+        vendor.features,
+        gvl.features,
+        "Feature",
+        undefined,
+        gvl.standardTexts?.features,
+      )}
       {named(
         l.specialFeatures,
         vendor.specialFeatures,
@@ -388,8 +426,6 @@ export function TcfVendorList({
     returnFocus.current = openId;
     setOpenId(null);
   };
-  const purposeName = (id: number) =>
-    gvl.purposes?.[id]?.name ?? `Purpose ${id}`;
 
   return (
     <section className="cc-tcf" aria-label={l.title} data-cc-part="tcf">
@@ -397,7 +433,12 @@ export function TcfVendorList({
       <ul className="cc-tcf__purposes">
         {purposeIds.map((id) => (
           <li key={id} className="cc-tcf__purpose">
-            <span className="cc-tcf__name">{purposeName(id)}</span>
+            <div className="cc-tcf__name">
+              <GvlDisclosure
+                item={gvl.purposes?.[id]}
+                fallback={`Purpose ${id}`}
+              />
+            </div>
             <label>
               <input
                 type="checkbox"
@@ -437,9 +478,18 @@ export function TcfVendorList({
           <ul className="cc-tcf__purposes">
             {featureIds.map((id) => (
               <li key={id} className="cc-tcf__purpose">
+                <div className="cc-tcf__name">
+                  <GvlDisclosure
+                    item={gvl.specialFeatures?.[id]}
+                    fallback={`Special feature ${id}`}
+                  />
+                </div>
                 <label>
                   <input
                     type="checkbox"
+                    aria-label={
+                      gvl.specialFeatures?.[id]?.name ?? `Special feature ${id}`
+                    }
                     checked={draft.specialFeatures.has(id)}
                     onChange={(e) =>
                       update({
@@ -451,7 +501,7 @@ export function TcfVendorList({
                       })
                     }
                   />
-                  {gvl.specialFeatures?.[id]?.name ?? `Special feature ${id}`}
+                  {l.consent}
                 </label>
               </li>
             ))}

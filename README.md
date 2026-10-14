@@ -255,6 +255,21 @@ URL). Links from the GVL are accepted only as https and open with
 button. A focused row stays mounted while it scrolls out of the window, so
 keyboard focus is never lost.
 
+### Current GVL disclosures
+
+`parseGvl` preserves descriptions and illustrations for purposes, special
+purposes, ordinary features, special features and data categories. It also
+preserves `standardTexts.features`, added by the TCF v2.4 specifications.
+`TcfVendorList` displays these as text in keyboard-accessible disclosure sections,
+including the standard explanation alongside ordinary features. Ordinary features
+have no consent toggle; special-feature opt-ins keep their supplied GVL names.
+
+Applications must supply the current GVL and its official language-specific
+terms, including the updated Special Feature 2 name. The SDK does not invent
+translations or fetch a GVL service automatically. These UI additions do not
+change the TC string encoding or the CMP API version. See [disclosure validation
+and launch checks](docs/tcf-disclosures.md).
+
 ## React headless primitives
 
 Import `Banner`, `Preferences`, and `OptOut` from

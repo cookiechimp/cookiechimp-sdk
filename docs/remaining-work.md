@@ -29,6 +29,7 @@ Daniel resumed the SDK work on 13 Oct 2026. SPEC items 1 to 27 are merged, along
 ## Known gaps and follow-ups
 
 - TCF:
+  - Current TCF v2.4 GVL disclosures are built, pending review: descriptions, illustrations and the standard feature explanation, with keyboard/mobile and safe-text checks. No CMP registration or validator approval is claimed.
   - SDK provider wiring is built in the optional `@cookiechimp/react/tcf-provider` entry, with a Next.js `TcfStub` helper, pending review. It requires an explicit application-owned feature decision, registered `cmpId` and valid vendor-list source. The regular consent UI remains available when TCF is disabled or fails.
   - No vendor list (GVL) CDN or proxy URL yet, so apps pass the list themselves.
   - Limiting TCF to Pro and connected mode needs platform support.

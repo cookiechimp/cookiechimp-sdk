@@ -444,3 +444,76 @@ describe("vendor UI choices", () => {
     expect(parsed?.dataCategories).toEqual({ "1": { name: "IP addresses" } });
   });
 });
+
+it("preserves bounded TCF v2.4 GVL feature explanations and illustrations for all disclosure kinds", () => {
+  const name = {
+    name: "Fixture name",
+    description: "Description",
+    illustrations: [" Example ", 42, null, "", "x".repeat(2001)],
+  };
+  const parsed = parseGvl({
+    vendorListVersion: 180,
+    tcfPolicyVersion: 5,
+    vendors: {},
+    standardTexts: { features: " Explanation " },
+    purposes: { "1": name },
+    specialPurposes: { "1": name },
+    features: { "1": name },
+    specialFeatures: { "2": name },
+    dataCategories: { "1": name },
+  });
+  expect(parsed?.standardTexts).toEqual({ features: "Explanation" });
+  for (const map of [
+    parsed?.purposes,
+    parsed?.specialPurposes,
+    parsed?.features,
+    parsed?.specialFeatures,
+    parsed?.dataCategories,
+  ])
+    expect(Object.values(map ?? {})[0]).toEqual({
+      name: "Fixture name",
+      description: "Description",
+      illustrations: ["Example"],
+    });
+});
+it("drops invalid explanation data and bounds the illustration list", () => {
+  const parsed = parseGvl({
+    vendorListVersion: 180,
+    tcfPolicyVersion: 5,
+    vendors: {},
+    standardTexts: { features: 42 },
+    features: {
+      "1": {
+        name: "Fixture",
+        illustrations: Array.from({ length: 40 }, (_, i) => String(i)),
+      },
+      "2": { name: "Other", illustrations: "not an array" },
+    },
+  });
+  expect(parsed).not.toHaveProperty("standardTexts");
+  expect(parsed?.features?.["1"]?.illustrations).toHaveLength(32);
+  expect(parsed?.features?.["2"]).not.toHaveProperty("illustrations");
+});
+
+it("discloses a special-purpose-only vendor without inventing consent or legitimate interest", () => {
+  const parsed = parseGvl({
+    vendorListVersion: 180,
+    tcfPolicyVersion: 5,
+    vendors: { "1": { id: 1, specialPurposes: [1] } },
+  });
+  expect(parsed?.vendors["1"]).toMatchObject({
+    purposes: [],
+    legIntPurposes: [],
+    specialPurposes: [1],
+  });
+  const model = tcModelFor(null, parsed as Gvl, {
+    cmpId: 300,
+    cmpVersion: 1,
+    consentScreen: 1,
+    consentLanguage: "en",
+    publisherCC: "IE",
+  });
+  expect([...model.disclosedVendors]).toEqual([1]);
+  expect(model.vendorConsents.size).toBe(0);
+  expect(model.vendorLegitimateInterests.size).toBe(0);
+});
