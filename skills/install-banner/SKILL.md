@@ -59,4 +59,5 @@ export default function RootLayout({ children }) {
   `CookieChimpStyles`, `GoogleConsentMode` and `GppStub`.
 - Then use the `gate-scripts` skill for any analytics or ad tags.
 
-Docs: https://github.com/cookiechimp/cookiechimp-sdk (see `llms.txt` on the docs site).
+Docs: https://docs.cookiechimp.com/docs/sdk/getting-started
+AI index: https://docs.cookiechimp.com/docs/llms.txt

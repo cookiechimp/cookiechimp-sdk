@@ -1,5 +1,7 @@
 # @cookiechimp/cli
 
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
 Set up and check CookieChimp in an existing project.
 
 ```sh

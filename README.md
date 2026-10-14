@@ -12,7 +12,9 @@ example, `fr-CA` can select `fr`, or `fr-FR` when only that regional variant is
 available, while `pt` can select `pt-BR`.
 - Small, fast, no banner flash on SSR, strict CSP friendly, Google Consent Mode v2 ready.
 
-Status: pre-alpha. See [SPEC.md](./SPEC.md) for the design and roadmap.
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
+Status: 1.0.0 candidate, not yet published to npm. See [release status](https://docs.cookiechimp.com/docs/sdk/release-status) and [SPEC.md](./SPEC.md).
 
 ## React server rendering
 

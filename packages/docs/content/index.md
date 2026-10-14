@@ -24,8 +24,8 @@ their hosting platform's headers.
 - [Getting started](getting-started.md): install and show a banner.
 - [Next.js](../../nextjs/README.md) or the [core and React reference](../../../README.md).
 - [Examples](examples.md) you can run.
-- [AI skills](ai-skills.md) for coding agents, and [llms.txt](https://llmstxt.org)
-  at `/llms.txt` and `/llms-full.txt` on this site.
+- [AI skills](ai-skills.md) for coding agents and the
+  [documentation index](https://docs.cookiechimp.com/docs/llms.txt).
 
 Status: pre-release. See [deployment and release status](deployment.md) before
 installing from npm or using connected mode in production.

@@ -25,7 +25,6 @@ export default defineConfig({
     server("@cookiechimp/fixture-nextjs", 3000),
     server("@cookiechimp/example-nextjs-app-router", 3101),
     server("@cookiechimp/example-nextjs-pages-router", 3102),
-    server("@cookiechimp/docs", 3103),
     server("@cookiechimp/example-react-vite", 3104),
   ],
 });

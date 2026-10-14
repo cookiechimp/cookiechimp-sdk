@@ -1,5 +1,7 @@
 # `@cookiechimp/tokens`
 
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
 Shared CookieChimp design tokens for the app and consent UI. The groups are color, banner, typography, radius, spacing, shadow, and focus. `src/tokens.ts` is the single source of truth. The build generates the CSS and JSON representations from it.
 
 - Import typed tokens from `@cookiechimp/tokens`.

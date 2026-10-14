@@ -1,5 +1,7 @@
 # @cookiechimp/translations
 
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
 Tree-shakeable consent UI translations for CookieChimp.
 
 This package is being prepared for CookieChimp SDK 1.0. npm installation is

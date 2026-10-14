@@ -1,8 +1,7 @@
 # AI skills
 
 The repo ships [Agent Skills](https://agentskills.io) for coding agents. Each is
-a `SKILL.md` with instructions an agent loads when the task matches. They are
-also published on this site under `/skills/<name>/SKILL.md`.
+a `SKILL.md` with instructions an agent loads when the task matches. Download the source files from the SDK repository.
 
 | Skill | Use it to |
 |---|---|
@@ -14,7 +13,7 @@ also published on this site under `/skills/<name>/SKILL.md`.
 To use them, copy the folders from
 [`skills/`](../../../skills/install-banner/SKILL.md) into your agent's skills
 directory (for example `.claude/skills/` or `.agents/skills/`), or point the
-agent at this site's [llms.txt](https://llmstxt.org) index.
+agent at the [CookieChimp documentation index](https://docs.cookiechimp.com/docs/llms.txt).
 
 The repo also has a `context7.json` so [Context7](https://context7.com) can
 index these docs.

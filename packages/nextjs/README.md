@@ -1,5 +1,7 @@
 # CookieChimp for Next.js
 
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
 `@cookiechimp/nextjs` provides an App Router server provider that renders the
 correct consent UI in the initial HTML and seeds the client with the same
 state.

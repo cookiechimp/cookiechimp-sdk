@@ -1,63 +1,42 @@
-import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { rolldown } from "rolldown";
-import { skills } from "./pages.ts";
-import {
-  buildPages,
-  buildSearchIndex,
-  contentSecurityPolicy,
-  docsBaseUrl,
-  llmsFull,
-  llmsTxt,
-} from "./site.ts";
+import { toMdx } from "./mintlify.ts";
+import { navigation, pages, repoUrl } from "./pages.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "../../..");
 const out = resolve(here, "../dist");
-// Absolute base URL for llms.txt links, for example https://docs.example.com.
-// Unset means root-relative links, so the output works on any host.
-const base = docsBaseUrl(process.env.DOCS_BASE_URL ?? "");
-
 await rm(out, { recursive: true, force: true });
-await mkdir(out, { recursive: true });
-const built = await buildPages(root);
-for (const page of built) {
-  await writeFile(join(out, `${page.slug}.html`), page.html);
-  await writeFile(join(out, `${page.slug}.md`), page.markdown);
+await mkdir(join(out, "sdk"), { recursive: true });
+for (const page of pages) {
+  const markdown = await readFile(join(root, page.source), "utf8");
+  await writeFile(join(out, "sdk", `${page.slug}.mdx`), toMdx(page, markdown));
 }
 await writeFile(
-  join(out, "search-index.json"),
-  JSON.stringify(buildSearchIndex(built)),
+  join(out, "navigation.json"),
+  `${JSON.stringify(navigation, null, 2)}\n`,
 );
-const searchBundle = await rolldown({
-  input: resolve(here, "search.ts"),
-  platform: "browser",
-});
-await searchBundle.write({
-  file: join(out, "search.js"),
-  format: "es",
-  minify: true,
-});
-await searchBundle.close();
-await writeFile(join(out, "llms.txt"), llmsTxt(built, base));
-await writeFile(join(out, "llms-full.txt"), llmsFull(built));
-await cp(resolve(here, "style.css"), join(out, "style.css"));
-await cp(resolve(here, "favicon.svg"), join(out, "favicon.svg"));
-// Static hosts that support _headers apply these to every generated file.
 await writeFile(
-  join(out, "_headers"),
-  `/*
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: no-referrer
-  Content-Security-Policy: ${contentSecurityPolicy(true)}; frame-ancestors 'none'
-`,
+  join(out, "source.json"),
+  `${JSON.stringify(
+    {
+      repository: repoUrl,
+      sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], {
+        cwd: root,
+        encoding: "utf8",
+      }).trim(),
+      dirty: Boolean(
+        execFileSync("git", ["status", "--porcelain", "--untracked-files=no"], {
+          cwd: root,
+          encoding: "utf8",
+        }).trim(),
+      ),
+      pages: pages.map(({ slug, source }) => ({ slug, source })),
+    },
+    null,
+    2,
+  )}\n`,
 );
-for (const skill of skills) {
-  await mkdir(join(out, "skills", skill), { recursive: true });
-  await writeFile(
-    join(out, "skills", skill, "SKILL.md"),
-    await readFile(join(root, "skills", skill, "SKILL.md"), "utf8"),
-  );
-}
-console.log(`docs: ${built.length} pages, ${skills.length} skills -> ${out}`);
+console.log(`Mintlify: ${pages.length} SDK pages -> ${out}`);

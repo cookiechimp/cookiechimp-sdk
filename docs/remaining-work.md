@@ -28,8 +28,8 @@ no platform changes. The 1.0.0 packages are prepared, not published.
 
 All seven required checks passed on each reviewed head. Benchmark smoke and
 packed-consumer checks also passed where present. The review record is in
-[SDK merge review](sdk-merge-review.md). Docs hosting/domain remain undecided,
-as requested. npm publication, deployment and external submission are separate.
+[SDK merge review](sdk-merge-review.md). Daniel selected the existing CookieChimp Mintlify docs repo for SDK documentation
+on 14 Oct. The integration is prepared in companion PRs, pending docs review/deployment. npm publication, deployment and external submission are separate.
 
 ## Launch gates requiring Daniel or external work
 
@@ -54,8 +54,9 @@ as requested. npm publication, deployment and external submission are separate.
 - npm organization access and trusted publishing setup. This machine was not
   authenticated at takeover. Explicit approval of the exact version is required;
   release:check --publish fails while requirements or locale reviews remain pending.
-- Docs hosting/domain: Daniel chose to prepare deployment and decide hosting later.
-  The static CI artifact is prepared; no deployment has been performed.
+- SDK docs move to the existing Mintlify site in `IdentitySquare/CookieChimp-Docs`.
+  Review and merge the companion docs PR, verify the new SDK routes are live, then
+  merge the SDK link/export migration. See [documentation workflow](documentation.md).
 - External skill/Context7 registry publication and benchmark submission require
   review and explicit submission instructions. Files and the manifest are prepared.
 

@@ -1,5 +1,7 @@
 # `@cookiechimp/scripts`
 
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
 Tree-shakeable analytics and advertising script presets for CookieChimp. Import only the integration you use.
 
 ```ts
