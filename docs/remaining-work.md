@@ -15,7 +15,7 @@ Daniel resumed the SDK work on 13 Oct 2026. SPEC items 1 to 27 are merged, along
 
 ## Still to build (SPEC section 9)
 
-- Item 29: benchmark suite and published results.
+- Item 29: benchmark suite and raw results in `bench/`, recorded on 13 Oct 2026. All 40 measured attempts and four excluded warmups passed. Results identify the clean measured source commit. SDK PR review and external benchmark submission remain separate steps.
 - Item 30: 1.0 release, npm publish with provenance. Needs Daniel's npm org access and an explicit go-ahead before publishing.
 
 ## Blocked on Daniel

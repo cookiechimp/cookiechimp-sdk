@@ -8,3 +8,4 @@ test-results/
 *.tsbuildinfo
 .scaffold-test/
 next-env.d.ts
+bench/results/ci.*
