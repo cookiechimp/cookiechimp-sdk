@@ -34,6 +34,7 @@ export default defineConfig({
     "@cookiechimp/core/consent-mode",
     "@cookiechimp/core/gpp",
     "@cookiechimp/core/gpp-stub",
+    "@cookiechimp/core/tcf-stub",
     "@cookiechimp/core/language",
     "@cookiechimp/core/regions",
     "@cookiechimp/core/sync",

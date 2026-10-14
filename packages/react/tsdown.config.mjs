@@ -7,6 +7,7 @@ export default defineConfig({
     "src/banner.tsx",
     "src/ui.tsx",
     "src/tcf.tsx",
+    "src/tcf-provider.tsx",
   ],
   dts: true,
   format: ["esm", "cjs"],
@@ -21,5 +22,6 @@ export default defineConfig({
     "@cookiechimp/core/endpoint",
     "@cookiechimp/core/gpp",
     "@cookiechimp/core/tcf",
+    "@cookiechimp/react",
   ],
 });

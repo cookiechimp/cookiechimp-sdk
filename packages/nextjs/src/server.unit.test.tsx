@@ -32,7 +32,12 @@ vi.mock("next/headers", () => ({
   }),
 }));
 
-import { CookieChimpProvider, GppStub, getServerConsent } from "./server";
+import {
+  CookieChimpProvider,
+  GppStub,
+  getServerConsent,
+  TcfStub,
+} from "./server";
 
 const state: ConsentState = {
   schemaVersion: 1,
@@ -441,4 +446,11 @@ describe("GPP wiring", () => {
     expect(html).toContain("__gpp");
     expect(html).toContain("__gppLocator");
   });
+});
+
+it("renders the static opt-in TCF head stub with its nonce", () => {
+  const html = renderToStaticMarkup(<TcfStub nonce="fixture-nonce" />);
+  expect(html).toContain('nonce="fixture-nonce"');
+  expect(html).toContain("__tcfapiLocator");
+  expect(html).toContain('data-cookiechimp-tcf=""');
 });

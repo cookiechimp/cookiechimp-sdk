@@ -34,7 +34,12 @@
       "require": "./dist/tcf.cjs"
     },
     "./styles.css": "./styles.css",
-    "./tcf.css": "./tcf.css"
+    "./tcf.css": "./tcf.css",
+    "./tcf-provider": {
+      "types": "./dist/tcf-provider.d.ts",
+      "import": "./dist/tcf-provider.mjs",
+      "require": "./dist/tcf-provider.cjs"
+    }
   },
   "files": [
     "dist",
@@ -42,7 +47,7 @@
     "tcf.css"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && for name in index headless banner ui tcf; do cp dist/$name.d.mts dist/$name.d.ts; done",
+    "build": "tsdown --config-loader native && for name in index headless banner ui tcf tcf-provider; do cp dist/$name.d.mts dist/$name.d.ts; done",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
