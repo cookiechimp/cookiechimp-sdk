@@ -247,7 +247,7 @@ Only the English TCF labels have had native-speaker review so far
 Purpose, feature and vendor names still come from the GVL, so load the GVL
 in the same language.
 
-Each vendor's name is a button (labelled "Details: <name>") that opens a panel with the disclosures
+Each vendor's name is a button (labelled `Details: <name>`) that opens a panel with the disclosures
 TCF policy requires: consent and legitimate interest purposes, special
 purposes, features, special features, data categories, retention periods,
 privacy policy and legitimate interest claim links, and device storage (cookie
