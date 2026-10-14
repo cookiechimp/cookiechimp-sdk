@@ -68,7 +68,6 @@ export function gateScripts(
   if (!doc) return noop();
   let stopped = false;
   const done = new WeakSet<Element>();
-  const loads = new Set<() => void>();
   const pending = new Map<Element, BlockedElement>();
   const granted = new Map<string, boolean>();
   const allowed = (category: string, service?: string) =>
@@ -132,12 +131,10 @@ export function gateScripts(
         if (source) fresh.src = source;
         if (source && !async) {
           const finish = () => {
-            loads.delete(finish);
             fresh.removeEventListener("load", finish);
             fresh.removeEventListener("error", finish);
             resolve();
           };
-          loads.add(finish);
           fresh.addEventListener("load", finish, { once: true });
           fresh.addEventListener("error", finish, { once: true });
         } else resolve();
@@ -233,7 +230,8 @@ export function gateScripts(
         stopped = true;
         observer?.disconnect();
         unsubscribe();
-        for (const finish of loads) finish();
+        // An already connected script still loads after stop. Its load/error
+        // event must release the shared queue before dependent scripts run.
       }
     },
     scan,

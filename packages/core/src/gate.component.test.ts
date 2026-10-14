@@ -361,3 +361,28 @@ it("preserves external and inline ordering across multiple gate controllers", as
     2,
   );
 });
+
+it("keeps a connected external script ahead of other controllers after stop", async () => {
+  const consent = runtime({ analytics: true });
+  const loaded: Array<() => void> = [];
+  vi.spyOn(HTMLScriptElement.prototype, "addEventListener").mockImplementation(
+    (type, listener) => {
+      if (type === "load") loaded.push(listener as () => void);
+    },
+  );
+  document.body.innerHTML =
+    '<script type="text/plain" data-cc-keep="true" data-cc-category="analytics" data-cc-src="/first.js"></script><script type="text/plain" data-cc-keep="true" data-cc-category="analytics">window.second = true;</script>';
+  const first = gate(consent);
+  gate(consent);
+  await tick();
+  first.stop();
+  await tick();
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    1,
+  );
+  loaded[0]?.();
+  await tick();
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    2,
+  );
+});
