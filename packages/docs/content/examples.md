@@ -10,7 +10,7 @@ Both are built and tested end to end in CI on every pull request.
 
 ```sh
 pnpm install
-pnpm --filter @cookiechimp/example-nextjs-app-router build
+pnpm --filter @cookiechimp/example-nextjs-app-router... build
 pnpm --filter @cookiechimp/example-nextjs-app-router start
 ```
 

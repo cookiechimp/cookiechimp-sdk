@@ -5,7 +5,7 @@ and a GA4 tag that stays blocked until analytics consent.
 
 ```sh
 pnpm install
-pnpm --filter @cookiechimp/example-nextjs-app-router build
+pnpm --filter @cookiechimp/example-nextjs-app-router... build
 pnpm --filter @cookiechimp/example-nextjs-app-router start   # http://127.0.0.1:3101
 ```
 
