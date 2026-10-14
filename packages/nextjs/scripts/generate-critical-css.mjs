@@ -1,8 +1,11 @@
 import { readFile, rename, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const reactCss = new URL("../../react/styles.css", import.meta.url).pathname;
+const reactCss = fileURLToPath(
+  new URL("../../react/styles.css", import.meta.url),
+);
 
 async function inline(file) {
   const css = await readFile(file, "utf8");
@@ -12,7 +15,9 @@ async function inline(file) {
     output += css.slice(offset, match.index);
     const path =
       match[1] === "@cookiechimp/tokens/css"
-        ? new URL("../../tokens/dist/tokens.css", import.meta.url).pathname
+        ? fileURLToPath(
+            new URL("../../tokens/dist/tokens.css", import.meta.url),
+          )
         : match[1].startsWith(".")
           ? resolve(dirname(file), match[1])
           : createRequire(file).resolve(match[1]);

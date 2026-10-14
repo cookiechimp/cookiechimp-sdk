@@ -164,17 +164,20 @@ export function GatedScript({
     bad("GatedScript", "src or inline children is required");
   useGate();
   return (
-    <script
-      {...props}
-      type="text/plain"
-      data-cc-part="gated-script"
-      data-cc-state="blocked"
-      data-cc-category={category}
-      data-cc-service={service}
-      data-cc-src={src}
-    >
-      {children}
-    </script>
+    <span hidden>
+      <script
+        {...props}
+        type="text/plain"
+        data-cc-part="gated-script"
+        data-cc-state="blocked"
+        data-cc-category={category}
+        data-cc-service={service}
+        data-cc-src={src}
+        data-cc-keep="true"
+      >
+        {children}
+      </script>
+    </span>
   );
 }
 

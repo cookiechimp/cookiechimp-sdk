@@ -299,3 +299,90 @@ describe("gateScripts iframe activation", () => {
     expect(placeholder).not.toHaveBeenCalled();
   });
 });
+
+it("claims retained scripts only once across controllers, scans and restarts", async () => {
+  const consent = runtime({ analytics: true });
+  document.body.innerHTML =
+    '<script type="text/plain" data-cc-category="analytics" data-cc-keep="true" nonce="safe"></script>';
+  const inert = document.querySelector("script");
+  const first = gate(consent);
+  const second = gate(consent);
+  await tick();
+  first.scan();
+  second.scan();
+  first.stop();
+  gate(consent);
+  await tick();
+  expect(inert?.isConnected).toBe(true);
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    1,
+  );
+  expect(
+    document.querySelector('[data-cc-activated="true"]')?.getAttribute("nonce"),
+  ).toBe("safe");
+});
+
+it("rechecks queued consent and can retry a cancelled activation", async () => {
+  const consent = runtime({ analytics: true });
+  document.body.innerHTML =
+    '<script type="text/plain" data-cc-category="analytics" data-cc-keep="true"></script>';
+  const first = gate(consent);
+  first.stop();
+  gate(consent);
+  consent.set("analytics", false);
+  await tick();
+  expect(document.querySelector('[data-cc-activated="true"]')).toBeNull();
+  consent.set("analytics", true);
+  await tick();
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    1,
+  );
+});
+
+it("preserves external and inline ordering across multiple gate controllers", async () => {
+  const consent = runtime({ analytics: true });
+  const loaded: Array<() => void> = [];
+  vi.spyOn(HTMLScriptElement.prototype, "addEventListener").mockImplementation(
+    (type, listener) => {
+      if (type === "load") loaded.push(listener as () => void);
+    },
+  );
+  document.body.innerHTML =
+    '<script type="text/plain" data-cc-keep="true" data-cc-category="analytics" data-cc-src="/first.js"></script><script type="text/plain" data-cc-keep="true" data-cc-category="analytics">window.second = true;</script>';
+  gate(consent);
+  gate(consent);
+  await tick();
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    1,
+  );
+  loaded[0]?.();
+  await tick();
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    2,
+  );
+});
+
+it("keeps a connected external script ahead of other controllers after stop", async () => {
+  const consent = runtime({ analytics: true });
+  const loaded: Array<() => void> = [];
+  vi.spyOn(HTMLScriptElement.prototype, "addEventListener").mockImplementation(
+    (type, listener) => {
+      if (type === "load") loaded.push(listener as () => void);
+    },
+  );
+  document.body.innerHTML =
+    '<script type="text/plain" data-cc-keep="true" data-cc-category="analytics" data-cc-src="/first.js"></script><script type="text/plain" data-cc-keep="true" data-cc-category="analytics">window.second = true;</script>';
+  const first = gate(consent);
+  gate(consent);
+  await tick();
+  first.stop();
+  await tick();
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    1,
+  );
+  loaded[0]?.();
+  await tick();
+  expect(document.querySelectorAll('[data-cc-activated="true"]')).toHaveLength(
+    2,
+  );
+});

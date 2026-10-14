@@ -37,6 +37,9 @@ function warn(message: string): void {
   if (isDev()) console.warn(`CookieChimp gate: ${message}`);
 }
 
+// Controllers for the same runtime share ordering as well as claims.
+const orderedScripts = new WeakMap<object, Promise<void>>();
+
 /**
  * Activate declaratively gated resources. Third-party code that assigns a plain
  * src needs `@cookiechimp/core/dynamic`, which intercepts the assignment before
@@ -67,14 +70,20 @@ export function gateScripts(
   const done = new WeakSet<Element>();
   const pending = new Map<Element, BlockedElement>();
   const granted = new Map<string, boolean>();
-  let ordered = Promise.resolve();
   const allowed = (category: string, service?: string) =>
     service ? consent.hasService(service) : consent.has(category);
   const keyFor = (category: string, service?: string) =>
     `${category}\0${service ?? ""}`;
 
   const script = (el: HTMLScriptElement) => {
-    if (done.has(el) || el.type !== "text/plain") return;
+    if (
+      done.has(el) ||
+      el.dataset.ccClaimed === "true" ||
+      el.type !== "text/plain"
+    ) {
+      pending.delete(el);
+      return;
+    }
     const category = el.dataset.ccCategory;
     if (!category) return;
     const service = el.dataset.ccService;
@@ -88,12 +97,16 @@ export function gateScripts(
       pending.set(el, { el, category, ...(service ? { service } : {}) });
       return;
     }
-    done.add(el);
-    pending.delete(el);
-    granted.set(keyFor(category, service), true);
     const activate = () =>
       new Promise<void>((resolve) => {
-        if (stopped || !el.isConnected) return resolve();
+        if (stopped || !el.isConnected || el.dataset.ccClaimed === "true")
+          return resolve();
+        // Consent may have changed while an earlier ordered script was loading.
+        if (!allowed(category, service)) return resolve();
+        done.add(el);
+        pending.delete(el);
+        granted.set(keyFor(category, service), true);
+        el.dataset.ccClaimed = "true";
         const fresh = doc.createElement("script");
         for (const { name, value } of [...el.attributes]) {
           if (
@@ -103,10 +116,13 @@ export function gateScripts(
               "data-cc-src",
               "data-cc-blocked",
               "data-cc-type",
+              "data-cc-keep",
+              "data-cc-claimed",
             ].includes(name)
           )
             fresh.setAttribute(name, value);
         }
+        if (el.nonce) fresh.nonce = el.nonce;
         fresh.type = el.dataset.ccType || "text/javascript";
         fresh.textContent = el.textContent;
         fresh.dataset.ccActivated = "true";
@@ -114,14 +130,26 @@ export function gateScripts(
         if (!async) fresh.async = false;
         if (source) fresh.src = source;
         if (source && !async) {
-          fresh.addEventListener("load", () => resolve(), { once: true });
-          fresh.addEventListener("error", () => resolve(), { once: true });
+          const finish = () => {
+            fresh.removeEventListener("load", finish);
+            fresh.removeEventListener("error", finish);
+            resolve();
+          };
+          fresh.addEventListener("load", finish, { once: true });
+          fresh.addEventListener("error", finish, { once: true });
         } else resolve();
         if (stopped) return resolve();
-        el.replaceWith(fresh);
+        // Frameworks still own the inert node. Keep it in place so their next
+        // reconciliation can insert siblings, update props and unmount safely.
+        if (el.dataset.ccKeep === "true") el.before(fresh);
+        else el.replaceWith(fresh);
       });
     if (source && el.hasAttribute("async")) void activate();
-    else ordered = ordered.then(activate);
+    else
+      orderedScripts.set(
+        consent,
+        (orderedScripts.get(consent) ?? Promise.resolve()).then(activate),
+      );
   };
 
   const frame = (el: HTMLIFrameElement) => {
@@ -202,6 +230,8 @@ export function gateScripts(
         stopped = true;
         observer?.disconnect();
         unsubscribe();
+        // An already connected script still loads after stop. Its load/error
+        // event must release the shared queue before dependent scripts run.
       }
     },
     scan,
