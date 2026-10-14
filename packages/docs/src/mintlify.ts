@@ -18,18 +18,20 @@ export function toMdx(page: PageSpec, markdown: string): string {
     .map((token) => {
       if (token.type === "code") return token.raw;
       if (token.type === "heading" && token.depth === 1) return "";
-      return token.raw
-        .split(/(`+[^`]*`+)/g)
-        .map((part, index) =>
-          index % 2
-            ? part
-            : part.replace(
-                /(\[[^\]]*\])\(([^\s)]+)\)/g,
-                (_match, label: string, href: string) =>
-                  `${label}(${rewriteLink(href, page.source)})`,
-              ),
-        )
-        .join("");
+      // Mask inline code without changing offsets. A link's label may itself
+      // contain code, while a link illustrated wholly inside code is inert.
+      const masked = token.raw.replace(/(`+)([\s\S]*?)\1/g, (code) =>
+        " ".repeat(code.length),
+      );
+      let out = "";
+      let cursor = 0;
+      for (const match of masked.matchAll(/\[[^\]]*\]\(([^\s)]+)\)/g)) {
+        const at = match.index + match[0].lastIndexOf("](") + 2;
+        out += token.raw.slice(cursor, at);
+        out += `${rewriteLink(match[1] ?? "", page.source)})`;
+        cursor = match.index + match[0].length;
+      }
+      return out + token.raw.slice(cursor);
     })
     .join("")
     .trim();

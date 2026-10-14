@@ -24,9 +24,10 @@ it("keeps code examples and inline code unchanged and lets frontmatter own the t
   const code = '```ts\nconst example = "[link](getting-started.md)";\n```';
   const mdx = toMdx(
     page,
-    `# Old title\n\n[Setup](getting-started.md)\n\n${code}\n\n\`[link](getting-started.md)\`\n`,
+    `# Old title\n\n[Setup](getting-started.md)\n\n[\`Setup\`](getting-started.md)\n\n${code}\n\n\`[link](getting-started.md)\`\n`,
   );
   expect(mdx).toContain("[Setup](/sdk/getting-started)");
+  expect(mdx).toContain("[`Setup`](/sdk/getting-started)");
   expect(mdx).toContain(code);
   expect(mdx).toContain("`[link](getting-started.md)`");
   expect(mdx).not.toContain("# Old title");
