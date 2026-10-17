@@ -2,13 +2,13 @@
   "version": "1.0.0",
   "manualChecks": {
     "platformDeployed": false,
-    "publicHistoryReviewed": false,
-    "npmOrganizationReady": false
+    "publicHistoryReviewed": true,
+    "npmOrganizationReady": true
   },
   "notes": {
-    "platformDeployed": "Daniel reviews and merges platform PR #2773 then #2772, and verifies deployment and connected delivery.",
-    "publicHistoryReviewed": "Review the removed error.log still present in Git history before making source public.",
-    "npmOrganizationReady": "Configure npm org access and the trusted publisher for this SDK repository and release.yml workflow."
+    "platformDeployed": "Platform PRs #2773 and #2772 merged on 17 Oct 2026; deployment 7137407395 succeeded for bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459. Still requires live connected config and consent-delivery evidence from Daniel; this agent performs no platform writes.",
+    "publicHistoryReviewed": "Daniel authorized public SDK source on 17 Oct 2026 after disclosure of the historical error.log account identifier. A targeted scan of 1315 unique Git blobs found no supported credential patterns. The identifier is not an authentication secret; history was preserved and the SDK repository is now public.",
+    "npmOrganizationReady": "Verified @cookiechimp Free organization ownership by danielpaul and enabled account 2FA on 17 Oct 2026. All eight hash-verified 1.0.0 candidates are staged. All eight GitHub trusted publisher connections were saved and independently read back with npm trust list: cookiechimp/cookiechimp-sdk, release.yml, npm-publish, publish and stage-publish permissions only. Connections require their first successful CI publication within npm's two-day validation window. Staged candidates are not a published SDK release."
   },
   "deferred": {
     "tcf": {
