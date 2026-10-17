@@ -66,7 +66,7 @@ for (const name of packageNames) {
   const files = new Set(paths);
   for (const path of paths) {
     if (
-      !/^package\/(?:dist\/[A-Za-z0-9_./-]+|(?:package\.json|README\.md|LICENSE|CHANGELOG\.md|styles\.css|tcf\.css|styles\.d\.ts))$/.test(
+      !/^package\/(?:dist\/[A-Za-z0-9_./-]+|(?:package\.json|README\.md|LICENSE|CHANGELOG\.md|styles\.css|tcf\.css|platform\.css|styles\.d\.ts))$/.test(
         path,
       ) ||
       path.includes("..")

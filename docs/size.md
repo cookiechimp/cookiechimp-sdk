@@ -59,7 +59,13 @@ The checked budgets are the source-of-truth values below. Region header provider
 | TCF/GPP module | lazy | 12288 |
 | TCF provider bootstrap | initial | 780 |
 | TCF/GPP with provider full import graph | total | 12288 |
+| platform JSON category and vendor UI | total | 24576 |
 <!-- size-budgets:end -->
+
+The opt-in `@cookiechimp/react/platform` entry includes the shared JSON adapter,
+category/vendor disclosures and `platform.css` (which imports the base SDK CSS).
+Its complete JavaScript and CSS graph has a separate 24 KB budget. This rendering
+does not ship in the default banner entry, and existing budgets are unchanged.
 
 Until the M3 Next.js package exists, `fixtures/nextjs-app` is the empty stand-in application. Its page is the baseline and contributes zero package bytes. Source scenario measurement avoids build identifiers and framework chunk allocation changing the result while measuring the complete CookieChimp graph used by a realistic render. Fixture-delta measurement is deferred to M7. The fixture no-flash test remains part of the required end-to-end job.
 
