@@ -15,7 +15,7 @@ const ready: PublicationState = {
   reviewedTcfLocales: ["en"],
 };
 
-it("blocks publication until every real prerequisite is satisfied", () => {
+it("blocks publication until every standalone prerequisite is satisfied", () => {
   expect(
     publicationBlockers({
       ...ready,
@@ -23,8 +23,22 @@ it("blocks publication until every real prerequisite is satisfied", () => {
       approvedVersion: "",
       manualChecks: {},
     }),
-  ).toHaveLength(5);
+  ).toEqual([
+    "A public source repository is required for npm provenance",
+    "Daniel must explicitly approve publication of this exact version",
+    "Manual check required: publicHistoryReviewed",
+    "Manual check required: npmOrganizationReady",
+  ]);
   expect(publicationBlockers(ready)).toEqual([]);
+});
+
+it("permits standalone publication without claiming live platform verification", () => {
+  const state = {
+    ...ready,
+    manualChecks: { ...ready.manualChecks, platformDeployed: false },
+  };
+  expect(publicationBlockers(state)).toEqual([]);
+  expect(state.manualChecks.platformDeployed).toBe(false);
 });
 it("cannot replace editorial review with a publication approval", () => {
   expect(

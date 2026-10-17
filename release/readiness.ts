@@ -16,13 +16,10 @@ export function publicationBlockers(state: PublicationState): string[] {
     blockers.push(
       "Daniel must explicitly approve publication of this exact version",
     );
-  // Optional managed IAB activation is tracked in readiness.json's deferred TODO.
-  // Its runtime CMP ID checks remain independent of package publication.
-  for (const name of [
-    "platformDeployed",
-    "publicHistoryReviewed",
-    "npmOrganizationReady",
-  ])
+  // Live platform delivery and optional managed IAB activation are tracked
+  // separately in readiness.json. Neither is required to use the standalone SDK.
+  // Do not mark those integrations verified merely to publish npm packages.
+  for (const name of ["publicHistoryReviewed", "npmOrganizationReady"])
     if (state.manualChecks[name] !== true)
       blockers.push(`Manual check required: ${name}`);
   const drafts = Object.entries(state.locales)

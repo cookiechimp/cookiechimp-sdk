@@ -38,12 +38,14 @@ Base and TCF copy for all 33 locales completed AI editorial review on
 17 Oct 2026. The [review record](translation-review.md) identifies the method,
 reviewer and exact source hashes. Keep that evidence current when copy changes.
 
-## Still required
+## Standalone publication readiness
 
 - Platform #2773 and #2772 are merged, and deployment `7137407395` succeeded
   for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459` on 17 Oct 2026. Daniel still
-  supplies live connected config/consent-delivery evidence. SDK work never
-  performs platform writes.
+  supplies live connected config/consent-delivery evidence before that integration
+  can be marked verified. `platformDeployed` remains false and is tracked as a
+  connected-integration TODO, independent of standalone npm publication. SDK
+  work never performs platform writes.
 - Optional CookieChimp-managed TCF activation is deferred to the
   [internal IAB TODO](iab-integration-todo.md). It is not an SDK publication gate.
   Production TCF still requires valid explicit configuration; no runtime check is bypassed.
@@ -64,7 +66,7 @@ reviewer and exact source hashes. Keep that evidence current when copy changes.
   provenance; do not promote them as the final provenance-verified release.
 - GitHub environment `npm-publish` now requires `danielpaul` review and permits
   main only. The workflow verifies reviewer protection before its publish job.
-- Complete `release/readiness.json` with the outstanding evidence. Daniel has
+- Keep `release/readiness.json` accurate. Daniel has
   authorized publication of version `1.0.0`; `release:check --publish` deliberately
   fails while any prerequisite or editorial locale review remains outstanding.
 

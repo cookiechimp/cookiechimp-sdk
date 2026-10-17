@@ -56,16 +56,9 @@ Base and TCF labels for all 33 locales completed AI editorial review on
   `release.yml`, environment `npm-publish`, publishing and staging permissions.
   First successful CI publication must validate them within npm's two-day window.
 
-## Launch gates requiring Daniel or external work
+## Standalone publication
 
-- Platform [#2773](https://github.com/IdentitySquare/CookieChimp/pull/2773),
-  consent idempotency, merged at 09:01 UTC, followed by
-  [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile
-  offline config, at 09:06 UTC on 17 Oct. Deployment `7137407395` succeeded at
-  09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Live connected
-  config and consent-record delivery still require evidence from Daniel.
-  Fixture tests and deployment success do not prove live record delivery.
-- Complete the remaining checks in `release/readiness.json`, then run the guarded
+- Run the guarded
   release workflow with `approved_version=1.0.0`. Publication must retain npm
   provenance; locally staged bootstrap candidates have no CI provenance and
   must not be promoted as the final provenance-verified release.
@@ -74,6 +67,16 @@ Base and TCF labels for all 33 locales completed AI editorial review on
 
 ## Deferred internal TODO
 
+- Live connected integration remains unverified. Platform
+  [#2773](https://github.com/IdentitySquare/CookieChimp/pull/2773), consent
+  idempotency, merged at 09:01 UTC, followed by
+  [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile
+  offline config, at 09:06 UTC on 17 Oct. Deployment `7137407395` succeeded at
+  09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Daniel still
+  supplies real connected config and consent-delivery evidence before that
+  integration can be marked verified. `platformDeployed` remains false; it is
+  not required for standalone npm publication. Fixture tests and deployment
+  success do not prove live record delivery. No platform write is authorized.
 - Optional managed IAB registration, CMP ID assignment and validation are deferred
   at Daniel's direction. The placeholder stays unset; the [internal TODO](iab-integration-todo.md)
   is not exported to Mintlify and is not an SDK publication gate. Production TCF
