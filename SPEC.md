@@ -173,6 +173,6 @@ M6 Compliance extensions
 
 M7 Launch
 28. Docs site, llms.txt, AI skills, examples.
-   Status (M7 PR39): `@cookiechimp/docs` builds a static docs site (strict CSP; only search loads a local script/index) from the package READMEs and `packages/docs/content`, plus `llms.txt`, `llms-full.txt` and per-page Markdown; four Agent Skills in `skills/`; `context7.json`; runnable `examples/nextjs-app-router`, `examples/nextjs-pages-router` and `examples/react-vite`, all tested in CI. Local full-text search links to generated section anchors. A test checks every `@cookiechimp/*` import in docs, skills and examples against real package exports. Still open: hosting and the docs domain (Daniel chose to decide later).
+   Documentation hosting is consolidated in `IdentitySquare/CookieChimp-Docs` on Mintlify, at `https://docs.cookiechimp.com/docs/sdk/overview`. `@cookiechimp/docs` exports 12 MDX guides, navigation and a source revision for that repo; its build is uncached so source/readme changes cannot leave stale exported pages. Mintlify supplies navigation, search, Markdown views and llms indexes. Four Agent Skills and `context7.json` stay in the SDK repo, alongside the three runnable examples. Companion SDK/docs PRs must be reviewed and the docs deployed before switching public SDK links. The standalone static docs website is retired by this integration.
 29. Benchmark suite and published results.
 30. 1.0 release, npm publish, provenance.

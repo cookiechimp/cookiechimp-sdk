@@ -1,4 +1,3 @@
-/** Docs site pages, in navigation order. Paths are relative to the repo root. */
 export interface PageSpec {
   slug: string;
   title: string;
@@ -8,43 +7,33 @@ export interface PageSpec {
 
 export const pages: readonly PageSpec[] = [
   {
-    slug: "index",
-    title: "CookieChimp Consent SDK",
-    description: "What the SDK is, what it ships, and where to start.",
+    slug: "overview",
+    title: "Consent SDK",
+    description: "CookieChimp consent for React, Next.js and plain JavaScript.",
     source: "packages/docs/content/index.md",
-  },
-  {
-    slug: "search",
-    title: "Search documentation",
-    description: "Search the local SDK reference and setup guides by section.",
-    source: "packages/docs/content/search.md",
   },
   {
     slug: "getting-started",
     title: "Getting started",
-    description:
-      "Install the SDK and show a consent banner in Next.js, React or plain JavaScript.",
+    description: "Install the SDK and show a consent banner.",
     source: "packages/docs/content/getting-started.md",
   },
   {
     slug: "reference",
     title: "Core and React reference",
-    description:
-      "Regions and regulations, script and iframe gating, Google Consent Mode v2, IAB GPP and TCF, headless primitives and network blocking.",
+    description: "Regions, gating, Consent Mode, headless UI, GPP and TCF.",
     source: "README.md",
   },
   {
     slug: "nextjs",
     title: "Next.js",
-    description:
-      "App Router and Pages Router providers, connected mode, self-hosted consent records, middleware, GPP and strict CSP.",
+    description: "App Router, Pages Router, connected mode and strict CSP.",
     source: "packages/nextjs/README.md",
   },
   {
     slug: "scripts",
     title: "Script presets",
-    description:
-      "GA4, GTM, Google Ads, Meta Pixel, Clarity, PostHog, Segment, Hotjar, LinkedIn and TikTok presets.",
+    description: "Analytics and advertising presets that wait for consent.",
     source: "packages/scripts/README.md",
   },
   {
@@ -62,8 +51,7 @@ export const pages: readonly PageSpec[] = [
   {
     slug: "devtools",
     title: "Devtools",
-    description:
-      "Floating panel for consent state, region and blocked resources.",
+    description: "Inspect consent state, regions and blocked resources.",
     source: "packages/devtools/README.md",
   },
   {
@@ -73,34 +61,54 @@ export const pages: readonly PageSpec[] = [
     source: "packages/tokens/README.md",
   },
   {
-    slug: "deployment",
-    title: "Deployment and release status",
-    description:
-      "Build and validate the static docs artifact, and check launch prerequisites.",
+    slug: "release-status",
+    title: "Release status",
+    description: "Package availability and production prerequisites.",
     source: "packages/docs/content/deployment.md",
   },
   {
     slug: "ai-skills",
     title: "AI skills",
     description:
-      "Agent skills for installing the banner, gating scripts, testing consent and connecting to CookieChimp.",
+      "Agent skills for installation, gating, testing and connected mode.",
     source: "packages/docs/content/ai-skills.md",
   },
   {
     slug: "examples",
     title: "Examples",
-    description:
-      "Runnable Next.js App Router, Pages Router and plain React/Vite examples.",
+    description: "Runnable Next.js and plain React/Vite apps.",
     source: "packages/docs/content/examples.md",
   },
 ];
 
-/** AI skills, published under /skills/<name>/SKILL.md. */
-export const skills = [
-  "install-banner",
-  "gate-scripts",
-  "test-consent",
-  "connect-cookiechimp",
-] as const;
+export const navigation = {
+  dropdown: "Consent SDK",
+  icon: "code",
+  description: "React, Next.js and JavaScript consent SDK",
+  groups: [
+    {
+      group: "Get started",
+      pages: [
+        "sdk/overview",
+        "sdk/getting-started",
+        "sdk/examples",
+        "sdk/release-status",
+      ],
+    },
+    {
+      group: "SDK reference",
+      pages: [
+        "sdk/reference",
+        "sdk/nextjs",
+        "sdk/scripts",
+        "sdk/translations",
+        "sdk/cli",
+        "sdk/devtools",
+        "sdk/tokens",
+        "sdk/ai-skills",
+      ],
+    },
+  ],
+};
 
 export const repoUrl = "https://github.com/cookiechimp/cookiechimp-sdk";

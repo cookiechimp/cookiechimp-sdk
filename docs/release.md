@@ -74,8 +74,9 @@ app, exercise consent and persistence in a browser, and verify provenance with
 `npm audit signatures`. Then prepare a reviewed GitHub release/tag and external
 benchmark submission. The workflow does not claim those steps have happened.
 
-Hosting and the docs domain remain undecided, as Daniel requested. The static
-artifact is ready for the eventual host; deployment is a separate action.
+Daniel selected the existing CookieChimp Mintlify site for SDK guides. The
+companion documentation PR must be reviewed and deployed before SDK links switch
+to the new routes. See [documentation workflow](documentation.md).
 
 Sources: [npm trusted publishers](https://docs.npmjs.com/trusted-publishers/)
 and [npm provenance](https://docs.npmjs.com/generating-provenance-statements/).

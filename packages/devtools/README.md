@@ -1,5 +1,7 @@
 # `@cookiechimp/devtools`
 
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
 A floating development panel for CookieChimp. It shows:
 
 - consent state: consent id, last action, whether a decision is still needed, and each category

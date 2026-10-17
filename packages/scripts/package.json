@@ -95,7 +95,7 @@
     "url": "git+https://github.com/cookiechimp/cookiechimp-sdk.git",
     "directory": "packages/scripts"
   },
-  "homepage": "https://github.com/cookiechimp/cookiechimp-sdk#readme",
+  "homepage": "https://docs.cookiechimp.com/docs/sdk/overview",
   "bugs": {
     "url": "https://github.com/cookiechimp/cookiechimp-sdk/issues"
   }

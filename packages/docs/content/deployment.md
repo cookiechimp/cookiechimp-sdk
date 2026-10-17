@@ -1,74 +1,35 @@
-# Deployment and release status
+# Release status
 
-The SDK is being prepared for its first npm release. Registry installation commands
-in these docs apply once the packages are published. Until then, clone the repository,
-run `pnpm install --frozen-lockfile`, and use the workspace examples.
+The SDK is a prepared 1.0.0 candidate. The npm packages have not been published.
+Registry installation commands in these guides apply after publication. Until
+then, contributors can build the SDK workspace and run its examples.
 
-## Build the docs
+## Documentation
 
-From the repository root:
+The Consent SDK guides live with the existing CookieChimp documentation on
+Mintlify. The SDK repository keeps the source guides and runnable examples;
+Mintlify provides navigation, search, Markdown views and AI documentation indexes.
 
-```sh
-pnpm install --frozen-lockfile
-pnpm --filter @cookiechimp/docs build
-pnpm --filter @cookiechimp/docs start
-```
+## Connected mode
 
-Preview at `http://127.0.0.1:3103`. Deploy the contents of
-`packages/docs/dist` as a static site when hosting and a domain have been chosen.
-The preview server is for local testing. No runtime Node service is needed for
-production. Include `search.html`, `search.js` and `search-index.json`: search runs
-entirely in the browser from that static artifact. CI uploads a `docs-site` artifact after the unit job builds and tests it.
+Local mode needs no account. Connected mode requires the shared platform config
+and consent-ingestion endpoints to be deployed and tested with the project's
+account. Cached or in-code config is a fallback; it does not prove consent records
+were delivered. Verify connected delivery before using it in production.
 
-The default build uses relative HTML links and root-relative llms.txt links.
-Deploy at the domain root. Once the domain is known, set `DOCS_BASE_URL` to its
-HTTPS origin when building to make llms.txt links absolute. It cannot contain
-credentials, a path, query parameters or a fragment. Serve Markdown
-and text files with their appropriate content types and enable `nosniff`.
-The generated `_headers` file contains suggested security headers; configure the
-same headers explicitly if the chosen host does not support that file.
+## IAB integrations and translations
 
-## Verify the artifact
+Production TCF requires a valid registered CMP ID, a current vendor list and IAB
+validation. Applications supply the GVL and the authoritative feature decision.
+The SDK does not provide a GVL CDN or enforce connected Pro entitlements.
+See the [reference](../../../README.md) for GPP coverage and TCF limitations.
 
-```sh
-pnpm test:unit
-pnpm test:e2e
-```
+Base and TCF locales marked as drafts require native-speaker review before launch.
+See [translations](translations.md). Prepared code and automated tests do not
+establish certification, language quality or registry publication.
 
-The browser suite serves all examples and the docs locally, checks navigation
-and internal links, resolves llms.txt and skill files, and checks for external
-requests. Re-run those checks against the deployment URL before calling it live.
-Only the search page loads a local script and generated index; all other docs pages render without JavaScript.
+## Publication
 
-## Connected mode dependencies
-
-Website accounts need platform PR
-[#2773](https://github.com/IdentitySquare/CookieChimp/pull/2773) for idempotent
-consent ingestion, followed by
-[#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772) for shared
-config endpoints. Daniel reviews and merges platform changes. Before those
-changes ship, connected mode can fall back to cached or in-code config; that
-fallback does not prove the platform received consent records.
-
-## Compliance and publication gates
-
-TCF production use requires a real IAB CMP ID and a valid vendor list. CookieChimp
-registration, platform entitlement enforcement and the vendor-list service remain
-external prerequisites. Current US state coverage and unreviewed locale status
-are documented in the [reference](../../../README.md) and
-[translations](translations.md).
-
-Native speakers must review draft translations before launch. npm publication
-requires Daniel's explicit go-ahead and npm organization access. Hosting, npm
-publication, registry submission and IAB validation are separate completion steps.
-The [remaining-work checklist](../../../docs/remaining-work.md) records their status.
-
-## Search content policy
-
-The search page permits only its same-origin script and index (`script-src 'self'`
-and `connect-src 'self'`). Other HTML pages keep `default-src 'none'` with only
-styles/images permitted. The generated `_headers` uses the search policy as a
-shared ceiling; each HTML page's CSP meta policy further restricts that page.
-Preserve both when deploying. No inline script, third-party search host, analytics
-or query logging is added by the SDK. Hosting access logs remain the host's policy;
-queries can appear in the URL when a search page is reloaded or shared.
+The eight packages are released together. Publication is a separate approval step
+with package, fresh-consumer and provenance verification. Contributor procedures
+are in the SDK repository's [release guide](../../../docs/release.md).

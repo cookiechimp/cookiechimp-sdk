@@ -398,9 +398,6 @@ importers:
       marked:
         specifier: 18.0.14
         version: 18.0.14
-      rolldown:
-        specifier: 1.2.13
-        version: 1.2.13
       typescript:
         specifier: 7.0.2
         version: 7.0.2

@@ -1,5 +1,7 @@
 # @cookiechimp/core
 
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
 Consent state, cookie storage and opt-in script, network and IAB integrations.
 
 This package is being prepared for CookieChimp SDK 1.0. npm installation is

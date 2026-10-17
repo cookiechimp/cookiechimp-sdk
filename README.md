@@ -12,7 +12,9 @@ example, `fr-CA` can select `fr`, or `fr-FR` when only that regional variant is
 available, while `pt` can select `pt-BR`.
 - Small, fast, no banner flash on SSR, strict CSP friendly, Google Consent Mode v2 ready.
 
-Status: pre-alpha. See [SPEC.md](./SPEC.md) for the design and roadmap.
+Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
+
+Status: 1.0.0 candidate, not yet published to npm. See [release status](https://docs.cookiechimp.com/docs/sdk/release-status) and [SPEC.md](./SPEC.md).
 
 ## React server rendering
 
@@ -245,7 +247,7 @@ Only the English TCF labels have had native-speaker review so far
 Purpose, feature and vendor names still come from the GVL, so load the GVL
 in the same language.
 
-Each vendor's name is a button (labelled "Details: <name>") that opens a panel with the disclosures
+Each vendor's name is a button (labelled `Details: <name>`) that opens a panel with the disclosures
 TCF policy requires: consent and legitimate interest purposes, special
 purposes, features, special features, data categories, retention periods,
 privacy policy and legitimate interest claim links, and device storage (cookie
@@ -280,28 +282,47 @@ headless primitives deliberately do not alter content outside the provider.
 
 ### Install order for runtime blocking
 
-`blockDynamic` only protects requests that start after it is installed. Install
-it before any third-party code runs: as the first module script in `<head>`,
-before tag managers or embeds. Installing it from a React effect or after
-hydration leaves a window in which a plain `src` assignment can start a
-request. Interceptors are active as soon as `blockDynamic` returns (the test
-fixture then sets `data-cc-dynamic="ready"` on `<html>` so e2e tests can wait
-for it).
+`blockDynamic` only protects requests that start after it is installed.
+Interceptors are active as soon as `blockDynamic` returns. Module scripts are
+deferred: putting one first in `<head>` does not make later parser-loaded
+scripts wait for its imports. Installing it from a React effect or after
+hydration also leaves a window in which a request can start.
+
+Load vendor scripts programmatically from the same bootstrap module, after
+installing the blocker, as below. Do not also include those vendors in ordinary
+`<script src>` tags, preload hints, or independent entry points. This explicit
+sequence waits for the SDK imports and installs interception before assigning
+the vendor URL or inserting its script. A matching vendor stays blocked until
+its service has consent.
 
 ```html
 <head>
   <script type="module">
     import { createConsent } from "/vendor/cookiechimp/core/index.mjs";
     import { blockDynamic } from "/vendor/cookiechimp/core/dynamic.mjs";
-    const config = { categories: ["analytics"], services: [/* ... */] };
-    blockDynamic(createConsent(config), { config });
+    const config = {
+      categories: ["analytics"],
+      services: [{
+        id: "analytics-vendor",
+        category: "analytics",
+        domains: ["vendor.example"],
+      }],
+    };
+    const consent = createConsent(config);
+    blockDynamic(consent, { config });
+
+    const vendor = document.createElement("script");
+    vendor.src = "https://vendor.example/tracker.js";
+    document.head.appendChild(vendor);
   </script>
-  <!-- third-party scripts after this point -->
 </head>
 ```
 
-A prebuilt inline (IIFE) head snippet and a Next.js `beforeInteractive`
-helper are planned with the M3 Next.js package.
+Use inert consent-gated markup for vendors declared in HTML. Runtime
+interception cannot prevent parser or preload requests that have already
+started. Match every vendor URL in your configuration; unmatched URLs pass
+through. The network blocker below is separately required for matching
+`fetch`, XMLHttpRequest and beacon calls.
 
 ## Network blocking
 
