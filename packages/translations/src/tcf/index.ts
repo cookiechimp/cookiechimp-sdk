@@ -38,5 +38,39 @@ export const tcfMessageKeys = [
 ] as const;
 export type TcfMessageKey = (typeof tcfMessageKeys)[number];
 export type TcfMessages = Readonly<Record<TcfMessageKey, string>>;
-/** Locales whose TCF labels have had native-speaker review. */
-export const tcfReviewedLocales = ["en"] as const;
+/** Locales with completed editorial review; method/date are in ../meta. */
+export const tcfReviewedLocales = [
+  "en",
+  "de",
+  "fr",
+  "es",
+  "it",
+  "nl",
+  "pt",
+  "pt-BR",
+  "pl",
+  "sv",
+  "da",
+  "fi",
+  "no",
+  "cs",
+  "sk",
+  "hu",
+  "ro",
+  "bg",
+  "el",
+  "hr",
+  "sl",
+  "et",
+  "lv",
+  "lt",
+  "ga",
+  "mt",
+  "tr",
+  "ja",
+  "zh",
+  "ko",
+  "ar",
+  "he",
+  "uk",
+] as const;

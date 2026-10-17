@@ -1,0 +1,624 @@
+{
+  "review": {
+    "reviewer": "Codex",
+    "method": "ai-editorial",
+    "reviewedAt": "2026-10-17"
+  },
+  "scope": "All 33 base and TCF interface label sets; meaning, accept/reject intent, terminology, grammar, placeholders, numeric durations and RTL language copy. This is AI editorial review, not native-speaker or IAB certification.",
+  "locales": {
+    "en": {
+      "base": "c7649a84e62e1fdca97e258be07c206d49586ca7fd4a7a3f31ea081f6dc7745f",
+      "tcf": "6341b6d03581590e901677ef5b787a75f62bf0d1106c6f526a2556c3c5bd8a39"
+    },
+    "de": {
+      "base": "2ae062b4861ce40fce21326f25b457d45244205ff725000ba136b7779e02cd61",
+      "tcf": "10e2e134ace63e85bc2ec8954465e41cf5d3793d6a3b75606dda8dbf25663a1a"
+    },
+    "fr": {
+      "base": "aa71fdd9bb4c863e2e799981f92606395534f69f7fc6c91e4bee795553d92f69",
+      "tcf": "3bcf801fc23cc70aa24d006268b15674650a868dbd4866255370840c7759aa1f"
+    },
+    "es": {
+      "base": "525a86540304b61bd728a4c471058c895c1201b721d52ca09cd71582207f2a57",
+      "tcf": "3e68687854f103db2a08ef4083ce2d65214dc2356b50768cf12a8d25331089ae"
+    },
+    "it": {
+      "base": "bbc0f841c0768ec212173f8865337eaa410b00a73244892ea37ab8b310b8a1a6",
+      "tcf": "e923d3ee29781e1c124f914386e5b09b109d2b429432cb501e31efd93c108fa3"
+    },
+    "nl": {
+      "base": "da6c409a9ffadef5bb20b52bf2134387a587750d63fbb32c0465caf0412c4bf1",
+      "tcf": "e0c88afee7bf3f20bd4673bf3f60b99d80bfc21ee3eec56faca8f6dda646c96f"
+    },
+    "pt": {
+      "base": "aff290180008821d57d5452e2fd5a56a6797bd9c396afb6b13ec53cff698e6ed",
+      "tcf": "30607278169b41758d4cdff2c600281b94e67f87862195eb6323b33a3f1adbc0"
+    },
+    "pt-BR": {
+      "base": "2ddb7f191dcafb62d8738cf08f4d924d05a605ce4040e3424503db7576323076",
+      "tcf": "d57ff9ce47d4fd2880d690be929a5d04c3c82465973e2eaa5d7af94091022e8c"
+    },
+    "pl": {
+      "base": "eeb0dc0c5a3979904c69cf226124b192e481a320a8508ae5948ce77625257ea8",
+      "tcf": "51e19e8670263f99932c8e5418c8d8128a3c5e59138fdf7baf4aa645469dacb5"
+    },
+    "sv": {
+      "base": "9e263c8530f56a0fef6a4b5b33ccdb49554af24b91e26b6825b7fcbd34abb488",
+      "tcf": "8ddaba034f7acf3fa84b99036adc07ad8ac21d3f92bb1972acf6656d2bb1a42d"
+    },
+    "da": {
+      "base": "92781adde34668a33f1c00503528da55a61f54de87dadcdf57b77a78a1b24f92",
+      "tcf": "845f5c6ee97502a501ff08e778342f973d7b223bd4a4ced7c9b50f076581246b"
+    },
+    "fi": {
+      "base": "b4963392fa31aa0905e5ca5325815ac8b667f9570d28e47dc0b62390f2fafc9c",
+      "tcf": "994acb7c79c4f0f91e990e913858eb16664b69543ab77fa638ec12941ea8a70d"
+    },
+    "no": {
+      "base": "3834f19019b09709bf4cf196443f8350d4f543b9628847ba3ca6a711306d8ad6",
+      "tcf": "926ba1ac6e75cd4e2e8e859c92eab4c92b5590ec250a7aa2431bccc578487c56"
+    },
+    "cs": {
+      "base": "bfaecd2630bd8272238558337f7f5a1a314302fd72d6d02ad09b8eb3beaf7b00",
+      "tcf": "9af1b756cf2db08ecdb9d798d63e982776d138c2b2bb1654fefa0a700aad6a2e"
+    },
+    "sk": {
+      "base": "bd443075423c024d523852717a3d0aa327281278bdee090d89d8b34618331461",
+      "tcf": "523ffc2e82f0e4419c94f3ebbef4fd1d4bfa64d4dc40a50f26016f67e3975ff9"
+    },
+    "hu": {
+      "base": "08507b03d6b8f6014b6d6d84d27de25a09dbc9d759480ccc60918c438954eca7",
+      "tcf": "8bc28580d303bc45a351dfb7705d16cf8aa81a59f7d00b4a231f05ad75e3f93d"
+    },
+    "ro": {
+      "base": "483989773246f44e5da6561d22f5a2fa6e0448784522a9b2ec48bc9b2fbb17f9",
+      "tcf": "bef896584dbbfbca5665f0ca38f129e604f95f7bb3d06716c6a750354a0322c2"
+    },
+    "bg": {
+      "base": "668f4d70b27fa988087d902aaeec37374be6057bafa329f5ce664f788adf691e",
+      "tcf": "4af1fda674d98651b11c0710daa533d4b346a3b5f5e2a2929862083208614a77"
+    },
+    "el": {
+      "base": "2ce54eaaec09dc6216dafc8f42089adc4573ad6236b24157a781d410462d8625",
+      "tcf": "a89a91d59211c608beb5ecec905de34a6e52dcc0d9b9097b9e341df48a999182"
+    },
+    "hr": {
+      "base": "cdd1cdc87d34d0f8aa77b4b9f165f5ae3c8a2e8602ec5dbbee7598c8e11e018e",
+      "tcf": "f93ad56ce1bf65dae9f03f867a363ff793c3d3587c012dedca633aa58e9c638b"
+    },
+    "sl": {
+      "base": "3ece3030244fbc0389e0ec3551fb9c55657f563538f75e97c30286d6ec5191ee",
+      "tcf": "9888ebfcc9096a22c2d6a360c2008e27f3039d2085c5d9b6b5d1f00004d6b6ee"
+    },
+    "et": {
+      "base": "72371d0dadc328d165dcf7ce61b0aeecb8a937fb802e3c4e886c93b22bd95e8e",
+      "tcf": "1efa3d1263cab6255927e3d5c4519a61ac83a4fc1cee919ae12220ed9bb78a76"
+    },
+    "lv": {
+      "base": "bf01275dd3fbd09f0bb3839af0ec5c92173d61f263cc7bc63080f065165adc84",
+      "tcf": "2f169e083c81d00d96b35d914a0f2e24a2b3128aa1d30d4777d76acd4d54d0e2"
+    },
+    "lt": {
+      "base": "284b3da93c4c762e8351fd57fc46cc90e65c7b0654878a4fc0133e6b9bb43b51",
+      "tcf": "6d85c83fe19b2a84f0cf0d32db38eb800361aab68e1061ed9b86ff5c1b874a78"
+    },
+    "ga": {
+      "base": "c2bc931ed65b1bf3c2ef5d759aad36b35c5571fc46465df6be71df72a22747e3",
+      "tcf": "22a115fd2a767c7a30639820d50448b9d5511fb1941c2f99fb9092cf6c564b52"
+    },
+    "mt": {
+      "base": "ddd0a2c1ea49d8663fa75aa8d61800c5f818dddf74514f2caefffa560558c49e",
+      "tcf": "a91b8ace5572af315f81dc09c386a1efb3a8a4c21fae2cae7c919b5a95f01d0b"
+    },
+    "tr": {
+      "base": "92dde48718dc6db58b8b976d27e5002d0e3c26f203d3278a06094549beb003be",
+      "tcf": "159db42865b7c230a38f0032f1ebceb2f65072a803ba0b5cc57df0a3994348cf"
+    },
+    "ja": {
+      "base": "21d96e0af8eb3b1aaff671b177aa8dc0b25084e8209527011f7dae97fb482758",
+      "tcf": "e70d5d7462ac8c5b80aeea83563af38a1a846ff01e7ba2496032380c993b7331"
+    },
+    "zh": {
+      "base": "cdc3656545668b61ebb1eb600eb177458b30f2b92780326f43e7cdfbe2fd0a6a",
+      "tcf": "64bf8f8d343f38c4ed80a17135c8387f9dfe3c739b763c692e0ff04c7f1b2f52"
+    },
+    "ko": {
+      "base": "273398283a94601e8d8e635af07c74581d418baed48f71317d89676c06415c22",
+      "tcf": "ed03cb53fecdb8a0dd5964765ca5d513c403220199ec171876e990106a5cdccf"
+    },
+    "ar": {
+      "base": "dc99d1070566c6c46ce0b60837dbc0df26d8d4920a7a5394fb39772c9ece340b",
+      "tcf": "52d56e2b763cf190052a6c1b59ec1a5c71b4daf75f39fcd5306f464bd3a277a6"
+    },
+    "he": {
+      "base": "f2e78b723e5f8228c0668de3dbe472b61f20c3822ca4d39829e2173fda14a0c6",
+      "tcf": "75f4332894277246fb25d42d246c1d0694dd7e52f59f589d0a85448a89928bc5"
+    },
+    "uk": {
+      "base": "14be0aaab01cedea8efbeab80bb0e3d054fdd6dc7338d90b5a0b3ab8df141992",
+      "tcf": "03f07acd212f27466f4e769bc08487a2bc0e741ce68a1bbb657fd7f9c94556fa"
+    }
+  },
+  "corrections": [
+    {
+      "file": "packages/translations/src/de.ts",
+      "key": "category.functional.description",
+      "before": "Speichert Einstellungen und verbessert Funktionen.",
+      "after": "Speichert Einstellungen."
+    },
+    {
+      "file": "packages/translations/src/de.ts",
+      "key": "category.marketing.description",
+      "before": "Ermöglicht relevante Werbung.",
+      "after": "Unterstützt Werbung."
+    },
+    {
+      "file": "packages/translations/src/fr.ts",
+      "key": "category.functional.description",
+      "before": "Mémorisent vos réglages et améliorent les fonctions.",
+      "after": "Mémorisent vos réglages."
+    },
+    {
+      "file": "packages/translations/src/fr.ts",
+      "key": "category.marketing.description",
+      "before": "Permettent des publicités pertinentes.",
+      "after": "Permettent d’afficher des publicités."
+    },
+    {
+      "file": "packages/translations/src/es.ts",
+      "key": "optOut.label",
+      "before": "Rechazar venta o intercambio",
+      "after": "Rechazar la venta o el uso compartido de datos"
+    },
+    {
+      "file": "packages/translations/src/es.ts",
+      "key": "category.functional.description",
+      "before": "Recuerdan ajustes y mejoran funciones.",
+      "after": "Recuerdan tus ajustes."
+    },
+    {
+      "file": "packages/translations/src/es.ts",
+      "key": "category.marketing.description",
+      "before": "Permiten publicidad relevante.",
+      "after": "Permiten mostrar publicidad."
+    },
+    {
+      "file": "packages/translations/src/lv.ts",
+      "key": "banner.rejectAll",
+      "before": "Noraidīt izvēles",
+      "after": "Noraidīt neobligātās sīkdatnes"
+    },
+    {
+      "file": "packages/translations/src/he.ts",
+      "key": "banner.rejectAll",
+      "before": "דחיית קבצים אופציונליים",
+      "after": "דחיית קובצי Cookie שאינם הכרחיים"
+    },
+    {
+      "file": "packages/translations/src/he.ts",
+      "key": "gated.placeholder",
+      "before": "תוכן זה דורש את רשותך.",
+      "after": "תוכן זה דורש את רשותכם."
+    },
+    {
+      "file": "packages/translations/src/ko.ts",
+      "key": "gpc.honoured",
+      "before": "글로벌 개인정보 보호 설정을 존중했습니다.",
+      "after": "Global Privacy Control(GPC) 신호를 반영했습니다."
+    },
+    {
+      "file": "packages/translations/src/ro.ts",
+      "key": "banner.rejectAll",
+      "before": "Respinge opționalele",
+      "after": "Respinge modulele cookie opționale"
+    },
+    {
+      "file": "packages/translations/src/ro.ts",
+      "key": "preferences.title",
+      "before": "Preferințe cookie",
+      "after": "Preferințe pentru module cookie"
+    },
+    {
+      "file": "packages/translations/src/tcf/de.ts",
+      "key": "specialFeatures",
+      "before": "Besondere Merkmale",
+      "after": "Spezielle Funktionen"
+    },
+    {
+      "file": "packages/translations/src/tcf/de.ts",
+      "key": "specialPurposes",
+      "before": "Besondere Zwecke",
+      "after": "Spezielle Zwecke"
+    },
+    {
+      "file": "packages/translations/src/tcf/de.ts",
+      "key": "retentionDays",
+      "before": "{days} Tage",
+      "after": "Tage: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/de.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies werden bis zu {days} Tage gespeichert",
+      "after": "Maximale Cookie-Laufzeit (Tage): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/nl.ts",
+      "key": "specialFeatures",
+      "before": "Speciale kenmerken",
+      "after": "Speciale functies"
+    },
+    {
+      "file": "packages/translations/src/tcf/nl.ts",
+      "key": "retentionDays",
+      "before": "{days} dagen",
+      "after": "Dagen: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/nl.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies worden maximaal {days} dagen bewaard",
+      "after": "Maximale cookieduur (dagen): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/da.ts",
+      "key": "acceptAll",
+      "before": "Accepter alle",
+      "after": "Acceptér alle"
+    },
+    {
+      "file": "packages/translations/src/tcf/da.ts",
+      "key": "retentionDays",
+      "before": "{days} dage",
+      "after": "Dage: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/da.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies gemmes i op til {days} dage",
+      "after": "Maksimal levetid for cookies (dage): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/ga.ts",
+      "key": "saved",
+      "before": "Roghanna sábháilte",
+      "after": "Sábháladh na roghanna"
+    },
+    {
+      "file": "packages/translations/src/tcf/ga.ts",
+      "key": "empty",
+      "before": "Níl aon díoltóir ag teacht leis",
+      "after": "Níor aimsíodh díoltóir ar bith"
+    },
+    {
+      "file": "packages/translations/src/tcf/mt.ts",
+      "key": "empty",
+      "before": "L-ebda fornitur ma jaqbel",
+      "after": "Ma nstab l-ebda fornitur"
+    },
+    {
+      "file": "packages/translations/src/tcf/mt.ts",
+      "key": "retentionDays",
+      "before": "{days} jiem",
+      "after": "Numru ta’ jiem: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/mt.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies maħżuna sa {days} jiem",
+      "after": "Żmien massimu tal-cookies (jiem): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/bg.ts",
+      "key": "legitimateInterest",
+      "before": "Законен интерес",
+      "after": "Легитимен интерес"
+    },
+    {
+      "file": "packages/translations/src/tcf/bg.ts",
+      "key": "legIntPurposes",
+      "before": "Цели (законен интерес)",
+      "after": "Цели (легитимен интерес)"
+    },
+    {
+      "file": "packages/translations/src/tcf/bg.ts",
+      "key": "legIntClaim",
+      "before": "Декларация за законен интерес",
+      "after": "Декларация за легитимен интерес"
+    },
+    {
+      "file": "packages/translations/src/tcf/bg.ts",
+      "key": "retentionDays",
+      "before": "{days} дни",
+      "after": "Брой дни: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/bg.ts",
+      "key": "cookieMaxAge",
+      "before": "Бисквитките се съхраняват до {days} дни",
+      "after": "Максимален срок на бисквитките (дни): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/hr.ts",
+      "key": "retentionDays",
+      "before": "{days} dana",
+      "after": "Broj dana: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/hr.ts",
+      "key": "cookieMaxAge",
+      "before": "Kolačići se čuvaju do {days} dana",
+      "after": "Maksimalno trajanje kolačića (dani): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/fi.ts",
+      "key": "nonCookieAccess",
+      "before": "Käyttää muita tallennus- tai käyttötapoja laitteella",
+      "after": "Käyttää muita laitteen tallennus- tai käyttötapoja"
+    },
+    {
+      "file": "packages/translations/src/tcf/fi.ts",
+      "key": "retentionDays",
+      "before": "{days} päivää",
+      "after": "Päivien määrä: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/fi.ts",
+      "key": "cookieMaxAge",
+      "before": "Evästeitä säilytetään enintään {days} päivää",
+      "after": "Evästeiden enimmäissäilytysaika (päivinä): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/lv.ts",
+      "key": "close",
+      "before": "Aizvērt sīkāku informāciju",
+      "after": "Aizvērt informāciju"
+    },
+    {
+      "file": "packages/translations/src/tcf/lv.ts",
+      "key": "retentionDays",
+      "before": "{days} dienas",
+      "after": "Dienu skaits: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/lv.ts",
+      "key": "cookieMaxAge",
+      "before": "Sīkdatnes tiek glabātas līdz {days} dienām",
+      "after": "Maksimālais sīkdatņu glabāšanas laiks (dienās): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/he.ts",
+      "key": "acceptAll",
+      "before": "לקבל הכול",
+      "after": "קבלת הכול"
+    },
+    {
+      "file": "packages/translations/src/tcf/he.ts",
+      "key": "rejectAll",
+      "before": "לדחות הכול",
+      "after": "דחיית הכול"
+    },
+    {
+      "file": "packages/translations/src/tcf/he.ts",
+      "key": "retentionDays",
+      "before": "{days} ימים",
+      "after": "מספר ימים: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/he.ts",
+      "key": "cookieMaxAge",
+      "before": "קובצי Cookie נשמרים עד {days} ימים",
+      "after": "משך האחסון המרבי של קובצי Cookie (בימים): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/ja.ts",
+      "key": "acceptAll",
+      "before": "すべて同意",
+      "after": "すべてに同意"
+    },
+    {
+      "file": "packages/translations/src/tcf/en.ts",
+      "key": "retentionDays",
+      "before": "{days} days",
+      "after": "Days: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/en.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies stored for up to {days} days",
+      "after": "Maximum cookie lifetime (days): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/fr.ts",
+      "key": "retentionDays",
+      "before": "{days} jours",
+      "after": "Jours : {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/fr.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies conservés jusqu’à {days} jours",
+      "after": "Durée maximale des cookies (jours) : {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/es.ts",
+      "key": "retentionDays",
+      "before": "{days} días",
+      "after": "Días: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/es.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies almacenadas hasta {days} días",
+      "after": "Duración máxima de las cookies (días): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/it.ts",
+      "key": "retentionDays",
+      "before": "{days} giorni",
+      "after": "Giorni: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/it.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookie conservati fino a {days} giorni",
+      "after": "Durata massima dei cookie (giorni): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/pt.ts",
+      "key": "retentionDays",
+      "before": "{days} dias",
+      "after": "Dias: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/pt.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies guardados até {days} dias",
+      "after": "Prazo máximo dos cookies (dias): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/pt-BR.ts",
+      "key": "retentionDays",
+      "before": "{days} dias",
+      "after": "Dias: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/pt-BR.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies armazenados por até {days} dias",
+      "after": "Duração máxima dos cookies (dias): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/pl.ts",
+      "key": "retentionDays",
+      "before": "{days} dni",
+      "after": "Liczba dni: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/pl.ts",
+      "key": "cookieMaxAge",
+      "before": "Pliki cookie przechowywane do {days} dni",
+      "after": "Maksymalny czas przechowywania plików cookie (dni): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/sv.ts",
+      "key": "retentionDays",
+      "before": "{days} dagar",
+      "after": "Dagar: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/sv.ts",
+      "key": "cookieMaxAge",
+      "before": "Kakor lagras i upp till {days} dagar",
+      "after": "Maximal lagringstid för kakor (dagar): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/no.ts",
+      "key": "retentionDays",
+      "before": "{days} dager",
+      "after": "Dager: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/no.ts",
+      "key": "cookieMaxAge",
+      "before": "Informasjonskapsler lagres i opptil {days} dager",
+      "after": "Maksimal lagringstid for informasjonskapsler (dager): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/cs.ts",
+      "key": "retentionDays",
+      "before": "{days} dní",
+      "after": "Počet dní: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/cs.ts",
+      "key": "cookieMaxAge",
+      "before": "Soubory cookie uloženy až {days} dní",
+      "after": "Maximální doba uložení souborů cookie (dny): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/sk.ts",
+      "key": "retentionDays",
+      "before": "{days} dní",
+      "after": "Počet dní: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/sk.ts",
+      "key": "cookieMaxAge",
+      "before": "Súbory cookie uložené až {days} dní",
+      "after": "Maximálna doba uloženia súborov cookie (dni): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/ro.ts",
+      "key": "retentionDays",
+      "before": "{days} zile",
+      "after": "Număr de zile: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/ro.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookie-uri stocate până la {days} zile",
+      "after": "Durata maximă a modulelor cookie (zile): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/el.ts",
+      "key": "retentionDays",
+      "before": "{days} ημέρες",
+      "after": "Ημέρες: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/el.ts",
+      "key": "cookieMaxAge",
+      "before": "Cookies αποθηκεύονται έως {days} ημέρες",
+      "after": "Μέγιστη διάρκεια cookies (ημέρες): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/sl.ts",
+      "key": "retentionDays",
+      "before": "{days} dni",
+      "after": "Število dni: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/sl.ts",
+      "key": "cookieMaxAge",
+      "before": "Piškotki se hranijo do {days} dni",
+      "after": "Najdaljša doba hrambe piškotkov (dnevi): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/et.ts",
+      "key": "retentionDays",
+      "before": "{days} päeva",
+      "after": "Päevade arv: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/et.ts",
+      "key": "cookieMaxAge",
+      "before": "Küpsiseid säilitatakse kuni {days} päeva",
+      "after": "Küpsiste maksimaalne säilitusaeg (päevades): {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/ar.ts",
+      "key": "retentionDays",
+      "before": "{days} يوم",
+      "after": "عدد الأيام: {days}"
+    },
+    {
+      "file": "packages/translations/src/tcf/ar.ts",
+      "key": "cookieMaxAge",
+      "before": "تُخزَّن ملفات تعريف الارتباط لمدة تصل إلى {days} يوم",
+      "after": "أقصى مدة لملفات تعريف الارتباط (بالأيام): {days}"
+    },
+    {
+      "file": "packages/react/src/tcf.tsx",
+      "key": "retentionDays",
+      "before": "{days} days",
+      "after": "Days: {days}"
+    },
+    {
+      "file": "packages/react/src/tcf.tsx",
+      "key": "cookieMaxAge",
+      "before": "Cookies stored for up to {days} days",
+      "after": "Maximum cookie lifetime (days): {days}"
+    }
+  ]
+}

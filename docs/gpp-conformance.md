@@ -16,7 +16,7 @@ persistence after reload. Existing GPC, API event, stub and cross-frame tests re
 
 No size budget changed. GPP is 2673 B of 2810 B, its stub is 859 B of 925 B,
 and combined TCF/GPP is 10366 B of 12288 B. The default bundle is unchanged.
-The IAB CMP registration and manual validation remain external prerequisites.
+Optional managed IAB integration work is tracked in [the internal TODO](iab-integration-todo.md).
 
 The current specification also lists newer MN, MD, IN, KY and RI formats
 (IDs 23 to 27), which the published reference library does not yet implement.

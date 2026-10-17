@@ -6,6 +6,10 @@
 
 - Prepare the first coordinated 1.0 release of the CookieChimp Consent SDK. Publication remains gated on review, external prerequisites and explicit approval.
 
+### Patch Changes
+
+- Complete editorial review of all 33 base and TCF locales, correct interface copy and quantity-dependent duration wording, and record review method/date with source evidence.
+
 ### Minor Changes
 
 - 19a64bc: Add tree-shakeable locale modules, language negotiation and controller APIs, and translated React provider hooks.

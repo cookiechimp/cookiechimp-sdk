@@ -13,13 +13,12 @@ const messages = {
   "category.necessary.name": "Nécessaires",
   "category.necessary.description": "Indispensables au fonctionnement du site.",
   "category.functional.name": "Fonctionnels",
-  "category.functional.description":
-    "Mémorisent vos réglages et améliorent les fonctions.",
+  "category.functional.description": "Mémorisent vos réglages.",
   "category.analytics.name": "Analyse",
   "category.analytics.description":
     "Nous aident à comprendre l’utilisation du site.",
   "category.marketing.name": "Marketing",
-  "category.marketing.description": "Permettent des publicités pertinentes.",
+  "category.marketing.description": "Permettent d’afficher des publicités.",
   "optOut.label": "Refuser la vente ou le partage",
   "gpc.honoured": "Le contrôle global de la confidentialité est respecté.",
   "recall.label": "Revoir les choix",

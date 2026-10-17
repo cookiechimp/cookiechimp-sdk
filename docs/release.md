@@ -33,16 +33,17 @@ SDK PRs #41, #39, #42, #44, #45, #46, #47 and #43 were reviewed and merged
 on 14 Oct 2026 under Daniel's authorization. All seven required checks passed
 on each final reviewed head. Publication approval remains separate.
 
+Base and TCF copy for all 33 locales completed AI editorial review on
+17 Oct 2026. The [review record](translation-review.md) identifies the method,
+reviewer and exact source hashes. Keep that evidence current when copy changes.
+
 ## Still required
 
-- Native speakers review 29 draft base locales and 32 draft TCF label locales.
-  Update the actual review metadata only after review; an approval flag cannot
-  substitute for it. Use [the translation review map](translation-review.md).
 - Daniel handles platform #2773 then #2772, and verifies deployment and actual
   connected config/consent delivery. SDK work never merges platform PRs.
-- Confirm CookieChimp's existing IAB registration status and assigned CMP ID,
-  then complete the manual
-  IAB validator checks. Do not advertise registration or enable TCF without them.
+- Optional CookieChimp-managed TCF activation is deferred to the
+  [internal IAB TODO](iab-integration-todo.md). It is not an SDK publication gate.
+  Production TCF still requires valid explicit configuration; no runtime check is bypassed.
 - The source repository is currently private. npm provenance requires a public
   source repository. Before making it public, Daniel must review source history:
   removed `error.log` remains in commit `7b90f7c` and contained a ChatGPT account
@@ -57,7 +58,7 @@ on each final reviewed head. Publication approval remains separate.
   The workflow verifies that protection exists before permitting its publish job.
 - Complete `release/readiness.json` with evidence, then Daniel explicitly
   approves publication of version `1.0.0`. `release:check --publish` deliberately
-  fails while any prerequisite or real locale review remains outstanding.
+  fails while any prerequisite or editorial locale review remains outstanding.
 
 ## Publish after approval
 
@@ -75,8 +76,8 @@ app, exercise consent and persistence in a browser, and verify provenance with
 benchmark submission. The workflow does not claim those steps have happened.
 
 Daniel selected the existing CookieChimp Mintlify site for SDK guides. The
-companion documentation PR must be reviewed and deployed before SDK links switch
-to the new routes. See [documentation workflow](documentation.md).
+documentation PR #76 and SDK PR #49 merged on 17 Oct 2026; all 12 SDK routes
+and the Mintlify AI indexes were verified live. See [documentation workflow](documentation.md).
 
 Sources: [npm trusted publishers](https://docs.npmjs.com/trusted-publishers/)
 and [npm provenance](https://docs.npmjs.com/generating-provenance-statements/).

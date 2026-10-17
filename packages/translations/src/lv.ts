@@ -4,7 +4,7 @@ const messages = {
   "banner.title": "Privātuma izvēles",
   "banner.description": "Izvēlieties, kuras sīkdatnes drīkst izmantot.",
   "banner.acceptAll": "Pieņemt visas sīkdatnes",
-  "banner.rejectAll": "Noraidīt izvēles",
+  "banner.rejectAll": "Noraidīt neobligātās sīkdatnes",
   "banner.customize": "Pielāgot",
   "banner.save": "Saglabāt",
   "banner.close": "Aizvērt",

@@ -4,7 +4,7 @@ const messages = {
   "banner.title": "אפשרויות פרטיות",
   "banner.description": "בחרו באילו קובצי Cookie ניתן להשתמש.",
   "banner.acceptAll": "קבלת כל קובצי ה-Cookie",
-  "banner.rejectAll": "דחיית קבצים אופציונליים",
+  "banner.rejectAll": "דחיית קובצי Cookie שאינם הכרחיים",
   "banner.customize": "התאמה אישית",
   "banner.save": "שמירה",
   "banner.close": "סגירה",
@@ -21,7 +21,7 @@ const messages = {
   "optOut.label": "ביטול הסכמה למכירה או לשיתוף",
   "gpc.honoured": "בקשת בקרת הפרטיות הגלובלית כובדה.",
   "recall.label": "בדיקת אפשרויות קובצי Cookie",
-  "gated.placeholder": "תוכן זה דורש את רשותך.",
+  "gated.placeholder": "תוכן זה דורש את רשותכם.",
   "gated.allow": "אישור תוכן",
 } as const satisfies Messages;
 export default messages;
