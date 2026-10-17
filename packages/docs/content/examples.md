@@ -3,10 +3,14 @@
 Runnable apps live in [`examples/`](../../../examples/nextjs-app-router/README.md).
 All three are built and tested end to end in CI on every pull request.
 
+Start with the [backend-connected walkthrough](connected-backend.md) when using
+a CookieChimp account. The React/Vite app's `/connected` page retrieves real
+dashboard config and delivers consent records with matching receipt status.
+
 | Example | Shows |
 |---|---|
 | `examples/nextjs-app-router` | `CookieChimpProvider` (server), banner, preferences, recall button, a gated GA4 tag, `useCategory`. |
-| `examples/react-vite` | Plain React/Vite, one local runtime, StrictMode, consent-gated script, persistence, preferences and recall. |
+| `examples/react-vite` | `/connected`: CookieChimp backend config, categories, copy, cookie settings, consent delivery, receipts and retries. `/`: local runtime, script gating, persistence, preferences and recall. |
 | `examples/nextjs-pages-router` | `withConsent` and `PagesConsentProvider` with the same UI. |
 
 ```sh

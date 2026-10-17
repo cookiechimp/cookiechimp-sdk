@@ -39,6 +39,15 @@ it("cannot replace editorial review with a publication approval", () => {
   ]);
 });
 
+it("requires live platform verification even when standalone usage is possible", () => {
+  expect(
+    publicationBlockers({
+      ...ready,
+      manualChecks: { ...ready.manualChecks, platformDeployed: false },
+    }),
+  ).toEqual(["Manual check required: platformDeployed"]);
+});
+
 it("permits SDK publication while optional IAB integration work is deferred", () => {
   expect(
     publicationBlockers({

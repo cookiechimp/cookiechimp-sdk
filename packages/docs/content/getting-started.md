@@ -3,6 +3,11 @@
 Registry commands below apply after the first npm release. Until then use the
 workspace examples. See [release status](deployment.md).
 
+For a CookieChimp-managed project, start with
+[Connect to CookieChimp](connected-backend.md). It shows a runnable example of
+dashboard config retrieval and consent delivery to the backend, including receipts
+and retries. The local setup below also works without an account.
+
 The quickest route is the CLI. It detects your framework, installs the right
 packages and writes starter files. It never edits files you already have.
 
