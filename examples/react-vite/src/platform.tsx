@@ -7,7 +7,7 @@ import {
 } from "@cookiechimp/react/platform";
 import "@cookiechimp/react/platform.css";
 import { createRoot } from "react-dom/client";
-import bundle from "./platform-config.json";
+import bundle from "../../../packages/core/src/fixtures/platform-offline-bundle.json";
 import "./platform.css";
 
 function App() {
