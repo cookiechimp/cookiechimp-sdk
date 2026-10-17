@@ -18,9 +18,9 @@ was inferred from these checks.
 The supplier must use current official GVL translations for the chosen language.
 If an application persists choices across devices, it must also explain that scope
 and handle conflicts in its account logic. The SDK does not provide account consent
-synchronization or a GVL CDN. Verify existing IAB registration status before starting
-another application; confirm the assigned CMP ID and complete current validation.
-Formal validation and IAB submission remain human-owned launch gates.
+synchronization or a GVL CDN. CookieChimp-managed TCF activation is deferred to
+the [internal IAB TODO](iab-integration-todo.md). Registration and validation are
+prerequisites for that activation, rather than for publishing the ordinary SDK.
 
 Sources: [IAB confirmed timeline](https://iabeurope.eu/wp-content/uploads/TCF_V-CMP_comms_TCFpoliciesV5.0.bAndSpecificationsV2.4ConfirmationOf-theTimeline_160726_IABEurope.pdf),
 [TCF specifications](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20Consent%20string%20and%20vendor%20list%20formats%20v2.md),

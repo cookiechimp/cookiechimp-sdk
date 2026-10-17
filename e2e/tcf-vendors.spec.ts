@@ -128,8 +128,8 @@ test("vendor details disclose purposes, retention, links and storage", async ({
     "Store and/or access information on a device",
   );
   await expect(panel).toContainText("Measure advertising performance");
-  await expect(panel).toContainText("Standard retention: 30 days");
-  await expect(panel).toContainText("Cookies stored for up to 90 days");
+  await expect(panel).toContainText("Standard retention: Days: 30");
+  await expect(panel).toContainText("Maximum cookie lifetime (days): 90");
   await expect(panel).toContainText(
     "Uses other device storage or access methods",
   );
@@ -188,10 +188,8 @@ test("TCF labels from @cookiechimp/translations render in German", async ({
     .getByRole("button", { name: "Details: Partner 3", exact: true })
     .click();
   const panel = page.getByRole("region", { name: "Partner 3", exact: true });
-  await expect(panel).toContainText("Standardspeicherdauer: 30 Tage");
-  await expect(panel).toContainText(
-    "Cookies werden bis zu 90 Tage gespeichert",
-  );
+  await expect(panel).toContainText("Standardspeicherdauer: Tage: 30");
+  await expect(panel).toContainText("Maximale Cookie-Laufzeit (Tage): 90");
   await expect(
     panel.getByRole("link", { name: "Datenschutzerklärung" }),
   ).toHaveAttribute("href", "https://partner3.example/privacy");

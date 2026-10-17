@@ -8,7 +8,7 @@ const labels = {
   search: "ベンダーを検索",
   consent: "同意",
   legitimateInterest: "正当な利益",
-  acceptAll: "すべて同意",
+  acceptAll: "すべてに同意",
   rejectAll: "すべて拒否",
   save: "選択を保存",
   saved: "選択を保存しました",

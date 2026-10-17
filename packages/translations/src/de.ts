@@ -14,13 +14,12 @@ const messages = {
   "category.necessary.name": "Notwendig",
   "category.necessary.description": "Für den Betrieb der Website erforderlich.",
   "category.functional.name": "Funktional",
-  "category.functional.description":
-    "Speichert Einstellungen und verbessert Funktionen.",
+  "category.functional.description": "Speichert Einstellungen.",
   "category.analytics.name": "Analyse",
   "category.analytics.description":
     "Hilft uns, die Nutzung der Website zu verstehen.",
   "category.marketing.name": "Marketing",
-  "category.marketing.description": "Ermöglicht relevante Werbung.",
+  "category.marketing.description": "Unterstützt Werbung.",
   "optOut.label": "Verkauf oder Weitergabe ablehnen",
   "gpc.honoured": "Global Privacy Control wurde berücksichtigt.",
   "recall.label": "Cookie-Auswahl prüfen",

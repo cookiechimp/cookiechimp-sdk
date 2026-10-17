@@ -19,7 +19,7 @@ const messages = {
   "category.marketing.name": "마케팅",
   "category.marketing.description": "광고를 지원합니다.",
   "optOut.label": "판매 또는 공유 거부",
-  "gpc.honoured": "글로벌 개인정보 보호 설정을 존중했습니다.",
+  "gpc.honoured": "Global Privacy Control(GPC) 신호를 반영했습니다.",
   "recall.label": "쿠키 선택 검토",
   "gated.placeholder": "이 콘텐츠에는 사용자의 허가가 필요합니다.",
   "gated.allow": "콘텐츠 허용",

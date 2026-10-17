@@ -1,4 +1,4 @@
-# Remaining work and launch status (14 Oct 2026)
+# Remaining work and launch status (17 Oct 2026)
 
 Daniel authorized Codex to review, fix and merge the SDK PRs on 14 Oct 2026.
 All eight SDK PRs below are now merged into main after review and green checks.
@@ -29,7 +29,13 @@ no platform changes. The 1.0.0 packages are prepared, not published.
 All seven required checks passed on each reviewed head. Benchmark smoke and
 packed-consumer checks also passed where present. The review record is in
 [SDK merge review](sdk-merge-review.md). Daniel selected the existing CookieChimp Mintlify docs repo for SDK documentation
-on 14 Oct. The integration is prepared in companion PRs, pending docs review/deployment. npm publication, deployment and external submission are separate.
+on 14 Oct. Docs PR #76 and SDK PR #49 merged on 17 Oct. All 12 SDK guides,
+Markdown views and the prefixed Mintlify AI indexes are live. npm publication
+and external submission remain separate.
+
+Base and TCF labels for all 33 locales completed AI editorial review on
+17 Oct 2026. Corrections, method and exact source hashes are recorded in the
+[review record](translation-review.md). This is not a native-speaker attestation.
 
 ## Launch gates requiring Daniel or external work
 
@@ -37,28 +43,25 @@ on 14 Oct. The integration is prepared in companion PRs, pending docs review/dep
   consent idempotency: Daniel merges first. Then
   [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile
   offline config, schema version, 304/ETag and caching/CORS headers. Verify deployment
-  and real connected config/record delivery. #2772 currently has a failed rspec
-  check; Daniel must resolve/review it before merging. Before deployment website accounts
+  and real connected config/record delivery. #2772 and #2773 remain open; the current checks are passing or skipped.
+  Daniel must review them before merging. Before deployment website accounts
   may get 403 and use cached or in-code fallback. Fixture tests do not prove live delivery.
-- Native-speaker review: 29 draft base locales and 32 draft TCF locales.
-  [Review map](translation-review.md). Existing review flags have not been invented.
-- Confirm the existing CookieChimp IAB registration status and assigned CMP ID,
-  then complete current manual validator checks. Verify prior registration status
-  before starting another application. Production TCF remains disabled without a
-  valid cmpId; GPP's default CMP ID remains 0. Current GVL disclosure support was
-  merged in #47 for the 23 October 2026 web deadline; formal approval is not claimed.
 - The GitHub source repository is private. Public source is needed for npm provenance.
   Review source history before any visibility change: removed error.log in commit
   7b90f7c contained a ChatGPT account ID, not a token. No history rewrite or visibility
   change has been made. That file cannot enter the package allowlists.
 - npm organization access and trusted publishing setup. This machine was not
   authenticated at takeover. Explicit approval of the exact version is required;
-  release:check --publish fails while requirements or locale reviews remain pending.
-- SDK docs move to the existing Mintlify site in `IdentitySquare/CookieChimp-Docs`.
-  Review and merge the companion docs PR, verify the new SDK routes are live, then
-  merge the SDK link/export migration. See [documentation workflow](documentation.md).
+  release:check --publish fails while publication requirements or editorial reviews remain pending.
 - External skill/Context7 registry publication and benchmark submission require
   review and explicit submission instructions. Files and the manifest are prepared.
+
+## Deferred internal TODO
+
+- Optional managed IAB registration, CMP ID assignment and validation are deferred
+  at Daniel's direction. The placeholder stays unset; the [internal TODO](iab-integration-todo.md)
+  is not exported to Mintlify and is not an SDK publication gate. Production TCF
+  still requires valid explicit configuration, and the provider stays disabled by default.
 
 ## Integration gaps and intentional limitations
 
@@ -75,8 +78,8 @@ on 14 Oct. The integration is prepared in companion PRs, pending docs review/dep
   records retry on the next visit and require receiver deduplication.
 - Sync is 2395 B, inside the revised 2.5 KB SPEC target. Provider headroom is about
   12%, below the 15% watch target; every enforced budget passes.
-- The conservative TCF/GPP component sum is 10624 B of 12288 B. The provider
-  bootstrap is 663 B and the deduplicated full IAB graph plus vendor CSS is 10347 B
+- The conservative TCF/GPP component sum is 10629 B of 12288 B. The provider
+  bootstrap is 663 B and the deduplicated full IAB graph plus vendor CSS is 10354 B
   of 12288 B. All 41 enforced budgets pass, including default-bundle exclusion.
 - The old unexplained e2e failure has not recurred. Failure traces are now retained
   and uploaded by CI so any recurrence can be investigated.

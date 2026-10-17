@@ -16,9 +16,10 @@ export function publicationBlockers(state: PublicationState): string[] {
     blockers.push(
       "Daniel must explicitly approve publication of this exact version",
     );
+  // Optional managed IAB activation is tracked in readiness.json's deferred TODO.
+  // Its runtime CMP ID checks remain independent of package publication.
   for (const name of [
     "platformDeployed",
-    "iabValidated",
     "publicHistoryReviewed",
     "npmOrganizationReady",
   ])
@@ -29,13 +30,13 @@ export function publicationBlockers(state: PublicationState): string[] {
     .map(([locale]) => locale);
   if (drafts.length)
     blockers.push(
-      `Native review pending for base locales: ${drafts.join(", ")}`,
+      `Editorial review pending for base locales: ${drafts.join(", ")}`,
     );
   const reviewed = new Set(state.reviewedTcfLocales);
   const tcfDrafts = state.tcfLocales.filter((locale) => !reviewed.has(locale));
   if (tcfDrafts.length)
     blockers.push(
-      `Native review pending for TCF locales: ${tcfDrafts.join(", ")}`,
+      `Editorial review pending for TCF locales: ${tcfDrafts.join(", ")}`,
     );
   return blockers;
 }

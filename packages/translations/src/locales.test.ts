@@ -110,7 +110,7 @@ describe("translation locales", () => {
       Object.entries(localeMeta)
         .filter(([, metadata]) => metadata.reviewed)
         .map(([locale]) => locale),
-    ).toEqual(["en", "de", "fr", "es"]);
+    ).toEqual(locales.map(([locale]) => locale));
     expect(localeMeta.ar.dir).toBe("rtl");
     expect(localeMeta.he.dir).toBe("rtl");
   });

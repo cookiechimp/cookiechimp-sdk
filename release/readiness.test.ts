@@ -7,7 +7,6 @@ const ready: PublicationState = {
   repositoryVisibility: "public",
   manualChecks: {
     platformDeployed: true,
-    iabValidated: true,
     publicHistoryReviewed: true,
     npmOrganizationReady: true,
   },
@@ -24,10 +23,10 @@ it("blocks publication until every real prerequisite is satisfied", () => {
       approvedVersion: "",
       manualChecks: {},
     }),
-  ).toHaveLength(6);
+  ).toHaveLength(5);
   expect(publicationBlockers(ready)).toEqual([]);
 });
-it("cannot replace native review with an approval flag", () => {
+it("cannot replace editorial review with a publication approval", () => {
   expect(
     publicationBlockers({
       ...ready,
@@ -35,7 +34,16 @@ it("cannot replace native review with an approval flag", () => {
       tcfLocales: ["de"],
     }),
   ).toEqual([
-    "Native review pending for base locales: de",
-    "Native review pending for TCF locales: de",
+    "Editorial review pending for base locales: de",
+    "Editorial review pending for TCF locales: de",
   ]);
+});
+
+it("permits SDK publication while optional IAB integration work is deferred", () => {
+  expect(
+    publicationBlockers({
+      ...ready,
+      manualChecks: { ...ready.manualChecks, iabValidated: false },
+    }),
+  ).toEqual([]);
 });

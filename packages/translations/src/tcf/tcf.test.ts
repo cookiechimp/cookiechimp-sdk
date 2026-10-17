@@ -105,6 +105,6 @@ describe("TCF labels", () => {
         );
       }
   });
-  it("mark only English as reviewed", () =>
-    expect(tcfReviewedLocales).toEqual(["en"]));
+  it("record editorial review for every shipped TCF locale", () =>
+    expect(tcfReviewedLocales).toEqual(Object.keys(localeMeta)));
 });

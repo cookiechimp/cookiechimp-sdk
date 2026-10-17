@@ -296,7 +296,7 @@ describe("TcfVendorList", () => {
       const text = p.textContent ?? "";
       for (const expected of [
         "Purposes (consent)",
-        "Store and/or access information on a device (Data retention: 90 days)",
+        "Store and/or access information on a device (Data retention: Days: 90)",
         "Use limited data to select advertising",
         "Purposes (legitimate interest)",
         "Measure advertising performance",
@@ -304,8 +304,8 @@ describe("TcfVendorList", () => {
         "Match and combine data from other data sources",
         "Use precise geolocation data",
         "IP addresses",
-        "Standard retention: 30 days",
-        "Cookies stored for up to 365 days",
+        "Standard retention: Days: 30",
+        "Maximum cookie lifetime (days): 365",
         "Cookie expiry is refreshed on use",
         "Uses other device storage or access methods",
       ])
@@ -337,6 +337,38 @@ describe("TcfVendorList", () => {
       expect(p.textContent).toContain("Does not use cookies");
       expect(p.querySelectorAll("a").length).toBe(0);
     });
+
+    it.each([0, 1, 2, 365])(
+      "renders numeric duration labels for %i days",
+      async (days) => {
+        const vendor = vendors[1];
+        if (!vendor) throw new Error("Missing vendor fixture");
+        const { host } = await setup({
+          gvl: {
+            ...gvl,
+            vendors: {
+              "1": {
+                ...vendor,
+                dataRetention: {
+                  stdRetention: days,
+                  purposes: { "1": days },
+                  specialPurposes: {},
+                },
+                cookieMaxAgeSeconds: days * 86400,
+              },
+            },
+          },
+        });
+        await act(async () => details(host, "Vendor 001").click());
+        const text = panel(host)?.textContent;
+        expect(text).toContain(`Standard retention: Days: ${days}`);
+        if (days === 0) expect(text).toContain(en.cookieSession);
+        else expect(text).toContain(`Maximum cookie lifetime (days): ${days}`);
+        expect(text).not.toContain("{days}");
+        expect(en.retentionDays).toBe("Days: {days}");
+        expect(en.cookieMaxAge).toBe("Maximum cookie lifetime (days): {days}");
+      },
+    );
 
     it("Escape and Close return focus to the row's Details button", async () => {
       const { host } = await setup();
@@ -431,9 +463,9 @@ describe("TcfVendorList", () => {
       ) as HTMLElement;
       expect(panel.textContent).toContain("Speicherung auf dem Gerät");
       expect(panel.textContent).toContain(
-        "Cookies werden bis zu 365 Tage gespeichert",
+        "Maximale Cookie-Laufzeit (Tage): 365",
       );
-      expect(panel.textContent).toContain("Standardspeicherdauer: 30 Tage");
+      expect(panel.textContent).toContain("Standardspeicherdauer: Tage: 30");
       expect(panel.textContent).toContain("Details schließen");
     });
   });
