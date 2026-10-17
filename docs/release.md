@@ -1,7 +1,8 @@
 # 1.0 release preparation
 
-The eight `@cookiechimp` packages are a coordinated 1.0.0 candidate, not a
-published release. SDK PR review and npm publication approval are separate.
+The eight `@cookiechimp` packages are coordinated 1.0.0 candidates staged on npm,
+not a published SDK release. Daniel approved staging and subsequently authorized
+publication on 17 Oct 2026. SDK PR review and npm publication approval are separate.
 
 ## Package and inspect
 
@@ -39,25 +40,30 @@ reviewer and exact source hashes. Keep that evidence current when copy changes.
 
 ## Still required
 
-- Daniel handles platform #2773 then #2772, and verifies deployment and actual
-  connected config/consent delivery. SDK work never merges platform PRs.
+- Platform #2773 and #2772 are merged, and deployment `7137407395` succeeded
+  for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459` on 17 Oct 2026. Daniel still
+  supplies live connected config/consent-delivery evidence. SDK work never
+  performs platform writes.
 - Optional CookieChimp-managed TCF activation is deferred to the
   [internal IAB TODO](iab-integration-todo.md). It is not an SDK publication gate.
   Production TCF still requires valid explicit configuration; no runtime check is bypassed.
-- The source repository is currently private. npm provenance requires a public
-  source repository. Before making it public, Daniel must review source history:
-  removed `error.log` remains in commit `7b90f7c` and contained a ChatGPT account
-  identifier (not a token). Package allowlists exclude that file. No history or
-  repository visibility change has been made by this work.
-- Daniel supplies npm organization access. This machine is unauthenticated.
-  Configure trusted publishing for `cookiechimp/cookiechimp-sdk`, workflow
+- The SDK repository is public with Daniel's authorization after disclosure of
+  the historical `error.log` account identifier (not a token). A targeted scan
+  of 1315 unique Git blobs found no supported credential patterns. History is
+  preserved; package allowlists exclude that log. The source-visibility check
+  is complete.
+- The free `@cookiechimp` npm organization, owner `danielpaul`, account 2FA and
+  CLI sign-in are verified. All eight exact candidates are staged, with npm
+  integrity values matching the artifact manifest. Finish trusted publishing
+  for `cookiechimp/cookiechimp-sdk`, workflow
   `release.yml`, environment `npm-publish`, with direct npm publish allowed.
-  New packages may require an authorized first publication before trusted
-  publisher settings are available; inspect npm's current setup flow before it.
-- Configure the GitHub environment `npm-publish` to require `danielpaul` review.
-  The workflow verifies that protection exists before permitting its publish job.
-- Complete `release/readiness.json` with evidence, then Daniel explicitly
-  approves publication of version `1.0.0`. `release:check --publish` deliberately
+  New-package staging created public placeholder pages and unlocked these
+  settings without releasing the SDK. The locally staged candidates lack CI
+  provenance; do not promote them as the final provenance-verified release.
+- GitHub environment `npm-publish` now requires `danielpaul` review and permits
+  main only. The workflow verifies reviewer protection before its publish job.
+- Complete `release/readiness.json` with the outstanding evidence. Daniel has
+  authorized publication of version `1.0.0`; `release:check --publish` deliberately
   fails while any prerequisite or editorial locale review remains outstanding.
 
 ## Publish after approval

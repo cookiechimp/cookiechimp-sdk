@@ -3,7 +3,8 @@
 Daniel authorized Codex to review, fix and merge the SDK PRs on 14 Oct 2026.
 All eight SDK PRs below are now merged into main after review and green checks.
 Platform actions remain Daniel's responsibility; this SDK takeover has made
-no platform changes. The 1.0.0 packages are prepared, not published.
+no platform changes. The eight 1.0.0 candidates are staged on npm for review,
+not published as an installable SDK release.
 
 ## Merged
 
@@ -37,22 +38,37 @@ Base and TCF labels for all 33 locales completed AI editorial review on
 17 Oct 2026. Corrections, method and exact source hashes are recorded in the
 [review record](translation-review.md). This is not a native-speaker attestation.
 
+## Launch preparation completed on 17 Oct 2026
+
+- Daniel authorized public SDK source after the historical account identifier
+  was disclosed. A targeted scan of 1315 unique Git blobs found no supported
+  credential patterns. The SDK repository is public; its Git history was preserved.
+- The existing free `@cookiechimp` npm organization belongs to `danielpaul`.
+  Account 2FA and the local npm CLI login are verified.
+- Daniel approved staging all eight `1.0.0` candidates. npm staging receipts
+  match the SHA-512 integrity values in `release/artifacts/manifest.json`.
+  npm displays public `0.0.0-stage` placeholder pages and the eight actual
+  candidates in the review queue. This is not publication of `1.0.0`.
+- GitHub environment `npm-publish` is restricted to main and requires
+  `danielpaul` review. Daniel subsequently authorized publishing `1.0.0`.
+
 ## Launch gates requiring Daniel or external work
 
 - Platform [#2773](https://github.com/IdentitySquare/CookieChimp/pull/2773),
-  consent idempotency: Daniel merges first. Then
+  consent idempotency, merged at 09:01 UTC, followed by
   [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile
-  offline config, schema version, 304/ETag and caching/CORS headers. Verify deployment
-  and real connected config/record delivery. #2772 and #2773 remain open; the current checks are passing or skipped.
-  Daniel must review them before merging. Before deployment website accounts
-  may get 403 and use cached or in-code fallback. Fixture tests do not prove live delivery.
-- The GitHub source repository is private. Public source is needed for npm provenance.
-  Review source history before any visibility change: removed error.log in commit
-  7b90f7c contained a ChatGPT account ID, not a token. No history rewrite or visibility
-  change has been made. That file cannot enter the package allowlists.
-- npm organization access and trusted publishing setup. This machine was not
-  authenticated at takeover. Explicit approval of the exact version is required;
-  release:check --publish fails while publication requirements or editorial reviews remain pending.
+  offline config, at 09:06 UTC on 17 Oct. Deployment `7137407395` succeeded at
+  09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Live connected
+  config and consent-record delivery still require evidence from Daniel.
+  Fixture tests and deployment success do not prove live record delivery.
+- Finish and verify GitHub trusted publishing on all eight npm packages for
+  `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`, with
+  direct publishing allowed. npm requests security-key verification when saving
+  the connection. No connection is recorded as ready until npm confirms it.
+- Complete the remaining checks in `release/readiness.json`, then run the guarded
+  release workflow with `approved_version=1.0.0`. Publication must retain npm
+  provenance; locally staged bootstrap candidates have no CI provenance and
+  must not be promoted as the final provenance-verified release.
 - External skill/Context7 registry publication and benchmark submission require
   review and explicit submission instructions. Files and the manifest are prepared.
 
