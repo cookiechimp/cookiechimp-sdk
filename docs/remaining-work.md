@@ -51,6 +51,10 @@ Base and TCF labels for all 33 locales completed AI editorial review on
   candidates in the review queue. This is not publication of `1.0.0`.
 - GitHub environment `npm-publish` is restricted to main and requires
   `danielpaul` review. Daniel subsequently authorized publishing `1.0.0`.
+- All eight npm GitHub trusted publisher connections are saved and verified
+  through `npm trust list`: repository `cookiechimp/cookiechimp-sdk`, workflow
+  `release.yml`, environment `npm-publish`, publishing and staging permissions.
+  First successful CI publication must validate them within npm's two-day window.
 
 ## Launch gates requiring Daniel or external work
 
@@ -61,10 +65,6 @@ Base and TCF labels for all 33 locales completed AI editorial review on
   09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Live connected
   config and consent-record delivery still require evidence from Daniel.
   Fixture tests and deployment success do not prove live record delivery.
-- Finish and verify GitHub trusted publishing on all eight npm packages for
-  `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`, with
-  direct publishing allowed. npm requests security-key verification when saving
-  the connection. No connection is recorded as ready until npm confirms it.
 - Complete the remaining checks in `release/readiness.json`, then run the guarded
   release workflow with `approved_version=1.0.0`. Publication must retain npm
   provenance; locally staged bootstrap candidates have no CI provenance and

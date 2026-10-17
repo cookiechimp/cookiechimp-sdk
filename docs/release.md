@@ -54,9 +54,11 @@ reviewer and exact source hashes. Keep that evidence current when copy changes.
   is complete.
 - The free `@cookiechimp` npm organization, owner `danielpaul`, account 2FA and
   CLI sign-in are verified. All eight exact candidates are staged, with npm
-  integrity values matching the artifact manifest. Finish trusted publishing
-  for `cookiechimp/cookiechimp-sdk`, workflow
-  `release.yml`, environment `npm-publish`, with direct npm publish allowed.
+  integrity values matching the artifact manifest. All eight trusted publishers
+  are saved and independently verified for `cookiechimp/cookiechimp-sdk`,
+  workflow `release.yml`, environment `npm-publish`, with direct publishing and
+  staging allowed. First successful CI publication must validate the connections
+  within npm's two-day window.
   New-package staging created public placeholder pages and unlocked these
   settings without releasing the SDK. The locally staged candidates lack CI
   provenance; do not promote them as the final provenance-verified release.
