@@ -14,6 +14,12 @@ available, while `pt` can select `pt-BR`.
 
 Documentation: [CookieChimp Consent SDK](https://docs.cookiechimp.com/docs/sdk/overview).
 
+Start with the [CookieChimp backend integration](./packages/docs/content/connected-backend.md)
+and its [runnable React example](./examples/react-vite/README.md) for dashboard
+configuration, consent delivery, matching receipts and offline retries. Local-only
+examples are also available. A `projectId` enables Next.js config retrieval;
+platform consent delivery must be wired explicitly.
+
 Status: 1.0.0 candidate, not yet published to npm. See [release status](https://docs.cookiechimp.com/docs/sdk/release-status) and [SPEC.md](./SPEC.md).
 
 ## React server rendering

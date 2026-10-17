@@ -19,6 +19,13 @@ export const pages: readonly PageSpec[] = [
     source: "packages/docs/content/getting-started.md",
   },
   {
+    slug: "connected-backend",
+    title: "Connect to CookieChimp",
+    description:
+      "Load dashboard configuration and deliver consent records to CookieChimp.",
+    source: "packages/docs/content/connected-backend.md",
+  },
+  {
     slug: "reference",
     title: "Core and React reference",
     description: "Regions, gating, Consent Mode, headless UI, GPP and TCF.",
@@ -91,6 +98,7 @@ export const navigation = {
       pages: [
         "sdk/overview",
         "sdk/getting-started",
+        "sdk/connected-backend",
         "sdk/examples",
         "sdk/release-status",
       ],

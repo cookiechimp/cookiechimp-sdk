@@ -20,11 +20,22 @@ h1 {
   color: #5d6270;
   font-size: 0.875rem;
 }
-main > button {
+main button {
   font: inherit;
   border: 1px solid #c9cbd5;
   border-radius: 0.5rem;
   background: white;
   padding: 0.5rem 1rem;
   cursor: pointer;
+}
+form {
+  display: grid;
+  gap: 0.75rem;
+}
+input {
+  font: inherit;
+  padding: 0.5rem;
+}
+code {
+  overflow-wrap: anywhere;
 }

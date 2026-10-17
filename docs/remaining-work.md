@@ -58,6 +58,12 @@ Base and TCF labels for all 33 locales completed AI editorial review on
 
 ## Launch gates requiring Daniel or external work
 
+Live backend verification is always an npm publication requirement, even for
+releases that support local-only usage. PR #52 proposing to remove that gate
+was closed at Daniel's direction. The backend-connected React example and
+[walkthrough](../packages/docs/content/connected-backend.md) make the config,
+consent delivery and receipt checks reproducible; mocked CI is separate evidence.
+
 - Platform [#2773](https://github.com/IdentitySquare/CookieChimp/pull/2773),
   consent idempotency, merged at 09:01 UTC, followed by
   [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile

@@ -98,7 +98,9 @@ async function exportedNames(
     "utf8",
   );
   const names = new Set<string>();
-  for (const [, list = ""] of types.matchAll(/export\s*\{([^}]*)\}/g))
+  for (const [, list = ""] of types.matchAll(
+    /export\s+(?:type\s+)?\{([^}]*)\}/g,
+  ))
     for (const part of list.split(",")) {
       const alias = part
         .trim()
@@ -153,6 +155,7 @@ describe("docs snippets", () => {
     const react = await exportedNames("@cookiechimp/react");
     expect(react).toBeInstanceOf(Set);
     expect((react as Set<string>).has("ConsentProvider")).toBe(true);
+    expect((react as Set<string>).has("Messages")).toBe(true);
     expect((react as Set<string>).has("NotAnExport")).toBe(false);
     expect(await exportedNames("@cookiechimp/react/styles.css")).toBe("css");
   });

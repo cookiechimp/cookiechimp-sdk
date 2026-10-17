@@ -13,14 +13,18 @@ import {
 import "@cookiechimp/react/styles.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { ConnectedExample } from "./connected";
 import "./style.css";
 
 // Create one runtime outside React renders. Apps supply trusted region context;
 // this example's regulation is configured explicitly and performs no geolocation.
-const consent = createConsent({
-  categories: { analytics: false },
-  regulation: "gdpr",
-});
+const consent =
+  window.location.pathname === "/connected"
+    ? null
+    : createConsent({
+        categories: { analytics: false },
+        regulation: "gdpr",
+      });
 
 function App() {
   const analytics = useCategory("analytics");
@@ -67,8 +71,12 @@ const root = document.getElementById("root");
 if (!root) throw new Error("Missing React mount point");
 createRoot(root).render(
   <StrictMode>
-    <ConsentProvider consent={consent}>
-      <App />
-    </ConsentProvider>
+    {consent ? (
+      <ConsentProvider consent={consent}>
+        <App />
+      </ConsentProvider>
+    ) : (
+      <ConnectedExample />
+    )}
   </StrictMode>,
 );
