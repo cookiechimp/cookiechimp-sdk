@@ -1,0 +1,438 @@
+{
+  "version": 4,
+  "account_hashid": "acctREDACTED",
+  "cache_version": "a1b2c3d4",
+  "generated_at": "2026-10-01T12:00:00Z",
+  "country_banner_map": {
+    "US": "bnrUS1",
+    "US-CA": "bnrUS1",
+    "DE": "bnrEU1",
+    "FR": "bnrEU1",
+    "IE": "bnrEU1"
+  },
+  "default_banner": "bnrUS1",
+  "banners": {
+    "bnrUS1": {
+      "hashid": "bnrUS1",
+      "name": "US Default",
+      "consent_mode": "opt_out",
+      "consent_duration_days": 182,
+      "revision": 3,
+      "force_consent": false,
+      "enable_tcf": false,
+      "target_type": "worldwide",
+      "target_countries": [],
+      "target_us_states": [],
+      "target_canadian_regions": [],
+      "gui_options": {
+        "layout": "box",
+        "position": "bottom right",
+        "button_placement": "inline",
+        "equal_weight_buttons": false,
+        "swap_buttons": false
+      },
+      "theme": {
+        "dark_mode": false,
+        "modal_border_radius": 8,
+        "btn_border_radius": 4,
+        "colors": {
+          "bg": "#ffffff",
+          "heading_color": "#000",
+          "text_color": "#333",
+          "link_color": "#2b2b2b",
+          "btn_primary_bg": "#2b2b2b",
+          "btn_primary_color": "#fff",
+          "btn_secondary_bg": "#fff",
+          "btn_secondary_color": "#2b2b2b"
+        },
+        "dark_colors": {
+          "bg": "#171a1c",
+          "heading_color": "#fff",
+          "text_color": "#999",
+          "link_color": "#bcbcbc",
+          "btn_primary_bg": "#fff",
+          "btn_primary_color": "#333",
+          "btn_secondary_bg": "#171a1c",
+          "btn_secondary_color": "#fff"
+        },
+        "logo_url_light": "https://cdn.example.test/logo-light.png",
+        "logo_url_dark": "https://cdn.example.test/logo-dark.png"
+      },
+      "buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_preferences_btn": true,
+        "show_close_btn": false
+      },
+      "preferences_buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_save_preferences_btn": true
+      },
+      "preferences_gui_options": {
+        "layout": "box",
+        "position": "left",
+        "equal_weight_buttons": false,
+        "control_level": "category_and_services",
+        "show_services": true,
+        "show_floating_icon": true,
+        "floating_icon_position": "bottom_left"
+      },
+      "footer": {
+        "enabled": true,
+        "content": "<a href='https://example.test/privacy'>Privacy Policy</a>",
+        "show_powered_by": true
+      },
+      "available_languages": ["en"]
+    },
+    "bnrEU1": {
+      "hashid": "bnrEU1",
+      "name": "EU GDPR",
+      "consent_mode": "opt_in",
+      "consent_duration_days": 182,
+      "revision": 3,
+      "force_consent": false,
+      "enable_tcf": false,
+      "target_type": "selected_countries",
+      "target_countries": ["DE", "FR", "IE"],
+      "target_us_states": [],
+      "target_canadian_regions": [],
+      "gui_options": {
+        "layout": "box",
+        "position": "bottom right",
+        "button_placement": "inline",
+        "equal_weight_buttons": false,
+        "swap_buttons": false
+      },
+      "theme": {
+        "dark_mode": false,
+        "modal_border_radius": 8,
+        "btn_border_radius": 4,
+        "colors": {
+          "bg": "#ffffff",
+          "heading_color": "#000",
+          "text_color": "#333",
+          "link_color": "#2b2b2b",
+          "btn_primary_bg": "#2b2b2b",
+          "btn_primary_color": "#fff",
+          "btn_secondary_bg": "#fff",
+          "btn_secondary_color": "#2b2b2b"
+        },
+        "dark_colors": {
+          "bg": "#171a1c",
+          "heading_color": "#fff",
+          "text_color": "#999",
+          "link_color": "#bcbcbc",
+          "btn_primary_bg": "#fff",
+          "btn_primary_color": "#333",
+          "btn_secondary_bg": "#171a1c",
+          "btn_secondary_color": "#fff"
+        },
+        "logo_url_light": "https://cdn.example.test/logo-light.png",
+        "logo_url_dark": "https://cdn.example.test/logo-dark.png"
+      },
+      "buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_preferences_btn": true,
+        "show_close_btn": false
+      },
+      "preferences_buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_save_preferences_btn": true
+      },
+      "preferences_gui_options": {
+        "layout": "box",
+        "position": "left",
+        "equal_weight_buttons": false,
+        "control_level": "category_and_services",
+        "show_services": true,
+        "show_floating_icon": true,
+        "floating_icon_position": "bottom_left"
+      },
+      "footer": {
+        "enabled": true,
+        "content": "<a href='https://example.test/privacy'>Privacy Policy</a>",
+        "show_powered_by": true
+      },
+      "available_languages": ["en", "de"]
+    }
+  },
+  "translations": {
+    "bnrUS1": {
+      "en": {
+        "consent_modal": {
+          "title": "We value your privacy",
+          "description": "We use cookies to improve your experience.",
+          "additional_description": "<p>More info.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject",
+          "preferences_btn": "Manage Preferences",
+          "close_btn": "Close",
+          "footer": "<a href='https://example.test/privacy'>Privacy Policy</a>"
+        },
+        "preferences_modal": {
+          "title": "Cookie Settings",
+          "description": "<p>Manage your preferences.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject",
+          "save_btn": "Save Preferences",
+          "close_btn": "Close",
+          "more_info_title": "More Information",
+          "more_info": "<p>Contact us at privacy@example.test.</p>"
+        },
+        "privacy_policy_url": "https://example.test/privacy"
+      }
+    },
+    "bnrEU1": {
+      "en": {
+        "consent_modal": {
+          "title": "We value your privacy",
+          "description": "We use cookies to improve your experience.",
+          "additional_description": "<p>More info.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject All",
+          "preferences_btn": "Manage Preferences",
+          "close_btn": "Close",
+          "footer": "<a href='https://example.test/privacy'>Privacy Policy</a>"
+        },
+        "preferences_modal": {
+          "title": "Cookie Settings",
+          "description": "<p>Manage your preferences.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject All",
+          "save_btn": "Save Preferences",
+          "close_btn": "Close",
+          "more_info_title": "More Information",
+          "more_info": "<p>Contact us at privacy@example.test.</p>"
+        },
+        "privacy_policy_url": "https://example.test/privacy"
+      },
+      "de": {
+        "consent_modal": {
+          "title": "Wir respektieren Ihre Privatsph\u00e4re",
+          "description": "We use cookies to improve your experience.",
+          "additional_description": "<p>More info.</p>",
+          "accept_btn": "Alle akzeptieren",
+          "reject_btn": "Alle ablehnen",
+          "preferences_btn": "Einstellungen",
+          "close_btn": "Close",
+          "footer": "<a href='https://example.test/privacy'>Privacy Policy</a>"
+        },
+        "preferences_modal": {
+          "title": "Cookie-Einstellungen",
+          "description": "<p>Manage your preferences.</p>",
+          "accept_btn": "Alle akzeptieren",
+          "reject_btn": "Alle ablehnen",
+          "save_btn": "Speichern",
+          "close_btn": "Close",
+          "more_info_title": "More Information",
+          "more_info": "<p>Contact us at privacy@example.test.</p>"
+        },
+        "privacy_policy_url": "https://example.test/privacy"
+      }
+    }
+  },
+  "categories": [
+    {
+      "slug": "essential",
+      "name": "Essential",
+      "description": "Required for the site to function",
+      "required": true,
+      "translations": {
+        "en": {
+          "name": "Essential",
+          "description": "Required for the site to function"
+        },
+        "de": {
+          "name": "Essenziell",
+          "description": "Required for the site to function"
+        }
+      },
+      "services": [
+        {
+          "id": "svcSESS1",
+          "name": "Session Management",
+          "description": "Manages user sessions",
+          "company": "Example Ltd",
+          "privacy_policy_url": "https://example.test/privacy",
+          "accepted_by_default": true,
+          "translations": {
+            "en": {
+              "name": "Session Management",
+              "description": "Manages user sessions"
+            }
+          },
+          "storage_items": [
+            {
+              "name": "session_id",
+              "type": "cookie",
+              "description": "Session identifier",
+              "duration": "Session",
+              "company": "Example Ltd",
+              "translations": {
+                "en": {
+                  "name": "session_id",
+                  "description": "Session identifier"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "storage_items": []
+    },
+    {
+      "slug": "analytics",
+      "name": "Analytics",
+      "description": "Helps us understand usage",
+      "required": false,
+      "translations": {
+        "en": {
+          "name": "Analytics",
+          "description": "Helps us understand usage"
+        },
+        "de": {
+          "name": "Statistik",
+          "description": "Helps us understand usage"
+        }
+      },
+      "services": [
+        {
+          "id": "svcGA4",
+          "name": "Google Analytics",
+          "description": "Usage statistics",
+          "company": "Example Ltd",
+          "privacy_policy_url": "https://example.test/privacy",
+          "accepted_by_default": false,
+          "translations": {
+            "en": {
+              "name": "Google Analytics",
+              "description": "Usage statistics"
+            },
+            "de": {
+              "name": "Google Analyse",
+              "description": "Usage statistics"
+            }
+          },
+          "storage_items": [
+            {
+              "name": "_ga",
+              "type": "cookie",
+              "description": "Distinguishes users",
+              "duration": "2 years",
+              "company": "Example Ltd",
+              "translations": {
+                "en": {
+                  "name": "_ga",
+                  "description": "Distinguishes users"
+                }
+              }
+            },
+            {
+              "name": "ga_local",
+              "type": "local_storage",
+              "description": "Local cache",
+              "duration": "Persistent",
+              "company": "Example Ltd",
+              "translations": {
+                "en": {
+                  "name": "ga_local",
+                  "description": "Local cache"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "storage_items": []
+    },
+    {
+      "slug": "marketing",
+      "name": "Marketing",
+      "description": "Personalised advertising",
+      "required": false,
+      "translations": {
+        "en": {
+          "name": "Marketing",
+          "description": "Personalised advertising"
+        },
+        "de": {
+          "name": "Marketing",
+          "description": "Personalised advertising"
+        }
+      },
+      "services": [
+        {
+          "id": "svcMETA1",
+          "name": "Meta Pixel",
+          "description": "Ad measurement",
+          "company": "Example Ltd",
+          "privacy_policy_url": "https://example.test/privacy",
+          "accepted_by_default": false,
+          "translations": {
+            "en": {
+              "name": "Meta Pixel",
+              "description": "Ad measurement"
+            }
+          },
+          "storage_items": [
+            {
+              "name": "_fbp",
+              "type": "cookie",
+              "description": "Ad attribution",
+              "duration": "3 months",
+              "company": "Example Ltd",
+              "translations": {
+                "en": {
+                  "name": "_fbp",
+                  "description": "Ad attribution"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "storage_items": []
+    }
+  ],
+  "services_index": {
+    "Session Management": {
+      "category": "essential",
+      "id": "svcSESS1"
+    },
+    "Google Analytics": {
+      "category": "analytics",
+      "id": "svcGA4"
+    },
+    "Meta Pixel": {
+      "category": "marketing",
+      "id": "svcMETA1"
+    }
+  },
+  "default_services": {},
+  "integrations": {
+    "google_consent_mode": {
+      "enabled": true,
+      "default_state": {
+        "analytics_storage": "denied",
+        "ad_storage": "denied",
+        "ad_user_data": "denied",
+        "ad_personalization": "denied"
+      },
+      "url_passthrough": false,
+      "ads_data_redaction": true
+    },
+    "global_privacy_control": {
+      "enabled": true
+    }
+  },
+  "rtl_languages": ["ar", "dv", "fa", "ha", "he", "ks", "ku", "ps", "ur", "yi"],
+  "cookie_settings": {
+    "name": "cookiechimp_pref_REDACTED",
+    "expires_days": 182
+  },
+  "updated_at": "2026-10-01T12:00:00Z",
+  "reconsent_required_at": "2026-06-01T00:00:00Z"
+}

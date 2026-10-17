@@ -151,13 +151,17 @@ type PreferencesValue = {
   title: string;
   description: string;
 };
+type PreferenceSelection = {
+  categories: Record<string, boolean>;
+  services?: Record<string, boolean>;
+};
 const PreferencesContext = createContext<PreferencesValue | null>(null);
 function focusable(root: HTMLElement) {
   return [
     ...root.querySelectorAll<HTMLElement>(
       'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
     ),
-  ];
+  ].filter((node) => !node.closest("[hidden]"));
 }
 function trapFocus(event: KeyboardEvent, root: HTMLElement | null) {
   const items = root ? focusable(root) : [];
@@ -299,8 +303,12 @@ function Category({
 }
 function PreferenceAction({
   kind,
+  selection,
   ...props
-}: ActionProps & { kind: "save" | "accept-all" | "reject-all" | "close" }) {
+}: ActionProps & {
+  kind: "save" | "accept-all" | "reject-all" | "close";
+  selection?: PreferenceSelection;
+}) {
   const context = required(
     useContext(PreferencesContext),
     `Preferences.${kind}`,
@@ -315,7 +323,8 @@ function PreferenceAction({
       onClick={(event) => {
         props.onClick?.(event);
         if (event.defaultPrevented) return;
-        if (kind === "save") actions.set({ categories: context?.staged });
+        if (kind === "save")
+          actions.set(selection ?? { categories: context?.staged });
         else if (kind === "accept-all") actions.acceptAll();
         else if (kind === "reject-all") actions.rejectAll();
         context?.close();
@@ -393,13 +402,29 @@ export const Banner = {
     <BannerAction {...props} action="reject" part="reject-all" />
   ),
   Customize: BannerCustomize,
+  Close: (props: ActionProps) => {
+    const banner = useBanner();
+    return (
+      <button
+        type="button"
+        {...props}
+        data-cc-part="banner-close"
+        onClick={(event) => {
+          props.onClick?.(event);
+          if (!event.defaultPrevented) banner.hide();
+        }}
+      />
+    );
+  },
 };
 export const Preferences = {
   Root: PreferencesRoot,
   Title: PreferencesTitle,
   Description: PreferencesDescription,
   Category,
-  Save: (props: ActionProps) => <PreferenceAction {...props} kind="save" />,
+  Save: (props: ActionProps & { selection?: PreferenceSelection }) => (
+    <PreferenceAction {...props} kind="save" />
+  ),
   AcceptAll: (props: ActionProps) => (
     <PreferenceAction {...props} kind="accept-all" />
   ),

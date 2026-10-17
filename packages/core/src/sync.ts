@@ -61,6 +61,34 @@ const KEY = /^cc_pk_[\w-]{8,128}$/;
 
 type Json = Record<string, unknown>;
 
+/** Localized disclosures retain the platform JSON field names. */
+export interface PlatformStorageItem {
+  name: string;
+  type?: string;
+  description?: string;
+  duration?: string;
+  company?: string;
+}
+export interface PlatformService {
+  id?: string;
+  /** Derived runtime key; callers never need to add this to their JSON. */
+  consent_key: string;
+  name: string;
+  description?: string;
+  company?: string;
+  privacy_policy_url?: string;
+  accepted_by_default?: boolean;
+  storage_items: PlatformStorageItem[];
+}
+export interface PlatformCategory {
+  slug: string;
+  name: string;
+  description?: string;
+  required: boolean;
+  services: PlatformService[];
+  storage_items: PlatformStorageItem[];
+}
+
 /** The SDK view of one platform offline bundle, for one banner and language. */
 export interface DashboardConfig {
   schemaVersion: 1;
@@ -75,6 +103,8 @@ export interface DashboardConfig {
   language: string;
   categories: CategoryConfig[];
   services: ServiceConfig[];
+  /** Category/vendor/cookie disclosures from the same platform bundle. */
+  preferences?: PlatformCategory[];
   /** SDK service id (slug of the unique platform service name) to platform service hashid. */
   serviceIds: Record<string, string>;
   /** `translations[banner][language]`: consent_modal, preferences_modal, privacy_policy_url. */
@@ -220,11 +250,41 @@ export function adaptPlatformConfig(
   };
   const categories: CategoryConfig[] = [];
   const services: ServiceConfig[] = [];
+  const preferences: PlatformCategory[] = [];
+  const storageItems = (value: unknown): PlatformStorageItem[] =>
+    array(value)
+      .filter(record)
+      .filter((item) => text(item.name, 256))
+      .map((item) => {
+        const translation = object(own(item.translations, language));
+        return pick<PlatformStorageItem>([
+          ["name", text(translation.name, 256) ?? text(item.name, 256)],
+          ["type", text(item.type, 64)],
+          [
+            "description",
+            text(translation.description, 4096) ?? text(item.description, 4096),
+          ],
+          [
+            "duration",
+            text(translation.duration, 512) ?? text(item.duration, 512),
+          ],
+          ["company", text(item.company)],
+        ]);
+      });
   const serviceIds: Record<string, string> = {};
   for (const category of array(value.categories)) {
     const id = record(category) && slug(category.slug);
     if (!id) continue;
     const required = category.required === true;
+    const detail: PlatformCategory = {
+      slug: id,
+      name: localized(category).label ?? id,
+      description: localized(category).description,
+      required,
+      services: [],
+      storage_items: storageItems(category.storage_items),
+    };
+    preferences.push(detail);
     categories.push(
       pick([
         ["id", id],
@@ -237,6 +297,18 @@ export function adaptPlatformConfig(
       const serviceId = record(service) && slug(service.name);
       if (!serviceId || Object.hasOwn(serviceIds, serviceId)) continue;
       serviceIds[serviceId] = text(service.id, 64) ?? "";
+      detail.services.push(
+        pick<PlatformService>([
+          ["id", text(service.id, 64)],
+          ["consent_key", serviceId],
+          ["name", localized(service).label ?? serviceId],
+          ["description", localized(service).description],
+          ["company", text(service.company)],
+          ["privacy_policy_url", text(service.privacy_policy_url, 2048)],
+          ["accepted_by_default", flag(service.accepted_by_default)],
+          ["storage_items", storageItems(service.storage_items)],
+        ]),
+      );
       const cookies = array(service.storage_items)
         .filter((item) => record(item) && item.type === "cookie")
         .map((item) => text((item as Json).name, 256))
@@ -264,6 +336,7 @@ export function adaptPlatformConfig(
     ["language", language ?? ""],
     ["categories", categories],
     ["services", services],
+    ["preferences", preferences],
     ["serviceIds", serviceIds],
     ["copy", object(own(translations, language))],
     ["translations", translations],

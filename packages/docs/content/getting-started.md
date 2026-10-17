@@ -139,3 +139,57 @@ consent.subscribe((state) => console.log(state.categories));
 - Send Google Consent Mode v2 signals and block runtime-added scripts: see the
   [reference](../../../README.md).
 - Translate the banner: [translations](translations.md).
+
+## Use the platform JSON for category and vendor preferences
+
+The opt-in `@cookiechimp/react/platform` UI uses the same offline/config JSON
+bundle as the existing widget. There is no second category or vendor list.
+
+```tsx
+import { PlatformConsentProvider, CookieBanner, CookiePreferences, RecallButton } from "@cookiechimp/react/platform";
+import "@cookiechimp/react/platform.css";
+import bundle from "./cookiechimp.config.json";
+
+export function ConsentUi() {
+  return (
+    <PlatformConsentProvider bundle={bundle} region="IE" locale="en">
+      <CookieBanner />
+      <CookiePreferences />
+      <RecallButton />
+    </PlatformConsentProvider>
+  );
+}
+```
+
+The provider selects `banners`, `translations`, `country_banner_map` and
+`default_banner` from the existing bundle. It consumes `categories[].slug`,
+`name`, `description`, `required`, `services[]` and `storage_items[]`. Vendor
+details keep `id`, `name`, `description`, `company`, `privacy_policy_url`,
+`accepted_by_default` and `storage_items`, including each storage item's `name`,
+`type`, `description`, `duration` and `company`. Nested `translations` supply
+localized names and descriptions. The adapter derives an internal `consent_key`
+to map runtime service keys back to the original platform IDs. Never add that
+field to the input JSON.
+
+Set the existing `preferences_gui_options.control_level` to
+`category_and_services` for per-vendor controls. `category_only` keeps category
+controls, with vendor details when `show_services` is true. Category switches
+update all vendors; an individual vendor updates the category when any vendor
+is allowed. Changes are staged until Save; Close discards them. Required
+categories and their vendors stay enabled, and GPC cannot be bypassed through
+a vendor override. Button labels, visibility, colors and radii use the existing
+JSON keys. Descriptions render as text, never executable dashboard HTML.
+
+Supply trusted region context from your application. The SDK performs no
+location lookup. For SSR, pass the server `initialState` as with
+`ConsentProvider`. The platform UI is a separate entry to preserve the default
+banner bundle size.
+
+Run the React/Vite workspace example and open `/platform.html` for a complete
+category/vendor demo. It uses the existing redacted bundle, with the canonical
+`category_and_services` control level and a separate demo cookie. It loads no
+tracking tags and sends no consent records. Production logging stays explicit.
+
+This entry supplies category/vendor consent and presentation. Optional protocol
+integrations, script gating and consent delivery still require their explicit
+SDK integrations; reading their dashboard flags does not activate them.

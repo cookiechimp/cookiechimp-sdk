@@ -310,6 +310,11 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   validateCookieOptions(config.cookie ?? {});
   const normalized = normalizeConfig(config);
   const configuredDefaults = categoryDefaults(normalized);
+  const required = new Set(
+    normalized.categories
+      .filter((category) => category.required)
+      .map((category) => category.id),
+  );
   const region = config.region ?? config.initial?.region ?? null;
   const regionKey = region
     ? `${region.country}${region.region ? `-${region.region}` : ""}`
@@ -335,7 +340,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   const defaults = Object.fromEntries(
     Object.entries(configuredDefaults).map(([name, enabled]) => [
       name,
-      name === "necessary"
+      required.has(name)
         ? true
         : regulation === "gdpr"
           ? false
@@ -352,9 +357,25 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
       ? null
       : readConsentCookie(document.cookie, config.cookie?.name);
   const restored = validState(config.initial) ?? browserState;
+  const requiredState = Object.fromEntries(
+    [...required].map((id) => [id, true]),
+  );
   const saleShare = new Set(
     config.saleShareCategories ?? ["advertising", "marketing"],
   );
+  const serviceChoices = (services: Record<string, boolean>) =>
+    Object.fromEntries(
+      Object.entries(services).map(([id, enabled]) => [
+        id,
+        required.has(serviceCategories[id] ?? "")
+          ? true
+          : regulation === "ccpa" &&
+              gpc &&
+              saleShare.has(serviceCategories[id] ?? "")
+            ? false
+            : enabled,
+      ]),
+    );
   const mustApplyGpc =
     regulation === "ccpa" &&
     gpc &&
@@ -365,7 +386,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   let state: ConsentState = restored
     ? {
         ...restored,
-        categories: { ...defaults, ...restored.categories, necessary: true },
+        categories: { ...defaults, ...restored.categories, ...requiredState },
         ...(restored.services ? { services: { ...restored.services } } : {}),
       }
     : {
@@ -388,6 +409,8 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     );
     if (mustApplyGpc) state.action = "gpc_auto";
   }
+  state.categories = { ...state.categories, ...requiredState };
+  if (state.services) state.services = serviceChoices(state.services);
   const emitter = createEmitter<ConsentState>();
   let decided = restored !== null || mustApplyGpc;
   let current = snapshot(state);
@@ -409,8 +432,12 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     state = {
       ...state,
       ts: new Date().toISOString(),
-      categories: { ...compliantCategories, necessary: true },
-      ...(services && Object.keys(services).length ? { services } : {}),
+      categories: { ...compliantCategories, ...requiredState },
+      ...(services && Object.keys(services).length
+        ? {
+            services: serviceChoices(services),
+          }
+        : {}),
       action,
       region,
       regulation,
@@ -481,6 +508,8 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     hasService: (service) => {
       const category = serviceCategories[service];
       if (!category) return false;
+      if (required.has(category)) return true;
+      if (regulation === "ccpa" && gpc && saleShare.has(category)) return false;
       return state.services?.[service] ?? state.categories[category] === true;
     },
     region,

@@ -1,5 +1,14 @@
 # Remaining work and launch status (17 Oct 2026)
 
+## Platform category and vendor UI (unreleased)
+
+- The SDK PR adds an opt-in UI driven by the existing platform JSON, with
+  vendor controls, privacy links and storage disclosures. The React/Vite
+  example includes `/platform.html`.
+- This work is not merged or published. Website adoption depends on SDK review,
+  current-head CI and the new package release.
+- The live backend configuration and consent-delivery release gate still applies.
+
 Daniel authorized Codex to review, fix and merge the SDK PRs on 14 Oct 2026.
 All eight SDK PRs below are now merged into main after review and green checks.
 Platform actions remain Daniel's responsibility; this SDK takeover has made

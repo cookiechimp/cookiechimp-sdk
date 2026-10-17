@@ -46,6 +46,15 @@
       "types": "./dist/tcf-provider.d.ts",
       "import": "./dist/tcf-provider.mjs",
       "require": "./dist/tcf-provider.cjs"
+    },
+    "./platform": {
+      "types": "./dist/platform.d.ts",
+      "import": "./dist/platform.mjs",
+      "require": "./dist/platform.cjs"
+    },
+    "./platform.css": {
+      "types": "./styles.d.ts",
+      "default": "./platform.css"
     }
   },
   "files": [
@@ -55,10 +64,11 @@
     "README.md",
     "LICENSE",
     "CHANGELOG.md",
-    "styles.d.ts"
+    "styles.d.ts",
+    "platform.css"
   ],
   "scripts": {
-    "build": "tsdown --config-loader native && for name in index headless banner ui tcf tcf-provider; do cp dist/$name.d.mts dist/$name.d.ts; done",
+    "build": "tsdown --config-loader native && for name in index headless banner ui tcf tcf-provider platform; do cp dist/$name.d.mts dist/$name.d.ts; done",
     "lint": "biome check .",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
