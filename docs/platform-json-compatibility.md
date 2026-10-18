@@ -33,9 +33,19 @@ category/vendor schema is required. These sources were compared with platform
 | `cookie_settings`, `expires_days`, `consent_duration_days` | Cookie name and expiration; hosts may explicitly override the cookie for isolated demos. |
 | `categories[].services[].storage_items` | Original IDs and localized names, purposes, companies, privacy links, storage types and durations; required categories and vendors remain enabled. |
 
-The React/Vite `/platform.html` example has controls that modify these fields on
-its copy of the shared JSON and render the actual SDK. It never loads vendor tags
-or sends consent logs. Its illustrative vendors are not a live-site inventory.
+The React/Vite `/platform.html` playground has 16 presets: all seven layout and
+button combinations plus vendor/category controls, dark mode, opt-out, Arabic/RTL,
+branding, minimal notices, forced interaction and motion off. Its controls edit
+these fields on a copy of the shared JSON. The isolated iframe renders the actual
+SDK, so overlays do not cover the playground controls. Desktop/mobile preview,
+full-page viewing, JSON inspection/copy and live consent state are available.
+Changing a setting starts a fresh demo; Replay banner clears only the one-hour
+demo cookie, while Reload saved choices retains it. Open full page uses the
+standalone `/platform.html?preview=1` view. Messages are checked against the
+same-origin frame/parent and current preview run.
+
+The playground never loads vendor tags or sends consent logs. Its illustrative
+vendors are not a live-site inventory.
 
 ## Runtime integrations and metadata
 

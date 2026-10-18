@@ -212,7 +212,9 @@ Collapsed details are inert and excluded from focus navigation, including while
 their closing transition runs. Developers building a custom UI can use
 `@cookiechimp/react/headless` with their own stylesheet instead.
 
-The example includes controls for all platform layouts, positions, button placements,
+The playground includes 16 presets, an isolated actual-SDK preview, desktop/mobile
+sizes, JSON export, consent state and saved-choice replay. It includes controls
+for all platform layouts, positions, button placements,
 button swapping, equal weight, side panels, color schemes and radii. They modify
 the same JSON consumed by the SDK. See the [JSON compatibility matrix](../../../docs/platform-json-compatibility.md)
 for the exact supported presentation fields and runtime integration boundaries.

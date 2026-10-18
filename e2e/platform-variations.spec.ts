@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("platform banner positions and button variations match their JSON options", async ({
   page,
 }) => {
-  await page.goto("http://127.0.0.1:3104/platform.html");
+  await page.goto("http://127.0.0.1:3104/platform.html?preview=1");
   const banner = page.locator(".cc-platform-banner");
   const viewport = page.viewportSize();
   if (!viewport) throw new Error("Missing viewport");
@@ -72,7 +72,7 @@ test("platform banner positions and button variations match their JSON options",
 test("platform auto theme, unit radii and both full-height side panels work", async ({
   page,
 }) => {
-  await page.goto("http://127.0.0.1:3104/platform.html");
+  await page.goto("http://127.0.0.1:3104/platform.html?preview=1");
   await page
     .getByRole("combobox", { name: "Color scheme", exact: true })
     .selectOption("auto");
@@ -121,7 +121,7 @@ test("platform auto theme, unit radii and both full-height side panels work", as
 
 test("platform layouts stay inside a mobile viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://127.0.0.1:3104/platform.html");
+  await page.goto("http://127.0.0.1:3104/platform.html?preview=1");
   for (const layout of ["box", "cloud", "bar"]) {
     await page
       .getByRole("combobox", { name: "Banner layout", exact: true })

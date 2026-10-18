@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("platform JSON drives vendor details and persisted per-vendor consent", async ({
   page,
 }) => {
-  await page.goto("http://127.0.0.1:3104/platform.html");
+  await page.goto("http://127.0.0.1:3104/platform.html?preview=1");
   await page
     .getByRole("button", { name: "Manage Preferences", exact: true })
     .click();
@@ -47,7 +47,7 @@ test("platform motion defaults on, can be disabled, and respects reduced motion"
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("http://127.0.0.1:3104/platform.html");
+  await page.goto("http://127.0.0.1:3104/platform.html?preview=1");
   const provider = page.locator("[data-cc-platform]");
   await expect(provider).toHaveAttribute("data-cc-motion", "on");
   await page
