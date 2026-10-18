@@ -271,7 +271,7 @@
 .cc-platform-branding {
   display: block;
   margin: 0 24px 16px;
-  text-align: center;
+  text-align: left;
   font-size: 11px;
   color: var(--cc-banner-text);
   text-underline-offset: 3px;
