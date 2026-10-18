@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import type { ConsentConfig, ConsentRecord } from "@cookiechimp/core";
+import { toPlatformConsent } from "@cookiechimp/core/consent-log";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
@@ -46,7 +48,11 @@ function State() {
   const state = useConsent();
   return <output>{JSON.stringify(state)}</output>;
 }
-function setup(control = "category_and_services", motion = true) {
+function setup(
+  control = "category_and_services",
+  motion = true,
+  onConsent?: ConsentConfig["onConsent"],
+) {
   const bundle = structuredClone(fixture);
   bundle.banners.bnrEU1.preferences_gui_options.control_level = control;
   const analytics = bundle.categories.find(
@@ -69,6 +75,7 @@ function setup(control = "category_and_services", motion = true) {
         locale="en"
         cookie={{ name: "cc_platform_test" }}
         motion={motion}
+        onConsent={onConsent}
       >
         <CookieBanner />
         <CookiePreferences />
@@ -83,6 +90,41 @@ function setup(control = "category_and_services", motion = true) {
 const saved = () =>
   JSON.parse(document.querySelector("output")?.textContent ?? "{}");
 describe("platform JSON consent UI", () => {
+  it("shows the consent UUID used by backend records and restores it after remount", () => {
+    const records: ConsentRecord[] = [];
+    setup("category_and_services", true, (record) => records.push(record));
+    click("Manage Preferences");
+    const id = () =>
+      document.querySelector('[data-cc-part="preferences-consent-id"]')
+        ?.textContent;
+    const original = saved().consentId;
+    expect(original).toMatch(/^[A-Za-z0-9_-]{16,64}$/);
+    expect(id()).toBe(original);
+    expect(
+      document.querySelector(".cc-platform-consent-id")?.textContent,
+    ).toContain("Your consent ID:");
+    click("Save Preferences");
+    const record = records[0];
+    if (!record) throw new Error("Missing consent record");
+    expect(
+      toPlatformConsent(record, { url: "https://example.test" }).uuid,
+    ).toBe(original);
+    act(cleanup);
+    document.body.replaceChildren();
+    setup();
+    act(() =>
+      document
+        .querySelector<HTMLButtonElement>('[data-cc-part="recall"]')
+        ?.click(),
+    );
+    expect(id()).toBe(original);
+    expect(
+      document
+        .querySelector('[data-cc-part="preferences-consent-id"]')
+        ?.getAttribute("dir"),
+    ).toBe("ltr");
+  });
+
   it("enables motion by default and keeps collapsed details inert", () => {
     setup();
     expect(

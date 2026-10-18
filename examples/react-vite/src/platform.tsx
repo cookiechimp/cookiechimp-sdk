@@ -98,6 +98,7 @@ function PreviewStage({ options }: { options: Options }) {
           <pre>
             {JSON.stringify(
               {
+                consentId: consent.consentId,
                 categories: consent.categories,
                 services: consent.services,
                 action: consent.action,
@@ -358,6 +359,7 @@ function Playground() {
               {consent
                 ? JSON.stringify(
                     {
+                      consentId: consent.consentId,
                       categories: consent.categories,
                       services: consent.services,
                       action: consent.action,

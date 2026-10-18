@@ -380,7 +380,11 @@ type Selection = {
   categories: Record<string, boolean>;
   services: Record<string, boolean>;
 };
-export function CookiePreferences() {
+export function CookiePreferences({
+  consentIdLabel = "Your consent ID",
+}: {
+  consentIdLabel?: string;
+} = {}) {
   const dashboard = usePlatform();
   const consent = useConsent();
   const runtime = useHeadlessContext()?.consent;
@@ -568,6 +572,14 @@ export function CookiePreferences() {
         {plain(copy.more_info) && (
           <div className="cc-platform-more-info cc-platform-rich">
             <RichText value={copy.more_info} />
+          </div>
+        )}
+        {consent.consentId && (
+          <div className="cc-platform-consent-id">
+            <span>{consentIdLabel}:</span>
+            <code dir="ltr" data-cc-part="preferences-consent-id">
+              {consent.consentId}
+            </code>
           </div>
         )}
         {footer.enabled !== false && footer.show_powered_by === true && (

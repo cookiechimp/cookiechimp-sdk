@@ -9,6 +9,12 @@ test("platform JSON drives vendor details and persisted per-vendor consent", asy
     .click();
   const dialog = page.getByRole("dialog", { name: "Cookie Settings" });
   await expect(dialog).toBeVisible();
+  const consentId = dialog.locator('[data-cc-part="preferences-consent-id"]');
+  const originalId = await consentId.innerText();
+  expect(originalId).toMatch(/^[A-Za-z0-9_-]{16,64}$/);
+  await expect(
+    page.getByRole("region", { name: "Live consent JSON" }),
+  ).toContainText(originalId);
   await expect(
     dialog.getByRole("switch", { name: "Essential", exact: true }),
   ).toBeDisabled();
@@ -32,6 +38,7 @@ test("platform JSON drives vendor details and persisted per-vendor consent", asy
   await page
     .getByRole("button", { name: "Manage cookie preferences", exact: true })
     .click();
+  await expect(consentId).toHaveText(originalId);
   await dialog.getByRole("button", { name: "Analytics", exact: true }).click();
   await expect(
     dialog.getByRole("switch", { name: "Google Analytics", exact: true }),

@@ -65,3 +65,9 @@ not a replacement for backend authorization.
 These boundaries are intentional and must remain explicit when describing support.
 The live backend config retrieval and consent-delivery checks remain required
 before npm publication. This PR is not a package release or a platform deployment.
+
+The preferences footer displays the current runtime `consentId`, the same value
+used as `uuid` by the platform consent-log integration. It comes from consent
+state, not configuration JSON, and does not confirm backend delivery. Saved
+choices restore the same ID. Hosts can translate its label with
+`<CookiePreferences consentIdLabel="Your consent ID" />`.

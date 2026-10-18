@@ -13,6 +13,9 @@
   presentation contract and explicit integration boundaries.
 - The preferences footer separates Save preferences from the paired accept/reject
   actions. On narrow screens Save gets its own row and accept/reject stay together.
+- The preferences modal shows the runtime consent ID above branding. This is
+  the same value submitted as `uuid` by the platform consent-log integration,
+  and persists with saved choices. Displaying it is not delivery confirmation.
 - Styled interactions animate by default, with `motion={false}` and automatic
   reduced-motion support. The example uses realistic vendor purposes, company
   names, privacy links and illustrative cookie settings from the same JSON.
