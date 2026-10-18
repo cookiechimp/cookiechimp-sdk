@@ -245,8 +245,9 @@
   border-top: 1px solid var(--cc-banner-separator-border);
   justify-content: flex-end;
 }
-.cc-platform-actions .cc-platform-branding {
-  flex: 0 0 100%;
+.cc-platform-branding {
+  display: block;
+  margin: 0 24px 16px;
   text-align: center;
   font-size: 11px;
   color: var(--cc-banner-text);

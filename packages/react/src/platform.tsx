@@ -551,6 +551,16 @@ export function CookiePreferences() {
         {plain(copy.more_info) && (
           <p className="cc-platform-more-info">{plain(copy.more_info)}</p>
         )}
+        {footer.enabled !== false && footer.show_powered_by === true && (
+          <a
+            className="cc-platform-branding"
+            href="https://cookiechimp.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Powered by CookieChimp
+          </a>
+        )}
         <footer className="cc-actions cc-platform-actions">
           {buttons.show_accept_necessary_btn !== false && (
             <Preferences.RejectAll className="cc-button cc-button--secondary">
@@ -575,16 +585,6 @@ export function CookiePreferences() {
                 plain(bannerCopy.accept_btn) ||
                 "Accept all"}
             </Preferences.AcceptAll>
-          )}
-          {footer.enabled !== false && footer.show_powered_by === true && (
-            <a
-              className="cc-platform-branding"
-              href="https://cookiechimp.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Powered by CookieChimp
-            </a>
           )}
         </footer>
       </div>
