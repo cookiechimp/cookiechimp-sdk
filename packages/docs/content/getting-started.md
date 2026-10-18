@@ -142,6 +142,9 @@ consent.subscribe((state) => console.log(state.categories));
 
 ## Use the platform JSON for category and vendor preferences
 
+See [Banner and vendor preferences](platform-ui.md) for the complete JSON
+contract, consent state, backend delivery, appearance controls and playground.
+
 The opt-in `@cookiechimp/react/platform` UI uses the same offline/config JSON
 bundle as the existing widget. There is no second category or vendor list.
 

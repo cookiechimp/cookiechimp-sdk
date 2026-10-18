@@ -10,7 +10,7 @@ dashboard config and delivers consent records with matching receipt status.
 | Example | Shows |
 |---|---|
 | `examples/nextjs-app-router` | `CookieChimpProvider` (server), banner, preferences, recall button, a gated GA4 tag, `useCategory`. |
-| `examples/react-vite` | `/connected`: CookieChimp backend config, categories, copy, cookie settings, consent delivery, receipts and retries. `/`: local runtime, script gating, persistence, preferences and recall. |
+| `examples/react-vite` | `/connected`: CookieChimp backend config, categories, copy, cookie settings, consent delivery, receipts and retries. `/platform.html`: 16 actual-SDK presets, category/vendor details, desktop/mobile previews, JSON export, complete service state and saved-choice replay. `/`: local runtime, script gating, persistence, preferences and recall. |
 | `examples/nextjs-pages-router` | `withConsent` and `PagesConsentProvider` with the same UI. |
 
 ```sh
@@ -20,3 +20,7 @@ pnpm --filter @cookiechimp/example-nextjs-app-router start
 ```
 
 Outside the monorepo, replace the `workspace:*` versions with published ones.
+
+See [Banner and vendor preferences](platform-ui.md#try-all-variations) for the
+playground controls and setup. Its sample vendors never load tracking tags or
+send records. The separate `/connected` example is for backend delivery.

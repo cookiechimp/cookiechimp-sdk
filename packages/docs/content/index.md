@@ -6,6 +6,9 @@ built by CookieChimp. MIT licensed.
 - **Connected mode.** Load a CookieChimp project's scanner categories,
   dashboard copy and translations with config sync, and send decisions with
   the platform consent-log adapter. Your code config can remain the fallback.
+- **Category and vendor preferences.** Render banner layouts, vendor details,
+  cookie disclosures, themes and languages from the platform JSON. A complete
+  service consent map and consent ID are available through React hooks.
 - **Local mode, no account.** Consent lives in a first-party `cc_consent`
   cookie. Your code owns the config.
 - **No banner flash.** The Next.js providers read the consent cookie on the
@@ -24,6 +27,8 @@ their hosting platform's headers.
 - [Connect to CookieChimp](connected-backend.md): dashboard configuration,
   platform consent delivery and the complete backend-connected example.
 - [Getting started](getting-started.md): install and show a banner.
+- [Banner and vendor preferences](platform-ui.md): shared JSON, appearance,
+  consent state and the full variation playground.
 - [Next.js](../../nextjs/README.md) or the [core and React reference](../../../README.md).
 - [Examples](examples.md) you can run.
 - [AI skills](ai-skills.md) for coding agents and the
