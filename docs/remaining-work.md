@@ -11,6 +11,8 @@
   placement/order/visibility, equal weight, themes, CSS-unit radii, logos, rich
   copy and forced interaction. See `platform-json-compatibility.md` for the
   presentation contract and explicit integration boundaries.
+- Preferences have a divided header and a dedicated scrolling body. The header
+  and action buttons remain visible in centered and side-panel layouts.
 - The preferences footer separates Save preferences from the paired accept/reject
   actions. On narrow screens Save gets its own row and accept/reject stay together.
 - The preferences modal shows the runtime consent ID above branding. This is

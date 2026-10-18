@@ -156,7 +156,7 @@ for (const width of [1280, 390, 320]) {
           '[data-cc-part="preferences-accept-all"]',
         );
         await expect(save).toBeVisible();
-        // Bring the sticky footer into view before measuring its final layout.
+        // Bring the footer into view before measuring its final layout.
         await save.scrollIntoViewIfNeeded();
         await expect(dialog.locator(".cc-preferences__panel")).toHaveCSS(
           "translate",
@@ -181,6 +181,56 @@ for (const width of [1280, 390, 320]) {
           expect(s.x + s.width).toBeLessThan(r.x);
         }
       }
+    }
+  });
+}
+
+for (const width of [1280, 390]) {
+  test(`only the preferences body scrolls at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 500 });
+    for (const panelLayout of ["box", "bar left", "bar right"]) {
+      const options = encodeURIComponent(
+        JSON.stringify({
+          panel: panelLayout,
+          view: "preferences",
+          motion: false,
+        }),
+      );
+      await page.goto(
+        `http://127.0.0.1:3104/platform.html?preview=1&fresh=1&options=${options}`,
+      );
+      const dialog = page.locator(".cc-platform-preferences");
+      const panel = dialog.locator(".cc-preferences__panel");
+      const header = dialog.locator(".cc-platform-heading");
+      const body = dialog.locator(".cc-platform-body");
+      const footer = dialog.locator(".cc-platform-actions");
+      await dialog
+        .getByRole("button", { name: "Analytics", exact: true })
+        .click();
+      await dialog
+        .getByRole("button", { name: "Google Analytics", exact: true })
+        .click();
+      await expect(header).toHaveCSS("border-bottom-width", "1px");
+      const before = await Promise.all([
+        header.boundingBox(),
+        footer.boundingBox(),
+      ]);
+      await body.hover();
+      await page.mouse.wheel(0, 2000);
+      await expect
+        .poll(() => body.evaluate((el) => el.scrollTop))
+        .toBeGreaterThan(0);
+      expect(await panel.evaluate((el) => el.scrollTop)).toBe(0);
+      expect(await dialog.evaluate((el) => el.scrollTop)).toBe(0);
+      expect(
+        await Promise.all([header.boundingBox(), footer.boundingBox()]),
+      ).toEqual(before);
+      await expect(
+        dialog.locator('[data-cc-part="preferences-save"]'),
+      ).toBeInViewport();
+      await expect(
+        dialog.getByRole("button", { name: "Close", exact: true }),
+      ).toBeInViewport();
     }
   });
 }

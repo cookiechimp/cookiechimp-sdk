@@ -476,122 +476,124 @@ export function CookiePreferences({
             ×
           </Preferences.Close>
         </header>
-        <Preferences.Description
-          as="div"
-          className="cc-description cc-platform-rich"
-        >
-          <RichText
-            value={
-              copy.description ||
-              "Choose consent by category or vendor. Expand an item to see its details."
-            }
-          />
-        </Preferences.Description>
-        {privacy && (
-          <a
-            className="cc-platform-policy"
-            href={privacy}
-            target="_blank"
-            rel="noopener noreferrer"
+        <div className="cc-platform-body">
+          <Preferences.Description
+            as="div"
+            className="cc-description cc-platform-rich"
           >
-            Privacy policy
-          </a>
-        )}
-        <div className="cc-platform-categories">
-          {categories.map((category) => (
-            <Disclosure
-              key={category.slug}
-              name={category.name}
-              className="cc-platform-category"
-              expandable={
-                !!category.description ||
-                (showServices &&
-                  (category.services.length > 0 ||
-                    category.storage_items.length > 0))
+            <RichText
+              value={
+                copy.description ||
+                "Choose consent by category or vendor. Expand an item to see its details."
               }
-              toggle={
-                <Switch
-                  name={category.name}
-                  checked={
-                    category.required ||
-                    draft.categories[category.slug] === true
-                  }
-                  disabled={locked(category)}
-                  onChange={() => toggleCategory(category)}
-                />
-              }
+            />
+          </Preferences.Description>
+          {privacy && (
+            <a
+              className="cc-platform-policy"
+              href={privacy}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              {category.description && (
-                <div className="cc-platform-rich">
-                  <RichText value={category.description} />
-                </div>
-              )}
-              {showServices && (
-                <>
-                  {category.services.map((service) => (
-                    <Disclosure
-                      key={service.consent_key}
-                      name={service.name}
-                      className="cc-platform-vendor"
-                      expandable={
-                        !!(
-                          service.description ||
-                          service.company ||
-                          url(service.privacy_policy_url) ||
-                          service.storage_items.length
-                        )
-                      }
-                      toggle={
-                        vendorControls ? (
-                          <Switch
-                            name={service.name}
-                            checked={
-                              category.required ||
-                              draft.services[service.consent_key] === true
-                            }
-                            disabled={locked(category)}
-                            onChange={() => toggleService(category, service)}
-                          />
-                        ) : undefined
-                      }
-                    >
-                      <VendorDetails service={service} />
-                    </Disclosure>
-                  ))}
-                  <StorageItems items={category.storage_items} />
-                </>
-              )}
-            </Disclosure>
-          ))}
+              Privacy policy
+            </a>
+          )}
+          <div className="cc-platform-categories">
+            {categories.map((category) => (
+              <Disclosure
+                key={category.slug}
+                name={category.name}
+                className="cc-platform-category"
+                expandable={
+                  !!category.description ||
+                  (showServices &&
+                    (category.services.length > 0 ||
+                      category.storage_items.length > 0))
+                }
+                toggle={
+                  <Switch
+                    name={category.name}
+                    checked={
+                      category.required ||
+                      draft.categories[category.slug] === true
+                    }
+                    disabled={locked(category)}
+                    onChange={() => toggleCategory(category)}
+                  />
+                }
+              >
+                {category.description && (
+                  <div className="cc-platform-rich">
+                    <RichText value={category.description} />
+                  </div>
+                )}
+                {showServices && (
+                  <>
+                    {category.services.map((service) => (
+                      <Disclosure
+                        key={service.consent_key}
+                        name={service.name}
+                        className="cc-platform-vendor"
+                        expandable={
+                          !!(
+                            service.description ||
+                            service.company ||
+                            url(service.privacy_policy_url) ||
+                            service.storage_items.length
+                          )
+                        }
+                        toggle={
+                          vendorControls ? (
+                            <Switch
+                              name={service.name}
+                              checked={
+                                category.required ||
+                                draft.services[service.consent_key] === true
+                              }
+                              disabled={locked(category)}
+                              onChange={() => toggleService(category, service)}
+                            />
+                          ) : undefined
+                        }
+                      >
+                        <VendorDetails service={service} />
+                      </Disclosure>
+                    ))}
+                    <StorageItems items={category.storage_items} />
+                  </>
+                )}
+              </Disclosure>
+            ))}
+          </div>
+          {plain(copy.more_info_title) && (
+            <h3 className="cc-platform-more-info-title">
+              {plain(copy.more_info_title)}
+            </h3>
+          )}
+          {plain(copy.more_info) && (
+            <div className="cc-platform-more-info cc-platform-rich">
+              <RichText value={copy.more_info} />
+            </div>
+          )}
+          {consent.consentId && (
+            <div className="cc-platform-consent-id">
+              <span>{consentIdLabel}:</span>
+              <code dir="ltr" data-cc-part="preferences-consent-id">
+                {consent.consentId}
+              </code>
+            </div>
+          )}
+          {footer.enabled !== false && footer.show_powered_by === true && (
+            <a
+              className="cc-platform-branding"
+              href="https://cookiechimp.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Powered by CookieChimp
+            </a>
+          )}
         </div>
-        {plain(copy.more_info_title) && (
-          <h3 className="cc-platform-more-info-title">
-            {plain(copy.more_info_title)}
-          </h3>
-        )}
-        {plain(copy.more_info) && (
-          <div className="cc-platform-more-info cc-platform-rich">
-            <RichText value={copy.more_info} />
-          </div>
-        )}
-        {consent.consentId && (
-          <div className="cc-platform-consent-id">
-            <span>{consentIdLabel}:</span>
-            <code dir="ltr" data-cc-part="preferences-consent-id">
-              {consent.consentId}
-            </code>
-          </div>
-        )}
-        {footer.enabled !== false && footer.show_powered_by === true && (
-          <a
-            className="cc-platform-branding"
-            href="https://cookiechimp.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Powered by CookieChimp
-          </a>
-        )}
         <footer className="cc-actions cc-platform-actions">
           {buttons.show_save_preferences_btn !== false && (
             <Preferences.Save

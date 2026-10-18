@@ -15,7 +15,7 @@ category/vendor schema is required. These sources were compared with platform
 | `gui_options.swap_buttons` | Reverses banner action order in the DOM so keyboard order follows the visual order. |
 | `gui_options.equal_weight_buttons` | Accept and reject share primary colors when enabled; preferences remains secondary. Accept stays primary when equal weight is disabled. |
 | `buttons` | Independent accept, reject, preferences and close visibility. Close dismisses without recording consent. |
-| `preferences_gui_options.layout`, `position` | Centered box or full-height left/right side panel; responsive at narrow widths. |
+| `preferences_gui_options.layout`, `position` | Centered box or full-height left/right side panel; responsive at narrow widths. A divided header and the action bar stay fixed while only the body scrolls. |
 | `preferences_gui_options.equal_weight_buttons` | Same accept/reject color behavior as the banner. |
 | `preferences_gui_options.control_level`, `show_services` | Category/vendor controls or category-only consent, with optional read-only service disclosures. |
 | `preferences_gui_options.show_floating_icon`, `floating_icon_position` | Hide/show the recall control at bottom left or bottom right. |

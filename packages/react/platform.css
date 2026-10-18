@@ -81,16 +81,31 @@
 .cc-platform-preferences .cc-preferences__panel {
   box-sizing: border-box;
   width: min(48rem, 100%);
+  max-height: calc(100dvh - 2rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: 0;
   border: 1px solid var(--cc-banner-separator-border);
 }
 .cc-platform-heading {
-  padding: 24px 56px 10px 24px;
+  padding: 20px 56px 20px 24px;
   position: relative;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--cc-banner-separator-border);
+  background: var(--cc-banner-bg);
 }
 .cc-platform-heading .cc-title {
+  margin: 0;
   font-size: 20px;
   font-weight: 600;
+}
+.cc-platform-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: 16px;
 }
 .cc-platform-preferences .cc-description {
   padding: 0 24px;
@@ -240,8 +255,7 @@
   line-height: 1.7;
 }
 .cc-platform-actions {
-  position: sticky;
-  bottom: 0;
+  flex-shrink: 0;
   padding: 16px 24px;
   background: var(--cc-banner-bg);
   border-top: 1px solid var(--cc-banner-separator-border);
@@ -343,13 +357,6 @@
 
 [data-cc-platform] .cc-button--secondary {
   border: 1px solid var(--cc-banner-btn-secondary-bg);
-}
-
-.cc-platform-heading {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--cc-banner-bg);
 }
 
 [data-cc-platform] .cc-recall svg {
