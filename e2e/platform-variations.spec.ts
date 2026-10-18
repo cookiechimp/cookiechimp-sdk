@@ -133,3 +133,54 @@ test("platform layouts stay inside a mobile viewport", async ({ page }) => {
     expect(bounds?.height).toBeLessThanOrEqual(844);
   }
 });
+
+for (const width of [1280, 390, 320]) {
+  test(`preferences keep save separate and accept/reject paired at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    for (const panel of ["box", "bar left", "bar right"]) {
+      for (const locale of ["en", "ar"]) {
+        const options = encodeURIComponent(
+          JSON.stringify({ panel, locale, view: "preferences" }),
+        );
+        await page.goto(
+          `http://127.0.0.1:3104/platform.html?preview=1&fresh=1&options=${options}`,
+        );
+        const dialog = page.locator(".cc-platform-preferences");
+        const save = dialog.locator('[data-cc-part="preferences-save"]');
+        const reject = dialog.locator(
+          '[data-cc-part="preferences-reject-all"]',
+        );
+        const accept = dialog.locator(
+          '[data-cc-part="preferences-accept-all"]',
+        );
+        await expect(save).toBeVisible();
+        // Bring the sticky footer into view before measuring its final layout.
+        await save.scrollIntoViewIfNeeded();
+        await expect(dialog.locator(".cc-preferences__panel")).toHaveCSS(
+          "translate",
+          "none",
+        );
+        const bounds = await Promise.all(
+          [save, reject, accept].map((button) => button.boundingBox()),
+        );
+        const [s, r, a] = bounds;
+        if (!s || !r || !a) throw new Error("Missing preferences action");
+        expect(r.y).toBeCloseTo(a.y, 0);
+        expect(r.height).toBeCloseTo(a.height, 0);
+        for (const box of [s, r, a]) {
+          expect(box.x).toBeGreaterThanOrEqual(0);
+          expect(box.x + box.width).toBeLessThanOrEqual(width);
+        }
+        if (width <= 640) {
+          expect(s.y + s.height).toBeLessThanOrEqual(r.y);
+        } else if (locale === "ar") {
+          expect(s.x).toBeGreaterThan(a.x + a.width);
+        } else {
+          expect(s.x + s.width).toBeLessThan(r.x);
+        }
+      }
+    }
+  });
+}

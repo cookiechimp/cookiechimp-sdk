@@ -11,6 +11,8 @@
   placement/order/visibility, equal weight, themes, CSS-unit radii, logos, rich
   copy and forced interaction. See `platform-json-compatibility.md` for the
   presentation contract and explicit integration boundaries.
+- The preferences footer separates Save preferences from the paired accept/reject
+  actions. On narrow screens Save gets its own row and accept/reject stay together.
 - Styled interactions animate by default, with `motion={false}` and automatic
   reduced-motion support. The example uses realistic vendor purposes, company
   names, privacy links and illustrative cookie settings from the same JSON.

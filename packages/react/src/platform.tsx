@@ -581,15 +581,6 @@ export function CookiePreferences() {
           </a>
         )}
         <footer className="cc-actions cc-platform-actions">
-          {buttons.show_accept_necessary_btn !== false && (
-            <Preferences.RejectAll
-              className={`cc-button cc-button--${gui.equal_weight_buttons !== false ? "primary" : "secondary"}`}
-            >
-              {plain(copy.reject_btn) ||
-                plain(bannerCopy.reject_btn) ||
-                "Reject optional"}
-            </Preferences.RejectAll>
-          )}
           {buttons.show_save_preferences_btn !== false && (
             <Preferences.Save
               selection={draft}
@@ -598,12 +589,26 @@ export function CookiePreferences() {
               {plain(copy.save_btn) || "Save preferences"}
             </Preferences.Save>
           )}
-          {buttons.show_accept_btn !== false && (
-            <Preferences.AcceptAll className="cc-button cc-button--primary">
-              {plain(copy.accept_btn) ||
-                plain(bannerCopy.accept_btn) ||
-                "Accept all"}
-            </Preferences.AcceptAll>
+          {(buttons.show_accept_necessary_btn !== false ||
+            buttons.show_accept_btn !== false) && (
+            <div className="cc-platform-actions__decisions">
+              {buttons.show_accept_necessary_btn !== false && (
+                <Preferences.RejectAll
+                  className={`cc-button cc-button--${gui.equal_weight_buttons !== false ? "primary" : "secondary"}`}
+                >
+                  {plain(copy.reject_btn) ||
+                    plain(bannerCopy.reject_btn) ||
+                    "Reject optional"}
+                </Preferences.RejectAll>
+              )}
+              {buttons.show_accept_btn !== false && (
+                <Preferences.AcceptAll className="cc-button cc-button--primary">
+                  {plain(copy.accept_btn) ||
+                    plain(bannerCopy.accept_btn) ||
+                    "Accept all"}
+                </Preferences.AcceptAll>
+              )}
+            </div>
           )}
         </footer>
       </div>

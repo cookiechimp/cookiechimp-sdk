@@ -245,7 +245,28 @@
   padding: 16px 24px;
   background: var(--cc-banner-bg);
   border-top: 1px solid var(--cc-banner-separator-border);
-  justify-content: flex-end;
+  align-items: stretch;
+}
+.cc-platform-actions > [data-cc-part="preferences-save"] {
+  flex: 0 1 auto;
+}
+.cc-platform-actions__decisions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  gap: var(--cc-spacing-2);
+  margin-inline-start: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+.cc-platform-actions__decisions > .cc-button {
+  flex: 1 1 auto;
+}
+@media (max-width: 640px) {
+  .cc-platform-actions > [data-cc-part="preferences-save"],
+  .cc-platform-actions > .cc-platform-actions__decisions {
+    flex: 1 1 100%;
+  }
 }
 .cc-platform-branding {
   display: block;

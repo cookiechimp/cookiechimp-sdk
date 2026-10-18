@@ -19,7 +19,7 @@ category/vendor schema is required. These sources were compared with platform
 | `preferences_gui_options.equal_weight_buttons` | Same accept/reject color behavior as the banner. |
 | `preferences_gui_options.control_level`, `show_services` | Category/vendor controls or category-only consent, with optional read-only service disclosures. |
 | `preferences_gui_options.show_floating_icon`, `floating_icon_position` | Hide/show the recall control at bottom left or bottom right. |
-| `preferences_buttons` | Independent accept, reject and save visibility. |
+| `preferences_buttons` | Independent accept, reject and save visibility. Save is separate from the paired accept/reject actions; on mobile Save occupies its own row. |
 | `theme.dark_mode` | `auto`, `light`, `dark`; auto follows system changes through CSS. Legacy booleans remain supported. |
 | `theme.colors`, `theme.dark_colors` | All eight background, heading, text, link and primary/secondary button colors, scoped to the consent UI. |
 | `theme.modal_border_radius`, `theme.btn_border_radius` | Valid platform CSS values in px, em, rem or percent, including zero; legacy numeric pixel radii remain supported. Side panels and full-width bars retain square viewport edges. |
