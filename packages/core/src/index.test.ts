@@ -241,6 +241,7 @@ describe("createConsent", () => {
       consentId: runtime.get().consentId,
       ts: expect.any(String),
       categories: { necessary: true, analytics: true },
+      services: {},
       action: "accept_all",
       region: null,
       regulation: "gdpr",
@@ -335,6 +336,66 @@ describe("createConsent", () => {
     expect(runtime.hasService("analytics-demo")).toBe(true);
     runtime.set({ services: { "analytics-demo": false } });
     expect(runtime.hasService("analytics-demo")).toBe(false);
+  });
+
+  it.each([
+    ["gdpr", false, { session: true, metrics: false, ads: false }],
+    ["ccpa", false, { session: true, metrics: true, ads: true }],
+    ["ccpa", true, { session: true, metrics: true, ads: false }],
+  ] as const)(
+    "exposes effective service defaults before a decision in %s with GPC %s",
+    (regulation, gpc, expected) => {
+      const runtime = createConsent({
+        categories: ["analytics", "marketing"],
+        services: [
+          { id: "session", category: "necessary" },
+          { id: "metrics", category: "analytics" },
+          { id: "ads", category: "marketing" },
+        ],
+        regulation,
+        gpc,
+      });
+      expect(runtime.get().services).toEqual(expected);
+      for (const [id, enabled] of Object.entries(expected)) {
+        expect(runtime.hasService(id)).toBe(enabled);
+      }
+      expect(Object.isFrozen(runtime.get().services)).toBe(true);
+    },
+  );
+
+  it("includes an empty services object without configured vendors", () => {
+    const runtime = createConsent({ categories: [] });
+    expect(runtime.get().services).toEqual({});
+    expect(runtime.rejectAll().services).toEqual({});
+  });
+
+  it("fills missing services from legacy state without making defaults explicit overrides", () => {
+    const records: unknown[] = [];
+    const runtime = createConsent({
+      categories: ["analytics"],
+      services: [
+        { id: "metrics", category: "analytics" },
+        { id: "heatmap", category: "analytics" },
+      ],
+      initial: { ...state(), services: { heatmap: false, removed: true } },
+      onConsent: (record) => records.push(record),
+    });
+    const listener = vi.fn();
+    runtime.subscribe(listener);
+    expect(runtime.get().services).toEqual({ metrics: false, heatmap: false });
+    runtime.set({ categories: { analytics: true } });
+    expect(runtime.get().services).toEqual({ metrics: true, heatmap: false });
+    expect(listener.mock.calls[0]?.[0].services).toEqual({
+      metrics: true,
+      heatmap: false,
+    });
+    expect(records[0]).toMatchObject({
+      services: { metrics: true, heatmap: false },
+    });
+    runtime.set({ categories: { analytics: false } });
+    expect(runtime.get().services).toEqual({ metrics: false, heatmap: false });
+    runtime.set({ services: { metrics: true } });
+    expect(runtime.get().services).toEqual({ metrics: true, heatmap: false });
   });
 
   it("decodes old v1 cookies with non-UUID ids and no service decisions", () => {

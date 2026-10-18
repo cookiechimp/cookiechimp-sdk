@@ -171,6 +171,11 @@ localized names and descriptions. The adapter derives an internal `consent_key`
 to map runtime service keys back to the original platform IDs. Never add that
 field to the input JSON.
 
+`useConsent().services` includes every configured vendor with its effective
+boolean value before and after a decision. It is `{}` when no services are
+configured. Values follow required categories, category defaults, saved vendor
+choices and GPC, without saving consent or sending a log just to display them.
+
 Set the existing `preferences_gui_options.control_level` to
 `category_and_services` for per-vendor controls. `category_only` keeps category
 controls, with vendor details when `show_services` is true. Category switches

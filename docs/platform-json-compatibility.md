@@ -71,3 +71,11 @@ used as `uuid` by the platform consent-log integration. It comes from consent
 state, not configuration JSON, and does not confirm backend delivery. Saved
 choices restore the same ID. Hosts can translate its label with
 `<CookiePreferences consentIdLabel="Your consent ID" />`.
+
+Runtime snapshots and consent callbacks include `services` with every configured
+service key and its effective boolean value, even before a decision. With no
+services configured the value is `{}`. Required vendors stay enabled; optional
+values follow category defaults or saved overrides and GPC. Sparse legacy
+cookies still work, and inherited values stay separate from explicit overrides
+in storage so category updates continue to apply. This complete map does not
+record a decision or send a consent log merely by being displayed.

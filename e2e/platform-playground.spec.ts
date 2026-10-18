@@ -74,6 +74,17 @@ test("saved vendor choices can be reloaded and the banner can be replayed", asyn
     .getByRole("link", { name: "Jump to the live preview", exact: true })
     .click();
   const demo = page.frameLocator("#sdk-preview");
+  const state = page.getByRole("region", { name: "Current consent" });
+  await expect(state).toContainText('"services"');
+  const defaults = {
+    "session-management": true,
+    "google-analytics": false,
+    "microsoft-clarity": false,
+    "meta-pixel": false,
+  };
+  expect(JSON.parse(await state.locator("pre").innerText()).services).toEqual(
+    defaults,
+  );
   await demo
     .getByRole("button", { name: "Manage Preferences", exact: true })
     .click();
@@ -85,7 +96,6 @@ test("saved vendor choices can be reloaded and the banner can be replayed", asyn
   await dialog
     .getByRole("button", { name: "Save Preferences", exact: true })
     .click();
-  const state = page.getByRole("region", { name: "Current consent" });
   await expect(state).toContainText('"google-analytics": true');
   await page
     .getByRole("button", { name: "Reload saved choices", exact: true })
@@ -108,6 +118,9 @@ test("saved vendor choices can be reloaded and the banner can be replayed", asyn
   await expect(demo.locator('[data-cc-part="banner"]')).toBeVisible();
   await expect(demo.locator('[data-cc-part="preferences"]')).toHaveCount(0);
   await expect(state).toContainText('"analytics": false');
+  expect(JSON.parse(await state.locator("pre").innerText()).services).toEqual(
+    defaults,
+  );
 });
 
 test("branding, mobile preview, button visibility and exported JSON use the same configuration", async ({

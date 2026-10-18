@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createConsent } from "./index";
+import { createConsent, readConsentCookie } from "./index";
 
 afterEach(() => {
   // biome-ignore lint/suspicious/noDocumentCookie: expire the fixture cookie between tests.
@@ -52,6 +52,31 @@ describe("browser consent", () => {
     const second = createConsent(config);
     expect(second.hasService("analytics-demo")).toBe(true);
     expect(second.get().services).toEqual({ "analytics-demo": true });
+  });
+
+  it("does not turn inherited services into explicit overrides when saved and reloaded", () => {
+    const config = {
+      categories: ["analytics"],
+      services: [
+        { id: "metrics", category: "analytics" },
+        { id: "heatmap", category: "analytics" },
+      ],
+    } as const;
+    const first = createConsent(config);
+    expect(first.get().services).toEqual({ metrics: false, heatmap: false });
+    expect(readConsentCookie(document.cookie)).toBeNull();
+    expect(first.needsDecision).toBe(true);
+    first.set({
+      categories: { analytics: true },
+      services: { heatmap: false },
+    });
+    expect(readConsentCookie(document.cookie)?.services).toEqual({
+      heatmap: false,
+    });
+    const second = createConsent(config);
+    expect(second.get().services).toEqual({ metrics: true, heatmap: false });
+    second.set({ categories: { analytics: false } });
+    expect(second.get().services).toEqual({ metrics: false, heatmap: false });
   });
 
   it("writes safe default cookie attributes on HTTP", () => {

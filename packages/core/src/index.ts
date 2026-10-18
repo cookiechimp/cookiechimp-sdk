@@ -415,7 +415,21 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   if (state.services) state.services = serviceChoices(state.services);
   const emitter = createEmitter<ConsentState>();
   let decided = restored !== null || mustApplyGpc;
-  let current = snapshot(state);
+  // Resolve inherited category choices for public snapshots without storing
+  // them as explicit vendor overrides in the cookie.
+  const resolvedSnapshot = () =>
+    snapshot({
+      ...state,
+      services: serviceChoices(
+        Object.fromEntries(
+          normalized.services.map(({ id, category }) => [
+            id,
+            state.services?.[id] ?? state.categories[category] === true,
+          ]),
+        ),
+      ),
+    });
+  let current = resolvedSnapshot();
 
   const decide = (
     categories: Record<string, boolean>,
@@ -447,17 +461,17 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     };
     decided = true;
     persist(state, config.cookie ?? {});
-    const result = snapshot(state);
+    const result = resolvedSnapshot();
     current = result;
     emitter.emit(result);
-    const { schemaVersion: _, ...record } = state;
+    const { schemaVersion: _, ...record } = result;
     config.onConsent?.(record);
     return result;
   };
 
   if (mustApplyGpc) {
     persist(state, config.cookie ?? {});
-    const { schemaVersion: _, ...record } = state;
+    const { schemaVersion: _, ...record } = current;
     config.onConsent?.(record);
   }
 
@@ -507,13 +521,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
       ),
     subscribe: emitter.subscribe,
     has: (category) => state.categories[category] === true,
-    hasService: (service) => {
-      const category = serviceCategories[service];
-      if (!category) return false;
-      if (required.has(category)) return true;
-      if (regulation === "ccpa" && gpc && saleShare.has(category)) return false;
-      return state.services?.[service] ?? state.categories[category] === true;
-    },
+    hasService: (service) => current.services?.[service] === true,
     region,
     regulation,
     gpc,

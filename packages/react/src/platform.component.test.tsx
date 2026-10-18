@@ -193,7 +193,12 @@ describe("platform JSON consent UI", () => {
     click("Manage Preferences");
     click("Analytics");
     act(() => toggle("Google Analytics")?.click());
-    expect(saved().services).toBeUndefined();
+    expect(saved().services).toMatchObject({
+      "session-management": true,
+      "google-analytics": false,
+      "microsoft-clarity": false,
+      matomo: false,
+    });
     expect(toggle("Analytics")?.getAttribute("aria-checked")).toBe("true");
     expect(toggle("Matomo")?.getAttribute("aria-checked")).toBe("false");
     click("Save Preferences");

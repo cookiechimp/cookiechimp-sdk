@@ -168,7 +168,9 @@ export function ConsentProvider(props: ConsentProviderProps) {
     };
   }, [gppKey]);
   const serverState = useRef(
-    props.initialState ?? runtime.current.get(),
+    props.consent && props.initialState
+      ? props.initialState
+      : runtime.current.get(),
   ).current;
   const preferencesTrigger = useRef<HTMLElement | null>(null);
   const capturePreferencesTrigger = useCallback(() => {

@@ -11,6 +11,9 @@
   placement/order/visibility, equal weight, themes, CSS-unit radii, logos, rich
   copy and forced interaction. See `platform-json-compatibility.md` for the
   presentation contract and explicit integration boundaries.
+- Runtime consent snapshots always expose a complete `services` map, including
+  before a decision. Values match effective category, vendor and GPC choices;
+  inherited defaults are not persisted as explicit overrides.
 - Preferences have a divided header and a dedicated scrolling body. The header
   and action buttons remain visible in centered and side-panel layouts.
 - The preferences footer separates Save preferences from the paired accept/reject
