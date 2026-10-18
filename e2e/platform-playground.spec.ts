@@ -45,11 +45,20 @@ test("all presets render the actual SDK and leave playground controls accessible
     await expect(
       page.getByRole("button", { name: "Open preferences", exact: true }),
     ).toBeEnabled();
-    if (name === "Arabic / RTL")
-      await expect(demo.locator("[data-cc-platform]")).toHaveAttribute(
-        "dir",
-        "rtl",
+    if (name === "Arabic / RTL") {
+      const dialog = demo.locator('[data-cc-part="preferences"]');
+      await expect(dialog).toHaveAttribute("lang", "ar");
+      await expect(dialog).toHaveAttribute("dir", "rtl");
+      await expect(dialog).toHaveCSS("direction", "rtl");
+      await expect(demo.locator(".demo-site")).toHaveCSS("direction", "ltr");
+      await expect(demo.locator("[data-cc-platform]")).not.toHaveAttribute(
+        "lang",
       );
+      await expect(demo.locator("[data-cc-platform]")).not.toHaveAttribute(
+        "dir",
+      );
+      await expect(dialog.locator(".cc-close")).toHaveCSS("left", "8px");
+    }
     if (name === "Opt-out notice")
       await expect(
         page.getByRole("region", { name: "Current consent" }),

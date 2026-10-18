@@ -90,6 +90,77 @@ function setup(
 const saved = () =>
   JSON.parse(document.querySelector("output")?.textContent ?? "{}");
 describe("platform JSON consent UI", () => {
+  it("prompts again and blocks optional vendors when moving from US opt-out to DE opt-in", () => {
+    const root = createRoot(
+      document.body.appendChild(document.createElement("div")),
+    );
+    cleanup = () => root.unmount();
+    const render = (region: string) =>
+      act(() =>
+        root.render(
+          <PlatformConsentProvider
+            bundle={fixture}
+            region={region}
+            locale="en"
+            cookie={{ name: "cc_platform_test" }}
+          >
+            <CookieBanner />
+            <CookiePreferences />
+            <State />
+          </PlatformConsentProvider>,
+        ),
+      );
+    render("US");
+    click("Accept All");
+    const previousId = saved().consentId;
+    expect(saved().services["google-analytics"]).toBe(true);
+    render("DE");
+    expect(document.querySelector('[data-cc-part="banner"]')).not.toBeNull();
+    expect(saved().consentId).not.toBe(previousId);
+    expect(saved().categories.analytics).toBe(false);
+    expect(saved().services).toEqual({
+      "session-management": true,
+      "google-analytics": false,
+      "microsoft-clarity": false,
+      "meta-pixel": false,
+    });
+    click("Reject All");
+    const optInId = saved().consentId;
+    act(cleanup);
+    document.body.replaceChildren();
+    setup();
+    expect(document.querySelector('[data-cc-part="banner"]')).toBeNull();
+    expect(saved().consentId).toBe(optInId);
+  });
+
+  it("recreates consent when the same banner changes its consent mode", () => {
+    const root = createRoot(
+      document.body.appendChild(document.createElement("div")),
+    );
+    cleanup = () => root.unmount();
+    const render = (bundle: typeof fixture) =>
+      act(() =>
+        root.render(
+          <PlatformConsentProvider
+            bundle={bundle}
+            region="US"
+            locale="en"
+            cookie={{ name: "cc_platform_test" }}
+          >
+            <CookieBanner />
+            <State />
+          </PlatformConsentProvider>,
+        ),
+      );
+    render(fixture);
+    click("Accept All");
+    const bundle = structuredClone(fixture);
+    bundle.banners.bnrUS1.consent_mode = "opt-in";
+    render(bundle);
+    expect(document.querySelector('[data-cc-part="banner"]')).not.toBeNull();
+    expect(saved().services["google-analytics"]).toBe(false);
+  });
+
   it("shows the consent UUID used by backend records and restores it after remount", () => {
     const records: ConsentRecord[] = [];
     setup("category_and_services", true, (record) => records.push(record));

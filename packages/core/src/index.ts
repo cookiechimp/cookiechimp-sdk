@@ -358,7 +358,13 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     typeof document === "undefined"
       ? null
       : readConsentCookie(document.cookie, config.cookie?.name);
-  const restored = validState(config.initial) ?? browserState;
+  const candidate = validState(config.initial) ?? browserState;
+  // A choice made under another regulation must not suppress this notice.
+  // Legacy cookies without regulation metadata remain compatible.
+  const restored =
+    candidate?.regulation && candidate.regulation !== regulation
+      ? null
+      : candidate;
   const requiredState = Object.fromEntries(
     [...required].map((id) => [id, true]),
   );

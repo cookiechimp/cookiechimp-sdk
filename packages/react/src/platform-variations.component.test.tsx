@@ -7,6 +7,7 @@ import {
   CookieBanner,
   CookiePreferences,
   PlatformConsentProvider,
+  RecallButton,
 } from "./platform";
 
 const fixture = JSON.parse(
@@ -23,6 +24,7 @@ afterEach(() => {
   act(cleanup);
   document.body.replaceChildren();
   document.documentElement.lang = "";
+  document.documentElement.removeAttribute("dir");
   // biome-ignore lint/suspicious/noDocumentCookie: Clear only the isolated test cookie.
   document.cookie = "cc_variations=; Max-Age=0; Path=/";
 });
@@ -44,8 +46,10 @@ function mount(
         locale={locale ?? undefined}
         cookie={{ name: "cc_variations" }}
       >
+        <main>Host application</main>
         <CookieBanner />
         <CookiePreferences />
+        <RecallButton />
       </PlatformConsentProvider>,
     ),
   );
@@ -244,6 +248,37 @@ it("uses the configured document language when no locale override is supplied", 
   document.documentElement.lang = "de-DE";
   mount(() => {}, "IE", null);
   expect(
-    document.querySelector("[data-cc-platform]")?.getAttribute("lang"),
+    document.querySelector('[data-cc-part="banner"]')?.getAttribute("lang"),
   ).toBe("de");
+});
+
+it("scopes Arabic language and direction to consent UI without changing the host", () => {
+  document.documentElement.lang = "en";
+  document.documentElement.dir = "ltr";
+  mount(
+    (bundle) => {
+      bundle.translations.bnrEU1.ar = bundle.translations.bnrEU1.en;
+      bundle.banners.bnrEU1.available_languages.push("ar");
+    },
+    "IE",
+    "ar",
+  );
+  const wrapper = document.querySelector("[data-cc-platform]");
+  expect(wrapper?.hasAttribute("lang")).toBe(false);
+  expect(wrapper?.hasAttribute("dir")).toBe(false);
+  const host = document.querySelector("main");
+  expect(host?.closest("[lang]")?.getAttribute("lang")).toBe("en");
+  expect(host?.closest("[dir]")?.getAttribute("dir")).toBe("ltr");
+  const banner = document.querySelector('[data-cc-part="banner"]');
+  expect(banner?.getAttribute("lang")).toBe("ar");
+  expect(banner?.getAttribute("dir")).toBe("rtl");
+  click("banner-customize");
+  const preferences = document.querySelector('[data-cc-part="preferences"]');
+  expect(preferences?.getAttribute("lang")).toBe("ar");
+  expect(preferences?.getAttribute("dir")).toBe("rtl");
+  click("preferences-reject-all");
+  const recall = document.querySelector('[data-cc-part="recall"]');
+  expect(recall?.getAttribute("lang")).toBe("ar");
+  expect(recall?.getAttribute("dir")).toBe("rtl");
+  expect(host?.closest("[dir]")?.getAttribute("dir")).toBe("ltr");
 });

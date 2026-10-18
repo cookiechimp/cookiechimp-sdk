@@ -41,6 +41,30 @@ describe("browser consent", () => {
     expect(reloaded.get().action).toBe("accept_all");
   });
 
+  it("requires fresh opt-in consent after restoring an opt-out cookie", () => {
+    const config = {
+      categories: ["analytics"],
+      services: [{ id: "metrics", category: "analytics" }],
+    } as const;
+    const first = createConsent({ ...config, regulation: "ccpa" });
+    first.acceptAll();
+    const previousCookie = document.cookie;
+    const onConsent = vi.fn();
+    const second = createConsent({ ...config, regulation: "gdpr", onConsent });
+    expect(second.needsDecision).toBe(true);
+    expect(second.has("analytics")).toBe(false);
+    expect(second.hasService("metrics")).toBe(false);
+    expect(second.get().consentId).not.toBe(first.get().consentId);
+    expect(document.cookie).toBe(previousCookie);
+    expect(onConsent).not.toHaveBeenCalled();
+    second.rejectAll();
+    const reloaded = createConsent({ ...config, regulation: "gdpr" });
+    expect(reloaded.needsDecision).toBe(false);
+    expect(reloaded.get().consentId).toBe(second.get().consentId);
+    expect(reloaded.hasService("metrics")).toBe(false);
+    expect(onConsent).toHaveBeenCalledOnce();
+  });
+
   it("persists and restores a per-service decision", () => {
     const config = {
       categories: ["analytics"],

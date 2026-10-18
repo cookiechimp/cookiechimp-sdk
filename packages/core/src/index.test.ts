@@ -326,6 +326,48 @@ describe("createConsent", () => {
     });
   });
 
+  it.each([
+    ["ccpa", "gdpr"],
+    ["none", "gdpr"],
+    ["gdpr", "ccpa"],
+  ] as const)(
+    "ignores server consent from %s when selecting %s",
+    (previous, regulation) => {
+      const onConsent = vi.fn();
+      const runtime = createConsent({
+        categories: { necessary: true, analytics: true },
+        services: [{ id: "metrics", category: "analytics" }],
+        regulation,
+        promptOnOptOut: true,
+        initial: {
+          ...state(),
+          regulation: previous,
+          categories: { analytics: true },
+          services: { metrics: true },
+        },
+        onConsent,
+      });
+      expect(runtime.needsDecision).toBe(true);
+      expect(runtime.get().consentId).not.toBe(state().consentId);
+      expect(runtime.get().regulation).toBe(regulation);
+      expect(runtime.has("necessary")).toBe(true);
+      expect(runtime.has("analytics")).toBe(regulation === "ccpa");
+      expect(runtime.hasService("metrics")).toBe(regulation === "ccpa");
+      expect(onConsent).not.toHaveBeenCalled();
+    },
+  );
+
+  it("restores consent when the regulation still matches", () => {
+    const initial = { ...state(), regulation: "gdpr" as const };
+    const runtime = createConsent({
+      categories: ["analytics"],
+      regulation: "gdpr",
+      initial,
+    });
+    expect(runtime.needsDecision).toBe(false);
+    expect(runtime.get().consentId).toBe(initial.consentId);
+  });
+
   it("resolves service consent from its category and explicit decisions", () => {
     const runtime = createConsent({
       categories: { analytics: false },

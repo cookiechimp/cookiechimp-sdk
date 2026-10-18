@@ -48,6 +48,19 @@ function usePlatform() {
     );
   return config;
 }
+function consentLocale(dashboard: DashboardConfig): {
+  lang: string;
+  dir: "rtl" | "ltr";
+} {
+  return {
+    lang: dashboard.language || "en",
+    dir: (dashboard.rtlLanguages ?? rtlLocales).some(
+      (locale) => locale === dashboard.language,
+    )
+      ? "rtl"
+      : "ltr",
+  };
+}
 export interface PlatformConsentProviderProps {
   /** The unchanged JSON from the platform offline/config endpoint. */
   bundle: unknown;
@@ -112,7 +125,7 @@ export function PlatformConsentProvider({
   return (
     <PlatformContext.Provider value={dashboard}>
       <ConsentProvider
-        key={`${dashboard.bannerId}:${dashboard.configVersion}:${dashboard.language}`}
+        key={`${dashboard.bannerId}:${dashboard.configVersion}:${dashboard.language}:${config.regulation}`}
         config={config}
         initialState={initialState}
         language={dashboard.language}
@@ -121,14 +134,6 @@ export function PlatformConsentProvider({
           data-cc-platform=""
           data-cc-motion={motion ? "on" : "off"}
           data-cc-theme={themeMode(dashboard.theme)}
-          lang={dashboard.language || "en"}
-          dir={
-            (dashboard.rtlLanguages ?? rtlLocales).some(
-              (locale) => locale === dashboard.language,
-            )
-              ? "rtl"
-              : "ltr"
-          }
           style={themeStyle(dashboard.theme)}
           data-cc-recall-position={String(
             object(dashboard.banner.preferences_gui_options)
@@ -192,6 +197,7 @@ export function CookieBanner() {
         <div className="cc-platform-backdrop" data-cc-part="banner-backdrop" />
       )}
       <Banner.Root
+        {...consentLocale(dashboard)}
         className="cc-banner cc-platform-banner"
         modal={force}
         data-cc-layout={display.layout}
@@ -459,6 +465,7 @@ export function CookiePreferences({
   const privacy = url(dashboard.copy.privacy_policy_url);
   return (
     <Preferences.Root
+      {...consentLocale(dashboard)}
       className="cc-preferences cc-platform-preferences"
       data-cc-layout={String(gui.layout ?? "box")}
       data-cc-position={String(gui.position ?? "center")}
@@ -638,7 +645,7 @@ export function RecallButton({ children }: { children?: ReactNode }) {
   )
     return null;
   return (
-    <BaseRecallButton>
+    <BaseRecallButton {...consentLocale(dashboard)}>
       {children ?? (
         <>
           <svg

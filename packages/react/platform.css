@@ -636,14 +636,17 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
-[data-cc-platform][dir="rtl"] .cc-platform-switch[aria-checked="true"] > span {
+[data-cc-platform]
+  .cc-platform-preferences[dir="rtl"]
+  .cc-platform-switch[aria-checked="true"]
+  > span {
   transform: translateX(-16px);
 }
-[data-cc-platform][dir="rtl"] .cc-close {
+[data-cc-platform] .cc-platform-preferences[dir="rtl"] .cc-close {
   right: auto;
   left: 8px;
 }
-[data-cc-platform][dir="rtl"] .cc-platform-heading {
+[data-cc-platform] .cc-platform-preferences[dir="rtl"] .cc-platform-heading {
   padding-left: 56px;
   padding-right: 24px;
 }

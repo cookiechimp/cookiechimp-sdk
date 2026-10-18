@@ -14,6 +14,11 @@
 - Runtime consent snapshots always expose a complete `services` map, including
   before a decision. Values match effective category, vendor and GPC choices;
   inherited defaults are not persisted as explicit overrides.
+- Saved consent with a different recorded regulation is ignored, including US
+  opt-out choices when an EU opt-in banner is selected. Optional vendors return
+  to the new mode's defaults until a fresh decision is saved.
+- Consent language and RTL direction are scoped to the banner, preferences and
+  recall control so application content keeps its own locale.
 - Preferences have a divided header and a dedicated scrolling body. The header
   and action buttons remain visible in centered and side-panel layouts.
 - The preferences footer separates Save preferences from the paired accept/reject
