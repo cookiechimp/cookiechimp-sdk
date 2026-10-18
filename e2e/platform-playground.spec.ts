@@ -70,6 +70,9 @@ test("saved vendor choices can be reloaded and the banner can be replayed", asyn
   page,
 }) => {
   await page.goto(address);
+  await page
+    .getByRole("link", { name: "Jump to the live preview", exact: true })
+    .click();
   const demo = page.frameLocator("#sdk-preview");
   await demo
     .getByRole("button", { name: "Manage Preferences", exact: true })
