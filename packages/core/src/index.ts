@@ -83,6 +83,8 @@ export interface ConsentConfig extends ConfigInput {
   /** Categories treated as sale/share for GPC. */
   saleShareCategories?: readonly string[];
   forceDecision?: boolean;
+  /** Show the initial notice in opt-out mode until a choice has been recorded. */
+  promptOnOptOut?: boolean;
 }
 
 export interface ConsentRuntime {
@@ -517,7 +519,8 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     gpc,
     get needsDecision() {
       return (
-        config.forceDecision === true || (regulation === "gdpr" && !decided)
+        config.forceDecision === true ||
+        ((regulation === "gdpr" || config.promptOnOptOut === true) && !decided)
       );
     },
     showOptOut: regulation === "ccpa",

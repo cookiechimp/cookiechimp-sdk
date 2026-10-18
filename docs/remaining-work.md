@@ -5,6 +5,10 @@
 - The SDK PR adds an opt-in UI driven by the existing platform JSON, with
   vendor controls, privacy links and storage disclosures. The React/Vite
   example includes `/platform.html`.
+- Platform GUI/theme parity includes every designer layout/position, button
+  placement/order/visibility, equal weight, themes, CSS-unit radii, logos, rich
+  copy and forced interaction. See `platform-json-compatibility.md` for the
+  presentation contract and explicit integration boundaries.
 - Styled interactions animate by default, with `motion={false}` and automatic
   reduced-motion support. The example uses realistic vendor purposes, company
   names, privacy links and illustrative cookie settings from the same JSON.

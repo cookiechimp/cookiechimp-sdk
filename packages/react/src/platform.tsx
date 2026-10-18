@@ -10,7 +10,6 @@ import {
 } from "@cookiechimp/core/sync";
 import { rtlLocales } from "@cookiechimp/translations";
 import {
-  type CSSProperties,
   createContext,
   type ReactNode,
   useContext,
@@ -22,43 +21,25 @@ import {
 import { Banner, Preferences } from "./headless";
 import {
   ConsentProvider,
+  useBanner,
   useConsent,
   useHeadlessContext,
   usePreferences,
 } from "./index";
+import {
+  bannerDisplay,
+  Logo,
+  object,
+  plain,
+  RichText,
+  themeMode,
+  themeStyle,
+  url,
+} from "./platform-presentation";
 
 import { RecallButton as BaseRecallButton } from "./ui";
 
 const PlatformContext = createContext<DashboardConfig | null>(null);
-const object = (value: unknown): Record<string, unknown> =>
-  value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
-// Disclosures are rendered as text, never as executable dashboard HTML.
-const plain = (value: unknown) =>
-  typeof value === "string"
-    ? value
-        .replace(/<[^>]*>/g, " ")
-        .replace(/&nbsp;/g, " ")
-        .replace(/&amp;/g, "&")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">")
-        .replace(/\s+/g, " ")
-        .trim()
-    : "";
-const url = (value: unknown) => {
-  if (typeof value !== "string") return undefined;
-  try {
-    const parsed = new URL(value);
-    return !parsed.username &&
-      !parsed.password &&
-      ["https:", "http:"].includes(parsed.protocol)
-      ? parsed.href
-      : undefined;
-  } catch {
-    return undefined;
-  }
-};
 function usePlatform() {
   const config = useContext(PlatformContext);
   if (!config)
@@ -67,40 +48,6 @@ function usePlatform() {
     );
   return config;
 }
-function themeStyle(theme: Record<string, unknown>): CSSProperties {
-  const colors = object(
-    theme.dark_mode === true ? theme.dark_colors : theme.colors,
-  );
-  const names: Record<string, string> = {
-    bg: "bg",
-    heading_color: "heading",
-    text_color: "text",
-    link_color: "link",
-    btn_primary_bg: "btn-primary-bg",
-    btn_primary_color: "btn-primary-color",
-    btn_secondary_bg: "btn-secondary-bg",
-    btn_secondary_color: "btn-secondary-color",
-  };
-  const style: Record<string, string> = {};
-  for (const [key, token] of Object.entries(names)) {
-    const value = colors[key];
-    if (
-      typeof value === "string" &&
-      /^(#[\da-f]{3,8}|[a-z]+|rgba?\([\d\s.,%]+\))$/i.test(value)
-    )
-      style[`--cc-banner-${token}`] = value;
-  }
-  for (const [key, token] of [
-    ["modal_border_radius", "card"],
-    ["btn_border_radius", "button"],
-  ] as const) {
-    const value = theme[key];
-    if (typeof value === "number" && value >= 0 && value <= 40)
-      style[`--cc-radius-${token}`] = `${value}px`;
-  }
-  return style as CSSProperties;
-}
-
 export interface PlatformConsentProviderProps {
   /** The unchanged JSON from the platform offline/config endpoint. */
   bundle: unknown;
@@ -124,12 +71,22 @@ export function PlatformConsentProvider({
   onConsent,
   motion = true,
 }: PlatformConsentProviderProps) {
+  const [detectedLocale, setDetectedLocale] = useState<string>();
   const dashboard = useMemo(
-    () => adaptPlatformConfig(bundle, { region, locale }),
-    [bundle, region, locale],
+    () =>
+      adaptPlatformConfig(bundle, { region, locale: locale ?? detectedLocale }),
+    [bundle, region, locale, detectedLocale],
   );
   if (!dashboard)
     throw new TypeError("Invalid CookieChimp platform JSON configuration.");
+  useEffect(() => {
+    if (locale) return;
+    const hint =
+      dashboard.banner.language_autodetect === "browser"
+        ? navigator.language
+        : document.documentElement.lang;
+    setDetectedLocale(hint || undefined);
+  }, [locale, dashboard.banner.language_autodetect]);
   const days = Number(
     dashboard.banner.expires_days ??
       dashboard.banner.consent_duration_days ??
@@ -140,6 +97,7 @@ export function PlatformConsentProvider({
     services: dashboard.services,
     regulation: dashboard.consentMode === "opt_out" ? "ccpa" : "gdpr",
     language: dashboard.language,
+    promptOnOptOut: true,
     cookie: {
       ...(typeof dashboard.cookie.name === "string"
         ? { name: dashboard.cookie.name }
@@ -162,9 +120,12 @@ export function PlatformConsentProvider({
         <div
           data-cc-platform=""
           data-cc-motion={motion ? "on" : "off"}
+          data-cc-theme={themeMode(dashboard.theme)}
           lang={dashboard.language || "en"}
           dir={
-            rtlLocales.some((locale) => locale === dashboard.language)
+            (dashboard.rtlLanguages ?? rtlLocales).some(
+              (locale) => locale === dashboard.language,
+            )
               ? "rtl"
               : "ltr"
           }
@@ -188,59 +149,99 @@ export function CookieBanner() {
   const buttons = object(dashboard.banner.buttons);
   const footer = object(dashboard.banner.footer);
   const privacy = url(dashboard.copy.privacy_policy_url);
-  const position =
-    gui.layout === "bar"
-      ? "bottom"
-      : String(gui.position ?? "bottom right").includes("left")
-        ? "bottom-left"
-        : String(gui.position).includes("center")
-          ? "center"
-          : "bottom-right";
+  const display = bannerDisplay(gui);
+  const banner = useBanner();
+  const preferences = usePreferences();
+  const force = dashboard.banner.force_consent === true;
+  useEffect(() => {
+    if (!force || !banner.open || preferences.open) return;
+    const previous = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = previous;
+    };
+  }, [force, banner.open, preferences.open]);
+  const equal = gui.equal_weight_buttons !== false;
+  const actions = [
+    buttons.show_accept_btn !== false ? (
+      <Banner.AcceptAll key="accept" className="cc-button cc-button--primary">
+        {plain(copy.accept_btn) || "Accept all"}
+      </Banner.AcceptAll>
+    ) : null,
+    buttons.show_accept_necessary_btn !== false ? (
+      <Banner.RejectAll
+        key="reject"
+        className={`cc-button cc-button--${equal ? "primary" : "secondary"}`}
+      >
+        {plain(copy.reject_btn) || "Reject optional"}
+      </Banner.RejectAll>
+    ) : null,
+    buttons.show_preferences_btn !== false ? (
+      <Banner.Customize
+        key="preferences"
+        className="cc-button cc-button--secondary"
+      >
+        {plain(copy.preferences_btn) || "Customize"}
+      </Banner.Customize>
+    ) : null,
+  ];
+  if (gui.swap_buttons === true) actions.reverse();
   return (
-    <Banner.Root className="cc-banner" data-cc-position={position}>
-      <div className="cc-banner__copy">
-        <Banner.Title className="cc-title">
-          {plain(copy.title) || "Privacy choices"}
-        </Banner.Title>
-        <Banner.Description className="cc-description">
-          {plain(copy.description) || "Choose which cookies may be used."}
-        </Banner.Description>
-        {footer.enabled !== false && privacy && (
-          <div className="cc-platform-footer">
-            <a href={privacy} target="_blank" rel="noopener noreferrer">
-              Privacy policy
-            </a>
-          </div>
-        )}
-      </div>
-      <div className="cc-actions">
-        {buttons.show_preferences_btn !== false && (
-          <Banner.Customize className="cc-button cc-button--secondary">
-            {plain(copy.preferences_btn) || "Customize"}
-          </Banner.Customize>
-        )}
-        {buttons.show_accept_necessary_btn !== false && (
-          <Banner.RejectAll className="cc-button cc-button--secondary">
-            {plain(copy.reject_btn) || "Reject optional"}
-          </Banner.RejectAll>
-        )}
-        {buttons.show_accept_btn !== false && (
-          <Banner.AcceptAll
-            className={`cc-button cc-button--${gui.equal_weight_buttons === true ? "secondary" : "primary"}`}
+    <>
+      {force && banner.open && !preferences.open && (
+        <div className="cc-platform-backdrop" data-cc-part="banner-backdrop" />
+      )}
+      <Banner.Root
+        className="cc-banner cc-platform-banner"
+        modal={force}
+        data-cc-layout={display.layout}
+        data-cc-position={display.position}
+        data-cc-button-placement={display.placement}
+        onKeyDown={(event) => {
+          if (force && event.key === "Escape") event.preventDefault();
+        }}
+      >
+        <div className="cc-banner__copy">
+          <Logo theme={dashboard.theme} />
+          <Banner.Title className="cc-title">
+            {plain(copy.title) || "Privacy choices"}
+          </Banner.Title>
+          <Banner.Description
+            as="div"
+            className="cc-description cc-platform-rich"
           >
-            {plain(copy.accept_btn) || "Accept all"}
-          </Banner.AcceptAll>
-        )}
+            <RichText
+              value={copy.description || "Choose which cookies may be used."}
+            />
+          </Banner.Description>
+          {plain(copy.additional_description) && (
+            <div className="cc-platform-rich cc-platform-additional">
+              <RichText value={copy.additional_description} />
+            </div>
+          )}
+          {footer.enabled !== false && (
+            <div className="cc-platform-footer cc-platform-rich">
+              {plain(copy.footer ?? footer.content) ? (
+                <RichText value={copy.footer ?? footer.content} omitBranding />
+              ) : privacy ? (
+                <a href={privacy} target="_blank" rel="noopener noreferrer">
+                  Privacy policy
+                </a>
+              ) : null}
+            </div>
+          )}
+        </div>
+        <div className="cc-actions">{actions}</div>
         {buttons.show_close_btn === true && (
           <Banner.Close
-            className="cc-button cc-button--secondary"
+            className="cc-close"
             aria-label={plain(copy.close_btn) || "Close"}
           >
             ×
           </Banner.Close>
         )}
-      </div>
-    </Banner.Root>
+      </Banner.Root>
+    </>
   );
 }
 
@@ -358,7 +359,11 @@ function VendorDetails({ service }: { service: PlatformService }) {
   const privacy = url(service.privacy_policy_url);
   return (
     <>
-      {service.description && <p>{plain(service.description)}</p>}
+      {service.description && (
+        <div className="cc-platform-rich">
+          <RichText value={service.description} />
+        </div>
+      )}
       <div className="cc-vendor-company">
         {service.company && <span>{plain(service.company)}</span>}
         {privacy && (
@@ -456,6 +461,7 @@ export function CookiePreferences() {
     >
       <div className="cc-preferences__panel">
         <header className="cc-platform-heading">
+          <Logo theme={dashboard.theme} />
           <Preferences.Title className="cc-title">
             {plain(copy.title) || "Cookie preferences"}
           </Preferences.Title>
@@ -466,9 +472,16 @@ export function CookiePreferences() {
             ×
           </Preferences.Close>
         </header>
-        <Preferences.Description className="cc-description">
-          {plain(copy.description) ||
-            "Choose consent by category or vendor. Expand an item to see its details."}
+        <Preferences.Description
+          as="div"
+          className="cc-description cc-platform-rich"
+        >
+          <RichText
+            value={
+              copy.description ||
+              "Choose consent by category or vendor. Expand an item to see its details."
+            }
+          />
         </Preferences.Description>
         {privacy && (
           <a
@@ -504,7 +517,11 @@ export function CookiePreferences() {
                 />
               }
             >
-              {category.description && <p>{plain(category.description)}</p>}
+              {category.description && (
+                <div className="cc-platform-rich">
+                  <RichText value={category.description} />
+                </div>
+              )}
               {showServices && (
                 <>
                   {category.services.map((service) => (
@@ -549,7 +566,9 @@ export function CookiePreferences() {
           </h3>
         )}
         {plain(copy.more_info) && (
-          <p className="cc-platform-more-info">{plain(copy.more_info)}</p>
+          <div className="cc-platform-more-info cc-platform-rich">
+            <RichText value={copy.more_info} />
+          </div>
         )}
         {footer.enabled !== false && footer.show_powered_by === true && (
           <a
@@ -563,7 +582,9 @@ export function CookiePreferences() {
         )}
         <footer className="cc-actions cc-platform-actions">
           {buttons.show_accept_necessary_btn !== false && (
-            <Preferences.RejectAll className="cc-button cc-button--secondary">
+            <Preferences.RejectAll
+              className={`cc-button cc-button--${gui.equal_weight_buttons !== false ? "primary" : "secondary"}`}
+            >
               {plain(copy.reject_btn) ||
                 plain(bannerCopy.reject_btn) ||
                 "Reject optional"}
@@ -578,9 +599,7 @@ export function CookiePreferences() {
             </Preferences.Save>
           )}
           {buttons.show_accept_btn !== false && (
-            <Preferences.AcceptAll
-              className={`cc-button cc-button--${gui.equal_weight_buttons === true ? "secondary" : "primary"}`}
-            >
+            <Preferences.AcceptAll className="cc-button cc-button--primary">
               {plain(copy.accept_btn) ||
                 plain(bannerCopy.accept_btn) ||
                 "Accept all"}

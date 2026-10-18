@@ -85,3 +85,38 @@ body {
     padding: 32px 20px 330px;
   }
 }
+
+.platform-demo__styles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  max-width: 800px;
+  border: 1px solid #dde1e8;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 24px 0;
+}
+.platform-demo__styles legend {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0 8px;
+}
+.platform-demo__styles label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+}
+.platform-demo__styles select {
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+  background: white;
+  border: 1px solid #cbd1da;
+  border-radius: 5px;
+  padding: 8px;
+}
+.platform-demo__styles .platform-demo__check {
+  flex-direction: row;
+  align-items: center;
+}

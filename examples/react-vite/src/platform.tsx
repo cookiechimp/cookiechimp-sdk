@@ -6,15 +6,18 @@ import {
   RecallButton,
 } from "@cookiechimp/react/platform";
 import "@cookiechimp/react/platform.css";
-import { useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import bundle from "../../../packages/core/src/fixtures/platform-offline-bundle.json";
+import { defaultOptions, StyleControls } from "./platform-controls";
 import "./platform.css";
 
 function App({
   motion,
   onMotionChange,
+  controls,
 }: {
+  controls: ReactNode;
   motion: boolean;
   onMotionChange(value: boolean): void;
 }) {
@@ -29,6 +32,7 @@ function App({
         policies and cookie details. Everything comes from the same platform
         JSON configuration.
       </p>
+      {controls}
       <div className="platform-demo__actions">
         <button type="button" onClick={preferences.show}>
           Manage cookie preferences
@@ -93,15 +97,43 @@ const root =
   document.getElementById("react-sdk-demo-root");
 function Demo() {
   const [motion, setMotion] = useState(true);
+  const [options, setOptions] = useState(defaultOptions);
+  const configured = useMemo(() => {
+    const result = structuredClone(bundle);
+    const banner = result.banners.bnrEU1;
+    Object.assign(banner.gui_options, {
+      layout: options.layout,
+      position: options.position,
+      button_placement: options.placement,
+      equal_weight_buttons: options.equal,
+      swap_buttons: options.swap,
+    });
+    Object.assign(banner.preferences_gui_options, {
+      layout: options.panel.startsWith("bar") ? "bar" : "box",
+      position: options.panel.endsWith("left") ? "left" : "right",
+      equal_weight_buttons: options.equal,
+    });
+    Object.assign(banner.theme, {
+      dark_mode: options.theme,
+      modal_border_radius: options.radius,
+      btn_border_radius: options.radius,
+    });
+    banner.force_consent = options.force;
+    return result;
+  }, [options]);
   return (
     <PlatformConsentProvider
-      bundle={bundle}
+      bundle={configured}
       region="IE"
       locale="en"
       cookie={{ name: "cc_platform_demo", maxAge: 3600 }}
       motion={motion}
     >
-      <App motion={motion} onMotionChange={setMotion} />
+      <App
+        motion={motion}
+        onMotionChange={setMotion}
+        controls={<StyleControls value={options} onChange={setOptions} />}
+      />
     </PlatformConsentProvider>
   );
 }

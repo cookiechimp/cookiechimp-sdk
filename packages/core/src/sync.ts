@@ -101,6 +101,7 @@ export interface DashboardConfig {
   bannerId: string;
   consentMode?: string;
   language: string;
+  rtlLanguages?: string[];
   categories: CategoryConfig[];
   services: ServiceConfig[];
   /** Category/vendor/cookie disclosures from the same platform bundle. */
@@ -239,7 +240,7 @@ export function adaptPlatformConfig(
     .find((code) => text(code, 16) && record(own(translations, code))) as
     | string
     | undefined;
-  const consentMode = text(banner.consent_mode, 32);
+  const consentMode = text(banner.consent_mode, 32)?.replace("-", "_");
   const localized = (item: Json) => {
     const entry = object(own(item.translations, language));
     return {
@@ -334,6 +335,15 @@ export function adaptPlatformConfig(
     ["bannerId", bannerId],
     ["consentMode", consentMode],
     ["language", language ?? ""],
+    [
+      "rtlLanguages",
+      Array.isArray(value.rtl_languages)
+        ? value.rtl_languages.filter(
+            (code): code is string =>
+              typeof code === "string" && /^[a-z]{2,3}$/.test(code),
+          )
+        : undefined,
+    ],
     ["categories", categories],
     ["services", services],
     ["preferences", preferences],

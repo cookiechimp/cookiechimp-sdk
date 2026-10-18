@@ -15,7 +15,7 @@
     "bnrUS1": {
       "hashid": "bnrUS1",
       "name": "US Default",
-      "consent_mode": "opt_out",
+      "consent_mode": "opt-out",
       "consent_duration_days": 182,
       "revision": 3,
       "force_consent": false,
@@ -32,9 +32,9 @@
         "swap_buttons": false
       },
       "theme": {
-        "dark_mode": false,
-        "modal_border_radius": 8,
-        "btn_border_radius": 4,
+        "dark_mode": "light",
+        "modal_border_radius": "8px",
+        "btn_border_radius": "4px",
         "colors": {
           "bg": "#ffffff",
           "heading_color": "#000",
@@ -55,8 +55,8 @@
           "btn_secondary_bg": "#171a1c",
           "btn_secondary_color": "#fff"
         },
-        "logo_url_light": "https://cdn.example.test/logo-light.png",
-        "logo_url_dark": "https://cdn.example.test/logo-dark.png"
+        "logo_url_light": null,
+        "logo_url_dark": null
       },
       "buttons": {
         "show_accept_btn": true,
@@ -83,12 +83,13 @@
         "content": "<a href='https://example.test/privacy'>Privacy Policy</a>",
         "show_powered_by": true
       },
-      "available_languages": ["en"]
+      "available_languages": ["en"],
+      "language_autodetect": "document"
     },
     "bnrEU1": {
       "hashid": "bnrEU1",
       "name": "EU GDPR",
-      "consent_mode": "opt_in",
+      "consent_mode": "opt-in",
       "consent_duration_days": 182,
       "revision": 3,
       "force_consent": false,
@@ -105,9 +106,9 @@
         "swap_buttons": false
       },
       "theme": {
-        "dark_mode": false,
-        "modal_border_radius": 8,
-        "btn_border_radius": 4,
+        "dark_mode": "light",
+        "modal_border_radius": "8px",
+        "btn_border_radius": "4px",
         "colors": {
           "bg": "#ffffff",
           "heading_color": "#000",
@@ -128,8 +129,8 @@
           "btn_secondary_bg": "#171a1c",
           "btn_secondary_color": "#fff"
         },
-        "logo_url_light": "https://cdn.example.test/logo-light.png",
-        "logo_url_dark": "https://cdn.example.test/logo-dark.png"
+        "logo_url_light": null,
+        "logo_url_dark": null
       },
       "buttons": {
         "show_accept_btn": true,
@@ -156,7 +157,8 @@
         "content": "<a href='https://example.test/privacy'>Privacy Policy</a>",
         "show_powered_by": true
       },
-      "available_languages": ["en", "de"]
+      "available_languages": ["en", "de"],
+      "language_autodetect": "document"
     }
   },
   "translations": {
@@ -165,7 +167,7 @@
         "consent_modal": {
           "title": "We value your privacy",
           "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
-          "additional_description": "<p>More info.</p>",
+          "additional_description": "<p>You can change or withdraw your choices at any time in cookie settings.</p>",
           "accept_btn": "Accept All",
           "reject_btn": "Reject",
           "preferences_btn": "Manage Preferences",
@@ -190,7 +192,7 @@
         "consent_modal": {
           "title": "We value your privacy",
           "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
-          "additional_description": "<p>More info.</p>",
+          "additional_description": "<p>You can change or withdraw your choices at any time in cookie settings.</p>",
           "accept_btn": "Accept All",
           "reject_btn": "Reject All",
           "preferences_btn": "Manage Preferences",
@@ -213,7 +215,7 @@
         "consent_modal": {
           "title": "Wir respektieren Ihre Privatsphäre",
           "description": "We use cookies to improve your experience.",
-          "additional_description": "<p>More info.</p>",
+          "additional_description": "<p>Sie können Ihre Auswahl jederzeit in den Cookie-Einstellungen ändern.</p>",
           "accept_btn": "Alle akzeptieren",
           "reject_btn": "Alle ablehnen",
           "preferences_btn": "Einstellungen",

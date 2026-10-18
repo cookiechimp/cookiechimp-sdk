@@ -178,7 +178,7 @@ update all vendors; an individual vendor updates the category when any vendor
 is allowed. Changes are staged until Save; Close discards them. Required
 categories and their vendors stay enabled, and GPC cannot be bypassed through
 a vendor override. Button labels, visibility, colors and radii use the existing
-JSON keys. Descriptions render as text, never executable dashboard HTML.
+JSON keys. Descriptions preserve safe formatting and links as React elements; executable HTML and arbitrary attributes are discarded.
 
 Supply trusted region context from your application. The SDK performs no
 location lookup. For SSR, pass the server `initialState` as with
@@ -211,6 +211,11 @@ This changes only presentation; consent choices and keyboard behavior are unchan
 Collapsed details are inert and excluded from focus navigation, including while
 their closing transition runs. Developers building a custom UI can use
 `@cookiechimp/react/headless` with their own stylesheet instead.
+
+The example includes controls for all platform layouts, positions, button placements,
+button swapping, equal weight, side panels, color schemes and radii. They modify
+the same JSON consumed by the SDK. See the [JSON compatibility matrix](../../../docs/platform-json-compatibility.md)
+for the exact supported presentation fields and runtime integration boundaries.
 
 The example JSON is illustrative, rather than an inventory of tags on a live site.
 Google cookie details follow its [GA4 documentation](https://support.google.com/analytics/answer/11397207?hl=en),

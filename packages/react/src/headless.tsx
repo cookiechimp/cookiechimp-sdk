@@ -47,7 +47,9 @@ function BannerRoot({ modal = false, children, ...props }: RootProps) {
   useEffect(() => {
     if (!banner.open || !modal) return;
     const previous = document.activeElement as HTMLElement | null;
-    queueMicrotask(() => focusable(root.current as HTMLElement)[0]?.focus());
+    queueMicrotask(() => {
+      if (root.current) focusable(root.current)[0]?.focus();
+    });
     return () => {
       queueMicrotask(() =>
         (previous?.isConnected ? previous : document.body).focus(),
@@ -93,10 +95,13 @@ function BannerTitle(props: PartProps) {
     />
   );
 }
-function BannerDescription(props: PartProps) {
+function BannerDescription({
+  as: Element = "p",
+  ...props
+}: PartProps & { as?: "p" | "div" }) {
   const context = required(useContext(BannerContext), "Banner.Description");
   return (
-    <p
+    <Element
       {...props}
       id={context?.description}
       data-cc-part="banner-description"
@@ -256,13 +261,16 @@ function PreferencesTitle(props: PartProps) {
     />
   );
 }
-function PreferencesDescription(props: PartProps) {
+function PreferencesDescription({
+  as: Element = "p",
+  ...props
+}: PartProps & { as?: "p" | "div" }) {
   const context = required(
     useContext(PreferencesContext),
     "Preferences.Description",
   );
   return (
-    <p
+    <Element
       {...props}
       id={context?.description}
       data-cc-part="preferences-description"
