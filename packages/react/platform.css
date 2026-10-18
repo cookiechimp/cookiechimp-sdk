@@ -173,7 +173,7 @@
   display: block;
   width: 18px;
   height: 18px;
-  background: var(--cc-banner-bg);
+  background: var(--cc-banner-text);
   border-radius: 50%;
   box-shadow: 0 1px 3px #0002;
 }
@@ -181,6 +181,7 @@
   background: var(--cc-color-brand-primary);
 }
 .cc-platform-switch[aria-checked="true"] > span {
+  background: var(--cc-banner-btn-primary-color);
   transform: translateX(16px);
 }
 .cc-platform-switch:disabled {
