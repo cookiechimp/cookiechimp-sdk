@@ -164,50 +164,50 @@
       "en": {
         "consent_modal": {
           "title": "We value your privacy",
-          "description": "We use cookies to improve your experience.",
+          "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
           "additional_description": "<p>More info.</p>",
           "accept_btn": "Accept All",
           "reject_btn": "Reject",
           "preferences_btn": "Manage Preferences",
           "close_btn": "Close",
-          "footer": "<a href='https://example.test/privacy'>Privacy Policy</a>"
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>"
         },
         "preferences_modal": {
           "title": "Cookie Settings",
-          "description": "<p>Manage your preferences.</p>",
+          "description": "<p>You are in control of your data. Essential cookies are always active because the website needs them to work. Choose which optional categories and vendors you allow, and expand each item to see its purpose, provider and cookies. Your choices take effect when you save them.</p>",
           "accept_btn": "Accept All",
           "reject_btn": "Reject",
           "save_btn": "Save Preferences",
           "close_btn": "Close",
-          "more_info_title": "More Information",
-          "more_info": "<p>Contact us at privacy@example.test.</p>"
+          "more_info_title": "About this example",
+          "more_info": "<p>This is an illustrative website configuration with real vendor names and example cookie settings. No analytics or advertising tags are loaded in this demo. Cookie durations can vary by site configuration and browser. You can return to these settings at any time using the cookie icon.</p>"
         },
-        "privacy_policy_url": "https://example.test/privacy"
+        "privacy_policy_url": "https://cookiechimp.com/privacy.php"
       }
     },
     "bnrEU1": {
       "en": {
         "consent_modal": {
           "title": "We value your privacy",
-          "description": "We use cookies to improve your experience.",
+          "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
           "additional_description": "<p>More info.</p>",
           "accept_btn": "Accept All",
           "reject_btn": "Reject All",
           "preferences_btn": "Manage Preferences",
           "close_btn": "Close",
-          "footer": "<a href='https://example.test/privacy'>Privacy Policy</a>"
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>"
         },
         "preferences_modal": {
           "title": "Cookie Settings",
-          "description": "<p>Manage your preferences.</p>",
+          "description": "<p>You are in control of your data. Essential cookies are always active because the website needs them to work. Choose which optional categories and vendors you allow, and expand each item to see its purpose, provider and cookies. Your choices take effect when you save them.</p>",
           "accept_btn": "Accept All",
           "reject_btn": "Reject All",
           "save_btn": "Save Preferences",
           "close_btn": "Close",
-          "more_info_title": "More Information",
-          "more_info": "<p>Contact us at privacy@example.test.</p>"
+          "more_info_title": "About this example",
+          "more_info": "<p>This is an illustrative website configuration with real vendor names and example cookie settings. No analytics or advertising tags are loaded in this demo. Cookie durations can vary by site configuration and browser. You can return to these settings at any time using the cookie icon.</p>"
         },
-        "privacy_policy_url": "https://example.test/privacy"
+        "privacy_policy_url": "https://cookiechimp.com/privacy.php"
       },
       "de": {
         "consent_modal": {
@@ -218,19 +218,19 @@
           "reject_btn": "Alle ablehnen",
           "preferences_btn": "Einstellungen",
           "close_btn": "Close",
-          "footer": "<a href='https://example.test/privacy'>Privacy Policy</a>"
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>"
         },
         "preferences_modal": {
           "title": "Cookie-Einstellungen",
-          "description": "<p>Manage your preferences.</p>",
+          "description": "<p>Sie entscheiden, welche optionalen Kategorien und Anbieter Sie zulassen. Erforderliche Cookies bleiben aktiv. Öffnen Sie einen Eintrag, um Zweck, Anbieter und Cookies zu sehen. Ihre Auswahl wird beim Speichern übernommen.</p>",
           "accept_btn": "Alle akzeptieren",
           "reject_btn": "Alle ablehnen",
           "save_btn": "Speichern",
           "close_btn": "Close",
-          "more_info_title": "More Information",
-          "more_info": "<p>Contact us at privacy@example.test.</p>"
+          "more_info_title": "Über dieses Beispiel",
+          "more_info": "<p>Beispielkonfiguration mit echten Anbietern. Diese Demo lädt keine Analyse- oder Werbe-Tags. Die Speicherdauer kann je nach Website und Browser abweichen.</p>"
         },
-        "privacy_policy_url": "https://example.test/privacy"
+        "privacy_policy_url": "https://cookiechimp.com/privacy.php"
       }
     }
   },
@@ -238,12 +238,12 @@
     {
       "slug": "essential",
       "name": "Essential",
-      "description": "Required for the site to function",
+      "description": "These cookies keep the website secure, maintain your session and remember your privacy choices. They are necessary for core features and cannot be switched off here.",
       "required": true,
       "translations": {
         "en": {
           "name": "Essential",
-          "description": "Required for the site to function"
+          "description": "These cookies keep the website secure, maintain your session and remember your privacy choices. They are necessary for core features and cannot be switched off here."
         },
         "de": {
           "name": "Essenziell",
@@ -254,44 +254,52 @@
         {
           "id": "svcSESS1",
           "name": "Session Management",
-          "description": "Manages user sessions",
-          "company": "Example Ltd",
-          "privacy_policy_url": "https://example.test/privacy",
+          "description": "Keeps your signed-in session available as you move between pages and supports core website features. This first-party example service is always enabled.",
+          "company": "Website operator",
+          "privacy_policy_url": "https://cookiechimp.com/privacy.php",
           "accepted_by_default": true,
           "translations": {
             "en": {
               "name": "Session Management",
-              "description": "Manages user sessions"
+              "description": "Keeps your signed-in session available as you move between pages and supports core website features. This first-party example service is always enabled."
             }
           },
           "storage_items": [
             {
               "name": "session_id",
               "type": "cookie",
-              "description": "Session identifier",
+              "description": "Links requests to your current session so the website can keep you signed in until the session ends.",
               "duration": "Session",
-              "company": "Example Ltd",
+              "company": "Website operator",
               "translations": {
                 "en": {
                   "name": "session_id",
-                  "description": "Session identifier"
+                  "description": "Links requests to your current session so the website can keep you signed in until the session ends."
                 }
               }
             }
           ]
         }
       ],
-      "storage_items": []
+      "storage_items": [
+        {
+          "name": "cc_platform_demo",
+          "type": "cookie",
+          "description": "Remembers the category and vendor choices you make in this demo so you are not asked again on every page load.",
+          "duration": "1 hour",
+          "company": "CookieChimp"
+        }
+      ]
     },
     {
       "slug": "analytics",
       "name": "Analytics",
-      "description": "Helps us understand usage",
+      "description": "These optional services help us understand which pages people visit and how they interact with the website, so we can improve navigation, content and performance. You can allow individual analytics vendors below.",
       "required": false,
       "translations": {
         "en": {
           "name": "Analytics",
-          "description": "Helps us understand usage"
+          "description": "These optional services help us understand which pages people visit and how they interact with the website, so we can improve navigation, content and performance. You can allow individual analytics vendors below."
         },
         "de": {
           "name": "Statistik",
@@ -302,14 +310,14 @@
         {
           "id": "svcGA4",
           "name": "Google Analytics",
-          "description": "Usage statistics",
-          "company": "Example Ltd",
-          "privacy_policy_url": "https://example.test/privacy",
+          "description": "Measures visits, page views and interactions to help us understand which content is useful and where people encounter problems. Google Analytics uses identifiers to distinguish visitors and group activity into sessions.",
+          "company": "Google LLC",
+          "privacy_policy_url": "https://policies.google.com/privacy",
           "accepted_by_default": false,
           "translations": {
             "en": {
               "name": "Google Analytics",
-              "description": "Usage statistics"
+              "description": "Measures visits, page views and interactions to help us understand which content is useful and where people encounter problems. Google Analytics uses identifiers to distinguish visitors and group activity into sessions."
             },
             "de": {
               "name": "Google Analyse",
@@ -320,28 +328,40 @@
             {
               "name": "_ga",
               "type": "cookie",
-              "description": "Distinguishes users",
+              "description": "Distinguishes visitors for website usage measurement.",
               "duration": "2 years",
-              "company": "Example Ltd",
-              "translations": {
-                "en": {
-                  "name": "_ga",
-                  "description": "Distinguishes users"
-                }
-              }
+              "company": "Google LLC"
             },
             {
-              "name": "ga_local",
-              "type": "local_storage",
-              "description": "Local cache",
-              "duration": "Persistent",
-              "company": "Example Ltd",
-              "translations": {
-                "en": {
-                  "name": "ga_local",
-                  "description": "Local cache"
-                }
-              }
+              "name": "_ga_<container-id>",
+              "type": "cookie",
+              "description": "Maintains session state for a Google Analytics 4 property. The suffix identifies the configured property.",
+              "duration": "2 years",
+              "company": "Google LLC"
+            }
+          ]
+        },
+        {
+          "id": "svcCLARITY",
+          "name": "Microsoft Clarity",
+          "description": "Creates heatmaps and session recordings to show how visitors navigate the website, where they click and where they may get stuck. This helps us identify usability issues and improve the experience.",
+          "company": "Microsoft Corporation",
+          "privacy_policy_url": "https://www.microsoft.com/en-us/privacy/privacystatement",
+          "accepted_by_default": false,
+          "storage_items": [
+            {
+              "name": "_clck",
+              "type": "cookie",
+              "description": "Remembers the Clarity visitor identifier and preferences for this website across visits.",
+              "duration": "1 year",
+              "company": "Microsoft Corporation"
+            },
+            {
+              "name": "_clsk",
+              "type": "cookie",
+              "description": "Connects page views from the same visit into a single Clarity session recording.",
+              "duration": "1 day",
+              "company": "Microsoft Corporation"
             }
           ]
         }
@@ -351,12 +371,12 @@
     {
       "slug": "marketing",
       "name": "Marketing",
-      "description": "Personalised advertising",
+      "description": "These optional services measure advertising campaigns and help show more relevant ads. They may connect activity on this website with activity on other websites. You can choose each marketing vendor separately.",
       "required": false,
       "translations": {
         "en": {
           "name": "Marketing",
-          "description": "Personalised advertising"
+          "description": "These optional services measure advertising campaigns and help show more relevant ads. They may connect activity on this website with activity on other websites. You can choose each marketing vendor separately."
         },
         "de": {
           "name": "Marketing",
@@ -367,27 +387,27 @@
         {
           "id": "svcMETA1",
           "name": "Meta Pixel",
-          "description": "Ad measurement",
-          "company": "Example Ltd",
-          "privacy_policy_url": "https://example.test/privacy",
+          "description": "Measures the effectiveness of campaigns on Facebook and Instagram by connecting website actions with advertising interactions. It can also support audiences and more relevant advertising across Meta services.",
+          "company": "Meta Platforms, Inc.",
+          "privacy_policy_url": "https://www.facebook.com/privacy/policy/",
           "accepted_by_default": false,
           "translations": {
             "en": {
               "name": "Meta Pixel",
-              "description": "Ad measurement"
+              "description": "Measures the effectiveness of campaigns on Facebook and Instagram by connecting website actions with advertising interactions. It can also support audiences and more relevant advertising across Meta services."
             }
           },
           "storage_items": [
             {
               "name": "_fbp",
               "type": "cookie",
-              "description": "Ad attribution",
+              "description": "Identifies a browser to help measure advertising performance and deliver relevant advertising.",
               "duration": "3 months",
-              "company": "Example Ltd",
+              "company": "Meta Platforms, Inc.",
               "translations": {
                 "en": {
                   "name": "_fbp",
-                  "description": "Ad attribution"
+                  "description": "Identifies a browser to help measure advertising performance and deliver relevant advertising."
                 }
               }
             }
@@ -409,6 +429,10 @@
     "Meta Pixel": {
       "category": "marketing",
       "id": "svcMETA1"
+    },
+    "Microsoft Clarity": {
+      "category": "analytics",
+      "id": "svcCLARITY"
     }
   },
   "default_services": {},

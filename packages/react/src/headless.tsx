@@ -161,7 +161,7 @@ function focusable(root: HTMLElement) {
     ...root.querySelectorAll<HTMLElement>(
       'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
     ),
-  ].filter((node) => !node.closest("[hidden]"));
+  ].filter((node) => !node.closest('[hidden], [inert], [aria-hidden="true"]'));
 }
 function trapFocus(event: KeyboardEvent, root: HTMLElement | null) {
   const items = root ? focusable(root) : [];

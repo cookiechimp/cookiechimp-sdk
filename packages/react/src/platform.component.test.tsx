@@ -33,7 +33,7 @@ const click = (text: string) => {
   ].find(
     (node) =>
       node.textContent?.trim().replace(/^[+−]\s*/, "") === text &&
-      !node.closest("[hidden]"),
+      !node.closest('[hidden], [aria-hidden="true"]'),
   );
   expect(button, text).toBeTruthy();
   act(() => button?.click());
@@ -46,7 +46,7 @@ function State() {
   const state = useConsent();
   return <output>{JSON.stringify(state)}</output>;
 }
-function setup(control = "category_and_services") {
+function setup(control = "category_and_services", motion = true) {
   const bundle = structuredClone(fixture);
   bundle.banners.bnrEU1.preferences_gui_options.control_level = control;
   const analytics = bundle.categories.find(
@@ -68,6 +68,7 @@ function setup(control = "category_and_services") {
         region="DE"
         locale="en"
         cookie={{ name: "cc_platform_test" }}
+        motion={motion}
       >
         <CookieBanner />
         <CookiePreferences />
@@ -82,6 +83,46 @@ function setup(control = "category_and_services") {
 const saved = () =>
   JSON.parse(document.querySelector("output")?.textContent ?? "{}");
 describe("platform JSON consent UI", () => {
+  it("enables motion by default and keeps collapsed details inert", () => {
+    setup();
+    expect(
+      document
+        .querySelector("[data-cc-platform]")
+        ?.getAttribute("data-cc-motion"),
+    ).toBe("on");
+    click("Manage Preferences");
+    const disclosure = document.querySelector<HTMLButtonElement>(
+      ".cc-platform-category .cc-disclosure__label",
+    );
+    const details = document.getElementById(
+      disclosure?.getAttribute("aria-controls") ?? "",
+    );
+    expect(details?.inert).toBe(true);
+    expect(details?.getAttribute("aria-hidden")).toBe("true");
+    click("Essential");
+    expect(details?.inert).toBe(false);
+    click("Essential");
+    expect(details?.inert).toBe(true);
+    expect(details?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("allows hosts to disable motion while preserving vendor consent", () => {
+    setup("category_and_services", false);
+    expect(
+      document
+        .querySelector("[data-cc-platform]")
+        ?.getAttribute("data-cc-motion"),
+    ).toBe("off");
+    click("Manage Preferences");
+    click("Analytics");
+    act(() => toggle("Microsoft Clarity")?.click());
+    click("Save Preferences");
+    expect(saved().services).toMatchObject({
+      "microsoft-clarity": true,
+      "google-analytics": false,
+    });
+  });
+
   it("renders the shared copy, category/vendor disclosures and storage details", () => {
     setup();
     click("Manage Preferences");
@@ -91,13 +132,13 @@ describe("platform JSON consent UI", () => {
     click("Analytics");
     click("Google Analytics");
     const expanded = document.querySelector('[data-cc-part="preferences"]');
-    expect(expanded?.textContent).toContain("Example Ltd");
+    expect(expanded?.textContent).toContain("Google LLC");
     expect(expanded?.textContent).toContain("_ga");
     expect(expanded?.textContent).toContain("2 years");
-    expect(expanded?.textContent).toContain("local storage");
+    expect(expanded?.textContent).toContain("_ga_<container-id>");
     expect(
       expanded
-        ?.querySelector('a[href="https://example.test/privacy"]')
+        ?.querySelector('a[href="https://policies.google.com/privacy"]')
         ?.getAttribute("rel"),
     ).toContain("noopener");
     expect(toggle("Essential")?.disabled).toBe(true);

@@ -6,11 +6,18 @@ import {
   RecallButton,
 } from "@cookiechimp/react/platform";
 import "@cookiechimp/react/platform.css";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import bundle from "../../../packages/core/src/fixtures/platform-offline-bundle.json";
 import "./platform.css";
 
-function App() {
+function App({
+  motion,
+  onMotionChange,
+}: {
+  motion: boolean;
+  onMotionChange(value: boolean): void;
+}) {
   const consent = useConsent();
   const preferences = usePreferences();
   return (
@@ -38,6 +45,19 @@ function App() {
           Reset demo
         </button>
       </div>
+      <label className="platform-demo__motion">
+        <input
+          type="checkbox"
+          checked={motion}
+          onChange={(event) => onMotionChange(event.target.checked)}
+        />
+        Animate interactions
+      </label>
+      <p className="platform-demo__note">
+        Motion is included by default and respects reduced-motion preferences.
+        To disable it in your app, pass <code>motion={"{false}"}</code> to{" "}
+        <code>PlatformConsentProvider</code>.
+      </p>
       <section
         className="platform-demo__state"
         aria-live="polite"
@@ -71,14 +91,18 @@ function App() {
 const root =
   document.getElementById("root") ??
   document.getElementById("react-sdk-demo-root");
-if (root)
-  createRoot(root).render(
+function Demo() {
+  const [motion, setMotion] = useState(true);
+  return (
     <PlatformConsentProvider
       bundle={bundle}
       region="IE"
       locale="en"
       cookie={{ name: "cc_platform_demo", maxAge: 3600 }}
+      motion={motion}
     >
-      <App />
-    </PlatformConsentProvider>,
+      <App motion={motion} onMotionChange={setMotion} />
+    </PlatformConsentProvider>
   );
+}
+if (root) createRoot(root).render(<Demo />);

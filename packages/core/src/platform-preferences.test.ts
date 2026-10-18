@@ -23,8 +23,8 @@ describe("platform consent disclosures", () => {
       id: "svcGA4",
       consent_key: "google-analytics",
       name: "Google Analyse",
-      company: "Example Ltd",
-      privacy_policy_url: "https://example.test/privacy",
+      company: "Google LLC",
+      privacy_policy_url: "https://policies.google.com/privacy",
     });
     expect(analytics?.services[0]?.storage_items).toEqual(
       expect.arrayContaining([
@@ -32,9 +32,9 @@ describe("platform consent disclosures", () => {
           name: "_ga",
           type: "cookie",
           duration: "2 years",
-          description: "Distinguishes users",
+          description: "Distinguishes visitors for website usage measurement.",
         }),
-        expect.objectContaining({ name: "ga_local", type: "local_storage" }),
+        expect.objectContaining({ name: "_ga_<container-id>", type: "cookie" }),
       ]),
     );
     expect(analytics?.services[0]?.consent_key).toBe(

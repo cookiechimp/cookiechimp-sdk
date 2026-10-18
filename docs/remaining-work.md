@@ -1,10 +1,13 @@
-# Remaining work and launch status (17 Oct 2026)
+# Remaining work and launch status (18 Oct 2026)
 
 ## Platform category and vendor UI (unreleased)
 
 - The SDK PR adds an opt-in UI driven by the existing platform JSON, with
   vendor controls, privacy links and storage disclosures. The React/Vite
   example includes `/platform.html`.
+- Styled interactions animate by default, with `motion={false}` and automatic
+  reduced-motion support. The example uses realistic vendor purposes, company
+  names, privacy links and illustrative cookie settings from the same JSON.
 - This work is not merged or published. Website adoption depends on SDK review,
   current-head CI and the new package release.
 - The live backend configuration and consent-delivery release gate still applies.

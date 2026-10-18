@@ -111,6 +111,8 @@ export interface PlatformConsentProviderProps {
   /** Optional host override, for example an isolated demo cookie. */
   cookie?: ConsentConfig["cookie"];
   onConsent?: ConsentConfig["onConsent"];
+  /** Animate the styled UI by default. Reduced-motion preferences always win. */
+  motion?: boolean;
 }
 export function PlatformConsentProvider({
   bundle,
@@ -120,6 +122,7 @@ export function PlatformConsentProvider({
   initialState,
   cookie,
   onConsent,
+  motion = true,
 }: PlatformConsentProviderProps) {
   const dashboard = useMemo(
     () => adaptPlatformConfig(bundle, { region, locale }),
@@ -158,6 +161,7 @@ export function PlatformConsentProvider({
       >
         <div
           data-cc-platform=""
+          data-cc-motion={motion ? "on" : "off"}
           lang={dashboard.language || "en"}
           dir={
             rtlLocales.some((locale) => locale === dashboard.language)
@@ -267,7 +271,7 @@ function Disclosure({
   const [open, setOpen] = useState(false);
   const id = useId();
   return (
-    <section className={`cc-disclosure ${className}`}>
+    <section className={`cc-disclosure ${className}`} data-cc-expanded={open}>
       <div className="cc-disclosure__row">
         {expandable ? (
           <button
@@ -277,7 +281,9 @@ function Disclosure({
             aria-controls={id}
             onClick={() => setOpen(!open)}
           >
-            <span aria-hidden="true">{open ? "−" : "+"}</span>
+            <span aria-hidden="true" className="cc-disclosure__icon">
+              +
+            </span>
             {name}
           </button>
         ) : (
@@ -285,8 +291,18 @@ function Disclosure({
         )}
         {toggle}
       </div>
-      <div id={id} hidden={!open} className="cc-disclosure__body">
-        {open ? children : null}
+      <div
+        id={id}
+        aria-hidden={!open}
+        className="cc-disclosure__content"
+        ref={(node) => {
+          // Use the DOM property so inert also works with React 18.
+          if (node) node.inert = !open;
+        }}
+      >
+        <div className="cc-disclosure__clip">
+          <div className="cc-disclosure__body">{children}</div>
+        </div>
       </div>
     </section>
   );

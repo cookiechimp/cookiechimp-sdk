@@ -187,8 +187,36 @@ banner bundle size.
 
 Run the React/Vite workspace example and open `/platform.html` for a complete
 category/vendor demo. It uses the existing redacted bundle, with the canonical
-`category_and_services` control level and a separate demo cookie. It loads no
+`category_and_services` control level, realistic Google Analytics, Microsoft
+Clarity and Meta Pixel disclosures, and a separate demo cookie. It loads no
 tracking tags and sends no consent records. Production logging stays explicit.
+
+### Motion
+
+The platform stylesheet includes short entrance, disclosure and switch animations
+by default. No animation package or additional import is needed. The UI automatically
+disables motion for visitors who request reduced motion in their operating system.
+To disable animations for all visitors, keep the same stylesheet and pass
+`motion={false}` to the provider:
+
+```tsx
+<PlatformConsentProvider bundle={bundle} region="IE" motion={false}>
+  <CookieBanner />
+  <CookiePreferences />
+  <RecallButton />
+</PlatformConsentProvider>
+```
+
+This changes only presentation; consent choices and keyboard behavior are unchanged.
+Collapsed details are inert and excluded from focus navigation, including while
+their closing transition runs. Developers building a custom UI can use
+`@cookiechimp/react/headless` with their own stylesheet instead.
+
+The example JSON is illustrative, rather than an inventory of tags on a live site.
+Google cookie details follow its [GA4 documentation](https://support.google.com/analytics/answer/11397207?hl=en),
+and Clarity purposes follow its [cookie documentation](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-cookies).
+Durations are example settings and may differ by site or browser. Vendor privacy
+links in the JSON point to the vendors' own policies.
 
 This entry supplies category/vendor consent and presentation. Optional protocol
 integrations, script gating and consent delivery still require their explicit
