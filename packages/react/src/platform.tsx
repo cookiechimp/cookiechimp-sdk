@@ -205,22 +205,11 @@ export function CookieBanner() {
         <Banner.Description className="cc-description">
           {plain(copy.description) || "Choose which cookies may be used."}
         </Banner.Description>
-        {footer.enabled !== false && (
+        {footer.enabled !== false && privacy && (
           <div className="cc-platform-footer">
-            {privacy && (
-              <a href={privacy} target="_blank" rel="noopener noreferrer">
-                Privacy policy
-              </a>
-            )}
-            {footer.show_powered_by === true && (
-              <a
-                href="https://cookiechimp.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Powered by CookieChimp
-              </a>
-            )}
+            <a href={privacy} target="_blank" rel="noopener noreferrer">
+              Privacy policy
+            </a>
           </div>
         )}
       </div>
@@ -394,6 +383,7 @@ export function CookiePreferences() {
   const categories = dashboard.preferences ?? [];
   const gui = object(dashboard.banner.preferences_gui_options);
   const buttons = object(dashboard.banner.preferences_buttons);
+  const footer = object(dashboard.banner.footer);
   const copy = object(dashboard.copy.preferences_modal);
   const bannerCopy = object(dashboard.copy.consent_modal);
   const [draft, setDraft] = useState<Selection>({
@@ -585,6 +575,16 @@ export function CookiePreferences() {
                 plain(bannerCopy.accept_btn) ||
                 "Accept all"}
             </Preferences.AcceptAll>
+          )}
+          {footer.enabled !== false && footer.show_powered_by === true && (
+            <a
+              className="cc-platform-branding"
+              href="https://cookiechimp.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Powered by CookieChimp
+            </a>
           )}
         </footer>
       </div>

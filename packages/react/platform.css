@@ -245,6 +245,13 @@
   border-top: 1px solid var(--cc-banner-separator-border);
   justify-content: flex-end;
 }
+.cc-platform-actions .cc-platform-branding {
+  flex: 0 0 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--cc-banner-text);
+  text-underline-offset: 3px;
+}
 @media (max-width: 480px) {
   .cc-platform-heading {
     padding-left: 16px;
