@@ -414,3 +414,21 @@ vendor tags, only when opting in. It supports `nonce` and an optional trusted
 `gdprApplies` value. Without the optional provider and stub, no TCF runs.
 TCF deployments configure their CMP ID, GVL source and authoritative feature
 access separately from the provider.
+
+## Platform JSON banner and vendor preferences
+
+Import `PlatformConsentProvider`, `CookieBanner`, `CookiePreferences` and
+`RecallButton` from `@cookiechimp/react/platform`, with
+`@cookiechimp/react/platform.css`, to render the dashboard JSON without a second
+configuration schema. The UI supports category/vendor choices, provider and
+storage disclosures, layout/button/theme variations, RTL and default animations
+with reduced-motion support and `motion={false}`. Its divided header and action
+bar stay fixed while only the preferences body scrolls.
+
+`useConsent()` exposes `consentId`, categories and every configured service with
+its effective value, including before a decision. `services` is `{}` when none
+are configured. Values honor required categories, saved vendor overrides and
+GPC; inherited defaults remain separate from explicit overrides in storage.
+The displayed consent ID is the `uuid` used for platform consent logs, not a
+delivery receipt. Logging, vendor tags, blocking and IAB integrations remain
+explicit. See [the platform UI guide](packages/docs/content/platform-ui.md).

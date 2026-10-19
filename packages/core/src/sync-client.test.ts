@@ -106,21 +106,24 @@ describe("adaptPlatformConfig with the platform offline bundle", () => {
         required: true,
         default: true,
         label: "Essential",
-        description: "Required for the site to function",
+        description:
+          "These cookies keep the website secure, maintain your session and remember your privacy choices. They are necessary for core features and cannot be switched off here.",
       },
       {
         id: "analytics",
         required: false,
         default: true,
         label: "Analytics",
-        description: "Helps us understand usage",
+        description:
+          "These optional services help us understand which pages people visit and how they interact with the website, so we can improve navigation, content and performance. You can allow individual analytics vendors below.",
       },
       {
         id: "marketing",
         required: false,
         default: true,
         label: "Marketing",
-        description: "Personalised advertising",
+        description:
+          "These optional services measure advertising campaigns and help show more relevant ads. They may connect activity on this website with activity on other websites. You can choose each marketing vendor separately.",
       },
     ]);
     expect(config.services).toEqual([
@@ -135,7 +138,14 @@ describe("adaptPlatformConfig with the platform offline bundle", () => {
         id: "google-analytics",
         category: "analytics",
         name: "Google Analytics",
-        cookies: ["_ga"],
+        cookies: ["_ga", "_ga_<container-id>"],
+        default: false,
+      },
+      {
+        id: "microsoft-clarity",
+        category: "analytics",
+        name: "Microsoft Clarity",
+        cookies: ["_clck", "_clsk"],
         default: false,
       },
       {
@@ -149,6 +159,7 @@ describe("adaptPlatformConfig with the platform offline bundle", () => {
     expect(config.serviceIds).toEqual({
       "session-management": "svcSESS1",
       "google-analytics": "svcGA4",
+      "microsoft-clarity": "svcCLARITY",
       "meta-pixel": "svcMETA1",
     });
     expect(config.copy).toMatchObject({
@@ -490,7 +501,8 @@ describe("createSync fetch and cache", () => {
     );
     expect(byId.analytics).toMatchObject({
       label: "Analytics",
-      description: "Helps us understand usage",
+      description:
+        "These optional services help us understand which pages people visit and how they interact with the website, so we can improve navigation, content and performance. You can allow individual analytics vendors below.",
     });
     expect(byId.preferences).toMatchObject({ label: "Local preferences" });
     expect(byId.marketing).toMatchObject({

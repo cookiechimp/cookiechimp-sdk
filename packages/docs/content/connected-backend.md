@@ -39,6 +39,15 @@ banner messages, cookie name and valid expiry settings feed the runtime. HTML
 in dashboard copy is never injected into the page. The demo includes no vendor
 tags, so accepting consent does not itself enable analytics requests.
 
+## Category and vendor preferences
+
+The `/connected` example uses the standard SDK components and adapted dashboard
+configuration. For the full category/vendor modal and presentation settings,
+use [Banner and vendor preferences](platform-ui.md) with the unchanged offline
+JSON. `PlatformConsentProvider` handles presentation and runtime state; wire its
+`onConsent` to the platform consent-log adapter separately. Its displayed consent
+ID is the record UUID, not proof of backend acknowledgement.
+
 ## Requests and responsibilities
 
 | Step | SDK API | CookieChimp endpoint |

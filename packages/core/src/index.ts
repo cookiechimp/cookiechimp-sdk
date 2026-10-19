@@ -83,6 +83,8 @@ export interface ConsentConfig extends ConfigInput {
   /** Categories treated as sale/share for GPC. */
   saleShareCategories?: readonly string[];
   forceDecision?: boolean;
+  /** Show the initial notice in opt-out mode until a choice has been recorded. */
+  promptOnOptOut?: boolean;
 }
 
 export interface ConsentRuntime {
@@ -310,6 +312,11 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   validateCookieOptions(config.cookie ?? {});
   const normalized = normalizeConfig(config);
   const configuredDefaults = categoryDefaults(normalized);
+  const required = new Set(
+    normalized.categories
+      .filter((category) => category.required)
+      .map((category) => category.id),
+  );
   const region = config.region ?? config.initial?.region ?? null;
   const regionKey = region
     ? `${region.country}${region.region ? `-${region.region}` : ""}`
@@ -335,7 +342,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   const defaults = Object.fromEntries(
     Object.entries(configuredDefaults).map(([name, enabled]) => [
       name,
-      name === "necessary"
+      required.has(name)
         ? true
         : regulation === "gdpr"
           ? false
@@ -351,10 +358,32 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     typeof document === "undefined"
       ? null
       : readConsentCookie(document.cookie, config.cookie?.name);
-  const restored = validState(config.initial) ?? browserState;
+  const candidate = validState(config.initial) ?? browserState;
+  // A choice made under another regulation must not suppress this notice.
+  // Legacy cookies without regulation metadata remain compatible.
+  const restored =
+    candidate?.regulation && candidate.regulation !== regulation
+      ? null
+      : candidate;
+  const requiredState = Object.fromEntries(
+    [...required].map((id) => [id, true]),
+  );
   const saleShare = new Set(
     config.saleShareCategories ?? ["advertising", "marketing"],
   );
+  const serviceChoices = (services: Record<string, boolean>) =>
+    Object.fromEntries(
+      Object.entries(services).map(([id, enabled]) => [
+        id,
+        required.has(serviceCategories[id] ?? "")
+          ? true
+          : regulation === "ccpa" &&
+              gpc &&
+              saleShare.has(serviceCategories[id] ?? "")
+            ? false
+            : enabled,
+      ]),
+    );
   const mustApplyGpc =
     regulation === "ccpa" &&
     gpc &&
@@ -365,7 +394,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   let state: ConsentState = restored
     ? {
         ...restored,
-        categories: { ...defaults, ...restored.categories, necessary: true },
+        categories: { ...defaults, ...restored.categories, ...requiredState },
         ...(restored.services ? { services: { ...restored.services } } : {}),
       }
     : {
@@ -388,9 +417,25 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     );
     if (mustApplyGpc) state.action = "gpc_auto";
   }
+  state.categories = { ...state.categories, ...requiredState };
+  if (state.services) state.services = serviceChoices(state.services);
   const emitter = createEmitter<ConsentState>();
   let decided = restored !== null || mustApplyGpc;
-  let current = snapshot(state);
+  // Resolve inherited category choices for public snapshots without storing
+  // them as explicit vendor overrides in the cookie.
+  const resolvedSnapshot = () =>
+    snapshot({
+      ...state,
+      services: serviceChoices(
+        Object.fromEntries(
+          normalized.services.map(({ id, category }) => [
+            id,
+            state.services?.[id] ?? state.categories[category] === true,
+          ]),
+        ),
+      ),
+    });
+  let current = resolvedSnapshot();
 
   const decide = (
     categories: Record<string, boolean>,
@@ -409,8 +454,12 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     state = {
       ...state,
       ts: new Date().toISOString(),
-      categories: { ...compliantCategories, necessary: true },
-      ...(services && Object.keys(services).length ? { services } : {}),
+      categories: { ...compliantCategories, ...requiredState },
+      ...(services && Object.keys(services).length
+        ? {
+            services: serviceChoices(services),
+          }
+        : {}),
       action,
       region,
       regulation,
@@ -418,17 +467,17 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
     };
     decided = true;
     persist(state, config.cookie ?? {});
-    const result = snapshot(state);
+    const result = resolvedSnapshot();
     current = result;
     emitter.emit(result);
-    const { schemaVersion: _, ...record } = state;
+    const { schemaVersion: _, ...record } = result;
     config.onConsent?.(record);
     return result;
   };
 
   if (mustApplyGpc) {
     persist(state, config.cookie ?? {});
-    const { schemaVersion: _, ...record } = state;
+    const { schemaVersion: _, ...record } = current;
     config.onConsent?.(record);
   }
 
@@ -478,17 +527,14 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
       ),
     subscribe: emitter.subscribe,
     has: (category) => state.categories[category] === true,
-    hasService: (service) => {
-      const category = serviceCategories[service];
-      if (!category) return false;
-      return state.services?.[service] ?? state.categories[category] === true;
-    },
+    hasService: (service) => current.services?.[service] === true,
     region,
     regulation,
     gpc,
     get needsDecision() {
       return (
-        config.forceDecision === true || (regulation === "gdpr" && !decided)
+        config.forceDecision === true ||
+        ((regulation === "gdpr" || config.promptOnOptOut === true) && !decided)
       );
     },
     showOptOut: regulation === "ccpa",

@@ -26,6 +26,13 @@ export const pages: readonly PageSpec[] = [
     source: "packages/docs/content/connected-backend.md",
   },
   {
+    slug: "platform-ui",
+    title: "Banner and vendor preferences",
+    description:
+      "Platform JSON, category and vendor choices, themes, consent state and the playground.",
+    source: "packages/docs/content/platform-ui.md",
+  },
+  {
     slug: "reference",
     title: "Core and React reference",
     description: "Regions, gating, Consent Mode, headless UI, GPP and TCF.",
@@ -98,6 +105,7 @@ export const navigation = {
       pages: [
         "sdk/overview",
         "sdk/getting-started",
+        "sdk/platform-ui",
         "sdk/connected-backend",
         "sdk/examples",
         "sdk/release-status",

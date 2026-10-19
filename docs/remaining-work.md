@@ -1,4 +1,37 @@
-# Remaining work and launch status (17 Oct 2026)
+# Remaining work and launch status (18 Oct 2026)
+
+## Platform category and vendor UI (unreleased)
+
+- The SDK PR adds an opt-in UI driven by the existing platform JSON, with
+  vendor controls, privacy links and storage disclosures. The React/Vite
+  example includes `/platform.html` with 16 interactive presets, an isolated
+  actual-SDK preview, desktop/mobile sizes, full controls, JSON export and
+  saved-choice replay. No tracking tags or consent records are sent.
+- Platform GUI/theme parity includes every designer layout/position, button
+  placement/order/visibility, equal weight, themes, CSS-unit radii, logos, rich
+  copy and forced interaction. See `platform-json-compatibility.md` for the
+  presentation contract and explicit integration boundaries.
+- Runtime consent snapshots always expose a complete `services` map, including
+  before a decision. Values match effective category, vendor and GPC choices;
+  inherited defaults are not persisted as explicit overrides.
+- Saved consent with a different recorded regulation is ignored, including US
+  opt-out choices when an EU opt-in banner is selected. Optional vendors return
+  to the new mode's defaults until a fresh decision is saved.
+- Consent language and RTL direction are scoped to the banner, preferences and
+  recall control so application content keeps its own locale.
+- Preferences have a divided header and a dedicated scrolling body. The header
+  and action buttons remain visible in centered and side-panel layouts.
+- The preferences footer separates Save preferences from the paired accept/reject
+  actions. On narrow screens Save gets its own row and accept/reject stay together.
+- The preferences modal shows the runtime consent ID above branding. This is
+  the same value submitted as `uuid` by the platform consent-log integration,
+  and persists with saved choices. Displaying it is not delivery confirmation.
+- Styled interactions animate by default, with `motion={false}` and automatic
+  reduced-motion support. The example uses realistic vendor purposes, company
+  names, privacy links and illustrative cookie settings from the same JSON.
+- This work is not merged or published. Website adoption depends on SDK review,
+  current-head CI and the new package release.
+- The live backend configuration and consent-delivery release gate still applies.
 
 Daniel authorized Codex to review, fix and merge the SDK PRs on 14 Oct 2026.
 All eight SDK PRs below are now merged into main after review and green checks.

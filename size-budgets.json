@@ -367,5 +367,15 @@
     "kind": "total",
     "limit": 12288,
     "css": ["packages/react/tcf.css"]
+  },
+  {
+    "name": "platform JSON category and vendor UI",
+    "scenario": "react platform",
+    "entry": "packages/react/dist/platform.mjs",
+    "kind": "total",
+    "limit": 24576,
+    "css": ["packages/react/platform.css"],
+    "excludedFrom": "packages/react/dist/banner.mjs",
+    "forbiddenTokens": ["PlatformConsentProvider", "cc-platform-categories"]
   }
 ]

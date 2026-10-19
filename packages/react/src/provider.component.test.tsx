@@ -224,6 +224,38 @@ describe("ConsentProvider hooks", () => {
     await act(() => root.unmount());
   });
 
+  it("renders the complete services map from a legacy server snapshot and hydrates it", async () => {
+    const { services: _, ...initial } = createConsent(config).acceptAll();
+    function Services() {
+      return <output>{JSON.stringify(useConsent().services)}</output>;
+    }
+    const app = (
+      <ConsentProvider
+        config={{
+          ...config,
+          services: [{ id: "metrics", category: "analytics" }],
+        }}
+        initialState={initial}
+      >
+        <Services />
+      </ConsentProvider>
+    );
+    const target = document.body.appendChild(document.createElement("div"));
+    target.innerHTML = renderToString(app);
+    expect(target.querySelector("output")?.textContent).toBe(
+      '{"metrics":true}',
+    );
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const root = hydrateRoot(target, app);
+    await act(async () => {});
+    expect(target.querySelector("output")?.textContent).toBe(
+      '{"metrics":true}',
+    );
+    expect(error.mock.calls.flat().join(" ")).not.toContain("hydration");
+    error.mockRestore();
+    await act(() => root.unmount());
+  });
+
   it("hydrates an initial snapshot without mismatch warnings", async () => {
     const initial = createConsent(config).acceptAll();
     const app = (

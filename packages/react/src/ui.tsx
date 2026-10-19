@@ -3,6 +3,7 @@
 import { gateScripts } from "@cookiechimp/core/gate";
 import en from "@cookiechimp/translations/en";
 import type {
+  HTMLAttributes,
   IframeHTMLAttributes,
   ReactNode,
   ScriptHTMLAttributes,
@@ -101,7 +102,14 @@ export function CookiePreferences({
   );
 }
 
-export function RecallButton({ children }: { children?: ReactNode }) {
+export function RecallButton({
+  children,
+  lang,
+  dir,
+}: { children?: ReactNode } & Pick<
+  HTMLAttributes<HTMLButtonElement>,
+  "lang" | "dir"
+>) {
   const { t } = useTranslations(en);
   const preferences = usePreferences();
   const banner = useBanner();
@@ -110,6 +118,8 @@ export function RecallButton({ children }: { children?: ReactNode }) {
     <button
       type="button"
       className="cc-recall"
+      lang={lang}
+      dir={dir}
       data-cc-part="recall"
       data-cc-state="closed"
       onClick={preferences.show}
