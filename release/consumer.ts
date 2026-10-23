@@ -393,9 +393,7 @@ try {
     .click();
   await page.reload();
   await expect(platform.locator('[data-cc-part="banner"]')).toHaveCount(0);
-  await platform
-    .getByRole("button", { name: "Manage cookie preferences", exact: true })
-    .click();
+  await platform.locator('[data-cc-part="recall"]').click();
   await expect(consentId).toHaveText(originalId);
   await platformDialog
     .getByRole("button", { name: "Analytics", exact: true })
@@ -410,9 +408,7 @@ try {
     .getByRole("button", { name: "Reject All", exact: true })
     .click();
   await page.reload();
-  await platform
-    .getByRole("button", { name: "Manage cookie preferences", exact: true })
-    .click();
+  await platform.locator('[data-cc-part="recall"]').click();
   await platformDialog
     .getByRole("button", { name: "Analytics", exact: true })
     .click();

@@ -113,11 +113,12 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   Fixture tests and deployment success do not prove live record delivery.
   Daniel deferred the live test on 23 Oct. Keep `platformDeployed` false; the
   [live test runbook](live-backend-verification.md) records inputs, cases and evidence.
-- Review and merge the 1.1.0 release preparation PR after its current-head CI
+- Review and merge [SDK #55](https://github.com/cookiechimp/cookiechimp-sdk/pull/55) after its current-head CI
   and installed-consumer checks pass. Candidate manifests bind version, package
   hashes and the exact source commit; packing/publishing no longer assumes 1.0.0.
-- Reconcile Docs #78 into #79 using a clean export of the reviewed SDK source.
-  Require the docs approving review, merge and verify the 14 routes on Mintlify.
+- Docs #79 now consolidates the backend guide from #78 and the platform guides
+  in one clean 14-page export. Require its approving review, merge and verify
+  the routes on Mintlify; close the duplicate #78 after checking the import.
   The new platform guide explicitly requires 1.1.0 rather than npm's current 1.0.0.
 - Complete live test evidence and recheck trusted publishers, then obtain new
   explicit approval for 1.1.0 and the `npm-publish` environment. Run the guarded
