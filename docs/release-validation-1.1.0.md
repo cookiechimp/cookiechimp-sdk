@@ -22,14 +22,15 @@ backend verification is deferred and the publication check remains blocked.
 Packing requires clean committed source. The exact source SHA, eight tarball
 SHA-256/SHA-512 hashes and installed-consumer proof are retained in the PR's
 `sdk-candidate-and-consumer-proof` artifact. Inspect `manifest.json` and
-`consumer-validation.json` from the current head; those generated records also
+`consumer-validation.json` from the current head; the consumer also checks the
+public core VERSION against installed package metadata. Those generated records
 cover standard consent, CSS, ESM/CJS, declarations, TCF/GVL and the platform UI's
 vendor disclosures, saved vendor choices and consent UUID. Local artifacts live
 in the ignored `release/artifacts/` directory after packing/consumer validation.
 
 Docs are generated separately from a clean committed SDK checkout and imported
-into Docs #79. Source provenance is recorded in its `sdk/source.json`; #78 is
-superseded only after its connected guide has been preserved in that import.
+into Docs #79. Source provenance is recorded in its `sdk/source.json`. Duplicate
+#78 was closed after its connected guide was preserved and validated in #79.
 Mintlify validation/deployment and live backend evidence remain separate checks.
 
 Still required before publication: review and merge, real backend evidence,

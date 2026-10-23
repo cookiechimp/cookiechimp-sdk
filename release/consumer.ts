@@ -87,6 +87,13 @@ for (const entry of manifest.packages) {
       const imported = await import(file);
       if (!Object.keys(imported).length)
         throw new Error(`Empty ESM export: ${specifier}`);
+      if (
+        specifier === "@cookiechimp/core" &&
+        imported.VERSION !== manifest.version
+      )
+        throw new Error(
+          "Exported SDK VERSION differs from the installed package",
+        );
       if (target.require) require(specifier);
     }
     count++;
@@ -450,6 +457,7 @@ try {
         tcfProvider: "passed",
         gvlDisclosures: "passed",
         css: "passed",
+        exportedVersion: "passed",
         platformVendorChoicesAndPersistence: "passed",
       },
       null,

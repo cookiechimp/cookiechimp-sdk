@@ -12,6 +12,8 @@
 
 ### Patch Changes
 
+- Correct the public `VERSION` export to match the released package and verify it against package metadata.
+
 - Ignore saved consent from a different recorded regulation so opt-out decisions cannot silently grant optional consent in a new opt-in region. Keep complete effective service choices in every runtime snapshot.
 
 ## 1.0.0

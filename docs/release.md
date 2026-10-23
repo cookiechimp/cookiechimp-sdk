@@ -63,7 +63,8 @@ steps read the configured release version instead of assuming 1.0.0.
 - Obtain explicit approval for version 1.1.0. The previous approval for 1.0.0
   does not carry to another version. The `npm-publish` environment must retain
   Daniel's required review and main-only branch policy.
-- Reconcile and review the Mintlify SDK guides in Docs #79, superseding #78.
+- Review the reconciled Mintlify SDK guides in Docs #79, which supersedes the
+  closed duplicate #78.
   They must identify 1.1.0-only APIs as upcoming until npm publication. Verify
   the 14 public SDK routes after the docs merge and Mintlify deployment.
 

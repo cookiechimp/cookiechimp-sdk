@@ -118,7 +118,8 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   hashes and the exact source commit; packing/publishing no longer assumes 1.0.0.
 - Docs #79 now consolidates the backend guide from #78 and the platform guides
   in one clean 14-page export. Require its approving review, merge and verify
-  the routes on Mintlify; close the duplicate #78 after checking the import.
+  the routes on Mintlify. Duplicate #78 was closed after the preserved import
+  passed validation.
   The new platform guide explicitly requires 1.1.0 rather than npm's current 1.0.0.
 - Complete live test evidence and recheck trusted publishers, then obtain new
   explicit approval for 1.1.0 and the `npm-publish` environment. Run the guarded
