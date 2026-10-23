@@ -11,6 +11,10 @@ backend verification is deferred and the publication check remains blocked.
   Chrome and mock the CookieChimp endpoints; no live consent records are sent.
 - All 42 enforced size budgets pass; none is pending. The platform UI graph is
   21249 B against its 24576 B budget on this local build.
+- A separate marginal-size audit found sync adds 3069 B over core, exceeding
+  the older 2.5 KB SPEC target by 509 B. Its standalone 4098 B measurement is
+  within the enforced 4355 B limit. The documentation now records the gap for
+  optimization or a reviewed target decision; no size limit was relaxed.
 - Next.js pins in development/examples/fixtures/benchmark applications and the
   release consumer are updated to 16.4.3 after official advisories identified
   16.4.0 as affected. `pnpm audit` reports zero advisories at all severity levels.

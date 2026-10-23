@@ -150,8 +150,11 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   platform UI renders its bounded safe rich-text subset.
 - Page-hide requests with custom headers can be dropped by the browser. Persisted
   records retry on the next visit and require receiver deduplication.
-- Sync is 2395 B, inside the revised 2.5 KB SPEC target. Provider headroom is about
-  12%, below the 15% watch target; every enforced budget passes.
+- All 42 enforced budgets pass. Sync is 4098 B against its 4355 B standalone
+  limit. Its remeasured marginal cost over core is 3069 B, exceeding the older
+  SPEC 2.5 KB target by 509 B. That target needs optimization or an explicit
+  reviewed decision; no limit was changed by release preparation. The previous
+  claim of a current 2395 B marginal cost was stale. See [size methodology](size.md).
 - The conservative TCF/GPP component sum is 10629 B of 12288 B. The provider
   bootstrap is 663 B and the deduplicated full IAB graph plus vendor CSS is 10354 B
   of 12288 B. The 1.1.0 validation passes all 42 enforced budgets, including the new
