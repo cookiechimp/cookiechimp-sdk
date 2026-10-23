@@ -77,7 +77,8 @@ export const pages: readonly PageSpec[] = [
   {
     slug: "release-status",
     title: "Versions and deployment",
-    description: "Package versions, connected deployment and optional integrations.",
+    description:
+      "Package versions, connected deployment and optional integrations.",
     source: "packages/docs/content/deployment.md",
   },
   {
