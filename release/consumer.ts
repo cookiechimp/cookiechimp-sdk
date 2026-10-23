@@ -201,14 +201,24 @@ await writeFile(
 );
 await writeFile(
   join(directory, "app/platform/page.tsx"),
+  `import { getServerConsent } from "@cookiechimp/nextjs/server";
+import { Experience } from "./experience";
+export default async function Page() {
+  return <Experience initialState={await getServerConsent({cookieName:"cc_packed_platform"})} />;
+}
+`,
+);
+await writeFile(
+  join(directory, "app/platform/experience.tsx"),
   `"use client";
+import type { ConsentState } from "@cookiechimp/core";
 import { PlatformConsentProvider, CookieBanner, CookiePreferences, RecallButton } from "@cookiechimp/react/platform";
 import "@cookiechimp/react/platform.css";
 import { useConsent } from "@cookiechimp/react";
 import bundle from "./bundle.json";
-function State() { return <output data-testid="platform-state">{JSON.stringify(useConsent())}</output>; }
-export default function Page() {
-  return <PlatformConsentProvider bundle={bundle} region="IE" locale="en" cookie={{name:"cc_packed_platform"}}>
+function State() { return <output data-testid="platform-state">{JSON.stringify(useConsent().services)}</output>; }
+export function Experience({initialState}: {initialState: ConsentState | null}) {
+  return <PlatformConsentProvider bundle={bundle} region="IE" locale="en" initialState={initialState} cookie={{name:"cc_packed_platform"}}>
     <h1>Packed platform UI</h1><State /><CookieBanner /><CookiePreferences /><RecallButton />
   </PlatformConsentProvider>;
 }
