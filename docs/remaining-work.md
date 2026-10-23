@@ -71,9 +71,8 @@ All seven required checks passed on each reviewed head. Benchmark smoke and
 packed-consumer checks also passed where present. The review record is in
 [SDK merge review](sdk-merge-review.md). Daniel selected the existing CookieChimp Mintlify docs repo for SDK documentation
 on 14 Oct. Docs PR #76 and SDK PR #49 merged on 17 Oct. All 12 SDK guides,
-Markdown views and the prefixed Mintlify AI indexes were verified live on 17 Oct. The backend
-and platform UI updates in Docs #78/#79 still await reconciliation, review and
-deployment; those new routes are not yet verified live.
+Markdown views and the prefixed Mintlify AI indexes were verified live on 17 Oct. Docs #79 consolidates the backend and platform UI guides into the same Mintlify
+site. SDK package publication and docs deployment have separate verification records.
 
 Base and TCF labels for all 33 locales completed AI editorial review on
 17 Oct 2026. Corrections, method and exact source hashes are recorded in the
@@ -113,14 +112,17 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   Fixture tests and deployment success do not prove live record delivery.
   Daniel deferred the live test on 23 Oct. Keep `platformDeployed` false; the
   [live test runbook](live-backend-verification.md) records inputs, cases and evidence.
-- Review and merge [SDK #55](https://github.com/cookiechimp/cookiechimp-sdk/pull/55) after its current-head CI
-  and installed-consumer checks pass. Candidate manifests bind version, package
-  hashes and the exact source commit; packing/publishing no longer assumes 1.0.0.
+- [SDK #55](https://github.com/cookiechimp/cookiechimp-sdk/pull/55) merged on 23 Oct
+  after current-head checks passed. Main CI and prepare-only release run
+  `40036259290` passed on `bcee50436707e27f9f5f38f7ef6a4c4f3baafb1e`;
+  all eight candidate tarballs passed hash/integrity verification and the
+  installed consumer checked 116 exports. Publication was skipped. Candidate
+  manifests bind version, package hashes and exact source commit.
 - Docs #79 now consolidates the backend guide from #78 and the platform guides
-  in one clean 14-page export. Require its approving review, merge and verify
-  the routes on Mintlify. Duplicate #78 was closed after the preserved import
-  passed validation.
-  The new platform guide explicitly requires 1.1.0 rather than npm's current 1.0.0.
+  in one clean 14-page export. Duplicate #78 was closed after the preserved
+  import passed validation. Public guides describe the SDK in present tense and
+  state package version requirements; internal publication gates remain here and
+  in `release/readiness.json`. Mintlify deployment is verified separately.
 - Complete live test evidence and recheck trusted publishers, then obtain new
   explicit approval for 1.1.0 and the `npm-publish` environment. Run the guarded
   workflow with `approved_version=1.1.0`; preserve integrity and provenance checks.

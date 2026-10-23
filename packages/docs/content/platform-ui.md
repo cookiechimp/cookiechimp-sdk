@@ -1,8 +1,6 @@
 # Banner and vendor preferences
 
-This entry requires SDK 1.1.0, which is being prepared for release. The published
-1.0.0 package does not include it. Until 1.1.0 is published, run the workspace
-playground described below. See [release status](deployment.md).
+Requires SDK 1.1.0 or newer. See [versions and deployment](deployment.md).
 
 Use `@cookiechimp/react/platform` to render the CookieChimp banner and preferences
 from the same JSON configuration used by the dashboard. Visitors can choose by

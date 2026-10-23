@@ -20,7 +20,7 @@ configuration, consent delivery, matching receipts and offline retries. Local-on
 examples are also available. A `projectId` enables Next.js config retrieval;
 platform consent delivery must be wired explicitly.
 
-Status: 1.0.0 is published on npm. This branch prepares 1.1.0, including the new platform JSON UI; 1.1.0 is not yet published. See [release status](https://docs.cookiechimp.com/docs/sdk/release-status) and [SPEC.md](./SPEC.md).
+Version compatibility: the platform JSON UI requires SDK 1.1.0 or newer. Keep the CookieChimp packages you use on matching versions. See [versions and deployment](https://docs.cookiechimp.com/docs/sdk/release-status) and [SPEC.md](./SPEC.md).
 
 ## React server rendering
 

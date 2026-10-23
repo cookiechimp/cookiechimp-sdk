@@ -1,17 +1,11 @@
-# Release status
+# Versions and deployment
 
-All eight 1.0.0 packages were published on npm on 17 October 2026. Standard SDK
-installation commands work with that version.
-
-Version 1.1.0 is the next coordinated release candidate. It adds the platform
-JSON banner, category/vendor preferences and the variation playground, and fixes
-consent restoration across regulations and consent UI locale isolation. The
-`@cookiechimp/react/platform` and `@cookiechimp/react/platform.css` entries require
-1.1.0 and are absent from 1.0.0. Use the workspace examples until the new version
-is published.
-
-Publication of 1.1.0 still requires live backend verification, review and approval
-of that exact version. It is not released by publishing these documentation pages.
+Keep the CookieChimp packages you use on matching versions. SDK 1.1.0 includes
+the platform JSON banner, category and vendor preferences, the variation
+playground, consent restoration across regulations and consent UI locale isolation.
+The `@cookiechimp/react/platform` and `@cookiechimp/react/platform.css` entries
+require 1.1.0 or newer. The 1.0.0 package cohort supports the standard consent
+integrations.
 
 ## Documentation
 
@@ -38,8 +32,8 @@ See the [reference](../../../README.md) for GPP coverage and TCF limitations.
 Banner and TCF interface labels are available in 33 editorially reviewed locales,
 including right-to-left Arabic and Hebrew. See [translations](translations.md).
 
-## Publication
+## Upgrading
 
-The eight packages are released together. Publication is a separate approval step
-with package, fresh-consumer and provenance verification. Contributor procedures
-are in the SDK repository's [release guide](../../../docs/release.md).
+Update the CookieChimp packages together and check the package changelogs for
+changes affecting your integration. Verify saved choices, your banner settings
+and connected consent delivery in your application after an upgrade.

@@ -1,8 +1,7 @@
 # Getting started
 
-The standard SDK is available on npm as 1.0.0. The platform JSON UI is part of
-the upcoming 1.1.0 release; use the workspace playground to try it before that
-version is published. See [release status](deployment.md).
+Use matching versions of the CookieChimp packages. The platform JSON banner and
+vendor preferences require SDK 1.1.0 or newer. See [versions and deployment](deployment.md).
 
 For a CookieChimp-managed project, start with
 [Connect to CookieChimp](connected-backend.md). It shows a runnable example of
