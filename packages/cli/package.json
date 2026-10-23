@@ -1,6 +1,6 @@
 {
   "name": "@cookiechimp/cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Set up and check CookieChimp in your project",
   "license": "MIT",
   "publishConfig": {

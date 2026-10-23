@@ -1,5 +1,16 @@
 # @cookiechimp/nextjs
 
+## 1.1.0
+
+### Patch Changes
+
+- Validate with patched Next.js 16.4.3 in the development dependency, examples and isolated consumer. Applications should use a patched Next.js release.
+
+- Updated dependencies [ee94b48]
+  - @cookiechimp/core@1.1.0
+  - @cookiechimp/react@1.1.0
+  - @cookiechimp/tokens@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

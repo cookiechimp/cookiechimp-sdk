@@ -1,5 +1,12 @@
 # @cookiechimp/devtools
 
+## 1.1.0
+
+### Patch Changes
+
+- Updated dependencies [ee94b48]
+  - @cookiechimp/core@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

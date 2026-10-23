@@ -1,5 +1,9 @@
 # @cookiechimp/tokens
 
+## 1.1.0
+
+Version alignment for the coordinated SDK 1.1.0 release.
+
 ## 1.0.0
 
 ### Major Changes

@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { releaseVersion, validateManifest } from "./manifest.ts";
 
 // This script is only entered after the workflow has checked main, CI,
 // Daniel's environment review and publication prerequisites.
@@ -18,36 +19,22 @@ const directory = resolve(import.meta.dirname, "artifacts");
 const manifest = JSON.parse(
   await readFile(join(directory, "manifest.json"), "utf8"),
 );
-const expected = [
-  "tokens",
-  "translations",
-  "core",
-  "react",
-  "nextjs",
-  "scripts",
-  "devtools",
-  "cli",
-].map((name) => `@cookiechimp/${name}`);
 if (
-  manifest.version !== "1.0.0" ||
   process.env.APPROVED_RELEASE_VERSION !== manifest.version ||
   process.env.GITHUB_ACTIONS !== "true"
 )
   throw new Error(
     "Publication requires GitHub Actions and approval of the exact release version",
   );
-if (
-  JSON.stringify(
-    manifest.packages.map((entry: { name: string }) => entry.name),
-  ) !== JSON.stringify(expected)
-)
-  throw new Error("Unexpected publication cohort or order");
+validateManifest(
+  manifest,
+  releaseVersion,
+  execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: resolve(import.meta.dirname, ".."),
+    encoding: "utf8",
+  }).trim(),
+);
 for (const entry of manifest.packages) {
-  if (
-    !/^cookiechimp-[a-z]+-1\.0\.0\.tgz$/.test(entry.file) ||
-    entry.version !== manifest.version
-  )
-    throw new Error("Invalid tarball identity");
   const file = join(directory, entry.file);
   const bytes = await readFile(file);
   if (createHash("sha256").update(bytes).digest("hex") !== entry.sha256)

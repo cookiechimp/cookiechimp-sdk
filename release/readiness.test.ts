@@ -2,8 +2,8 @@ import { expect, it } from "vitest";
 import { type PublicationState, publicationBlockers } from "./readiness";
 
 const ready: PublicationState = {
-  version: "1.0.0",
-  approvedVersion: "1.0.0",
+  version: "1.1.0",
+  approvedVersion: "1.1.0",
   repositoryVisibility: "public",
   manualChecks: {
     platformDeployed: true,
@@ -36,6 +36,12 @@ it("cannot replace editorial review with a publication approval", () => {
   ).toEqual([
     "Editorial review pending for base locales: de",
     "Editorial review pending for TCF locales: de",
+  ]);
+});
+
+it("does not reuse the 1.0.0 publication approval for the next release", () => {
+  expect(publicationBlockers({ ...ready, approvedVersion: "1.0.0" })).toEqual([
+    "Daniel must explicitly approve publication of this exact version",
   ]);
 });
 

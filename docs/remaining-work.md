@@ -1,6 +1,6 @@
-# Remaining work and launch status (18 Oct 2026)
+# Remaining work and launch status (23 Oct 2026)
 
-## Platform category and vendor UI (unreleased)
+## Platform category and vendor UI (merged, awaiting 1.1.0 publication)
 
 - The SDK PR adds an opt-in UI driven by the existing platform JSON, with
   vendor controls, privacy links and storage disclosures. The React/Vite
@@ -29,15 +29,22 @@
 - Styled interactions animate by default, with `motion={false}` and automatic
   reduced-motion support. The example uses realistic vendor purposes, company
   names, privacy links and illustrative cookie settings from the same JSON.
-- This work is not merged or published. Website adoption depends on SDK review,
-  current-head CI and the new package release.
+- This work merged in [SDK #54](https://github.com/cookiechimp/cookiechimp-sdk/pull/54)
+  on 19 Oct 2026. Current main passed all seven required checks. It is absent
+  from the published 1.0.0 packages and is included in the 1.1.0 candidate.
+  Website adoption requires the new package release and Daniel's platform review.
+- The 1.1.0 preparation also patches pinned Next.js development/example/consumer
+  dependencies from vulnerable 16.4.0 to 16.4.3, consistently across benchmark
+  comparators. Historical benchmark measurements retain their recorded versions.
 - The live backend configuration and consent-delivery release gate still applies.
 
 Daniel authorized Codex to review, fix and merge the SDK PRs on 14 Oct 2026.
 All eight SDK PRs below are now merged into main after review and green checks.
 Platform actions remain Daniel's responsibility; this SDK takeover has made
-no platform changes. The eight 1.0.0 candidates are staged on npm for review,
-not published as an installable SDK release.
+no platform changes. All eight 1.0.0 packages were published on 17 Oct 2026.
+Registry inspection on 23 Oct confirms their integrity metadata but no advertised
+provenance attestations. See `release/npm-1.0.0-audit.json`. Version 1.1.0 is being
+prepared from the merged SDK work; it is not published.
 
 ## Merged
 
@@ -64,30 +71,30 @@ All seven required checks passed on each reviewed head. Benchmark smoke and
 packed-consumer checks also passed where present. The review record is in
 [SDK merge review](sdk-merge-review.md). Daniel selected the existing CookieChimp Mintlify docs repo for SDK documentation
 on 14 Oct. Docs PR #76 and SDK PR #49 merged on 17 Oct. All 12 SDK guides,
-Markdown views and the prefixed Mintlify AI indexes are live. npm publication
-and external submission remain separate.
+Markdown views and the prefixed Mintlify AI indexes were verified live on 17 Oct. The backend
+and platform UI updates in Docs #78/#79 still await reconciliation, review and
+deployment; those new routes are not yet verified live.
 
 Base and TCF labels for all 33 locales completed AI editorial review on
 17 Oct 2026. Corrections, method and exact source hashes are recorded in the
 [review record](translation-review.md). This is not a native-speaker attestation.
 
-## Launch preparation completed on 17 Oct 2026
+## Launch setup and published 1.0.0
 
 - Daniel authorized public SDK source after the historical account identifier
   was disclosed. A targeted scan of 1315 unique Git blobs found no supported
   credential patterns. The SDK repository is public; its Git history was preserved.
 - The existing free `@cookiechimp` npm organization belongs to `danielpaul`.
-  Account 2FA and the local npm CLI login are verified.
-- Daniel approved staging all eight `1.0.0` candidates. npm staging receipts
-  match the SHA-512 integrity values in `release/artifacts/manifest.json`.
-  npm displays public `0.0.0-stage` placeholder pages and the eight actual
-  candidates in the review queue. This is not publication of `1.0.0`.
+  Account 2FA and CLI sign-in were verified on 17 Oct; reauthenticate if needed.
+- Daniel approved staging and publication of 1.0.0. Registry inspection now
+  confirms all eight actual 1.0.0 versions were published on 17 Oct, after
+  initial staging. The earlier claim that they remain only staged is obsolete.
 - GitHub environment `npm-publish` is restricted to main and requires
   `danielpaul` review. Daniel subsequently authorized publishing `1.0.0`.
-- All eight npm GitHub trusted publisher connections are saved and verified
-  through `npm trust list`: repository `cookiechimp/cookiechimp-sdk`, workflow
-  `release.yml`, environment `npm-publish`, publishing and staging permissions.
-  First successful CI publication must validate them within npm's two-day window.
+- All eight npm trusted publisher connections were verified on 17 Oct for
+  `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`.
+  Recheck them before 1.1.0 publication: the initial two-day validation window
+  has elapsed and the 1.0.0 registry metadata advertises no provenance.
 
 ## Launch gates requiring Daniel or external work
 
@@ -104,10 +111,19 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Live connected
   config and consent-record delivery still require evidence from Daniel.
   Fixture tests and deployment success do not prove live record delivery.
-- Complete the remaining checks in `release/readiness.json`, then run the guarded
-  release workflow with `approved_version=1.0.0`. Publication must retain npm
-  provenance; locally staged bootstrap candidates have no CI provenance and
-  must not be promoted as the final provenance-verified release.
+  Daniel deferred the live test on 23 Oct. Keep `platformDeployed` false; the
+  [live test runbook](live-backend-verification.md) records inputs, cases and evidence.
+- Review and merge the 1.1.0 release preparation PR after its current-head CI
+  and installed-consumer checks pass. Candidate manifests bind version, package
+  hashes and the exact source commit; packing/publishing no longer assumes 1.0.0.
+- Reconcile Docs #78 into #79 using a clean export of the reviewed SDK source.
+  Require the docs approving review, merge and verify the 14 routes on Mintlify.
+  The new platform guide explicitly requires 1.1.0 rather than npm's current 1.0.0.
+- Complete live test evidence and recheck trusted publishers, then obtain new
+  explicit approval for 1.1.0 and the `npm-publish` environment. Run the guarded
+  workflow with `approved_version=1.1.0`; preserve integrity and provenance checks.
+  Install from npm, verify signatures/browser behavior, and publish the reviewed
+  GitHub release/tag only after registry verification.
 - External skill/Context7 registry publication and benchmark submission require
   review and explicit submission instructions. Files and the manifest are prepared.
 
@@ -128,14 +144,16 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   the national fallback. See [conformance and coverage](gpp-conformance.md).
 - Consent records do not reach Tinybird; that remains platform-side work.
 - No cc_pk_ validation: the platform deliberately treats account hashids as public.
-- Dashboard copy with HTML uses the code message as a safe fallback.
+- Standard connected UI uses code-label fallbacks for dashboard HTML. The opt-in
+  platform UI renders its bounded safe rich-text subset.
 - Page-hide requests with custom headers can be dropped by the browser. Persisted
   records retry on the next visit and require receiver deduplication.
 - Sync is 2395 B, inside the revised 2.5 KB SPEC target. Provider headroom is about
   12%, below the 15% watch target; every enforced budget passes.
 - The conservative TCF/GPP component sum is 10629 B of 12288 B. The provider
   bootstrap is 663 B and the deduplicated full IAB graph plus vendor CSS is 10354 B
-  of 12288 B. All 41 enforced budgets pass, including default-bundle exclusion.
+  of 12288 B. The 1.1.0 validation passes all 42 enforced budgets, including the new
+  platform UI graph and default-bundle exclusion.
 - The old unexplained e2e failure has not recurred. Failure traces are now retained
   and uploaded by CI so any recurrence can be investigated.
 

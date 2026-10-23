@@ -2,19 +2,19 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { packageNames, releaseVersion, validateManifest } from "./manifest.ts";
 
-export const packageNames = [
-  "tokens",
-  "translations",
-  "core",
-  "react",
-  "nextjs",
-  "scripts",
-  "devtools",
-  "cli",
-] as const;
 const root = resolve(import.meta.dirname, "..");
 const out = resolve(root, process.argv[2] ?? "release/artifacts");
+if (
+  execFileSync("git", ["status", "--porcelain"], {
+    cwd: root,
+    encoding: "utf8",
+  }).trim()
+)
+  throw new Error(
+    "Commit release changes before packing a source-bound candidate",
+  );
 // Always build the exact current source before packing, including after rebases.
 execFileSync(
   "pnpm",
@@ -49,7 +49,7 @@ for (const name of packageNames) {
   );
   if (
     source.private ||
-    source.version !== "1.0.0" ||
+    source.version !== releaseVersion ||
     source.license !== "MIT" ||
     source.publishConfig?.access !== "public"
   )
@@ -111,8 +111,14 @@ for (const name of packageNames) {
     files: paths.length,
   });
 }
+const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+  cwd: root,
+  encoding: "utf8",
+}).trim();
+const manifest = { version: releaseVersion, sourceCommit, packages };
+validateManifest(manifest, releaseVersion, sourceCommit);
 await writeFile(
   join(out, "manifest.json"),
-  `${JSON.stringify({ version: "1.0.0", packages }, null, 2)}\n`,
+  `${JSON.stringify(manifest, null, 2)}\n`,
 );
 console.log(`Validated ${packages.length} tarballs in ${out}`);

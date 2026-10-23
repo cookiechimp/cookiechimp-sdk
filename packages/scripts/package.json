@@ -1,6 +1,6 @@
 {
   "name": "@cookiechimp/scripts",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Opt-in analytics and advertising presets for CookieChimp",
   "license": "MIT",
   "publishConfig": {

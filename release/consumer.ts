@@ -4,16 +4,22 @@ import { createRequire } from "node:module";
 import { createServer } from "node:net";
 import { join, resolve } from "node:path";
 import { chromium, expect } from "@playwright/test";
+import { releaseVersion, validateManifest } from "./manifest.ts";
 
 const directory = resolve(import.meta.dirname, "consumer");
 const artifacts = resolve(import.meta.dirname, "artifacts");
 const manifest = JSON.parse(
   await readFile(join(artifacts, "manifest.json"), "utf8"),
 );
+validateManifest(
+  manifest,
+  releaseVersion,
+  execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+);
 await rm(directory, { recursive: true, force: true });
 await mkdir(join(directory, "app"), { recursive: true });
 const dependencies: Record<string, string> = {
-  next: "16.4.0",
+  next: "16.4.3",
   react: "19.3.0",
   "react-dom": "19.3.0",
   typescript: "7.0.2",
@@ -58,7 +64,7 @@ for (const entry of manifest.packages) {
   const packed = JSON.parse(
     await readFile(join(folder, "package.json"), "utf8"),
   );
-  if (packed.version !== "1.0.0")
+  if (packed.version !== manifest.version)
     throw new Error("Consumer resolved another SDK version");
   for (const [subpath, value] of Object.entries(packed.exports ?? {})) {
     const specifier = entry.name + (subpath === "." ? "" : subpath.slice(1));
@@ -181,6 +187,32 @@ export default function Page() {
 await writeFile(
   join(directory, "next.config.mjs"),
   "export default { turbopack: { root: process.cwd() } };\n",
+);
+await mkdir(join(directory, "app/platform"), { recursive: true });
+await writeFile(
+  join(directory, "app/platform/bundle.json"),
+  await readFile(
+    resolve(
+      import.meta.dirname,
+      "../packages/core/src/fixtures/platform-offline-bundle.json",
+    ),
+    "utf8",
+  ),
+);
+await writeFile(
+  join(directory, "app/platform/page.tsx"),
+  `"use client";
+import { PlatformConsentProvider, CookieBanner, CookiePreferences, RecallButton } from "@cookiechimp/react/platform";
+import "@cookiechimp/react/platform.css";
+import { useConsent } from "@cookiechimp/react";
+import bundle from "./bundle.json";
+function State() { return <output data-testid="platform-state">{JSON.stringify(useConsent())}</output>; }
+export default function Page() {
+  return <PlatformConsentProvider bundle={bundle} region="IE" locale="en" cookie={{name:"cc_packed_platform"}}>
+    <h1>Packed platform UI</h1><State /><CookieBanner /><CookiePreferences /><RecallButton />
+  </PlatformConsentProvider>;
+}
+`,
 );
 const next = require.resolve("next/dist/bin/next");
 execFileSync(process.execPath, [next, "build"], {
@@ -328,11 +360,79 @@ try {
     ),
   ).toBe("undefined");
   expect(errors).toEqual([]);
+  await page.goto(`${url}/platform`);
+  const platform = page.locator("[data-cc-platform]");
+  await expect(platform.locator('[data-cc-part="banner"]')).toBeVisible();
+  await platform
+    .getByRole("button", { name: "Manage Preferences", exact: true })
+    .click();
+  const platformDialog = platform.getByRole("dialog", {
+    name: "Cookie Settings",
+  });
+  await expect(platformDialog).toBeVisible();
+  const consentId = platformDialog.locator(
+    '[data-cc-part="preferences-consent-id"]',
+  );
+  const originalId = await consentId.innerText();
+  expect(originalId).toMatch(/^[A-Za-z0-9_-]{16,64}$/);
+  await expect(
+    platformDialog.getByRole("switch", { name: "Essential", exact: true }),
+  ).toBeDisabled();
+  await platformDialog
+    .getByRole("button", { name: "Analytics", exact: true })
+    .click();
+  await platformDialog
+    .getByRole("button", { name: "Google Analytics", exact: true })
+    .click();
+  await expect(platformDialog.getByText("_ga", { exact: true })).toBeVisible();
+  await platformDialog
+    .getByRole("switch", { name: "Google Analytics", exact: true })
+    .click();
+  await platformDialog
+    .getByRole("button", { name: "Save Preferences", exact: true })
+    .click();
+  await page.reload();
+  await expect(platform.locator('[data-cc-part="banner"]')).toHaveCount(0);
+  await platform
+    .getByRole("button", { name: "Manage cookie preferences", exact: true })
+    .click();
+  await expect(consentId).toHaveText(originalId);
+  await platformDialog
+    .getByRole("button", { name: "Analytics", exact: true })
+    .click();
+  await expect(
+    platformDialog.getByRole("switch", {
+      name: "Google Analytics",
+      exact: true,
+    }),
+  ).toHaveAttribute("aria-checked", "true");
+  await platformDialog
+    .getByRole("button", { name: "Reject All", exact: true })
+    .click();
+  await page.reload();
+  await platform
+    .getByRole("button", { name: "Manage cookie preferences", exact: true })
+    .click();
+  await platformDialog
+    .getByRole("button", { name: "Analytics", exact: true })
+    .click();
+  await expect(
+    platformDialog.getByRole("switch", {
+      name: "Google Analytics",
+      exact: true,
+    }),
+  ).toHaveAttribute("aria-checked", "false");
+  await page.screenshot({
+    path: join(directory, "platform-verified.png"),
+    fullPage: true,
+  });
+  expect(errors).toEqual([]);
   await writeFile(
     join(artifacts, "consumer-validation.json"),
     JSON.stringify(
       {
-        version: "1.0.0",
+        version: manifest.version,
+        sourceCommit: manifest.sourceCommit,
         packageCount: manifest.packages.length,
         checkedExports: count,
         browser: browser.version(),
@@ -344,6 +444,7 @@ try {
         tcfProvider: "passed",
         gvlDisclosures: "passed",
         css: "passed",
+        platformVendorChoicesAndPersistence: "passed",
       },
       null,
       2,
