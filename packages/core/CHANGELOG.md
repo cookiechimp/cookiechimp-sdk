@@ -1,5 +1,21 @@
 # @cookiechimp/core
 
+## 1.1.0
+
+### Minor Changes
+
+- ee94b48: Add category and vendor preferences driven directly by the existing platform JSON bundle. Preserve localized descriptions, company and privacy-policy details, and cookie/storage disclosures. Add an opt-in React platform UI and a runnable JSON example, with staged per-vendor choices, required-category protection and GPC-aware vendor consent.
+
+  Animate styled interactions by default without a new dependency, honor reduced-motion preferences and support `motion={false}`. Include realistic vendor disclosures in the shared JSON example.
+
+  Honor the platform GUI/theme variants, safe formatted content, logos, force-consent interaction and language detection. Normalize current hyphenated consent modes and show the initial opt-out notice without changing opt-out defaults.
+
+### Patch Changes
+
+- Correct the public `VERSION` export to match the released package and verify it against package metadata.
+
+- Ignore saved consent from a different recorded regulation so opt-out decisions cannot silently grant optional consent in a new opt-in region. Keep complete effective service choices in every runtime snapshot.
+
 ## 1.0.0
 
 ### Major Changes

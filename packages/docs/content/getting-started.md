@@ -1,7 +1,8 @@
 # Getting started
 
-Registry commands below apply after the first npm release. Until then use the
-workspace examples. See [release status](deployment.md).
+The standard SDK is available on npm as 1.0.0. The platform JSON UI is part of
+the upcoming 1.1.0 release; use the workspace playground to try it before that
+version is published. See [release status](deployment.md).
 
 For a CookieChimp-managed project, start with
 [Connect to CookieChimp](connected-backend.md). It shows a runnable example of

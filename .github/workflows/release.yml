@@ -9,7 +9,7 @@ on:
         options: [prepare, publish]
         default: prepare
       approved_version:
-        description: Enter 1.0.0 only after approving publication of the reviewed release
+        description: Enter the exact version from release/readiness.json after approving publication
         type: string
         default: ''
 
@@ -71,7 +71,7 @@ jobs:
           node --input-type=module -e 'import fs from "node:fs"; const rules = JSON.parse(fs.readFileSync("/tmp/npm-environment.json", "utf8")).protection_rules; if (!rules?.some(r => r.type === "required_reviewers" && r.reviewers?.some(v => v.reviewer?.login === "danielpaul"))) throw new Error("npm-publish must require Daniel review");'
       - uses: actions/upload-artifact@v4
         with:
-          name: sdk-1.0.0-candidate
+          name: sdk-candidate-${{ github.sha }}
           path: release/artifacts/
           if-no-files-found: error
           retention-days: 30
@@ -92,7 +92,7 @@ jobs:
       - run: npm install --global npm@12.2.0
       - uses: actions/download-artifact@v4
         with:
-          name: sdk-1.0.0-candidate
+          name: sdk-candidate-${{ github.sha }}
           path: release/artifacts/
       - name: Confirm the reviewed main SHA and required checks
         env:

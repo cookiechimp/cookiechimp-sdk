@@ -1,91 +1,95 @@
-# 1.0 release preparation
+# Coordinated SDK release preparation
 
-The eight `@cookiechimp` packages are coordinated 1.0.0 candidates staged on npm,
-not a published SDK release. Daniel approved staging and subsequently authorized
-publication on 17 Oct 2026. SDK PR review and npm publication approval are separate.
+All eight `@cookiechimp` 1.0.0 packages were published on 17 October 2026.
+The registry snapshot in `release/npm-1.0.0-audit.json`, checked on 23 October,
+records their integrity and lack of advertised provenance attestations. Published
+versions cannot be overwritten. This branch prepares the new 1.1.0 release.
+
+## What changes in 1.1.0
+
+The opt-in platform JSON UI, category/vendor choices, storage disclosures,
+GUI/theme variants and playground merged in SDK #54 on 19 October. The release
+also includes complete effective service snapshots, consent invalidation across
+regulations and consent UI locale isolation. The new React platform entry and
+stylesheet are absent from npm 1.0.0. See each package's changelog and
+[the draft release notes](releases/1.1.0.md).
 
 ## Package and inspect
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm build
+# Commit reviewed source changes before creating source-bound tarballs.
 pnpm release:pack
 pnpm release:check
 ```
 
-`release/artifacts/` contains eight tarballs and a manifest with SHA-256 and
-npm SHA-512 integrity hashes. Packaging checks each export/bin target, license,
-README and changelog, refuses unintended files and unresolved workspace dependencies,
-and preserves dependency-first publication order. Tests, fixtures, credentials,
-Codex logs and benchmark comparators cannot enter the package allowlist.
-The React stylesheet exports include types and are marked as side effects so
-consumer bundlers retain CSS. Package installs must also be tested outside this
-workspace before publication.
+`release/artifacts/` contains eight tarballs and a manifest with the coordinated
+version, source commit, SHA-256 and npm SHA-512 integrity hashes. Packing requires a clean committed checkout and always
+builds current source, checks every export/bin target and release document,
+rejects unintended files and unresolved workspace dependencies, and preserves
+dependency-first publication order. Consumer validation and publishing reject
+candidates for another version, source commit or package cohort.
 
-PR CI also installs the tarballs in an isolated consumer, checks 114 public entries,
-validates standalone declarations strictly, and exercises the Next.js production
-app in Chromium. Next.js declaration dependencies use its normal `skipLibCheck`
-setting; the standalone SDK declarations are checked with it disabled.
+Tests, fixtures, credentials, Codex logs and benchmark comparators cannot enter
+the package allowlist. React stylesheet exports include types and are marked as
+side effects so consumer bundlers retain CSS. Package installs are also tested
+outside the workspace with `pnpm release:consumer`.
 
-The manual **SDK release** workflow defaults to `prepare`. It reruns all
-validation and saves the `sdk-1.0.0-candidate` artifact without publishing.
+PR CI installs the tarballs in an isolated consumer, checks all public entries,
+validates standalone declarations strictly and exercises a Next.js production app
+in Chromium. It covers standard consent, script gating, persistence, TCF/GVL and
+the new platform vendor UI, disclosures and saved vendor choices. Next.js
+declaration dependencies use its normal `skipLibCheck` setting; standalone SDK
+declarations are checked with it disabled.
 
-SDK PRs #41, #39, #42, #44, #45, #46, #47 and #43 were reviewed and merged
-on 14 Oct 2026 under Daniel's authorization. All seven required checks passed
-on each final reviewed head. Publication approval remains separate.
+The manual **SDK release** workflow defaults to `prepare`. It reruns validation
+and saves `sdk-candidate-<source-sha>` without publishing. Its artifact and publish
+steps read the configured release version instead of assuming 1.0.0.
 
-Base and TCF copy for all 33 locales completed AI editorial review on
-17 Oct 2026. The [review record](translation-review.md) identifies the method,
-reviewer and exact source hashes. Keep that evidence current when copy changes.
+## Outstanding publication requirements
 
-## Still required
+- Daniel deferred the live backend test on 23 October. Keep
+  `manualChecks.platformDeployed` false until reviewed test-account evidence
+  proves config retrieval, accept/reject/custom delivery, matching receipts,
+  platform records, persistence and retry behavior. The exact inputs and steps
+  are in [the live backend runbook](live-backend-verification.md). Deployment of
+  platform #2773/#2772 alone is not delivery proof. SDK work performs no platform
+  writes; Daniel owns platform configuration and live consent submissions.
+- Recheck all eight npm trusted publishers. They were verified on 17 October
+  for `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`.
+  Their initial two-day validation window may have expired. Use GitHub OIDC and
+  provenance for 1.1.0; do not promote the old bootstrap artifacts.
+- Obtain explicit approval for version 1.1.0. The previous approval for 1.0.0
+  does not carry to another version. The `npm-publish` environment must retain
+  Daniel's required review and main-only branch policy.
+- Review the reconciled Mintlify SDK guides in Docs #79, which supersedes the
+  closed duplicate #78.
+  They must identify 1.1.0-only APIs as upcoming until npm publication. Verify
+  the 14 public SDK routes after the docs merge and Mintlify deployment.
 
-- Platform #2773 and #2772 are merged, and deployment `7137407395` succeeded
-  for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459` on 17 Oct 2026. Daniel still
-  supplies live connected config/consent-delivery evidence. SDK work never
-  performs platform writes.
-- Optional CookieChimp-managed TCF activation is deferred to the
-  [internal IAB TODO](iab-integration-todo.md). It is not an SDK publication gate.
-  Production TCF still requires valid explicit configuration; no runtime check is bypassed.
-- The SDK repository is public with Daniel's authorization after disclosure of
-  the historical `error.log` account identifier (not a token). A targeted scan
-  of 1315 unique Git blobs found no supported credential patterns. History is
-  preserved; package allowlists exclude that log. The source-visibility check
-  is complete.
-- The free `@cookiechimp` npm organization, owner `danielpaul`, account 2FA and
-  CLI sign-in are verified. All eight exact candidates are staged, with npm
-  integrity values matching the artifact manifest. All eight trusted publishers
-  are saved and independently verified for `cookiechimp/cookiechimp-sdk`,
-  workflow `release.yml`, environment `npm-publish`, with direct publishing and
-  staging allowed. First successful CI publication must validate the connections
-  within npm's two-day window.
-  New-package staging created public placeholder pages and unlocked these
-  settings without releasing the SDK. The locally staged candidates lack CI
-  provenance; do not promote them as the final provenance-verified release.
-- GitHub environment `npm-publish` now requires `danielpaul` review and permits
-  main only. The workflow verifies reviewer protection before its publish job.
-- Complete `release/readiness.json` with the outstanding evidence. Daniel has
-  authorized publication of version `1.0.0`; `release:check --publish` deliberately
-  fails while any prerequisite or editorial locale review remains outstanding.
+The SDK source repository is public. Organization ownership, account 2FA and
+public source history review were completed on 17 October. All 33 base/TCF
+locales completed AI editorial review; exact hashes are recorded in
+[the translation review](translation-review.md). Optional managed IAB activation
+remains a separate [internal TODO](iab-integration-todo.md), not a publication gate.
 
-## Publish after approval
+## Publish after evidence and approval
 
-Run the **SDK release** workflow from main, choose `publish`, and enter `1.0.0`
-as `approved_version`. Its environment checkpoint requires Daniel review.
-The source SHA must still be main and all seven CI checks must be green.
-The publish job uses npm OIDC, publishes the exact prepared tarballs with
+From reviewed main with all seven required checks green, run **SDK release**,
+choose `publish` and enter `1.1.0` as `approved_version`. The workflow verifies
+prerequisites before reaching Daniel's environment review. It confirms the source
+SHA is still main, publishes the exact prepared tarballs with npm OIDC and
 provenance, and verifies registry integrity and attestations for every package.
-A partial rerun skips an existing version only when its bytes and provenance match.
-It refuses an existing mismatched version; npm versions cannot be overwritten.
+A partial rerun skips an existing version only when its bytes and provenance
+match. A mismatched or unattested existing version is rejected.
 
 After registry verification, install the published packages in a fresh Next.js
-app, exercise consent and persistence in a browser, and verify provenance with
-`npm audit signatures`. Then prepare a reviewed GitHub release/tag and external
-benchmark submission. The workflow does not claim those steps have happened.
+app, exercise standard and platform consent/persistence in a browser, and run
+`npm audit signatures`. Update the public release-status guide, then publish the
+reviewed GitHub release/tag using [the prepared notes](releases/1.1.0.md).
+The workflow does not create tags or claim publication or live tests occurred.
+External skill/Context7 and benchmark submissions remain separately approved work.
 
-Daniel selected the existing CookieChimp Mintlify site for SDK guides. The
-documentation PR #76 and SDK PR #49 merged on 17 Oct 2026; all 12 SDK routes
-and the Mintlify AI indexes were verified live. See [documentation workflow](documentation.md).
-
-Sources: [npm trusted publishers](https://docs.npmjs.com/trusted-publishers/)
-and [npm provenance](https://docs.npmjs.com/generating-provenance-statements/).
+Canonical SDK guides belong on the existing CookieChimp Mintlify site. No new
+hosting/domain is required. See [the documentation workflow](documentation.md).

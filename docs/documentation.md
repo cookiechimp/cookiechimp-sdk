@@ -38,11 +38,17 @@ Do not hand-edit generated MDX pages: change their SDK sources and regenerate.
 
 ## Merge and deployment order
 
-1. Review and merge the companion CookieChimp-Docs PR.
-2. Verify the new public overview, getting-started and reference routes on the
-   existing Mintlify deployment, including search and internal links.
-3. Merge the SDK PR that changes README/package links and retires the standalone
-   website. SDK checks must be green on its current head.
+1. Prepare and review the SDK source changes and generate docs from their exact
+   clean commit. Consolidate overlapping SDK documentation PRs into one current
+   import so an older generated page cannot overwrite a newer guide.
+2. Merge the reviewed SDK source before deploying docs that link to its new files.
+   New APIs may be documented before npm publication only when the guide clearly
+   identifies the required upcoming version and a runnable workspace alternative.
+3. Obtain the documentation repository's required approving review and merge the
+   reconciled docs PR. Do not bypass branch protection without explicit approval.
+4. Verify all exported public routes, getting-started/reference links and the
+   Mintlify AI indexes after deployment. After npm publication, update and
+   regenerate the public release-status guide from reviewed source.
 
 Documentation publication does not publish npm packages, register the CMP or
 prove connected platform delivery. Those remain separate launch requirements.

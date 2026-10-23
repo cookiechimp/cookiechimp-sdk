@@ -448,5 +448,11 @@ describe("createConsent", () => {
 });
 
 describe("VERSION", () => {
-  it("exposes the package version", () => expect(VERSION).toBe("0.0.0"));
+  it("matches the actual package version", async () => {
+    const { readFile } = await import("node:fs/promises");
+    const metadata = JSON.parse(
+      await readFile(new URL("../package.json", import.meta.url), "utf8"),
+    );
+    expect(VERSION).toBe(metadata.version);
+  });
 });

@@ -1,0 +1,72 @@
+{
+  "checkedAt": "2026-10-23T22:16:08.694Z",
+  "registry": "https://registry.npmjs.org",
+  "candidateVersion": "1.1.0",
+  "candidateAlreadyPublished": false,
+  "packages": [
+    {
+      "name": "@cookiechimp/tokens",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:52:24.286Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-yyWDpzYXPFL8cXVypib5MPgq6xesVuPA4Q0CQGxxh/fwjIjNMj2ZMsDpEwqHOq1W74GWcg9JDT/74VV560lQvg==",
+      "provenanceAttestations": null
+    },
+    {
+      "name": "@cookiechimp/translations",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:54:38.040Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-9Bd0erdNRQCItTTaOh9obF3gzcMhho7VRNHZXEROwdaST4mKjjbrvUWFTkxDw5C/FaYq1u+HY+t7waJ2l27U1g==",
+      "provenanceAttestations": null
+    },
+    {
+      "name": "@cookiechimp/core",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:54:13.493Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-llgtxckiWhy73iIIQHs7wblIfl03JL8FmigtLT4BhMRR3USvF2nIJunj0wJyQLYecuxiEUnaC9qv4nTc0sCLmA==",
+      "provenanceAttestations": null
+    },
+    {
+      "name": "@cookiechimp/react",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:53:15.155Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-UDRGcAdnifvl1V2gU1Kp206gCmzaCYifX8Uz2U0HJNpPOUZ1xDFxo0HhSXkcrYAcrwiounJKTHdcK66vVC2H/A==",
+      "provenanceAttestations": null
+    },
+    {
+      "name": "@cookiechimp/nextjs",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:54:29.689Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-EKliz/gb5XmEf5bAB+MRODTuZd7VK/XjFQmzvxcyU8uQXNESqFUKx96Hbxx+EKW8k448cmamJU1yb8eja9ypsw==",
+      "provenanceAttestations": null
+    },
+    {
+      "name": "@cookiechimp/scripts",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:53:34.351Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-NcQTAhdaqQ6VNgZszBdy25prs00lRJ8xzcNQ/39IhnQn/x+TPpJZthhsHHeepyg372r6R+U8d8hAfS13jn5tNw==",
+      "provenanceAttestations": null
+    },
+    {
+      "name": "@cookiechimp/devtools",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:52:48.247Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-H8VE68rHLyzmzHq2QZyn/Oz2v5Pyw9F2ETfYVV0lNIKI10iRIwtX+OvXDlS1/G8IrJxNke06DG9K2xPbCJLZmQ==",
+      "provenanceAttestations": null
+    },
+    {
+      "name": "@cookiechimp/cli",
+      "version": "1.0.0",
+      "publishedAt": "2026-10-17T17:52:38.681Z",
+      "latest": "1.0.0",
+      "integrity": "sha512-2BF9CXic9J0gBhWYNUr5L5ZqnUUqoOPpaG9GXTekzrVnHbBHFy2PIScE3lAHQLLZYmMSWMNEyaNGK3jlJCH0+g==",
+      "provenanceAttestations": null
+    }
+  ]
+}
