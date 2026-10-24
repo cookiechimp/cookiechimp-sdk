@@ -3,12 +3,12 @@
   "manualChecks": {
     "platformDeployed": false,
     "publicHistoryReviewed": true,
-    "npmOrganizationReady": false
+    "npmOrganizationReady": true
   },
   "notes": {
     "platformDeployed": "Daniel requested live test preparation on 24 Oct 2026 after deferring the test on 23 Oct. The connected page was built from main 73a13e39a600aa9552fa38cce143e843407a2e41 and served at http://127.0.0.1:3104/connected, with no live consent submissions. Keep this false until the test-account evidence in docs/live-backend-verification.md is reviewed. No platform writes are performed by SDK preparation.",
     "publicHistoryReviewed": "Daniel authorized public SDK source on 17 Oct 2026 after disclosure of the historical error.log account identifier. A targeted scan of 1315 unique Git blobs found no supported credential patterns. The identifier is not an authentication secret; history was preserved and the SDK repository is now public.",
-    "npmOrganizationReady": "Authenticated npm settings inspection on 24 Oct 2026 confirmed all eight trusted publisher connections are Expired: core, tokens, translations, react, nextjs, scripts, devtools and cli. They bind cookiechimp/cookiechimp-sdk, release.yml and npm-publish with npm publish and npm stage publish permissions. npm requires deleting and recreating the expired connections. Keep this false until those connections are restored and verified. GitHub's npm-publish environment still requires danielpaul review and allows only main. The organization itself remains configured; 1.1.0 must use GitHub OIDC and provenance. See release/npm-1.0.0-audit.json for the earlier registry audit."
+    "npmOrganizationReady": "Daniel authorized equivalent renewal of all eight expired npm trusted publisher connections on 24 Oct 2026. npm CLI recreation and authenticated settings inspection verified one connection per package with cookiechimp/cookiechimp-sdk, release.yml, npm-publish and npm publish/npm stage publish permissions. All eight are Pending validation, not yet proven by a trusted publish. Their first-publish deadlines are 26 Oct 2026 at 22:08-22:09 UTC; recheck before publication and renew again if expired. No package version was published during renewal. GitHub environment review and main-only restrictions remain required. See release/npm-trusted-publishers-2026-10-24.json. Live backend evidence and exact-version publication approval are still pending."
   },
   "deferred": {
     "tcf": {

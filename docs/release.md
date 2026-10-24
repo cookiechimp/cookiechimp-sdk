@@ -57,10 +57,15 @@ steps read the configured release version instead of assuming 1.0.0.
   are in [the live backend runbook](live-backend-verification.md). Deployment of
   platform #2773/#2772 alone is not delivery proof. SDK work performs no platform
   writes; Daniel owns platform configuration and live consent submissions.
-- Authenticated npm inspection on 24 October found all eight trusted publisher
-  connections expired. Restore and verify their existing bindings to
+- All eight expired npm trusted publisher connections were renewed and verified
+  on 24 October with Daniel's authorization. Their bindings remain
   `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`, with
-  publish/stage permissions before setting `npmOrganizationReady` true. Use
+  publish/stage permissions. `npmOrganizationReady` is true for the restored
+  configuration; [the audit](../release/npm-trusted-publishers-2026-10-24.json)
+  records one connection per package. npm reports **Pending validation** until
+  the first trusted publish succeeds. The connections expire on 26 October at
+  22:08-22:09 UTC if unused, so recheck before publication and renew if needed.
+  Renewal published no package version and does not prove provenance. Use
   GitHub OIDC and provenance for 1.1.0; do not promote old bootstrap artifacts.
 - Obtain explicit approval for version 1.1.0. The previous approval for 1.0.0
   does not carry to another version. The `npm-publish` environment must retain

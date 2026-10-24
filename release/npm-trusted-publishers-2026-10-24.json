@@ -1,0 +1,120 @@
+{
+  "inspectedAt": "2026-10-24T22:10:31Z",
+  "source": "Authenticated npm CLI trust list and npm package settings after successful equivalent renewal",
+  "packageVersionPublished": false,
+  "provenanceVerified": false,
+  "connections": [
+    {
+      "package": "@cookiechimp/scripts",
+      "connections": {
+        "id": "76c5a6fe-fb4c-450a-9d0c-57a00faecaaa",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:08 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/scripts/access"
+    },
+    {
+      "package": "@cookiechimp/tokens",
+      "connections": {
+        "id": "81464de2-d8bc-4247-b92e-2dbe9bc37ebb",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:08 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/tokens/access"
+    },
+    {
+      "package": "@cookiechimp/translations",
+      "connections": {
+        "id": "24355474-3813-4f10-9efa-69ffadf875f4",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:08 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/translations/access"
+    },
+    {
+      "package": "@cookiechimp/core",
+      "connections": {
+        "id": "f8911459-8a34-4147-86c7-f7f1d93896e8",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:09 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/core/access"
+    },
+    {
+      "package": "@cookiechimp/react",
+      "connections": {
+        "id": "8e08d14d-4db7-4dcd-bf30-19d13071dec0",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:09 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/react/access"
+    },
+    {
+      "package": "@cookiechimp/nextjs",
+      "connections": {
+        "id": "07ea8532-09e6-45cf-a6f2-3d2590876259",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:09 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/nextjs/access"
+    },
+    {
+      "package": "@cookiechimp/devtools",
+      "connections": {
+        "id": "fcc942ab-d7cd-47a7-9bf8-a1fe82becb18",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:09 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/devtools/access"
+    },
+    {
+      "package": "@cookiechimp/cli",
+      "connections": {
+        "id": "76bd8dab-0ee4-4c72-944e-4b0f7fcc1895",
+        "type": "github",
+        "file": "release.yml",
+        "repository": "cookiechimp/cookiechimp-sdk",
+        "environment": "npm-publish",
+        "permissions": ["createPackage", "createStagedPackage"]
+      },
+      "status": "pending_validation",
+      "validationNotice": "Trusted publishing config not yet validated. Publish once before Oct 26, 2026, 10:09 PM UTC to validate this configuration.",
+      "settingsUrl": "https://www.npmjs.com/package/@cookiechimp/cli/access"
+    }
+  ]
+}

@@ -90,11 +90,15 @@ Base and TCF labels for all 33 locales completed AI editorial review on
   initial staging. The earlier claim that they remain only staged is obsolete.
 - GitHub environment `npm-publish` is restricted to main and requires
   `danielpaul` review. Daniel subsequently authorized publishing `1.0.0`.
-- An authenticated npm recheck on 24 Oct found all eight trusted publisher
-  connections expired. Their repository, workflow, environment and publish/stage
-  permissions are correct, but npm requires deleting and recreating them.
-  `npmOrganizationReady` is false until restoration and verification. GitHub's
-  publishing environment still requires Daniel's review and permits only main.
+- Daniel authorized renewal of all eight expired npm trusted publisher
+  connections on 24 Oct. All eight were recreated and verified with the same
+  repository, workflow, environment and publish/stage permissions; the
+  [connection audit](../release/npm-trusted-publishers-2026-10-24.json) records
+  one connection per package. `npmOrganizationReady` is true for this setup.
+  npm reports **Pending validation** until a trusted publish succeeds, with
+  first-publish deadlines on 26 Oct at 22:08-22:09 UTC. Recheck immediately before
+  publication and renew again if expired. No package version was published.
+  GitHub's environment still requires Daniel's review and permits only main.
 
 ## Launch gates requiring Daniel or external work
 
