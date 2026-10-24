@@ -166,6 +166,8 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
 
 ## Working rules
 
+- Billing counts all users, including bots. The obsolete bot analytics, consent
+  retention and billing PR stack is not a prerequisite for the SDK launch.
 - Follow AGENTS.md and CONTRIBUTING.md. Never copy CookieYes code. No client-side geolocation.
 - All seven checks must pass on the current head. Packed-consumer and benchmark
   checks provide additional validation. Separate local proof, CI, merge, deployment
