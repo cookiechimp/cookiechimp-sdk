@@ -49,24 +49,26 @@ steps read the configured release version instead of assuming 1.0.0.
 
 ## Outstanding publication requirements
 
-- Daniel deferred the live backend test on 23 October. Keep
+- Daniel requested live test preparation on 24 October after deferring the test
+  on 23 October. The connected page is prepared; real results remain pending. Keep
   `manualChecks.platformDeployed` false until reviewed test-account evidence
   proves config retrieval, accept/reject/custom delivery, matching receipts,
   platform records, persistence and retry behavior. The exact inputs and steps
   are in [the live backend runbook](live-backend-verification.md). Deployment of
   platform #2773/#2772 alone is not delivery proof. SDK work performs no platform
   writes; Daniel owns platform configuration and live consent submissions.
-- Recheck all eight npm trusted publishers. They were verified on 17 October
-  for `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`.
-  Their initial two-day validation window may have expired. Use GitHub OIDC and
-  provenance for 1.1.0; do not promote the old bootstrap artifacts.
+- Authenticated npm inspection on 24 October found all eight trusted publisher
+  connections expired. Restore and verify their existing bindings to
+  `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`, with
+  publish/stage permissions before setting `npmOrganizationReady` true. Use
+  GitHub OIDC and provenance for 1.1.0; do not promote old bootstrap artifacts.
 - Obtain explicit approval for version 1.1.0. The previous approval for 1.0.0
   does not carry to another version. The `npm-publish` environment must retain
   Daniel's required review and main-only branch policy.
-- Review the reconciled Mintlify SDK guides in Docs #79, which supersedes the
-  closed duplicate #78.
-  They must identify 1.1.0-only APIs as upcoming until npm publication. Verify
-  the 14 public SDK routes after the docs merge and Mintlify deployment.
+- Docs #79 and #81 are merged and deployed, including the connected-backend
+  guide and the all-users billing policy. Public guides use present-tense copy
+  with SDK version requirements. Verify the public guides against the final
+  published package behavior as part of release verification.
 
 The SDK source repository is public. Organization ownership, account 2FA and
 public source history review were completed on 17 October. All 33 base/TCF

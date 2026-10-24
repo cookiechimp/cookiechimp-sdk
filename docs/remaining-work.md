@@ -1,4 +1,4 @@
-# Remaining work and launch status (23 Oct 2026)
+# Remaining work and launch status (24 Oct 2026)
 
 ## Platform category and vendor UI (merged, awaiting 1.1.0 publication)
 
@@ -90,10 +90,11 @@ Base and TCF labels for all 33 locales completed AI editorial review on
   initial staging. The earlier claim that they remain only staged is obsolete.
 - GitHub environment `npm-publish` is restricted to main and requires
   `danielpaul` review. Daniel subsequently authorized publishing `1.0.0`.
-- All eight npm trusted publisher connections were verified on 17 Oct for
-  `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`.
-  Recheck them before 1.1.0 publication: the initial two-day validation window
-  has elapsed and the 1.0.0 registry metadata advertises no provenance.
+- An authenticated npm recheck on 24 Oct found all eight trusted publisher
+  connections expired. Their repository, workflow, environment and publish/stage
+  permissions are correct, but npm requires deleting and recreating them.
+  `npmOrganizationReady` is false until restoration and verification. GitHub's
+  publishing environment still requires Daniel's review and permits only main.
 
 ## Launch gates requiring Daniel or external work
 
@@ -110,7 +111,9 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Live connected
   config and consent-record delivery still require evidence from Daniel.
   Fixture tests and deployment success do not prove live record delivery.
-  Daniel deferred the live test on 23 Oct. Keep `platformDeployed` false; the
+  Daniel requested preparation on 24 Oct after deferring the test on 23 Oct.
+  The connected example is built and served locally on port 3104; real account
+  inputs and live results remain pending. Keep `platformDeployed` false; the
   [live test runbook](live-backend-verification.md) records inputs, cases and evidence.
 - [SDK #55](https://github.com/cookiechimp/cookiechimp-sdk/pull/55) merged on 23 Oct
   after current-head checks passed. Main CI and prepare-only release run

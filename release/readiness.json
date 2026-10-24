@@ -3,12 +3,12 @@
   "manualChecks": {
     "platformDeployed": false,
     "publicHistoryReviewed": true,
-    "npmOrganizationReady": true
+    "npmOrganizationReady": false
   },
   "notes": {
-    "platformDeployed": "Live backend verification deferred by Daniel on 23 Oct 2026. Platform dependency PRs #2773 and #2772 merged on 17 Oct; deployment alone does not prove connected config and consent delivery. Keep this false until the test-account evidence in docs/live-backend-verification.md is reviewed. No platform writes are performed by SDK preparation.",
+    "platformDeployed": "Daniel requested live test preparation on 24 Oct 2026 after deferring the test on 23 Oct. The connected page was built from main 73a13e39a600aa9552fa38cce143e843407a2e41 and served at http://127.0.0.1:3104/connected, with no live consent submissions. Keep this false until the test-account evidence in docs/live-backend-verification.md is reviewed. No platform writes are performed by SDK preparation.",
     "publicHistoryReviewed": "Daniel authorized public SDK source on 17 Oct 2026 after disclosure of the historical error.log account identifier. A targeted scan of 1315 unique Git blobs found no supported credential patterns. The identifier is not an authentication secret; history was preserved and the SDK repository is now public.",
-    "npmOrganizationReady": "The @cookiechimp organization, danielpaul ownership and account 2FA were verified on 17 Oct 2026. Registry inspection on 23 Oct confirms all eight 1.0.0 packages were published on 17 Oct; none advertises provenance attestations. The 1.1.0 candidate must use GitHub OIDC and provenance. Recheck all eight trusted publisher connections before publication; their initial two-day validation window may have expired. See release/npm-1.0.0-audit.json."
+    "npmOrganizationReady": "Authenticated npm settings inspection on 24 Oct 2026 confirmed all eight trusted publisher connections are Expired: core, tokens, translations, react, nextjs, scripts, devtools and cli. They bind cookiechimp/cookiechimp-sdk, release.yml and npm-publish with npm publish and npm stage publish permissions. npm requires deleting and recreating the expired connections. Keep this false until those connections are restored and verified. GitHub's npm-publish environment still requires danielpaul review and allows only main. The organization itself remains configured; 1.1.0 must use GitHub OIDC and provenance. See release/npm-1.0.0-audit.json for the earlier registry audit."
   },
   "deferred": {
     "tcf": {

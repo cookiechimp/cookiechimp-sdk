@@ -1,10 +1,27 @@
 # Live backend verification for SDK 1.1.0
 
-Status: deferred by Daniel on 23 October 2026. This is still a publication gate.
+Status: test page prepared on 24 October 2026, awaiting Daniel's test account
+and live results. Built from main `73a13e39a600aa9552fa38cce143e843407a2e41`
+and served at `http://127.0.0.1:3104/connected`; HTTP 200 and a browser render
+without console errors were verified. No live consent records were submitted.
+This is still a publication gate.
 Mocked CI, a successful deployment and local consent persistence do not satisfy it.
 Keep `manualChecks.platformDeployed` false until real evidence is reviewed.
 
-## Information Daniel supplies when testing resumes
+## Find the public account ID
+
+Open the chosen test account's installation snippet, or search the HTML of a
+site where that account's CookieChimp widget is installed for
+`cookiechimp.com/widget/`. For example:
+
+```html
+<script src="https://cookiechimp.com/widget/abc123.js"></script>
+```
+
+Here the public account ID is `abc123`. Enter only the ID, without the URL,
+`/widget/` or `.js`. The example above is illustrative. Do not use an API key.
+
+## Test account setup
 
 - A dedicated test account's public hashid from its installation snippet. Do not
   supply an API key, password, session cookie or production visitor data.
@@ -12,9 +29,14 @@ Keep `manualChecks.platformDeployed` false until real evidence is reviewed.
   The workspace example defaults to `http://127.0.0.1:3104`; `localhost` is a
   different origin. If local origins are unsupported, use an approved preview
   origin and serve the same built example there.
+- Under Account Settings > Additional Domains, allow `127.0.0.1` for this local
+  test. Daniel makes this account configuration change. Keep the browser URL
+  on `http://127.0.0.1:3104`, rather than switching to `localhost`.
 - Confirmation that the account has an active English opt-in banner for Ireland,
   with at least one optional category and a service. The example supplies `IE`
   and `en`; select or configure a test account accordingly.
+  Prefer two optional categories so the custom case can enable one and reject
+  another.
 - Access to view that account's consent records in the dashboard. Daniel performs
   platform configuration and the live consent submissions; SDK preparation does
   not modify the platform or post records on his behalf.
@@ -31,7 +53,11 @@ pnpm --filter @cookiechimp/example-react-vite start
 
 Open `http://127.0.0.1:3104/connected`, enter the public account ID and choose
 **Load CookieChimp configuration**. In browser DevTools, preserve the Network log
-and filter for `mobile-sdk`. Do not use `/platform.html` for this test: that
+and filter for `mobile-sdk`. For each sync request, the Payload tab contains
+`consents[].client_id` and `consents[].uuid`; the Response tab contains `synced`.
+Search the dashboard's Consent Records for `uuid` to confirm storage. The local
+page's acknowledgement message must agree with the response for that decision.
+Do not use `/platform.html` for this test: that
 playground intentionally does not send consent records.
 
 ## Daniel runs the live cases
@@ -51,12 +77,18 @@ playground intentionally does not send consent records.
    and platform record. Required categories must remain enabled.
 5. **Persistence:** reload after the custom decision. Confirm the choices and
    consent UUID restore from the account's cookie without prompting again.
-6. **Retry:** after config is loaded, use DevTools request blocking to block only
-   the sync URL. Save a changed decision; confirm a queued delivery without a
-   success acknowledgement. Unblock it, toggle offline/online if needed, and
+6. **Retry:** after config is loaded, right-click an earlier sync request in
+   Chrome's Network panel and choose **Block request**. In the **Request
+   conditions** drawer, confirm the pattern blocks only the sync URL, not all
+   CookieChimp requests. Keep DevTools open; closing it disables blocking.
+   Save a changed decision; confirm a queued delivery without a success
+   acknowledgement. Uncheck that blocking condition, toggle offline/online if needed, and
    wait for retry. Confirm the same queued `client_id` is acknowledged, the queue
    drains and the platform has one record for that retry ID. Do not delete local
    storage while the queued record is pending.
+
+Chrome documents the current controls in
+[Request conditions](https://developer.chrome.com/docs/devtools/request-conditions).
 
 A 2xx response, displayed UUID or empty queue without a matching receipt is not
 delivery proof. Keep `client_id` (delivery/retry identity) distinct from `uuid`
