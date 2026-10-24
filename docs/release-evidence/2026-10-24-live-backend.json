@@ -1,0 +1,132 @@
+{
+  "version": "1.1.0",
+  "testedSourceSha": "6b15623974ee3e75bcc4c448b234cd767e82315e",
+  "equivalentMainSha": "dc962edff35541b77948ad7367ca9d32556cda02",
+  "testDateUtc": "2026-10-24",
+  "accountId": "K8ktWD",
+  "accountSource": "https://cookiechimp.com/ installation script /widget/K8ktWD.js",
+  "origin": "http://localhost:3104",
+  "country": "IE",
+  "language": "en",
+  "bannerId": "KvNnu9",
+  "configVersion": "884cc663",
+  "platformConfigVersion": 5,
+  "configRequests": [
+    {
+      "requestId": "40191.30",
+      "ifNoneMatch": true,
+      "httpStatus": 200
+    },
+    {
+      "requestId": "40191.48",
+      "ifNoneMatch": true,
+      "httpStatus": 200
+    }
+  ],
+  "decisions": [
+    {
+      "case": "accept",
+      "createdAt": "2026-10-24T22:18:10.266Z",
+      "action": "accept_all",
+      "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:18:10.266Z",
+      "consentUuid": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8",
+      "acceptedCategories": ["necessary", "essential", "analytics"],
+      "rejectedCategories": [],
+      "httpStatus": 200,
+      "matchingReceipt": {
+        "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:18:10.266Z",
+        "server_id": "9RwHVAwQxV"
+      },
+      "dashboardVerified": false
+    },
+    {
+      "case": "reject",
+      "createdAt": "2026-10-24T22:18:38.534Z",
+      "action": "reject_all",
+      "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:18:38.534Z",
+      "consentUuid": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8",
+      "acceptedCategories": ["necessary", "essential"],
+      "rejectedCategories": ["analytics"],
+      "httpStatus": 200,
+      "matchingReceipt": {
+        "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:18:38.534Z",
+        "server_id": "w29H5epmvz"
+      },
+      "dashboardVerified": false
+    },
+    {
+      "case": "custom",
+      "createdAt": "2026-10-24T22:19:20.096Z",
+      "action": "custom",
+      "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:20.096Z",
+      "consentUuid": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8",
+      "acceptedCategories": ["necessary", "essential", "analytics"],
+      "rejectedCategories": [],
+      "httpStatus": 200,
+      "matchingReceipt": {
+        "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:20.096Z",
+        "server_id": "eA9HGXyDWn"
+      },
+      "dashboardVerified": false
+    },
+    {
+      "case": "retry",
+      "createdAt": "2026-10-24T22:19:46.422Z",
+      "action": "reject_all",
+      "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:46.422Z",
+      "consentUuid": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8",
+      "acceptedCategories": ["necessary", "essential"],
+      "rejectedCategories": ["analytics"],
+      "httpStatus": 200,
+      "matchingReceipt": {
+        "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:46.422Z",
+        "server_id": "zz5HYM5eym"
+      },
+      "dashboardVerified": false
+    }
+  ],
+  "persistence": {
+    "choicesRestored": true,
+    "essential": true,
+    "analytics": true,
+    "sameConsentUuidAfterReload": true,
+    "noDecisionOnReload": true
+  },
+  "retry": {
+    "queuedWhileBlocked": 1,
+    "queueAfterAcknowledgement": 0,
+    "attempts": [
+      {
+        "requestId": "40191.50",
+        "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:46.422Z",
+        "blocked": true,
+        "httpStatus": null
+      },
+      {
+        "requestId": "40191.51",
+        "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:46.422Z",
+        "blocked": true,
+        "httpStatus": null
+      },
+      {
+        "requestId": "40191.52",
+        "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:46.422Z",
+        "blocked": true,
+        "httpStatus": null
+      },
+      {
+        "requestId": "40191.53",
+        "clientId": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:46.422Z",
+        "blocked": false,
+        "httpStatus": 200
+      }
+    ],
+    "requestBlockingRemoved": true,
+    "dashboardDuplicateCheck": "pending"
+  },
+  "limitations": [
+    "This account exposes one optional category, analytics; the custom test re-enabled it through Save Preferences. A mixed choice across two optional categories was not available.",
+    "Dashboard storage and duplicate verification await authenticated dashboard access."
+  ],
+  "publicationGateSatisfied": false
+}

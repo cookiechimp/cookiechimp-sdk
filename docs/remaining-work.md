@@ -115,10 +115,13 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Live connected
   config and consent-record delivery still require evidence from Daniel.
   Fixture tests and deployment success do not prove live record delivery.
-  Daniel requested preparation on 24 Oct after deferring the test on 23 Oct.
-  The connected example is built and served locally on port 3104; real account
-  inputs and live results remain pending. Keep `platformDeployed` false; the
-  [live test runbook](live-backend-verification.md) records inputs, cases and evidence.
+  On 24 Oct Daniel selected cookiechimp.com's public account `K8ktWD` for testing.
+  Live browser config, accept/reject/custom delivery, persistence and blocked
+  retry checks passed at `http://localhost:3104`, with four matching HTTP 200
+  receipts and an empty queue. The [evidence](release-evidence/2026-10-24-live-backend.json)
+  records exact decision and server IDs. Dashboard storage and retry uniqueness
+  await authenticated access, so `platformDeployed` remains false. The
+  [live test runbook](live-backend-verification.md) records the remaining check.
 - [SDK #55](https://github.com/cookiechimp/cookiechimp-sdk/pull/55) merged on 23 Oct
   after current-head checks passed. Main CI and prepare-only release run
   `40036259290` passed on `bcee50436707e27f9f5f38f7ef6a4c4f3baafb1e`;

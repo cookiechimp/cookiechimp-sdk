@@ -1,12 +1,17 @@
 # Live backend verification for SDK 1.1.0
 
-Status: test page prepared on 24 October 2026, awaiting Daniel's test account
-and live results. Built from main `73a13e39a600aa9552fa38cce143e843407a2e41`
-and served at `http://127.0.0.1:3104/connected`; HTTP 200 and a browser render
-without console errors were verified. No live consent records were submitted.
-This is still a publication gate.
-Mocked CI, a successful deployment and local consent persistence do not satisfy it.
-Keep `manualChecks.platformDeployed` false until real evidence is reviewed.
+Status: live browser checks ran on 24 October 2026 using account `K8ktWD`,
+which Daniel selected from cookiechimp.com's installation script. The test page
+used `http://localhost:3104/connected?project=K8ktWD`; this account already permits
+`localhost`. Accept, reject, custom, persistence and blocked-request retry checks
+passed, with four HTTP 200 matching receipts. See the
+[sanitized evidence](release-evidence/2026-10-24-live-backend.json).
+
+Authenticated dashboard confirmation of the four records and retry uniqueness
+is still pending because Chrome is signed out. Keep
+`manualChecks.platformDeployed` false until that final check is complete.
+The tested source is `6b15623974ee3e75bcc4c448b234cd767e82315e`; package and example
+sources match reviewed main `dc962edff35541b77948ad7367ca9d32556cda02`.
 
 ## Find the public account ID
 
@@ -37,9 +42,11 @@ Here the public account ID is `abc123`. Enter only the ID, without the URL,
   and `en`; select or configure a test account accordingly.
   Prefer two optional categories so the custom case can enable one and reject
   another.
-- Access to view that account's consent records in the dashboard. Daniel performs
-  platform configuration and the live consent submissions; SDK preparation does
-  not modify the platform or post records on his behalf.
+- Access to view that account's consent records in the dashboard. Daniel owns
+  platform configuration and selects the account for live submissions. On
+  24 October he authorized testing with `K8ktWD`; the SDK browser test submitted
+  four decisions to that account. No platform repository or account settings
+  were changed.
 
 ## Prepare the page
 
@@ -60,7 +67,7 @@ page's acknowledgement message must agree with the response for that decision.
 Do not use `/platform.html` for this test: that
 playground intentionally does not send consent records.
 
-## Daniel runs the live cases
+## Run the live cases
 
 1. **Live config:** confirm the actual `GET /api/v1/mobile-sdk/offline/{accountId}`
    succeeds and the page reports a dashboard banner ID and config version.
