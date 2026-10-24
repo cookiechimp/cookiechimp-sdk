@@ -77,12 +77,18 @@ playground intentionally does not send consent records.
    and platform record. Required categories must remain enabled.
 5. **Persistence:** reload after the custom decision. Confirm the choices and
    consent UUID restore from the account's cookie without prompting again.
-6. **Retry:** after config is loaded, use DevTools request blocking to block only
-   the sync URL. Save a changed decision; confirm a queued delivery without a
-   success acknowledgement. Unblock it, toggle offline/online if needed, and
+6. **Retry:** after config is loaded, right-click an earlier sync request in
+   Chrome's Network panel and choose **Block request**. In the **Request
+   conditions** drawer, confirm the pattern blocks only the sync URL, not all
+   CookieChimp requests. Keep DevTools open; closing it disables blocking.
+   Save a changed decision; confirm a queued delivery without a success
+   acknowledgement. Uncheck that blocking condition, toggle offline/online if needed, and
    wait for retry. Confirm the same queued `client_id` is acknowledged, the queue
    drains and the platform has one record for that retry ID. Do not delete local
    storage while the queued record is pending.
+
+Chrome documents the current controls in
+[Request conditions](https://developer.chrome.com/docs/devtools/request-conditions).
 
 A 2xx response, displayed UUID or empty queue without a matching receipt is not
 delivery proof. Keep `client_id` (delivery/retry identity) distinct from `uuid`
