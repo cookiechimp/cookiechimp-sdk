@@ -49,14 +49,14 @@ steps read the configured release version instead of assuming 1.0.0.
 
 ## Outstanding publication requirements
 
-- Daniel requested live test preparation on 24 October after deferring the test
-  on 23 October. The connected page is prepared; real results remain pending. Keep
-  `manualChecks.platformDeployed` false until reviewed test-account evidence
-  proves config retrieval, accept/reject/custom delivery, matching receipts,
-  platform records, persistence and retry behavior. The exact inputs and steps
-  are in [the live backend runbook](live-backend-verification.md). Deployment of
-  platform #2773/#2772 alone is not delivery proof. SDK work performs no platform
-  writes; Daniel owns platform configuration and live consent submissions.
+- Live browser config, accept/reject/custom delivery, matching receipts,
+  persistence and blocked-request retry checks passed on 24 October using account
+  `K8ktWD`, selected by Daniel from cookiechimp.com's installation script.
+  The [sanitized evidence](release-evidence/2026-10-24-live-backend.json) records
+  four acknowledged decisions. Dashboard storage and retry uniqueness still
+  require authenticated confirmation, so keep `manualChecks.platformDeployed`
+  false. See [the live backend runbook](live-backend-verification.md). No platform
+  repository or account settings were changed.
 - All eight expired npm trusted publisher connections were renewed and verified
   on 24 October with Daniel's authorization. Their bindings remain
   `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`, with
