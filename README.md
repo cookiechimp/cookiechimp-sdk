@@ -363,8 +363,18 @@ Limitations of `./network`:
   not covered. Install it before any third-party code.
 - Code running in iframes or workers is not covered, since each has its own
   globals.
-- Image pixels, WebSocket, and EventSource requests are not covered. An image
-  pixel handler for `./dynamic` is on the backlog.
+- Image requests use `blockDynamic`, including detached `new Image()`, image
+  `src`/`srcset` and picture source `srcset`. WebSocket and EventSource requests
+  are not intercepted.
+
+`blockDynamic` defers a matching image URL until all its candidate services have
+consent, and reports `kind: "image"`. Detached images are retained until their
+blocked URLs are released, replaced, removed or the controller stops. Withdrawal
+blocks future assignments; it cannot undo requests already sent. Install the
+blocker before assigning image URLs. Parser-loaded images, preload hints, CSS
+backgrounds, HTML string sinks other than `insertAdjacentHTML`, other realms
+and native setters captured before installation are
+outside this protection. Scanning existing markup cannot undo a prior request.
 
 
 ### Opt-in React TCF provider

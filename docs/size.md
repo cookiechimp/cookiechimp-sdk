@@ -14,7 +14,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | Name | Kind | Limit (bytes) |
 |---|---:|---:|
 | declarative script and iframe gating | extra | 2048 |
-| runtime script and iframe blocking | extra | 2688 |
+| runtime script, iframe and image blocking | extra | 3200 |
 | network blocking | extra | 2304 |
 | consent-mode | extra | 1560 |
 | language controller | extra | 1050 |
@@ -79,6 +79,7 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 
 | entry | old | new | reason | PR |
 | --- | --- | --- | --- | --- |
+| dynamic images | 2688 B | 3200 B | Adds detached/DOM/responsive image interception, safe restoration and matcher-failure guards (2751 B); default core is unchanged | Image pixel follow-up |
 | dynamic | 2560 B | 2688 B | Shared patch registry and broader DOM insertion coverage for runtime blocking | #10 |
 | network | 2048 B | 2304 B | Headroom for fetch, XHR, and beacon interception (measured 2039 B at landing) | #10 |
 | consent-mode | none | 1560 B | New Consent Mode v2 entry | M1 PR9 |

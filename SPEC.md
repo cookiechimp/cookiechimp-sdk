@@ -141,7 +141,7 @@ M1 Core (local mode)
 8. Network blocker (fetch, XHR, beacon).
 9. Google Consent Mode v2 signals.
 
-Backlog (after M1): image pixel handler in `./dynamic` (block `img` and `Image()` tracking pixels whose URL matches a service without consent).
+Image pixel handling in `./dynamic` blocks matching `img` and detached `Image()` URL assignments before consent, including responsive image and picture sources. Native references captured before installation and requests already started are outside its scope.
 
 M2 React
 10. Provider and hooks.
