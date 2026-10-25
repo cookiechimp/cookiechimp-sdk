@@ -1,0 +1,159 @@
+{
+  "verifiedAt": "2026-10-25T09:42:34.083211+00:00",
+  "version": "1.1.0",
+  "sourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+  "releaseRun": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789",
+  "packages": [
+    {
+      "package": "@cookiechimp/tokens",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T08:55:06.709Z",
+      "sha256": "0407c5a259a72ee73b1e049ecbc1ab6d8294eed712ff353c02bb6967a08b6c06",
+      "integrity": "sha512-yCnWKQO1RtXwOFICYI4KPpumq82nS2ED68aurNz5scdKxnvifmYsQ5/8usebkiMgk/EIOPBCn+dv9yeqS58VpA==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2ftokens@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8d68ddb2786cabcedcca0c0c91aa23b1aa51a2e6",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40176763055/attempts/1"
+    },
+    {
+      "package": "@cookiechimp/translations",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T09:31:18.479Z",
+      "sha256": "8d7b34a3cebd114a23f1fa5a9b15895944268227d1a5ee3752e42525f79a2d97",
+      "integrity": "sha512-FVyOJM4v4d+xvsGDlsiqUYN9m63J8uwVW6+/dSgdEMIna7QTzHGIKYh8pX4k3ZiTC3V1m+zQoPpj0tbAXmvr/A==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2ftranslations@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789/attempts/1"
+    },
+    {
+      "package": "@cookiechimp/core",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T09:32:53.887Z",
+      "sha256": "3d96c8e18a018214863e144b81d4cf1ed7e157cc366fc4cb3152c4659beac43f",
+      "integrity": "sha512-QXPws4+stiT5SRJ5iIMeO90Q2+8vqImyWbxkyWXoTbtZffxLBFtF/6z0R7zJfR5YACczyNalDMjihZnh0P4oag==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2fcore@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789/attempts/1"
+    },
+    {
+      "package": "@cookiechimp/react",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T09:34:08.632Z",
+      "sha256": "216b2351611e3a596a7700ab593275930e7e7c5d0bdfa04218a405b928633277",
+      "integrity": "sha512-9XLLMjFAjR8y+cTiLYbCqm4QN+CoP2fLXm6HzsgzV9BDHWLRZVKunzcpfprW8LxnbtQ+JwfIhWgTrMTDhMLXqA==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2freact@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789/attempts/1"
+    },
+    {
+      "package": "@cookiechimp/nextjs",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T09:36:29.631Z",
+      "sha256": "72f2e0679a41d41e9002803dac3775bb1b08a231ad74b03f8afb53a266f01a34",
+      "integrity": "sha512-CsMgoScVeNdgHLL/4ZSexZ8Hi9HQCr4lNXM70/HOucgdp/W18J/w5I6+Sm5/+rUEWOWuxU+WJ+mch7J73GcFtQ==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2fnextjs@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789/attempts/1"
+    },
+    {
+      "package": "@cookiechimp/scripts",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T09:37:35.829Z",
+      "sha256": "b9635f8c4c779afc0b962fe88d305f91e10231bd7cac080628551610d3bfdb5a",
+      "integrity": "sha512-PBFpHi0SLMs1LJgapFoFoSFIt5MBHS8tWtU0ZG34iLLAPrF/TJYFgoJ0F1RS8lvx5xwZXDilAkFeNWLR1UuGOg==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2fscripts@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789/attempts/1"
+    },
+    {
+      "package": "@cookiechimp/devtools",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T09:39:35.046Z",
+      "sha256": "3fd346e465c8684e18fe7e0830ad3bcfc6d6babac524ac83267c6be2d28399c4",
+      "integrity": "sha512-HlkrRm/NA57UNntL3ghOVCT+QcpJyPvBJ5U9310gTEEanYdfv49Cgds1st+cvrDvD6jMDTbpKg5Duss9AdQEkg==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2fdevtools@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789/attempts/1"
+    },
+    {
+      "package": "@cookiechimp/cli",
+      "version": "1.1.0",
+      "latest": "1.1.0",
+      "publishedAt": "2026-10-25T09:40:50.762Z",
+      "sha256": "dfde2bf662158c7d8aae11d4ab5cebf4c6d6f088fab52e4c5dadcd61f310ab38",
+      "integrity": "sha512-h8jyztNQOFlgEs5iNYtgffl71eBwGBwEO+QlhdXxBlb3UDaBIl6cQuLQBm7B+voS7LutWV4s/grH4aIoFMmf5w==",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2fcli@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "signaturesAdvertised": true,
+      "provenanceSourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+      "provenanceInvocation": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789/attempts/1"
+    }
+  ],
+  "complete": true,
+  "signatureAudit": {
+    "command": "npm audit signatures",
+    "passed": true,
+    "invalid": [],
+    "missing": []
+  }
+}

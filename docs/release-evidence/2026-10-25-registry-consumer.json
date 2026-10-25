@@ -1,0 +1,118 @@
+{
+  "version": "1.1.0",
+  "sourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+  "registryInstall": {
+    "verifiedAt": "2026-10-25T09:42:42.058Z",
+    "version": "1.1.0",
+    "sourceCommit": "8e1c0375ff90bc6ac1328479970842ea92c47efc",
+    "exportCount": 116,
+    "standaloneDeclarationsStrict": true,
+    "nextDeclarationsPassed": true,
+    "coreVersion": "1.1.0",
+    "installedPackages": [
+      {
+        "name": "@cookiechimp/tokens",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/tokens/-/tokens-1.1.0.tgz",
+        "integrity": "sha512-yCnWKQO1RtXwOFICYI4KPpumq82nS2ED68aurNz5scdKxnvifmYsQ5/8usebkiMgk/EIOPBCn+dv9yeqS58VpA=="
+      },
+      {
+        "name": "@cookiechimp/translations",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/translations/-/translations-1.1.0.tgz",
+        "integrity": "sha512-FVyOJM4v4d+xvsGDlsiqUYN9m63J8uwVW6+/dSgdEMIna7QTzHGIKYh8pX4k3ZiTC3V1m+zQoPpj0tbAXmvr/A=="
+      },
+      {
+        "name": "@cookiechimp/core",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/core/-/core-1.1.0.tgz",
+        "integrity": "sha512-QXPws4+stiT5SRJ5iIMeO90Q2+8vqImyWbxkyWXoTbtZffxLBFtF/6z0R7zJfR5YACczyNalDMjihZnh0P4oag=="
+      },
+      {
+        "name": "@cookiechimp/react",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/react/-/react-1.1.0.tgz",
+        "integrity": "sha512-9XLLMjFAjR8y+cTiLYbCqm4QN+CoP2fLXm6HzsgzV9BDHWLRZVKunzcpfprW8LxnbtQ+JwfIhWgTrMTDhMLXqA=="
+      },
+      {
+        "name": "@cookiechimp/nextjs",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/nextjs/-/nextjs-1.1.0.tgz",
+        "integrity": "sha512-CsMgoScVeNdgHLL/4ZSexZ8Hi9HQCr4lNXM70/HOucgdp/W18J/w5I6+Sm5/+rUEWOWuxU+WJ+mch7J73GcFtQ=="
+      },
+      {
+        "name": "@cookiechimp/scripts",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/scripts/-/scripts-1.1.0.tgz",
+        "integrity": "sha512-PBFpHi0SLMs1LJgapFoFoSFIt5MBHS8tWtU0ZG34iLLAPrF/TJYFgoJ0F1RS8lvx5xwZXDilAkFeNWLR1UuGOg=="
+      },
+      {
+        "name": "@cookiechimp/devtools",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/devtools/-/devtools-1.1.0.tgz",
+        "integrity": "sha512-HlkrRm/NA57UNntL3ghOVCT+QcpJyPvBJ5U9310gTEEanYdfv49Cgds1st+cvrDvD6jMDTbpKg5Duss9AdQEkg=="
+      },
+      {
+        "name": "@cookiechimp/cli",
+        "version": "1.1.0",
+        "resolved": "https://registry.npmjs.org/@cookiechimp/cli/-/cli-1.1.0.tgz",
+        "integrity": "sha512-h8jyztNQOFlgEs5iNYtgffl71eBwGBwEO+QlhdXxBlb3UDaBIl6cQuLQBm7B+voS7LutWV4s/grH4aIoFMmf5w=="
+      }
+    ]
+  },
+  "signatureAudit": {
+    "passed": true,
+    "invalid": [],
+    "missing": []
+  },
+  "productionBuild": {
+    "framework": "Next.js",
+    "version": "16.4.3",
+    "passed": true
+  },
+  "http": {
+    "verifiedAt": "2026-10-25T09:48:13.345615+00:00",
+    "checks": [
+      {
+        "route": "/",
+        "status": 200,
+        "contentType": "text/html; charset=utf-8"
+      },
+      {
+        "route": "/platform",
+        "status": 200,
+        "contentType": "text/html; charset=utf-8"
+      }
+    ]
+  },
+  "browser": {
+    "verifiedAt": "2026-10-25T09:46:51.412Z",
+    "version": "1.1.0",
+    "consumer": "fresh npm install; Next.js 16.4.3 production build",
+    "routes": ["/", "/platform"],
+    "standard": {
+      "initialOptionalBlocked": true,
+      "acceptActivatesGatedScript": true,
+      "acceptedChoicesPersistAfterReload": true,
+      "rejectionPersistsAfterReload": true,
+      "scriptBlockedAfterRejectedReload": true
+    },
+    "platform": {
+      "requiredCategoryDisabled": true,
+      "vendorPurposeAndCookieDisclosuresVisible": true,
+      "custom": {
+        "googleAnalytics": true,
+        "microsoftClarity": false,
+        "metaPixel": false
+      },
+      "customChoicesPersistAfterReload": true,
+      "consentIdentifierPersists": true,
+      "rejectAllPersistsAfterReload": true,
+      "requiredServiceRemainsEnabled": true
+    },
+    "browserErrors": [],
+    "liveBackendEvidence": "docs/release-evidence/2026-10-24-live-backend.json",
+    "newPlatformRecordsSubmitted": false
+  },
+  "cliHelpPassed": true
+}
