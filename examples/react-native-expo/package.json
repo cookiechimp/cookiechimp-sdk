@@ -1,0 +1,33 @@
+{
+  "name": "@cookiechimp/example-react-native-expo",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "android": "expo start --android",
+    "export": "expo export --platform ios --platform android",
+    "web": "expo start --web",
+    "pack-sdk": "cd ../.. && pnpm --filter @cookiechimp/core --filter @cookiechimp/react-native build && pnpm --filter @cookiechimp/core --filter @cookiechimp/react-native exec pnpm pack --pack-destination ../../examples/react-native-expo/vendor"
+  },
+  "dependencies": {
+    "@cookiechimp/react-native": "file:vendor/cookiechimp-react-native-1.1.0.tgz",
+    "@expo/metro-runtime": "~55.0.0",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~55.0.32",
+    "expo-status-bar": "~55.0.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.10",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-web": "^0.21.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~5.9.2"
+  },
+  "overrides": {
+    "@cookiechimp/core": "file:vendor/cookiechimp-core-1.1.0.tgz"
+  }
+}
