@@ -2,6 +2,7 @@ import {
   type CategoryConfig,
   type ConfigInput,
   categoryRecords,
+  isDevelopment as isDev,
   type NormalizedConfig,
   normalizeConfig,
   type ServiceConfig,
@@ -47,8 +48,7 @@ export function categoriesHash(config: ConfigInput | NormalizedConfig): string {
   let hash = 0x811c9dc5;
   const text = categories.join("|");
   for (let index = 0; index < text.length; index++) {
-    hash ^= text.charCodeAt(index);
-    hash = Math.imul(hash, 0x01000193);
+    hash = Math.imul(hash ^ text.charCodeAt(index), 0x01000193);
   }
   return (hash >>> 0).toString(36).padStart(7, "0");
 }
@@ -171,9 +171,6 @@ export interface SyncClient {
   destroy(): void;
 }
 
-const isDev = () =>
-  typeof process !== "undefined" && process.env.NODE_ENV !== "production";
-
 const record = (value: unknown): value is Json =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 const object = (value: unknown): Json => (record(value) ? value : {});
@@ -183,10 +180,11 @@ const own = (value: unknown, key: unknown): unknown =>
     : undefined;
 const text = (value: unknown, max = 512) =>
   typeof value === "string" && value.length <= max ? value : undefined;
-const flag = (value: unknown) =>
-  typeof value === "boolean" ? value : undefined;
-const pick = <T extends object>(entries: [string, unknown][]) =>
-  Object.fromEntries(entries.filter(([, value]) => value !== undefined)) as T;
+const pick = <T extends object>(value: T): T =>
+  Object.fromEntries(
+    Object.entries(value).filter(([, item]) => item !== undefined),
+  ) as T;
+const unsafeKeys = new Set(["__proto__", "constructor", "prototype"]);
 const array = (value: unknown) => (Array.isArray(value) ? value : []);
 const slug = (value: unknown) =>
   text(value, 128)
@@ -197,11 +195,7 @@ const slug = (value: unknown) =>
 
 /** Parse JSON, dropping `__proto__`, `constructor` and `prototype` keys at every depth. */
 export const safeJson = (body: string): unknown =>
-  JSON.parse(body, (key, value) =>
-    key === "__proto__" || key === "constructor" || key === "prototype"
-      ? undefined
-      : value,
-  );
+  JSON.parse(body, (key, value) => (unsafeKeys.has(key) ? undefined : value));
 
 /**
  * Adapt an untrusted platform offline bundle
@@ -235,136 +229,130 @@ export function adaptPlatformConfig(
   const banner = own(value.banners, bannerId) as Json;
   const translations = object(own(value.translations, bannerId));
   const wanted = options.locale?.split("-")[0]?.toLowerCase();
-  const language = [wanted, ...array(banner.available_languages)]
-    .concat(Object.keys(translations))
-    .find((code) => text(code, 16) && record(own(translations, code))) as
+  const language = [
+    wanted,
+    ...array(banner.available_languages),
+    ...Object.keys(translations),
+  ].find((code) => text(code, 16) && record(own(translations, code))) as
     | string
     | undefined;
   const consentMode = text(banner.consent_mode, 32)?.replace("-", "_");
-  const localized = (item: Json) => {
-    const entry = object(own(item.translations, language));
-    return {
-      label: text(entry.name) ?? text(item.name),
-      description:
-        text(entry.description, 4096) ?? text(item.description, 4096),
-    };
-  };
+  const translated = (item: Json, key: string, max = 512) =>
+    text(object(own(item.translations, language))[key], max) ??
+    text(item[key], max);
   const categories: CategoryConfig[] = [];
   const services: ServiceConfig[] = [];
   const preferences: PlatformCategory[] = [];
   const storageItems = (value: unknown): PlatformStorageItem[] =>
-    array(value)
-      .filter(record)
-      .filter((item) => text(item.name, 256))
-      .map((item) => {
-        const translation = object(own(item.translations, language));
-        return pick<PlatformStorageItem>([
-          ["name", text(translation.name, 256) ?? text(item.name, 256)],
-          ["type", text(item.type, 64)],
-          [
-            "description",
-            text(translation.description, 4096) ?? text(item.description, 4096),
-          ],
-          [
-            "duration",
-            text(translation.duration, 512) ?? text(item.duration, 512),
-          ],
-          ["company", text(item.company)],
-        ]);
-      });
+    array(value).flatMap((item) => {
+      if (!record(item) || !text(item.name, 256)) return [];
+      return [
+        pick<PlatformStorageItem>({
+          name: translated(item, "name", 256) as string,
+          type: text(item.type, 64),
+          description: translated(item, "description", 4096),
+          duration: translated(item, "duration"),
+          company: text(item.company),
+        }),
+      ];
+    });
   const serviceIds: Record<string, string> = {};
   for (const category of array(value.categories)) {
-    const id = record(category) && slug(category.slug);
+    const id = slug(object(category).slug);
     if (!id) continue;
     const required = category.required === true;
+    const label = translated(category, "name");
+    const description = translated(category, "description", 4096);
     const detail: PlatformCategory = {
       slug: id,
-      name: localized(category).label ?? id,
-      description: localized(category).description,
+      name: label ?? id,
+      description: description,
       required,
       services: [],
       storage_items: storageItems(category.storage_items),
     };
     preferences.push(detail);
     categories.push(
-      pick([
-        ["id", id],
-        ["required", required],
-        ["default", required || consentMode === "opt_out"],
-        ...Object.entries(localized(category)),
-      ]),
+      pick({
+        id: id,
+        required: required,
+        default: required || consentMode === "opt_out",
+        label,
+        description,
+      }),
     );
     for (const service of array(category.services)) {
-      const serviceId = record(service) && slug(service.name);
+      const serviceId = slug(object(service).name);
       if (!serviceId || Object.hasOwn(serviceIds, serviceId)) continue;
-      serviceIds[serviceId] = text(service.id, 64) ?? "";
+      const name = translated(service, "name");
+      const serviceHashid = text(service.id, 64);
+      const accepted =
+        typeof service.accepted_by_default === "boolean"
+          ? service.accepted_by_default
+          : undefined;
+      serviceIds[serviceId] = serviceHashid ?? "";
       detail.services.push(
-        pick<PlatformService>([
-          ["id", text(service.id, 64)],
-          ["consent_key", serviceId],
-          ["name", localized(service).label ?? serviceId],
-          ["description", localized(service).description],
-          ["company", text(service.company)],
-          ["privacy_policy_url", text(service.privacy_policy_url, 2048)],
-          ["accepted_by_default", flag(service.accepted_by_default)],
-          ["storage_items", storageItems(service.storage_items)],
-        ]),
+        pick<PlatformService>({
+          id: serviceHashid,
+          consent_key: serviceId,
+          name: name ?? serviceId,
+          description: translated(service, "description", 4096),
+          company: text(service.company),
+          privacy_policy_url: text(service.privacy_policy_url, 2048),
+          accepted_by_default: accepted,
+          storage_items: storageItems(service.storage_items),
+        }),
       );
-      const cookies = array(service.storage_items)
-        .filter((item) => record(item) && item.type === "cookie")
-        .map((item) => text((item as Json).name, 256))
-        .filter((name): name is string => !!name);
+      const cookies = array(service.storage_items).flatMap((item) =>
+        record(item) && item.type === "cookie" && text(item.name, 256)
+          ? [item.name as string]
+          : [],
+      );
       services.push(
-        pick([
-          ["id", serviceId],
-          ["category", id],
-          ["name", localized(service).label],
-          ["cookies", cookies.length ? cookies : undefined],
-          ["default", flag(service.accepted_by_default)],
-        ]),
+        pick({
+          id: serviceId,
+          category: id,
+          name: name,
+          cookies: cookies.length ? cookies : undefined,
+          default: accepted,
+        }),
       );
     }
   }
   const revision = value.version;
-  return pick<DashboardConfig>([
-    ["schemaVersion", 1],
-    ["configVersion", configVersion],
-    ["etag", `"${configVersion}"`],
-    ["revision", Number.isInteger(revision) ? revision : undefined],
-    ["accountId", accountId],
-    ["bannerId", bannerId],
-    ["consentMode", consentMode],
-    ["language", language ?? ""],
-    [
-      "rtlLanguages",
-      Array.isArray(value.rtl_languages)
-        ? value.rtl_languages.filter(
-            (code): code is string =>
-              typeof code === "string" && /^[a-z]{2,3}$/.test(code),
-          )
-        : undefined,
-    ],
-    ["categories", categories],
-    ["services", services],
-    ["preferences", preferences],
-    ["serviceIds", serviceIds],
-    ["copy", object(own(translations, language))],
-    ["translations", translations],
-    ["regions", map],
-    ["theme", object(banner.theme)],
-    ["banner", banner],
-    ["integrations", object(value.integrations)],
-    ["cookie", object(value.cookie_settings)],
-    ["reconsentRequiredAt", text(value.reconsent_required_at, 64)],
-    ["updatedAt", text(value.updated_at, 64)],
-  ]);
+  return pick<DashboardConfig>({
+    schemaVersion: 1,
+    configVersion: configVersion,
+    etag: `"${configVersion}"`,
+    revision: Number.isInteger(revision) ? (revision as number) : undefined,
+    accountId: accountId,
+    bannerId: bannerId,
+    consentMode: consentMode,
+    language: language ?? "",
+    rtlLanguages: Array.isArray(value.rtl_languages)
+      ? value.rtl_languages.filter(
+          (code): code is string =>
+            typeof code === "string" && /^[a-z]{2,3}$/.test(code),
+        )
+      : undefined,
+    categories: categories,
+    services: services,
+    preferences: preferences,
+    serviceIds: serviceIds,
+    copy: object(own(translations, language)),
+    translations: translations,
+    regions: map,
+    theme: object(banner.theme),
+    banner: banner,
+    integrations: object(value.integrations),
+    cookie: object(value.cookie_settings),
+    reconsentRequiredAt: text(value.reconsent_required_at, 64),
+    updatedAt: text(value.updated_at, 64),
+  });
 }
 
-const layer = (dashboard?: DashboardConfig): ConfigInput | undefined =>
-  dashboard && {
-    categories: dashboard.categories,
-    services: dashboard.services,
-  };
+// mergeConfig reads only categories/services; avoid allocating a second view.
+type ConfigLayer = Pick<ConfigInput, "categories" | "services">;
 
 function apiUrl(base: string): string | undefined {
   try {
@@ -387,7 +375,7 @@ export function createSync(options: SyncOptions): SyncClient {
   const problem = !ID.test(options.projectId)
     ? "invalid projectId"
     : key?.startsWith("cc_sk_")
-      ? "secret keys must never be used in the browser"
+      ? "secret key forbidden"
       : key !== undefined && !KEY.test(key)
         ? "invalid publishable key"
         : !base
@@ -405,13 +393,13 @@ export function createSync(options: SyncOptions): SyncClient {
   let pending: Promise<SyncState> | undefined;
   let destroyed = false;
 
-  /** Parse and adapt an untrusted body; returns the sanitised JSON to cache. */
-  const adapt = (body: string): [DashboardConfig, string] | undefined => {
+  /** Parse and adapt an untrusted body; retain the sanitised value for cache writes. */
+  const adapt = (body: string): [DashboardConfig, unknown] | undefined => {
     try {
       if (body.length > MAX_BYTES) return;
       const value = safeJson(body);
       const parsed = adaptPlatformConfig(value, options);
-      return parsed && [parsed, JSON.stringify(value)];
+      return parsed && [parsed, value];
     } catch {}
   };
   const build = (
@@ -422,14 +410,18 @@ export function createSync(options: SyncOptions): SyncClient {
     error?: string,
   ): SyncState | undefined => {
     try {
-      return pick<SyncState>([
-        ["config", mergeConfig(defaults, layer(dashboard), options.override)],
-        ["dashboard", dashboard],
-        ["source", dashboard ? source : "local"],
-        ["status", status],
-        ["error", error],
-        ["categoriesChanged", categoriesChanged],
-      ]);
+      return pick<SyncState>({
+        config: mergeConfig(
+          defaults,
+          dashboard as ConfigLayer | undefined,
+          options.override,
+        ),
+        dashboard: dashboard,
+        source,
+        status: status,
+        error: error,
+        categoriesChanged: categoriesChanged,
+      });
     } catch {}
   };
   const local = (status: SyncState["status"], error?: string) =>
@@ -453,10 +445,10 @@ export function createSync(options: SyncOptions): SyncClient {
     if (!destroyed) for (const listener of listeners) listener(next);
     return next;
   };
-  const writeCache = (version: string, body: string) => {
+  const writeCache = (version: string, body: unknown) => {
     try {
       const previous = storage?.getItem(pointer);
-      storage?.setItem(`${pointer}:${version}`, body);
+      storage?.setItem(`${pointer}:${version}`, JSON.stringify(body));
       storage?.setItem(pointer, version);
       if (previous && previous !== version)
         storage?.removeItem(`${pointer}:${previous}`);
@@ -464,8 +456,13 @@ export function createSync(options: SyncOptions): SyncClient {
   };
   const failed = (error: string) => emit({ ...state, status: "error", error });
   const hash = (dashboard: DashboardConfig) =>
-    categoriesHash(mergeConfig(defaults, layer(dashboard), options.override)) +
-    (dashboard.reconsentRequiredAt ?? "");
+    categoriesHash(
+      mergeConfig(
+        defaults,
+        dashboard as ConfigLayer | undefined,
+        options.override,
+      ),
+    ) + (dashboard.reconsentRequiredAt ?? "");
 
   const run = async (): Promise<SyncState> => {
     const doFetch = options.fetch ?? globalThis.fetch;
@@ -493,15 +490,19 @@ export function createSync(options: SyncOptions): SyncClient {
           signal: timeout.signal,
         },
       );
-      if (response.status === 304 && current)
-        return emit({ ...state, source: "dashboard", status: "ready" });
       if (response.status === 304 && known)
-        return emit({ ...state, status: "ready" });
+        return emit({
+          ...state,
+          source: current ? "dashboard" : state.source,
+          status: "ready",
+        });
       if (!response.ok) return failed(`HTTP ${response.status}`);
       const body = await response.text();
-      if (body.length > MAX_BYTES) return failed("config too large");
       const adapted = adapt(body);
-      if (!adapted) return failed("invalid config");
+      if (!adapted)
+        return failed(
+          body.length > MAX_BYTES ? "config too large" : "invalid config",
+        );
       const [parsed, clean] = adapted;
       const changed =
         options.reprompt !== false &&

@@ -20,6 +20,8 @@ export interface SizeBudget {
   css?: string[];
   /** Extra entries measured separately (same kind) and added to this row. */
   alsoEntries?: string[];
+  /** Subtract this bundled entry to enforce marginal cost over a shared base. */
+  subtractEntry?: string;
   informational?: true;
 }
 export interface BudgetResult extends SizeBudget {
@@ -233,10 +235,20 @@ export async function runBudgets(
           measureEntry(resolve(root, entry), budget.kind),
         ),
       );
+      const baseline = budget.subtractEntry
+        ? await measureEntry(resolve(root, budget.subtractEntry), budget.kind)
+        : 0;
+      if (baseline === undefined)
+        return {
+          ...budget,
+          status: "fail" as const,
+          detail: `missing baseline: ${budget.subtractEntry}`,
+        };
       const bytes =
         jsBytes === undefined || extra.some((size) => size === undefined)
           ? undefined
-          : jsBytes +
+          : jsBytes -
+            baseline +
             extra.reduce<number>((sum, size) => sum + (size ?? 0), 0) +
             (budget.css
               ? await measureCss(
@@ -244,6 +256,12 @@ export async function runBudgets(
                 )
               : 0);
       const result = compareBudget(budget, bytes);
+      if (bytes !== undefined && bytes < 0)
+        return {
+          ...result,
+          status: "fail" as const,
+          detail: "negative marginal size",
+        };
       const detail = await checkDefaultExclusion(budget, root);
       if (detail) return { ...result, status: "fail" as const, detail };
       if (

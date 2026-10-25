@@ -295,3 +295,40 @@ describe("size harness", () => {
     expect(await main(root)).toBe(1);
   });
 });
+
+it("enforces marginal graph bytes and fails closed for a missing or larger baseline", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cookiechimp-size-marginal-"));
+  await writeFile(
+    join(root, "base.mjs"),
+    "export const core = 'shared baseline';",
+  );
+  await writeFile(
+    join(root, "full.mjs"),
+    "export * from './base.mjs'; export const sync = 'connected client extra bytes';",
+  );
+  const base = (await measureEntry(join(root, "base.mjs"), "extra")) ?? 0;
+  const full = (await measureEntry(join(root, "full.mjs"), "extra")) ?? 0;
+  const row: SizeBudget = {
+    ...budget("full.mjs", full - base),
+    kind: "extra",
+    subtractEntry: "base.mjs",
+  };
+  expect((await runBudgets([row], root))[0]).toMatchObject({
+    bytes: full - base,
+    status: "pass",
+  });
+  expect(
+    (await runBudgets([{ ...row, limit: full - base - 1 }], root))[0]?.status,
+  ).toBe("fail");
+  expect(
+    (await runBudgets([{ ...row, subtractEntry: "missing.mjs" }], root))[0],
+  ).toMatchObject({ status: "fail", detail: "missing baseline: missing.mjs" });
+  expect(
+    (
+      await runBudgets(
+        [{ ...row, entry: "base.mjs", subtractEntry: "full.mjs" }],
+        root,
+      )
+    )[0],
+  ).toMatchObject({ status: "fail", detail: "negative marginal size" });
+});

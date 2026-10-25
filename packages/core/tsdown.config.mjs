@@ -8,10 +8,11 @@ const shared = {
 };
 
 export default defineConfig([
-  { ...shared, entry: ["src/index.ts"] },
   {
     ...shared,
+    // Share config normalization with sync while keeping opt-in entries separate.
     entry: [
+      "src/index.ts",
       "src/sync.ts",
       "src/consent-log.ts",
       "src/endpoint.ts",
@@ -21,7 +22,6 @@ export default defineConfig([
       "src/consent-mode.ts",
       "src/language.ts",
     ],
-    clean: false,
   },
   { ...shared, entry: ["src/dynamic.ts"], clean: false },
   { ...shared, entry: ["src/network.ts"], clean: false },
