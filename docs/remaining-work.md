@@ -22,39 +22,38 @@ matching stored records and one copy of the retried decision. The installed npm
 consumer verified 116 exports, a production build, CLI and browser behavior.
 The 33 base/TCF locales completed [editorial review](translation-review.md).
 
-## Implemented follow-ups awaiting review
+## Completed SDK implementation
 
-These changes are on review branches. They are **not merged or published** and
-are not contained in the immutable 1.1.0 release.
+The three follow-ups below are implemented. Daniel authorized merging the stack
+on 25 October after checking comments and current-head CI. They are **not yet
+published** and are not contained in the immutable 1.1.0 release.
 
-| Review order | SDK change | Validation and size contract |
+| SDK PR | Completed change | Validation and size contract |
 |---|---|---|
-| [#64](https://github.com/cookiechimp/cookiechimp-sdk/pull/64) | Image pixel blocking in `./dynamic`, including detached `Image()`, image `src`/`srcset` and picture sources; restore allowed URLs and cancel stale requests | Component and real browser request-count coverage. Dynamic is 2751 B; proposed opt-in limit 3200 B, up from 2688 B. Default core unchanged. |
+| [#64](https://github.com/cookiechimp/cookiechimp-sdk/pull/64) | Image pixel blocking in `./dynamic`, including detached `Image()`, image `src`/`srcset` and picture sources; restore allowed URLs and cancel stale requests | Component and real browser request-count coverage. Dynamic is 2751 B; opt-in limit 3200 B, up from 2688 B. Default core unchanged. |
 | [#65](https://github.com/cookiechimp/cookiechimp-sdk/pull/65) | Share config code and remove redundant sync adapter work; enforce marginal size in CI | Core 3670 B, full core+sync 6230 B, marginal 2560 B. Meets the original unchanged 2.5 KB target. Standalone sync 3966 B of its unchanged 4355 B limit. |
-| [#66](https://github.com/cookiechimp/cookiechimp-sdk/pull/66) | Own formats for MN/MD/IN/KY/RI, including required modern section headers, sensitive-data/GPC subsections and state routing | Pinned-spec vectors, strict modern decoding, CMP API, consent, GPC and reload coverage. GPP graph 3187 B; proposed GPP-only budget 3680 B, up from 2810 B; combined IAB cap remains 12288 B. See [conformance](gpp-conformance.md). |
+| [#66](https://github.com/cookiechimp/cookiechimp-sdk/pull/66) | Own formats for MN/MD/IN/KY/RI, including required modern section headers, sensitive-data/GPC subsections and state routing | Pinned-spec vectors, strict modern decoding, CMP API, consent, GPC and reload coverage. GPP graph 3187 B; GPP-only budget 3680 B, up from 2810 B; combined IAB cap remains 12288 B. See [conformance](gpp-conformance.md). |
 
-The PRs form a review stack: image blocking, then sync, then GPP and checklist
-cleanup. Review and merge in that order, retargeting the next PR to main after
-its base merges. CI and final source parity must be checked on each current head.
+Image blocking (#64) and sync (#65) merged into main on 25 October. The final
+GPP change and this checklist ship together in #66. The review found no actionable
+PR comments. Each merge requires current-head checks and source parity; no review
+or branch-protection bypass is part of this sequence.
 
-## To release these follow-ups
+## Next release steps
 
-1. Daniel reviews the PRs, including the explicit dynamic/GPP-only budget changes.
-2. Merge the approved stack after current-head lint, typecheck, unit, component,
-   e2e, size and `ci-required` checks pass. Packed-consumer and benchmark smoke
-   provide additional validation.
-3. Prepare a new coordinated package version using the changesets. Never
-   overwrite or republish 1.1.0. Rebuild the clean source and verify candidates.
-4. Complete the required live backend config and record-delivery verification
+1. Prepare a new coordinated package version using the changesets. Never
+   overwrite or republish 1.1.0. Rebuild the clean merged source, run all required
+   checks and verify candidate packages, including the packed consumer.
+2. Complete the required live backend config and record-delivery verification
    for that release. Local mocks and passing fixture tests remain separate proof.
-5. Obtain explicit publication/deployment approval, publish through the protected
+3. Obtain explicit publication/deployment approval, publish through the protected
    workflow, and independently verify npm bytes, provenance and fresh consumers.
-6. Import the exact clean SDK documentation export into CookieChimp-Docs through
+4. Import the exact clean SDK documentation export into CookieChimp-Docs through
    a reviewed docs PR, then verify Mintlify deployment and live routes/indexes.
 
-No additional SDK feature implementation is planned in this checklist after the
-three follow-ups pass review. Future defects and scope additions remain normal
-maintenance; they are not undisclosed launch blockers.
+The SDK implementation backlog in this checklist is complete. Future defects and
+scope additions remain normal maintenance. The next release and documentation
+publication remain separate approved actions.
 
 ## Optional external distribution
 
