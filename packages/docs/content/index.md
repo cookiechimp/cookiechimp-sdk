@@ -34,5 +34,5 @@ their hosting platform's headers.
 - [AI skills](ai-skills.md) for coding agents and the
   [documentation index](https://docs.cookiechimp.com/docs/llms.txt).
 
-Status: pre-release. See [deployment and release status](deployment.md) before
-installing from npm or using connected mode in production.
+Current release: **1.1.0**, available on npm. See [versions and deployment](deployment.md)
+for installation, upgrading and connected-mode verification.

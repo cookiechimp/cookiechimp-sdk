@@ -1,6 +1,6 @@
 # Remaining work and launch status (25 Oct 2026)
 
-## Platform category and vendor UI (merged, 1.1.0 publication in progress)
+## Platform category and vendor UI (published in 1.1.0)
 
 - The SDK PR adds an opt-in UI driven by the existing platform JSON, with
   vendor controls, privacy links and storage disclosures. The React/Vite
@@ -30,9 +30,9 @@
   reduced-motion support. The example uses realistic vendor purposes, company
   names, privacy links and illustrative cookie settings from the same JSON.
 - This work merged in [SDK #54](https://github.com/cookiechimp/cookiechimp-sdk/pull/54)
-  on 19 Oct 2026. Current main passed all seven required checks. It is absent
-  from the published 1.0.0 packages and is included in the 1.1.0 candidate.
-  Website adoption requires the new package release and Daniel's platform review.
+  on 19 Oct 2026. All seven required checks passed on the publishing source.
+  This UI is published in 1.1.0. Adoption in the hosted platform remains a
+  separate action requiring Daniel's platform review.
 - The 1.1.0 preparation also patches pinned Next.js development/example/consumer
   dependencies from vulnerable 16.4.0 to 16.4.3, consistently across benchmark
   comparators. Historical benchmark measurements retain their recorded versions.
@@ -43,11 +43,12 @@ All eight SDK PRs below are now merged into main after review and green checks.
 Platform actions remain Daniel's responsibility; this SDK takeover has made
 no platform changes. All eight 1.0.0 packages were published on 17 Oct 2026.
 Registry inspection on 23 Oct confirms their integrity metadata but no advertised
-provenance attestations. See `release/npm-1.0.0-audit.json`. Version 1.1.0 is being
-prepared from the merged SDK work. Its publication is partial: only
-`@cookiechimp/tokens@1.1.0` is published, with verified bytes and advertised
-provenance. The remaining seven packages are still at 1.0.0. See the
-[25 October registry audit](../release/npm-1.1.0-partial-audit-2026-10-25.json).
+provenance attestations. See `release/npm-1.0.0-audit.json`. All eight 1.1.0 packages
+were published on 25 Oct through the protected GitHub OIDC workflow and are npm
+`latest`. Registry integrity, provenance and fresh-install signature/browser
+checks passed. See the [complete audit](../release/npm-1.1.0-audit.json),
+[consumer evidence](release-evidence/2026-10-25-registry-consumer.json) and
+[GitHub release](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.1.0).
 
 ## Merged
 
@@ -81,7 +82,7 @@ Base and TCF labels for all 33 locales completed AI editorial review on
 17 Oct 2026. Corrections, method and exact source hashes are recorded in the
 [review record](translation-review.md). This is not a native-speaker attestation.
 
-## Launch setup and published 1.0.0
+## Launch setup and published releases
 
 - Daniel authorized public SDK source after the historical account identifier
   was disclosed. A targeted scan of 1315 unique Git blobs found no supported
@@ -98,10 +99,11 @@ Base and TCF labels for all 33 locales completed AI editorial review on
   repository, workflow, environment and publish/stage permissions; the
   [connection audit](../release/npm-trusted-publishers-2026-10-24.json) records
   one connection per package. `npmOrganizationReady` is true for this setup.
-  npm reports **Pending validation** until a trusted publish succeeds, with
-  first-publish deadlines on 26 Oct at 22:08-22:09 UTC. Recheck immediately before
-  publication and renew again if expired. No package version was published.
-  GitHub's environment still requires Daniel's review and permits only main.
+  Renewal itself published no version. All eight connections subsequently
+  completed a trusted publish on 25 Oct, satisfying their first-publish deadlines.
+  Daniel approved 1.1.0 from `8d68ddb` and recovery publication/deployment review
+  from `8e1c037`. GitHub's environment still requires Daniel's review and permits
+  only main.
 
 ## Launch gates requiring Daniel or external work
 
@@ -116,8 +118,8 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   [#2772](https://github.com/IdentitySquare/CookieChimp/pull/2772), shared web/mobile
   offline config, at 09:06 UTC on 17 Oct. Deployment `7137407395` succeeded at
   09:09 UTC for `bbe4feff688e60e65ce33b9ec9a4bdb6dbd00459`. Live connected
-  config and consent-record delivery still require evidence from Daniel.
-  Fixture tests and deployment success do not prove live record delivery.
+  config and consent-record delivery were verified on 24-25 Oct as recorded below.
+  Fixture tests and deployment success alone do not prove live record delivery.
   On 24 Oct Daniel selected cookiechimp.com's public account `K8ktWD` for testing.
   Live browser config, accept/reject/custom delivery, persistence and blocked
   retry checks passed at `http://localhost:3104`, with four matching HTTP 200
@@ -137,17 +139,16 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   import passed validation. Public guides describe the SDK in present tense and
   state package version requirements; internal publication gates remain here and
   in `release/readiness.json`. Mintlify deployment is verified separately.
-- Live test evidence is complete. All eight trusted-publisher bindings were
-  rechecked on 25 October. Daniel approved 1.1.0 from `8d68ddb` and release run #6.
-  npm accepted the first token package, but immediate verification hit a temporary
-  404. Recovery exposed npm 12's single-item metadata array, which the publisher
-  did not normalize; npm prevented an overwrite. The publisher fix adds response
-  normalization and bounded propagation polling, preserving integrity/provenance
-  checks and regression coverage. Review the corrected source and its new candidate,
-  confirm the published token tarball matches, then obtain approval for that source
-  before resuming the remaining seven packages. Install from npm, verify signatures
-  and browser behavior, and publish the reviewed GitHub release/tag only after
-  the complete cohort is verified.
+- Live backend evidence is complete. SDK #62 fixed npm 12 metadata normalization
+  and registry propagation handling. Daniel approved recovery source `8e1c037`
+  and its deployment review. Release run #8 verified/skipped the identical token
+  version and published the remaining seven 1.1.0 packages. All registry bytes,
+  expected provenance sources and npm signatures were verified. A fresh npm
+  consumer checked 116 exports, a production build, CLI help, standard/platform
+  consent, gated scripts, mixed vendor choices, withdrawal and reload persistence.
+  The [GitHub release](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.1.0)
+  contains the tarballs and evidence. The public release-status sources are updated;
+  the docs repository import and Mintlify deployment are verified separately.
 - External skill/Context7 registry publication and benchmark submission require
   review and explicit submission instructions. Files and the manifest are prepared.
 

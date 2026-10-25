@@ -1,18 +1,21 @@
-# Coordinated SDK release preparation
+# Coordinated SDK release 1.1.0
 
-All eight `@cookiechimp` 1.0.0 packages were published on 17 October 2026.
-The registry snapshot in `release/npm-1.0.0-audit.json`, checked on 23 October,
-records their integrity and lack of advertised provenance attestations. Published
-versions cannot be overwritten. This branch prepares the new 1.1.0 release.
+All eight `@cookiechimp` packages are published as npm `latest` at **1.1.0** on
+25 October 2026. The [GitHub release](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.1.0)
+contains the exact tarballs, manifest, registry audit and fresh-consumer evidence.
 
-Daniel approved 1.1.0 from `8d68ddb2786cabcedcca0c0c91aa23b1aa51a2e6` on
-25 October and approved release run [#6](https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40176763055).
-That run published `@cookiechimp/tokens@1.1.0` with matching bytes and provenance.
-The other seven packages remain at 1.0.0; see the
-[partial registry audit](../release/npm-1.1.0-partial-audit-2026-10-25.json).
-The workflow checked npm before metadata propagated, then failed to recognize
-npm 12's single-item array response during recovery. npm prevented an overwrite.
-Recovery must use the corrected publisher from a newly reviewed source commit.
+Daniel approved the original source `8d68ddb` and the recovery source
+`8e1c0375ff90bc6ac1328479970842ea92c47efc`, including the protected deployment
+review. The original run published the token package. Recovery
+[run #8](https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40180633789)
+verified and skipped that identical tarball, then published the other seven.
+[The complete audit](../release/npm-1.1.0-audit.json) records each package's actual
+provenance source. Runtime code, types and styles match the original candidate.
+
+The earlier 1.0.0 cohort was published on 17 October. Its historical registry
+snapshot remains in `release/npm-1.0.0-audit.json`; published versions cannot be
+overwritten. The [partial 1.1.0 snapshot](../release/npm-1.1.0-partial-audit-2026-10-25.json)
+records the earlier interrupted attempt, not the final release state.
 
 ## What changes in 1.1.0
 
@@ -21,7 +24,7 @@ GUI/theme variants and playground merged in SDK #54 on 19 October. The release
 also includes complete effective service snapshots, consent invalidation across
 regulations and consent UI locale isolation. The new React platform entry and
 stylesheet are absent from npm 1.0.0. See each package's changelog and
-[the draft release notes](releases/1.1.0.md).
+[the release notes](releases/1.1.0.md).
 
 ## Package and inspect
 
@@ -56,36 +59,33 @@ The manual **SDK release** workflow defaults to `prepare`. It reruns validation
 and saves `sdk-candidate-<source-sha>` without publishing. Its artifact and publish
 steps read the configured release version instead of assuming 1.0.0.
 
-## Outstanding publication requirements
+## Completed 1.1.0 release gates
 
-- Live browser config, accept/reject/custom delivery, matching receipts,
-  persistence and blocked-request retry checks passed on 24 October using account
-  `K8ktWD`, selected by Daniel from cookiechimp.com's installation script.
-  The [sanitized evidence](release-evidence/2026-10-24-live-backend.json) records
-  four acknowledged decisions. Authenticated dashboard inspection on 25 October
-  confirmed exactly four matching stored records, their saved preferences and
-  one retry record. `manualChecks.platformDeployed` is true for this evidence.
-  See [the live backend runbook](live-backend-verification.md). No platform
-  repository or account settings were changed.
-- All eight expired npm trusted publisher connections were renewed and verified
-  on 24 October with Daniel's authorization. Their bindings remain
-  `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`, with
-  publish/stage permissions. `npmOrganizationReady` is true for the restored
-  configuration; [the audit](../release/npm-trusted-publishers-2026-10-24.json)
-  records one connection per package. npm reports **Pending validation** until
-  the first trusted publish succeeds. The connections expire on 26 October at
-  22:08-22:09 UTC if unused, so recheck before publication and renew if needed.
-  Renewal published no package version and does not prove provenance. Use
-  GitHub OIDC and provenance for 1.1.0; do not promote old bootstrap artifacts.
-- Daniel approved 1.1.0 from `8d68ddb` and its protected deployment on 25 October.
-  The remaining publication now needs the publisher fixes and approval of the
-  new reviewed source commit. Verify the existing token package against the
-  new candidate before resuming; never overwrite or remove it. The `npm-publish`
-  environment must retain Daniel's required review and main-only branch policy.
-- Docs #79 and #81 are merged and deployed, including the connected-backend
-  guide and the all-users billing policy. Public guides use present-tense copy
-  with SDK version requirements. Verify the public guides against the final
-  published package behavior as part of release verification.
+- Live browser config, accept/reject/custom consent delivery, matching receipts,
+  persistence and blocked-request retry passed using Daniel-selected account
+  `K8ktWD`. Authenticated dashboard inspection confirmed exactly four matching
+  stored records and their preferences. See the
+  [live backend evidence](release-evidence/2026-10-24-live-backend.json) and
+  [runbook](live-backend-verification.md). No platform repository or account
+  settings were changed.
+- All eight renewed trusted-publisher bindings were reconfirmed on 25 October.
+  Each has now completed a successful GitHub OIDC publish. The main-only
+  `npm-publish` environment retains Daniel's required review.
+- All eight registry tarballs match the
+  [publishing manifest](../release/npm-1.1.0-manifest.json). Their provenance
+  identifies the expected repository, workflow, main ref, source and invocation.
+  `npm audit signatures` passed in a fresh npm installation.
+- The [fresh registry consumer](release-evidence/2026-10-25-registry-consumer.json)
+  verified all 116 exports, strict standalone declarations, core `VERSION`, a
+  Next.js 16.4.3 production build and both HTTP routes. Browser checks covered
+  standard accept/reject, gated scripts, mixed vendor choices, disclosures,
+  withdrawal, stable consent IDs and reload persistence, with no console errors.
+  The installed CLI help command passed. These local consumer checks submitted
+  no additional platform records; the live backend evidence is recorded separately.
+- Canonical public guide sources now identify 1.1.0 as available on npm. Import
+  the clean committed export into the docs repository and verify its separate
+  Mintlify deployment. Docs #79 and #81 already include connected-backend guidance
+  and the all-users billing policy.
 
 The SDK source repository is public. Organization ownership, account 2FA and
 public source history review were completed on 17 October. All 33 base/TCF
@@ -93,26 +93,27 @@ locales completed AI editorial review; exact hashes are recorded in
 [the translation review](translation-review.md). Optional managed IAB activation
 remains a separate [internal TODO](iab-integration-todo.md), not a publication gate.
 
-## Publish after evidence and approval
+## Future releases and recovery
 
-From reviewed main with all seven required checks green, run **SDK release**,
-choose `publish` and enter `1.1.0` as `approved_version`. The workflow verifies
-prerequisites before reaching Daniel's environment review. It confirms the source
-SHA is still main, publishes the exact prepared tarballs with npm OIDC and
-provenance, and verifies registry integrity and attestations for every package.
-A partial rerun normalizes npm's object and single-item array metadata responses
-and skips an existing version only when its bytes and provenance match. A
-mismatched or unattested existing version is rejected. After npm acknowledges a
-new publish, verification polls for up to five minutes for metadata/provenance
-propagation, with each registry command limited to 15 seconds. Integrity
-mismatches and non-404 registry errors fail immediately.
+Do not republish 1.1.0 from a later commit. For a new release, update all eight
+package versions, changelogs and `release/readiness.json`, review current live
+backend evidence, and obtain explicit approval of the new version and source.
+From reviewed main with all seven required checks green, choose `publish` in
+**SDK release** and enter that exact version as `approved_version`.
 
-After registry verification, install the published packages in a fresh Next.js
-app, exercise standard and platform consent/persistence in a browser, and run
-`npm audit signatures`. Update the public release-status guide, then publish the
-reviewed GitHub release/tag using [the prepared notes](releases/1.1.0.md).
-The workflow does not create tags or claim publication or live tests occurred.
-External skill/Context7 and benchmark submissions remain separately approved work.
+The workflow requires Daniel's protected-environment review, confirms the source
+SHA is still main and publishes the exact prepared tarballs with GitHub OIDC and
+provenance. Recovery normalizes npm's object/single-item-array metadata and skips
+an existing version only when its bytes and provenance match. Mismatched or
+unattested existing versions fail. Newly acknowledged uploads receive up to five
+minutes of metadata/provenance polling, with each registry command limited to
+15 seconds; integrity mismatches and non-404 errors fail immediately.
+
+After publication, verify registry bytes/provenance, install from npm in a fresh
+consumer, run signature auditing and browser checks, and publish the reviewed
+GitHub release/tag with its evidence. Keep the public release-status guide and
+internal launch record current. External skill/Context7 and benchmark submissions
+remain separately approved work.
 
 Canonical SDK guides belong on the existing CookieChimp Mintlify site. No new
 hosting/domain is required. See [the documentation workflow](documentation.md).
