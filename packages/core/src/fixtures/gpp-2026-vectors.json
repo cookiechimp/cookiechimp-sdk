@@ -1,0 +1,345 @@
+{
+  "commit": "03fdf0332d261ee896b77d7f9a10edde1498fc7c",
+  "paths": [
+    "Sections/US-States/IN/Indiana Privacy Technical Specification.md",
+    "Sections/US-States/KY/Kentucky Privacy Technical Specification.md",
+    "Sections/US-States/MD/Maryland Privacy Technical Specification.md",
+    "Sections/US-States/MN/Minnesota Privacy Technical Specification.md",
+    "Sections/US-States/RI/Rhode Island Privacy Technical Specification.md"
+  ],
+  "method": "Independent integer packing from pinned IAB field tables. Modern headers exclude core subsection zero and use 6-bit padding. Minnesota retains byte-padding compatibility with the published reference format.",
+  "vectors": [
+    {
+      "name": "usmn",
+      "case": "default",
+      "values": {},
+      "encoded": "BAAAAAQA.QA"
+    },
+    {
+      "name": "usmn",
+      "case": "ones",
+      "values": {
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 1,
+        "TargetedAdvertisingOptOutNotice": 1,
+        "SaleOptOut": 1,
+        "TargetedAdvertisingOptOut": 1,
+        "SensitiveDataProcessing": [1, 1, 1, 1, 1, 1, 1, 1],
+        "KnownChildSensitiveDataConsents": 1,
+        "AdditionalDataProcessingConsent": 1,
+        "MspaCoveredTransaction": 1,
+        "MspaOptOutOptionMode": 1,
+        "MspaServiceProviderMode": 1,
+        "Gpc": true
+      },
+      "encoded": "BVVVVVVA.YA"
+    },
+    {
+      "name": "usmn",
+      "case": "twos",
+      "values": {
+        "ProcessingNotice": 2,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 2,
+        "SaleOptOut": 2,
+        "TargetedAdvertisingOptOut": 2,
+        "SensitiveDataProcessing": [2, 2, 2, 2, 2, 2, 2, 2],
+        "KnownChildSensitiveDataConsents": 2,
+        "AdditionalDataProcessingConsent": 2,
+        "MspaCoveredTransaction": 2,
+        "MspaOptOutOptionMode": 2,
+        "MspaServiceProviderMode": 2
+      },
+      "encoded": "BqqqqqqA.QA"
+    },
+    {
+      "name": "usmn",
+      "case": "mixed",
+      "values": {
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 0,
+        "TargetedAdvertisingOptOutNotice": 0,
+        "SaleOptOut": 2,
+        "TargetedAdvertisingOptOut": 1,
+        "SensitiveDataProcessing": [1, 2, 1, 0, 2, 0, 1, 1],
+        "KnownChildSensitiveDataConsents": 0,
+        "AdditionalDataProcessingConsent": 0,
+        "MspaCoveredTransaction": 2,
+        "MspaOptOutOptionMode": 2,
+        "MspaServiceProviderMode": 1,
+        "Gpc": true
+      },
+      "encoded": "BQlkhQpA.YA"
+    },
+    {
+      "name": "usmn",
+      "case": "omitted",
+      "values": {
+        "GpcSegmentIncluded": false
+      },
+      "encoded": "BAAAAAQA"
+    },
+    {
+      "name": "usmd",
+      "case": "default",
+      "values": {},
+      "encoded": "YBABY.BQAA.Q"
+    },
+    {
+      "name": "usmd",
+      "case": "ones",
+      "values": {
+        "MspaCoveredTransaction": 1,
+        "MspaMode": 1,
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 1,
+        "TargetedAdvertisingOptOutNotice": 1,
+        "SaleOptOut": 1,
+        "TargetedAdvertisingOptOut": 1,
+        "AdditionalDataProcessingConsent": 1,
+        "Gpc": true
+      },
+      "encoded": "YBABY.BVVU.Y"
+    },
+    {
+      "name": "usmd",
+      "case": "twos",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 2,
+        "ProcessingNotice": 2,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 2,
+        "SaleOptOut": 2,
+        "TargetedAdvertisingOptOut": 2,
+        "AdditionalDataProcessingConsent": 2
+      },
+      "encoded": "YBABY.Bqqo.Q"
+    },
+    {
+      "name": "usmd",
+      "case": "mixed",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 2,
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 0,
+        "SaleOptOut": 0,
+        "TargetedAdvertisingOptOut": 0,
+        "AdditionalDataProcessingConsent": 0,
+        "Gpc": true
+      },
+      "encoded": "YBABY.BpgA.Y"
+    },
+    {
+      "name": "usmd",
+      "case": "omitted",
+      "values": {
+        "GpcSegmentIncluded": false
+      },
+      "encoded": "YBAA.BQAA"
+    },
+    {
+      "name": "usin",
+      "case": "default",
+      "values": {
+        "SensitiveDataProcessing": [0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      "encoded": "ZBABY.BQAA.AAA"
+    },
+    {
+      "name": "usin",
+      "case": "ones",
+      "values": {
+        "MspaCoveredTransaction": 1,
+        "MspaMode": 1,
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 1,
+        "TargetedAdvertisingOptOutNotice": 1,
+        "SaleOptOut": 1,
+        "TargetedAdvertisingOptOut": 1,
+        "KnownChildSensitiveDataConsents": 1,
+        "AdditionalDataProcessingConsent": 1,
+        "SensitiveDataProcessing": [1, 2, 0, 1, 2, 0, 1, 2]
+      },
+      "encoded": "ZBABY.BVVV.YYY"
+    },
+    {
+      "name": "usin",
+      "case": "twos",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 2,
+        "ProcessingNotice": 2,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 2,
+        "SaleOptOut": 2,
+        "TargetedAdvertisingOptOut": 2,
+        "KnownChildSensitiveDataConsents": 2,
+        "AdditionalDataProcessingConsent": 2,
+        "SensitiveDataProcessing": [1, 2, 0, 1, 2, 0, 1, 2]
+      },
+      "encoded": "ZBABY.Bqqq.YYY"
+    },
+    {
+      "name": "usin",
+      "case": "mixed",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 1,
+        "ProcessingNotice": 0,
+        "SaleOptOutNotice": 0,
+        "TargetedAdvertisingOptOutNotice": 1,
+        "SaleOptOut": 2,
+        "TargetedAdvertisingOptOut": 1,
+        "KnownChildSensitiveDataConsents": 0,
+        "AdditionalDataProcessingConsent": 1,
+        "SensitiveDataProcessing": [1, 2, 0, 1, 2, 0, 1, 2]
+      },
+      "encoded": "ZBABY.BkGR.YYY"
+    },
+    {
+      "name": "usin",
+      "case": "omitted",
+      "values": {
+        "SensitiveDataConsentSegmentIncluded": false
+      },
+      "encoded": "ZBAA.BQAA"
+    },
+    {
+      "name": "usky",
+      "case": "default",
+      "values": {
+        "SensitiveDataProcessing": [0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      "encoded": "aBABY.BQAA.AAA"
+    },
+    {
+      "name": "usky",
+      "case": "ones",
+      "values": {
+        "MspaCoveredTransaction": 1,
+        "MspaMode": 1,
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 1,
+        "TargetedAdvertisingOptOutNotice": 1,
+        "SaleOptOut": 1,
+        "TargetedAdvertisingOptOut": 1,
+        "KnownChildSensitiveDataConsents": 1,
+        "AdditionalDataProcessingConsent": 1,
+        "SensitiveDataProcessing": [2, 0, 1, 2, 0, 1, 2, 0]
+      },
+      "encoded": "aBABY.BVVV.hhg"
+    },
+    {
+      "name": "usky",
+      "case": "twos",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 2,
+        "ProcessingNotice": 2,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 2,
+        "SaleOptOut": 2,
+        "TargetedAdvertisingOptOut": 2,
+        "KnownChildSensitiveDataConsents": 2,
+        "AdditionalDataProcessingConsent": 2,
+        "SensitiveDataProcessing": [2, 0, 1, 2, 0, 1, 2, 0]
+      },
+      "encoded": "aBABY.Bqqq.hhg"
+    },
+    {
+      "name": "usky",
+      "case": "mixed",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 2,
+        "ProcessingNotice": 0,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 0,
+        "SaleOptOut": 1,
+        "TargetedAdvertisingOptOut": 2,
+        "KnownChildSensitiveDataConsents": 2,
+        "AdditionalDataProcessingConsent": 0,
+        "SensitiveDataProcessing": [2, 0, 1, 2, 0, 1, 2, 0]
+      },
+      "encoded": "aBABY.Boho.hhg"
+    },
+    {
+      "name": "usky",
+      "case": "omitted",
+      "values": {
+        "SensitiveDataConsentSegmentIncluded": false
+      },
+      "encoded": "aBAA.BQAA"
+    },
+    {
+      "name": "usri",
+      "case": "default",
+      "values": {
+        "SensitiveDataProcessing": [0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      "encoded": "bBABY.BQAA.AAA"
+    },
+    {
+      "name": "usri",
+      "case": "ones",
+      "values": {
+        "MspaCoveredTransaction": 1,
+        "MspaMode": 1,
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 1,
+        "TargetedAdvertisingOptOutNotice": 1,
+        "SaleOptOut": 1,
+        "TargetedAdvertisingOptOut": 1,
+        "KnownChildSensitiveDataConsents": 1,
+        "AdditionalDataProcessingConsent": 1,
+        "SensitiveDataProcessing": [0, 1, 2, 0, 1, 2, 0, 1]
+      },
+      "encoded": "bBABY.BVVV.GGE"
+    },
+    {
+      "name": "usri",
+      "case": "twos",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 2,
+        "ProcessingNotice": 2,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 2,
+        "SaleOptOut": 2,
+        "TargetedAdvertisingOptOut": 2,
+        "KnownChildSensitiveDataConsents": 2,
+        "AdditionalDataProcessingConsent": 2,
+        "SensitiveDataProcessing": [0, 1, 2, 0, 1, 2, 0, 1]
+      },
+      "encoded": "bBABY.Bqqq.GGE"
+    },
+    {
+      "name": "usri",
+      "case": "mixed",
+      "values": {
+        "MspaCoveredTransaction": 2,
+        "MspaMode": 2,
+        "ProcessingNotice": 1,
+        "SaleOptOutNotice": 2,
+        "TargetedAdvertisingOptOutNotice": 1,
+        "SaleOptOut": 1,
+        "TargetedAdvertisingOptOut": 0,
+        "KnownChildSensitiveDataConsents": 0,
+        "AdditionalDataProcessingConsent": 0,
+        "SensitiveDataProcessing": [0, 1, 2, 0, 1, 2, 0, 1]
+      },
+      "encoded": "bBABY.BplA.GGE"
+    },
+    {
+      "name": "usri",
+      "case": "omitted",
+      "values": {
+        "SensitiveDataConsentSegmentIncluded": false
+      },
+      "encoded": "bBAA.BQAA"
+    }
+  ]
+}

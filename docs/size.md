@@ -52,7 +52,7 @@ The checked budgets are the source-of-truth values below. Region header provider
 | CLI binary | total | 8800 |
 | CLI programmatic API | total | 8905 |
 | GPP stub | extra | 925 |
-| GPP US sections module | lazy | 2810 |
+| GPP US sections module | lazy | 3680 |
 | TCF stub | extra | 645 |
 | TCF core module | lazy | 4555 |
 | TCF vendor list UI | extra | 4295 |
@@ -154,6 +154,7 @@ The TCF/GPP exclusion guard always scans the default core entry and every static
 | TCF vendor list UI | 2555 B | 4295 B | Vendor names become Details buttons opening a per-vendor details panel (purposes, retention, links, storage) with its CSS, and focused-row pinning so focus survives windowing, and rows no longer wrap at narrow widths: 2221 B to 3733 B (+1512 B). Limit reset to about 15% headroom. TCF/GPP total 10123 B of the 12288 B SPEC cap | M6 PR37 |
 | TCF labels (largest locale, el) | n/a | 940 B | New opt-in `@cookiechimp/translations/tcf/<locale>` entries. Largest is el at 815 B; limit about 15% headroom over the largest. Every existing per-locale bundle (`dist/<locale>.mjs` and `.cjs`) is byte-identical to main, and the row asserts the TCF keys stay out of `dist/el.mjs` | M6 PR38 |
 | TCF/GPP module | 12288 B | 12288 B | Limit unchanged. Row now sums the TCF core, GPP and TCF vendor UI entries plus `tcf.css` (`alsoEntries`) instead of measuring `tcf.mjs` alone: 3960 B to 10123 B measured, about 17% headroom. Watch item: 2165 B left under the SPEC cap | M7 PR39 |
+| GPP 2026 sections | 2810 B | 3680 B | Five additional states, April 2026 section headers, sensitive subsections and strict modern decoding; measured 3187 B, combined IAB caps unchanged | Five-state follow-up |
 | GPP later state sections | 2810 B | 2810 B | Limit unchanged. Ten additional state schemas and state routing: 2430 B to 2673 B. Stub: 809 B to 859 B, inside 925 B. Combined TCF/GPP: 10123 B to 10366 B, inside 12288 B, leaving 1922 B. Default bundles remain unchanged | GPP follow-up |
 | TCF provider bootstrap and full graph | new | 780 B / 12288 B | Dedicated opt-in provider entry: 666 B initial. A new full-graph row includes its dynamic core import plus TCF, GPP and vendor UI/CSS, deduplicated and measured at 10127 B. Existing conservative component sum remains guarded at 10366 B of 12288 B. No existing budget changed; default bundles unchanged | TCF provider follow-up |
 | TCF disclosure follow-up | unchanged | unchanged | Current GVL text and illustration support: TCF core 4042 B, vendor UI with CSS 3909 B, conservative component sum 10624 B and full IAB graph 10347 B under 12288 B. Provider bootstrap 663 B under 780 B. All existing budgets and default-bundle exclusions remain enforced | TCF disclosure follow-up |

@@ -2,7 +2,8 @@
 
 This suite compares a no-CMP baseline, CookieChimp, CookieYes SDK 0.8.1
 (`@cookieyes/nextjs`) and Vanilla CookieConsent 3.1.0 on the same minimal
-Next.js 16.4.0 / React 19.3.0 page. Each fixture has its own production build,
+Next.js 16.4.3 / React 19.3.0 page. Archived result files retain the framework
+versions and source revision under which they were measured. Each fixture has its own production build,
 so one product's styles or code cannot enter another product's baseline.
 `fixtures/shared/page.tsx` and `styles.css` supply identical page content.
 No vendor implementation is copied; comparator adapters use public APIs only.

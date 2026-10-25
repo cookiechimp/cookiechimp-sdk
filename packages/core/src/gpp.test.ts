@@ -12,7 +12,10 @@ import {
   usValues,
 } from "./gpp";
 
-const names = Object.keys(US_SECTIONS) as UsSectionName[];
+// Published reference 3.2.0 covers section IDs 7 through 22.
+const names = (Object.keys(US_SECTIONS) as UsSectionName[]).filter(
+  (name) => US_SECTIONS[name].id <= 22,
+);
 
 // Deterministic PRNG so failures reproduce.
 function rng(seed: number) {

@@ -208,3 +208,47 @@ describe("installGpp", () => {
     expect(gpp()).toBeUndefined();
   });
 });
+
+it.each([
+  ["MN", "usmn", 23],
+  ["MD", "usmd", 24],
+  ["IN", "usin", 25],
+  ["KY", "usky", 26],
+  ["RI", "usri", 27],
+] as const)(
+  "%s exposes its own section through the CMP API and updates preferences",
+  async (state, prefix, id) => {
+    const consent = runtime(
+      { advertising: true, marketing: true },
+      { region: { country: "US", region: state } },
+    );
+    const controller = installGpp(consent);
+    try {
+      const [ping] = await call("ping");
+      expect(ping).toMatchObject({
+        applicableSections: [id],
+        sectionList: [id],
+      });
+      expect((ping as { supportedAPIs: string[] }).supportedAPIs).toEqual(
+        expect.arrayContaining([
+          "23:usmn",
+          "24:usmd",
+          "25:usin",
+          "26:usky",
+          "27:usri",
+        ]),
+      );
+      expect(await call("hasSection", "usnat")).toEqual([false, true]);
+      expect(await call("getField", `${prefix}.SaleOptOut`)).toEqual([2, true]);
+      consent.update({ advertising: false, marketing: false });
+      expect(await call("getField", `${prefix}.SaleOptOut`)).toEqual([1, true]);
+      if (state !== "MN")
+        expect(await call("getField", `${prefix}.MspaVersion`)).toEqual([
+          1,
+          true,
+        ]);
+    } finally {
+      controller.stop();
+    }
+  },
+);

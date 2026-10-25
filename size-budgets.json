@@ -304,7 +304,7 @@
     "scenario": "gpp",
     "entry": "packages/core/dist/gpp.mjs",
     "kind": "lazy",
-    "limit": 2810,
+    "limit": 3680,
     "excludedFrom": "packages/core/dist/index.mjs",
     "forbiddenTokens": ["installGpp", "MspaCoveredTransaction"]
   },
