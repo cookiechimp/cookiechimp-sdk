@@ -25,6 +25,11 @@ export interface ConsentLog {
   record(consent: ConsentRecord, language?: string): void;
   /** Send due records now. Resolves with the number still queued. */
   flush(): Promise<number>;
+  /**
+   * Clear retry delays and send every queued record now. Call it when
+   * connectivity returns or an app comes to the foreground.
+   */
+  retry(): Promise<number>;
   /** Number of queued records. */
   pending(): number;
   destroy(): void;
@@ -91,7 +96,14 @@ export function createRecordQueue<R>(
     storage =
       options.storage === undefined ? globalThis.localStorage : options.storage;
   } catch {}
-  const win = typeof window === "undefined" ? undefined : window;
+  // React Native defines `window` without DOM events or `document`; the app
+  // calls `retry()` from AppState and network listeners instead.
+  const win =
+    typeof window !== "undefined" &&
+    typeof window.addEventListener === "function" &&
+    typeof document !== "undefined"
+      ? window
+      : undefined;
   let queue: Queued<R>[] = [];
   let timer: ReturnType<typeof setTimeout> | undefined;
   let sending: Promise<number> | undefined;
@@ -214,10 +226,11 @@ export function createRecordQueue<R>(
   const onHide = () => {
     if (document.visibilityState === "hidden") void run(true);
   };
-  const onOnline = () => {
+  const retry = () => {
     for (const item of queue) item.next = 0;
-    void log.flush();
+    return log.flush();
   };
+  const onOnline = () => void retry();
 
   const log: ConsentLog = {
     record(consent, language) {
@@ -234,17 +247,20 @@ export function createRecordQueue<R>(
       } catch {}
     },
     flush: () => run(),
+    retry,
     pending: () => queue.length,
     destroy() {
       destroyed = true;
       clearTimeout(timer);
       win?.removeEventListener("online", onOnline);
-      document?.removeEventListener?.("visibilitychange", onHide);
+      if (win) document.removeEventListener("visibilitychange", onHide);
     },
   };
-  if (!problem && win) {
-    win.addEventListener("online", onOnline);
-    document.addEventListener("visibilitychange", onHide);
+  if (!problem) {
+    if (win) {
+      win.addEventListener("online", onOnline);
+      document.addEventListener("visibilitychange", onHide);
+    }
     schedule();
   }
   return log;
