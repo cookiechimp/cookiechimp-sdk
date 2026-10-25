@@ -167,6 +167,14 @@
     "forbiddenTokens": ["mergeConfig", "categoriesHash", "matchService"]
   },
   {
+    "name": "connected sync marginal over core",
+    "scenario": "sync marginal",
+    "entry": "scripts/size-scenarios/core-sync.ts",
+    "subtractEntry": "packages/core/dist/index.mjs",
+    "kind": "extra",
+    "limit": 2560
+  },
+  {
     "name": "consent log",
     "scenario": "consent-log",
     "entry": "packages/core/dist/consent-log.mjs",

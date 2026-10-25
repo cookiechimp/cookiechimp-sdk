@@ -7,8 +7,13 @@ not merged or published. It covers detached `Image()`, DOM image `src`/`srcset`
 and picture sources, with consent restoration and stale-request cancellation.
 The opt-in dynamic graph measures 2751 B; its proposed budget is 3200 B (was
 2688 B). The default core graph is unchanged. Browser request-count tests and
-41 dynamic component tests pass. Sync marginal-size optimization and the five
-GPP state formats remain the next SDK tasks.
+41 dynamic component tests pass. The sync follow-up on
+`codex/deduplicate-sync-config` shares configuration code and removes redundant
+adapter work. Core is 3670 B, core plus the complete sync entry is 6230 B, and
+the marginal cost is 2560 B, meeting the original target without increasing it.
+Standalone sync is 3966 B of 4355 B. All 43 enforced budgets pass, including the
+new marginal guard. Both follow-ups await review; the five GPP state formats
+remain the next SDK task.
 
 ## Platform category and vendor UI (published in 1.1.0)
 
@@ -183,11 +188,10 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   platform UI renders its bounded safe rich-text subset.
 - Page-hide requests with custom headers can be dropped by the browser. Persisted
   records retry on the next visit and require receiver deduplication.
-- All 42 enforced budgets pass. Sync is 4098 B against its 4355 B standalone
-  limit. Its remeasured marginal cost over core is 3069 B, exceeding the older
-  SPEC 2.5 KB target by 509 B. That target needs optimization or an explicit
-  reviewed decision; no limit was changed by release preparation. The previous
-  claim of a current 2395 B marginal cost was stale. See [size methodology](size.md).
+- Published 1.1.0 sync measured 4098 B standalone and 3069 B marginal over
+  core. The review follow-up above meets the 2560 B marginal target and adds a
+  failing CI guard; it is not part of the published 1.1.0 tarballs. See
+  [size methodology](size.md).
 - The conservative TCF/GPP component sum is 10629 B of 12288 B. The provider
   bootstrap is 663 B and the deduplicated full IAB graph plus vendor CSS is 10354 B
   of 12288 B. The 1.1.0 validation passes all 42 enforced budgets, including the new
