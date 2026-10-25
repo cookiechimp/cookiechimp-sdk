@@ -351,6 +351,17 @@ export function createEngine(options: CookieChimpOptions): Engine {
       if (destroyed) return;
       const locale = options.language ?? deviceLocale();
       debug("region", regionKey(region) || "none", "locale", locale);
+      // Retry delivery on every foreground; refresh config after five minutes,
+      // or right away while the first config download has not succeeded.
+      appState = AppState.addEventListener("change", (next) => {
+        if (next !== "active") return;
+        void log?.retry();
+        if (
+          !snapshot.dashboard ||
+          Date.now() - lastRevalidate > REVALIDATE_AFTER
+        )
+          revalidate(region);
+      });
       let dashboard: DashboardConfig | undefined;
       if (options.config !== undefined) {
         dashboard = adaptPlatformConfig(options.config, {
@@ -379,11 +390,6 @@ export function createEngine(options: CookieChimpOptions): Engine {
         }
       } else return fail("accountId or config is required");
       apply(dashboard, region);
-      appState = AppState.addEventListener("change", (next) => {
-        if (next !== "active") return;
-        void log?.retry();
-        if (Date.now() - lastRevalidate > REVALIDATE_AFTER) revalidate(region);
-      });
     },
     destroy() {
       destroyed = true;

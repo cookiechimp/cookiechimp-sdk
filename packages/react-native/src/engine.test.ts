@@ -262,7 +262,7 @@ describe("connected mode", () => {
     }
   });
 
-  it("stays out of the way when config cannot be loaded on first launch", async () => {
+  it("stays out of the way when config cannot be loaded on first launch, then recovers on foreground", async () => {
     const api = platform({ configStatus: 500 });
     const state = await start({
       accountId: ACCOUNT,
@@ -271,6 +271,15 @@ describe("connected mode", () => {
     });
     expect(state).toMatchObject({ status: "error", bannerOpen: false });
     expect(CookieChimp.acceptedCategory("analytics")).toBe(false);
+
+    api.fetch.mockImplementation(platform().fetch);
+    emitAppState("active");
+    await vi.waitFor(() =>
+      expect(store.getSnapshot()).toMatchObject({
+        status: "ready",
+        bannerOpen: true,
+      }),
+    );
   });
 
   it("requires an account ID or a bundle", async () => {
