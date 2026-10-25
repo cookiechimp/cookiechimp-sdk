@@ -39,6 +39,34 @@ GPP change and this checklist ship together in #66. The review found no actionab
 PR comments. Each merge requires current-head checks and source parity; no review
 or branch-protection bypass is part of this sequence.
 
+## React Native SDK (in progress)
+
+Daniel chose on 25 October 2026 to build the React Native SDK as
+`packages/react-native` in this repository on top of `@cookiechimp/core`,
+replacing the unpublished scaffold in IdentitySquare/CookieChimp-ReactNative-SDK.
+
+Built and tested locally, not yet merged or published:
+
+- Core runs without a browser: a synchronous `storage` adapter for
+  `createConsent`, `platform: "ios" | "android"` consent records,
+  `ConsentLog.retry()`, and Hermes fallbacks for Web Crypto and `TextDecoder`.
+- `@cookiechimp/react-native` (marked `private` so it cannot publish by accident):
+  connected and offline modes, AsyncStorage persistence, dashboard-styled
+  native banner and preferences, consent records, re-consent, vendor
+  callbacks, the `CookieChimp` API and hooks, and a Mintlify guide.
+
+Remaining before a React Native release:
+
+1. Region detection decision (CookieChimp geolocation endpoint vs app-supplied
+   region) and a matching update to this repository's location rule.
+2. An Expo example app and a device check on iOS and Android.
+3. Live backend config retrieval and consent delivery from a real device build,
+   the same gate as every release.
+4. Add the package to the release cohort (`release/manifest.ts`, changesets,
+   consumer check), remove `private`, and obtain publication approval.
+5. Align the dashboard React Native setup snippets (platform repository,
+   Daniel's review) with the published package name and API.
+
 ## Next release steps
 
 1. Prepare a new coordinated package version using the changesets. Never
