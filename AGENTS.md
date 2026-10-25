@@ -2,7 +2,7 @@
 
 - Work in `cookiechimp/cookiechimp-sdk`. Do not modify, merge, deploy or run writes against the CookieChimp platform repository.
 - Platform dependencies require Daniel's review and action. Daniel authorized Codex to review, fix and merge the SDK PRs for this completion sequence on 14 Oct 2026, after their current-head checks pass. npm publication and external submissions still require his explicit approval.
-- Follow `CONTRIBUTING.md`: clean-room implementation, no client-side geolocation, no em dash characters, and all seven required CI checks on the current head.
+- Follow `CONTRIBUTING.md`: clean-room implementation, no client-side geolocation (except the opt-in React Native `geolocation` option described there), no em dash characters, and all seven required CI checks on the current head.
 - Keep `docs/remaining-work.md` accurate. Distinguish built and tested work from merged, deployed and published work.
 - Live CookieChimp backend config retrieval and consent delivery are always required before npm publication, including releases that support local-only usage. Keep connected examples prominent; never waive this release gate to expedite publication.
 

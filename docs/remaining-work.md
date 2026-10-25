@@ -53,18 +53,20 @@ Built and tested locally, not yet merged or published:
 - `@cookiechimp/react-native` (marked `private` so it cannot publish by accident):
   connected and offline modes, AsyncStorage persistence, dashboard-styled
   native banner and preferences, consent records, re-consent, vendor
-  callbacks, the `CookieChimp` API and hooks, and a Mintlify guide.
+  callbacks, the `CookieChimp` API and hooks, a Mintlify guide and an Expo
+  example outside the workspace.
+- Region: Daniel chose opt-in CookieChimp geolocation on 25 October 2026. Apps
+  pass `country`, or enable `geolocation`; an unknown region uses the GDPR
+  fallback. See CONTRIBUTING.md.
 
 Remaining before a React Native release:
 
-1. Region detection decision (CookieChimp geolocation endpoint vs app-supplied
-   region) and a matching update to this repository's location rule.
-2. An Expo example app and a device check on iOS and Android.
-3. Live backend config retrieval and consent delivery from a real device build,
+1. A device check on iOS and Android with the Expo example.
+2. Live backend config retrieval and consent delivery from a real device build,
    the same gate as every release.
-4. Add the package to the release cohort (`release/manifest.ts`, changesets,
+3. Add the package to the release cohort (`release/manifest.ts`, changesets,
    consumer check), remove `private`, and obtain publication approval.
-5. Align the dashboard React Native setup snippets (platform repository,
+4. Align the dashboard React Native setup snippets (platform repository,
    Daniel's review) with the published package name and API.
 
 ## Next release steps

@@ -59,8 +59,9 @@ export interface CookieChimpOptions {
   /** Banner language, for example `de` or `pt-BR`. Defaults to the device language. */
   language?: string;
   /**
-   * Ask CookieChimp's first-party endpoint for the connection's country when
-   * `country` is not given. Defaults to true.
+   * Opt in to asking CookieChimp's first-party endpoint for the connection's
+   * country when `country` is not given. Needs `accountId`. Defaults to false:
+   * without a region the selected banner uses GDPR (opt-in) rules.
    */
   geolocation?: boolean;
   /** Send consent records to CookieChimp. Defaults to true. */
@@ -238,7 +239,9 @@ export function createEngine(options: CookieChimpOptions): Engine {
       runtime = createConsent({
         categories: dashboard.categories,
         services: dashboard.services,
-        regulation: dashboard.consentMode === "opt_out" ? "ccpa" : "gdpr",
+        // An unknown region gets the safe GDPR fallback, as on the web.
+        regulation:
+          region && dashboard.consentMode === "opt_out" ? "ccpa" : "gdpr",
         language: dashboard.language,
         promptOnOptOut: true,
         region,
@@ -341,7 +344,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
       if (destroyed) return;
       const region =
         parseRegion(options.country) ??
-        (options.geolocation !== false && options.accountId && !options.config
+        (options.geolocation === true && options.accountId
           ? await fetchRegion({
               accountId: options.accountId,
               apiBase,

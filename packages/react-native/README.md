@@ -74,14 +74,21 @@ To update an offline config, download the file again and ship an app update.
 
 ## Region and language
 
-The region selects which dashboard banner applies.
+The region selects which dashboard banner applies and whether its opt-out
+(CCPA) rules can be used. By default the SDK never looks up the user's location.
 
-1. `country="DE"` or `country="US-CA"` always wins.
-2. Otherwise, in connected mode, the SDK asks CookieChimp's own geolocation
-   endpoint for the connection's country (one small request on launch, IP based).
-   No third-party location service is contacted and device location permissions
-   are never used. Turn it off with `geolocation={false}`.
-3. Without a region, the dashboard's default banner applies.
+1. `country="DE"` or `country="US-CA"` always wins. Pass it when your app
+   already knows the user's country, for example from your own backend.
+2. Otherwise, with `geolocation` and an `accountId`, the SDK asks CookieChimp's
+   own first-party endpoint for the connection's country (one small IP-based
+   request on launch). No third-party location service is contacted and device
+   location permissions are never used. This is off unless you opt in.
+3. Without a region, the dashboard's default banner is shown with the safe GDPR
+   fallback: optional categories stay off until the user chooses, even when the
+   default banner is an opt-out banner.
+
+Device locale (for example `en-US`) is a language setting, not a location, and
+is never used to choose the region.
 
 The language defaults to the device language and falls back to the first
 language the banner has. Override it with `language="fr"`.
@@ -94,7 +101,7 @@ language the banner has. Override it with `language="fr"`.
 | `config` | The downloaded config JSON (offline mode). |
 | `country` | `DE`, `US-CA` and so on. Overrides region detection. |
 | `language` | Banner language. Defaults to the device language. |
-| `geolocation` | Ask CookieChimp for the country when `country` is not set. Default `true`. |
+| `geolocation` | Opt in to asking CookieChimp for the country when `country` is not set. Default `false`. |
 | `syncConsents` | Send consent records to CookieChimp. Default `true`. |
 | `ui` | Render the built-in banner and preferences. Set `false` for your own UI. |
 | `insets` | Safe-area insets for the banner, for example from `react-native-safe-area-context`. |

@@ -20,7 +20,8 @@ built by CookieChimp. MIT licensed.
 
 The SDK never looks up a visitor's location. It makes no geo-IP or external
 location request. Applications pass trusted region context, for example from
-their hosting platform's headers.
+their hosting platform's headers. React Native apps can opt in to CookieChimp's
+own first-party region lookup instead.
 
 ## Where to start
 

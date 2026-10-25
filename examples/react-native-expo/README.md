@@ -20,8 +20,9 @@ Open it in Expo Go, an iOS simulator or an Android emulator, or press `w` for
 the web preview.
 
 - Without configuration it runs in offline mode from `cookiechimp-config.json`,
-  the sample platform bundle used by the SDK tests. Its default banner is the
-  US opt-out banner, so optional categories start allowed.
+  the sample platform bundle used by the SDK tests. With no region known, its
+  default banner uses the GDPR fallback, so optional categories start off.
+  Pass `country="US-CA"` to the provider to see the opt-out behavior.
 - Set `EXPO_PUBLIC_COOKIECHIMP_ACCOUNT_ID=your_account_id` to load your live
   dashboard config and send consent records to CookieChimp.
 

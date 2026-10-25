@@ -89,12 +89,30 @@ describe("offline mode", () => {
     expect(api.calls().map(([url]) => url)).toEqual([]);
   });
 
-  it("uses the default banner when no country is known", async () => {
+  it("shows the default banner with GDPR rules when no country is known", async () => {
+    const vendor = { onStart: vi.fn() };
+    CookieChimp.registerVendor("Google Analytics", "analytics", vendor);
     const state = await start({ config: bundle, fetch: platform().fetch });
+    // The default banner is opt-out, but an unknown region is never treated as
+    // opt-out: nothing optional runs before a choice.
     expect(state.dashboard?.bannerId).toBe("bnrUS1");
+    expect(state.region).toBeNull();
+    expect(state.regulation).toBe("gdpr");
+    expect(state.bannerOpen).toBe(true);
+    expect(CookieChimp.acceptedCategory("analytics")).toBe(false);
+    expect(vendor.onStart).not.toHaveBeenCalled();
+  });
+
+  it("uses opt-out rules once the app supplies a US region", async () => {
+    const state = await start({
+      config: bundle,
+      country: "US-CA",
+      fetch: platform().fetch,
+    });
     expect(state.regulation).toBe("ccpa");
     // Opt-out banners still ask once so the user sees the notice.
     expect(state.bannerOpen).toBe(true);
+    expect(CookieChimp.acceptedCategory("analytics")).toBe(true);
   });
 
   it("stores a decision, delivers a consent record and restores it on the next launch", async () => {
@@ -190,9 +208,14 @@ describe("offline mode", () => {
 });
 
 describe("connected mode", () => {
-  it("uses the CookieChimp geolocation endpoint, then caches config", async () => {
+  it("uses the CookieChimp geolocation endpoint when opted in, then caches config", async () => {
     const api = platform({ geo: { country: "US", region: "US-CA" } });
-    const state = await start({ accountId: ACCOUNT, fetch: api.fetch });
+    const state = await start({
+      accountId: ACCOUNT,
+      geolocation: true,
+      fetch: api.fetch,
+    });
+    expect(state.regulation).toBe("ccpa");
     expect(state.status).toBe("ready");
     expect(state.region).toEqual({ country: "US", region: "CA" });
     expect(state.dashboard?.bannerId).toBe("bnrUS1");
@@ -222,8 +245,12 @@ describe("connected mode", () => {
     );
   });
 
-  it("skips the geolocation request when a country is given or it is disabled", async () => {
-    for (const options of [{ country: "FR" }, { geolocation: false }]) {
+  it("never looks up the location by default or when a country is given", async () => {
+    for (const options of [
+      {},
+      { geolocation: false },
+      { country: "FR", geolocation: true },
+    ]) {
       const api = platform();
       storage = memoryStorage();
       await start({ accountId: ACCOUNT, fetch: api.fetch, ...options });
