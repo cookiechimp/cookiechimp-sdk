@@ -3,6 +3,11 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { releaseVersion, validateManifest } from "./manifest.ts";
+import {
+  parseRegistryMetadata,
+  type RegistryMetadata,
+  verifyRegistryPublication,
+} from "./registry.ts";
 
 // This script is only entered after the workflow has checked main, CI,
 // Daniel's environment review and publication prerequisites.
@@ -40,11 +45,9 @@ for (const entry of manifest.packages) {
   if (createHash("sha256").update(bytes).digest("hex") !== entry.sha256)
     throw new Error(`Tarball changed: ${entry.name}`);
   // A partial rerun is allowed only when the existing registry bytes match.
-  let existing:
-    | { "dist.integrity"?: string; "dist.attestations"?: unknown }
-    | undefined;
+  let existing: RegistryMetadata | undefined;
   try {
-    existing = JSON.parse(
+    existing = parseRegistryMetadata(
       execFileSync(
         "npm",
         [
@@ -55,7 +58,7 @@ for (const entry of manifest.packages) {
           "--json",
           "--registry=https://registry.npmjs.org",
         ],
-        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 15000 },
       ),
     );
   } catch (error) {
@@ -86,23 +89,20 @@ for (const entry of manifest.packages) {
     ],
     { stdio: "inherit" },
   );
-  const published = JSON.parse(
-    execFileSync(
-      "npm",
-      [
-        "view",
-        `${entry.name}@${entry.version}`,
-        "dist.integrity",
-        "dist.attestations",
-        "--json",
-        "--registry=https://registry.npmjs.org",
-      ],
-      { encoding: "utf8" },
+  await verifyRegistryPublication(entry, () =>
+    parseRegistryMetadata(
+      execFileSync(
+        "npm",
+        [
+          "view",
+          `${entry.name}@${entry.version}`,
+          "dist.integrity",
+          "dist.attestations",
+          "--json",
+          "--registry=https://registry.npmjs.org",
+        ],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 15000 },
+      ),
     ),
   );
-  if (
-    published["dist.integrity"] !== entry.integrity ||
-    !published["dist.attestations"]
-  )
-    throw new Error(`Published version verification failed: ${entry.name}`);
 }
