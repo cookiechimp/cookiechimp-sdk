@@ -153,7 +153,7 @@ test("an unvalidated origin or secret key fails closed with no request", async (
   await page.goto("/sync?key=cc_sk_secret12345");
   await expect(section(page)).toHaveAttribute("data-cc-sync", "disabled");
   await expect(page.getByTestId("sync-error")).toHaveText(
-    "secret keys must never be used in the browser",
+    "secret key forbidden",
   );
   await page.waitForTimeout(300);
   expect(requests).toEqual([]);
