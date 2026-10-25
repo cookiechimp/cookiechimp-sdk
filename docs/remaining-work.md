@@ -119,9 +119,10 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   Live browser config, accept/reject/custom delivery, persistence and blocked
   retry checks passed at `http://localhost:3104`, with four matching HTTP 200
   receipts and an empty queue. The [evidence](release-evidence/2026-10-24-live-backend.json)
-  records exact decision and server IDs. Dashboard storage and retry uniqueness
-  await authenticated access, so `platformDeployed` remains false. The
-  [live test runbook](live-backend-verification.md) records the remaining check.
+  records exact decision and server IDs. Authenticated dashboard inspection on
+  25 Oct confirmed exactly four matching stored records, their saved preferences
+  and one retry record. `platformDeployed` is true for this evidence. The
+  [live test runbook](live-backend-verification.md) records the completed checks.
 - [SDK #55](https://github.com/cookiechimp/cookiechimp-sdk/pull/55) merged on 23 Oct
   after current-head checks passed. Main CI and prepare-only release run
   `40036259290` passed on `bcee50436707e27f9f5f38f7ef6a4c4f3baafb1e`;
@@ -133,7 +134,7 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   import passed validation. Public guides describe the SDK in present tense and
   state package version requirements; internal publication gates remain here and
   in `release/readiness.json`. Mintlify deployment is verified separately.
-- Complete live test evidence and recheck trusted publishers, then obtain new
+- Live test evidence is complete. Recheck trusted publishers, then obtain new
   explicit approval for 1.1.0 and the `npm-publish` environment. Run the guarded
   workflow with `approved_version=1.1.0`; preserve integrity and provenance checks.
   Install from npm, verify signatures/browser behavior, and publish the reviewed

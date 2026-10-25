@@ -53,9 +53,10 @@ steps read the configured release version instead of assuming 1.0.0.
   persistence and blocked-request retry checks passed on 24 October using account
   `K8ktWD`, selected by Daniel from cookiechimp.com's installation script.
   The [sanitized evidence](release-evidence/2026-10-24-live-backend.json) records
-  four acknowledged decisions. Dashboard storage and retry uniqueness still
-  require authenticated confirmation, so keep `manualChecks.platformDeployed`
-  false. See [the live backend runbook](live-backend-verification.md). No platform
+  four acknowledged decisions. Authenticated dashboard inspection on 25 October
+  confirmed exactly four matching stored records, their saved preferences and
+  one retry record. `manualChecks.platformDeployed` is true for this evidence.
+  See [the live backend runbook](live-backend-verification.md). No platform
   repository or account settings were changed.
 - All eight expired npm trusted publisher connections were renewed and verified
   on 24 October with Daniel's authorization. Their bindings remain

@@ -37,7 +37,9 @@
         "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:18:10.266Z",
         "server_id": "9RwHVAwQxV"
       },
-      "dashboardVerified": false
+      "dashboardVerified": true,
+      "dashboardUrl": "https://cookiechimp.com/visitors/9RwHVAwQxV",
+      "dashboardPreferences": "Accept Type\nAll\nGPC Preference\nOpt-in\nAccepted Categories\nnecessary\nEssential\nAnalytics\nRejected Categories\n---"
     },
     {
       "case": "reject",
@@ -52,7 +54,9 @@
         "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:18:38.534Z",
         "server_id": "w29H5epmvz"
       },
-      "dashboardVerified": false
+      "dashboardVerified": true,
+      "dashboardUrl": "https://cookiechimp.com/visitors/w29H5epmvz",
+      "dashboardPreferences": "Accept Type\nNecessary\nGPC Preference\nOpt-in\nAccepted Categories\nnecessary\nEssential\nRejected Categories\nAnalytics"
     },
     {
       "case": "custom",
@@ -67,7 +71,9 @@
         "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:20.096Z",
         "server_id": "eA9HGXyDWn"
       },
-      "dashboardVerified": false
+      "dashboardVerified": true,
+      "dashboardUrl": "https://cookiechimp.com/visitors/eA9HGXyDWn",
+      "dashboardPreferences": "Accept Type\nCustom\nGPC Preference\nOpt-in\nAccepted Categories\nnecessary\nEssential\nAnalytics\nRejected Categories\n---"
     },
     {
       "case": "retry",
@@ -82,7 +88,9 @@
         "client_id": "a7c4b2b1-7a36-474d-a9b9-50528ccfb0e8:2026-10-24T22:19:46.422Z",
         "server_id": "zz5HYM5eym"
       },
-      "dashboardVerified": false
+      "dashboardVerified": true,
+      "dashboardUrl": "https://cookiechimp.com/visitors/zz5HYM5eym",
+      "dashboardPreferences": "Accept Type\nNecessary\nGPC Preference\nOpt-in\nAccepted Categories\nnecessary\nEssential\nRejected Categories\nAnalytics"
     }
   ],
   "persistence": {
@@ -122,11 +130,20 @@
       }
     ],
     "requestBlockingRemoved": true,
-    "dashboardDuplicateCheck": "pending"
+    "dashboardDuplicateCheck": "passed"
   },
   "limitations": [
-    "This account exposes one optional category, analytics; the custom test re-enabled it through Save Preferences. A mixed choice across two optional categories was not available.",
-    "Dashboard storage and duplicate verification await authenticated dashboard access."
+    "This account exposes one optional category, analytics; the custom test re-enabled it through Save Preferences. A mixed choice across two optional categories was not available."
   ],
-  "publicationGateSatisfied": false
+  "dashboardVerification": {
+    "verifiedAt": "2026-10-25T07:52:03Z",
+    "method": "Authenticated CookieChimp Consent Log filtered by the test consent UUID, followed by inspection of all four record detail pages",
+    "recordCount": 4,
+    "serverIds": ["9RwHVAwQxV", "eA9HGXyDWn", "w29H5epmvz", "zz5HYM5eym"],
+    "allReceiptsMatchStoredRecords": true,
+    "preferencesMatchSubmittedChoices": true,
+    "retryRecordCount": 1
+  },
+  "liveBackendGateSatisfied": true,
+  "publicationPerformed": false
 }

@@ -7,9 +7,12 @@ used `http://localhost:3104/connected?project=K8ktWD`; this account already perm
 passed, with four HTTP 200 matching receipts. See the
 [sanitized evidence](release-evidence/2026-10-24-live-backend.json).
 
-Authenticated dashboard confirmation of the four records and retry uniqueness
-is still pending because Chrome is signed out. Keep
-`manualChecks.platformDeployed` false until that final check is complete.
+Authenticated dashboard inspection completed on 25 October at 07:52 UTC.
+The Consent Log filtered by the test UUID contains exactly four records whose
+server IDs match the four receipts. Each detail page has the expected saved
+preferences; the retry record appears once. `manualChecks.platformDeployed` is
+true for this reviewed evidence. Exact-version publication approval is still
+required, and no package version was published during verification.
 The tested source is `6b15623974ee3e75bcc4c448b234cd767e82315e`; package and example
 sources match reviewed main `dc962edff35541b77948ad7367ca9d32556cda02`.
 
@@ -34,9 +37,11 @@ Here the public account ID is `abc123`. Enter only the ID, without the URL,
   The workspace example defaults to `http://127.0.0.1:3104`; `localhost` is a
   different origin. If local origins are unsupported, use an approved preview
   origin and serve the same built example there.
-- Under Account Settings > Additional Domains, allow `127.0.0.1` for this local
-  test. Daniel makes this account configuration change. Keep the browser URL
-  on `http://127.0.0.1:3104`, rather than switching to `localhost`.
+- Use an origin already allowed by the selected account. For the completed
+  `K8ktWD` test, `localhost` was already allowed and the page used
+  `http://localhost:3104`. For another account, Daniel can allow the required
+  host under Account Settings > Additional Domains. Keep the same host and
+  origin throughout a run; no account setting change was needed for this test.
 - Confirmation that the account has an active English opt-in banner for Ireland,
   with at least one optional category and a service. The example supplies `IE`
   and `en`; select or configure a test account accordingly.
