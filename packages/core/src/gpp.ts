@@ -19,7 +19,12 @@ export type UsSectionName =
   | "usne"
   | "usnh"
   | "usnj"
-  | "ustn";
+  | "ustn"
+  | "usmn"
+  | "usmd"
+  | "usin"
+  | "usky"
+  | "usri";
 /** 0 not applicable, 1 yes or opted out, 2 no or did not opt out. */
 export type Tristate = 0 | 1 | 2;
 export type UsSectionValues = Record<string, number | number[] | boolean>;
@@ -29,6 +34,9 @@ interface SectionSpec {
   id: number;
   version: number;
   gpc: boolean;
+  /** April 2026 section header and separately encoded subsections. */
+  subsections?: true;
+  sensitive?: number;
   fields: readonly FieldSpec[];
 }
 
@@ -73,6 +81,25 @@ const stateSpec = (
     ),
     ...MSPA,
   ],
+});
+
+const subsectionSpec = (id: number, gpc = false): SectionSpec => ({
+  id,
+  version: 1,
+  gpc,
+  subsections: true,
+  sensitive: gpc ? undefined : 8,
+  fields: f(
+    "MspaCoveredTransaction",
+    "MspaMode",
+    `Processing${N}`,
+    `${SALE}${N}`,
+    `${TA}${N}`,
+    SALE,
+    TA,
+    ...(gpc ? [] : [KIDS]),
+    "AdditionalDataProcessingConsent",
+  ),
 });
 
 /** Field order and widths from the IAB GPP section specifications. */
@@ -180,6 +207,11 @@ export const US_SECTIONS: Record<UsSectionName, SectionSpec> = {
   usnh: stateSpec(20, 8, 3),
   usnj: stateSpec(21, 10, 5),
   ustn: stateSpec(22, 8),
+  usmn: stateSpec(23, 8),
+  usmd: subsectionSpec(24, true),
+  usin: subsectionSpec(25),
+  usky: subsectionSpec(26),
+  usri: subsectionSpec(27),
 };
 
 const STATE_SECTIONS: Record<string, UsSectionName> = {
@@ -198,14 +230,19 @@ const STATE_SECTIONS: Record<string, UsSectionName> = {
   NH: "usnh",
   NJ: "usnj",
   TN: "ustn",
+  MN: "usmn",
+  MD: "usmd",
+  IN: "usin",
+  KY: "usky",
+  RI: "usri",
 };
 const B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 const int = (value: number, bits: number) =>
   value.toString(2).padStart(bits, "0").slice(-bits);
 
-function base64(bits: string): string {
-  while (bits.length % 8) bits += "0";
+function base64(bits: string, bytePadding = true): string {
+  while (bytePadding && bits.length % 8) bits += "0";
   while (bits.length % 6) bits += "0";
   let out = "";
   for (let i = 0; i < bits.length; i += 6)
@@ -235,8 +272,7 @@ function fibonacci(value: number): string {
   return bits;
 }
 
-/** Encode the GPP header: type 3, version 1, Fibonacci section ID ranges. */
-export function encodeHeader(ids: readonly number[]): string {
+function ranges(ids: readonly number[]): string {
   const sorted = [...new Set(ids)].sort((a, b) => a - b);
   const groups: number[][] = [];
   for (const id of sorted) {
@@ -244,7 +280,7 @@ export function encodeHeader(ids: readonly number[]): string {
     if (last && last[last.length - 1] === id - 1) last.push(id);
     else groups.push([id]);
   }
-  let bits = int(3, 6) + int(1, 6) + int(groups.length, 12);
+  let bits = int(groups.length, 12);
   let offset = 0;
   for (const group of groups) {
     const start = group[0] as number;
@@ -255,8 +291,19 @@ export function encodeHeader(ids: readonly number[]): string {
         : `1${fibonacci(start - offset)}${fibonacci(end - start)}`;
     offset = end;
   }
-  return base64(bits);
+  return bits;
 }
+
+/** Encode the GPP header: type 3, version 1, Fibonacci section ID ranges. */
+export function encodeHeader(ids: readonly number[]): string {
+  return base64(int(3, 6) + int(1, 6) + ranges(ids));
+}
+
+const sectionHeader = (spec: SectionSpec, included: boolean) =>
+  base64(
+    int(spec.id, 6) + int(spec.version, 6) + ranges(included ? [1] : []),
+    false,
+  );
 
 function clamp(value: unknown, fallback: number): number {
   return value === 0 || value === 1 || value === 2 ? value : fallback;
@@ -268,7 +315,17 @@ export function encodeSection(
   values: UsSectionValues = {},
 ): string {
   const spec = US_SECTIONS[name];
-  let bits = int(spec.version, 6);
+  const version = values.MspaVersion;
+  let bits = int(
+    spec.subsections &&
+      typeof version === "number" &&
+      Number.isInteger(version) &&
+      version >= 0 &&
+      version <= 63
+      ? version
+      : spec.version,
+    6,
+  );
   for (const [field, count] of spec.fields) {
     const fallback = field === "MspaCoveredTransaction" ? 1 : 0;
     const value = values[field];
@@ -280,8 +337,27 @@ export function encodeSection(
       bits += int(fallback === 1 && n === 0 ? 1 : n, 2);
     }
   }
+  if (spec.subsections) {
+    const included =
+      (spec.gpc
+        ? values.GpcSegmentIncluded
+        : values.SensitiveDataConsentSegmentIncluded) !== false;
+    const parts = [sectionHeader(spec, included), base64(bits, false)];
+    if (included) {
+      let extra = `01${values.Gpc === true ? 1 : 0}`;
+      if (spec.sensitive) {
+        const sensitive = values[SDP];
+        extra = Array.from({ length: spec.sensitive }, (_, i) =>
+          int(clamp(Array.isArray(sensitive) ? sensitive[i] : 0, 0), 2),
+        ).join("");
+      }
+      parts.push(base64(extra, false));
+    }
+    return parts.join(".");
+  }
   let encoded = base64(bits);
-  if (spec.gpc) encoded += `.${base64(`01${values.Gpc === true ? 1 : 0}`)}`;
+  if (spec.gpc && values.GpcSegmentIncluded !== false)
+    encoded += `.${base64(`01${values.Gpc === true ? 1 : 0}`)}`;
   return encoded;
 }
 
@@ -291,11 +367,28 @@ export function decodeSection(
   encoded: string,
 ): UsSectionValues | null {
   const spec = US_SECTIONS[name];
-  const [core = "", gpc] = encoded.split(".");
+  const parts = encoded.split(".");
+  if (
+    spec.subsections &&
+    (parts.length < 2 ||
+      parts.length > 3 ||
+      parts[0] !== sectionHeader(spec, parts.length === 3))
+  )
+    return null;
+  const [core = "", gpc] = spec.subsections ? parts.slice(1) : parts;
   const bits = unbase64(core);
-  if (!bits || Number.parseInt(bits.slice(0, 6), 2) !== spec.version)
+  if (
+    !bits ||
+    bits.length < 6 ||
+    (!spec.subsections && Number.parseInt(bits.slice(0, 6), 2) !== spec.version)
+  )
     return null;
   const out: UsSectionValues = { Version: spec.version };
+  if (spec.subsections) {
+    out.SectionID = spec.id;
+    out.SubSections = parts.length === 3 ? [1] : [];
+    out.MspaVersion = Number.parseInt(bits.slice(0, 6), 2);
+  }
   let at = 6;
   const read = () => {
     const n = Number.parseInt(bits.slice(at, at + 2), 2);
@@ -305,6 +398,38 @@ export function decodeSection(
   for (const [field, count] of spec.fields) {
     if (at + 2 * (count ?? 1) > bits.length) return null;
     out[field] = count ? Array.from({ length: count }, read) : read();
+  }
+  if (spec.subsections) {
+    if (
+      base64(bits.slice(0, at), false) !== core ||
+      spec.fields.some(([field]) => out[field] === 3) ||
+      out.MspaCoveredTransaction === 0
+    )
+      return null;
+    const extra = gpc === undefined ? null : unbase64(gpc);
+    if (gpc !== undefined && extra === null) return null;
+    if (spec.sensitive) {
+      out.SensitiveDataConsentSegmentIncluded = extra !== null;
+      if (extra !== null) {
+        const length = spec.sensitive * 2;
+        const values = Array.from({ length: spec.sensitive }, (_, i) =>
+          Number.parseInt(extra.slice(i * 2, i * 2 + 2), 2),
+        );
+        if (
+          extra.length < length ||
+          values.some((value) => value > 2) ||
+          base64(extra.slice(0, length), false) !== gpc
+        )
+          return null;
+        out[SDP] = values;
+      }
+    }
+    if (
+      spec.gpc &&
+      gpc !== undefined &&
+      (extra?.slice(0, 2) !== "01" || base64(extra.slice(0, 3), false) !== gpc)
+    )
+      return null;
   }
   if (spec.gpc) {
     const g = gpc === undefined ? null : unbase64(gpc);

@@ -139,6 +139,11 @@ for (const [state, prefix, id] of [
   ["NJ", "usnj", 21],
   ["IA", "usia", 18],
   ["FL", "usfl", 13],
+  ["MN", "usmn", 23],
+  ["MD", "usmd", 24],
+  ["IN", "usin", 25],
+  ["KY", "usky", 26],
+  ["RI", "usri", 27],
 ] as const) {
   test(`${state} publishes its state section, updates consent and persists`, async ({
     page,
@@ -155,6 +160,33 @@ for (const [state, prefix, id] of [
     await expect(page.locator("html")).toHaveAttribute("data-cc-gpp", "ready");
     expect(await gpp(page, "getField", `${prefix}.SaleOptOut`)).toBe(2);
     await page.getByRole("button", { name: "Opt out of sale" }).click();
+    expect(await gpp(page, "getField", `${prefix}.SaleOptOut`)).toBe(1);
+  });
+}
+
+for (const [state, prefix] of [
+  ["MN", "usmn"],
+  ["MD", "usmd"],
+  ["IN", "usin"],
+  ["KY", "usky"],
+  ["RI", "usri"],
+] as const) {
+  test(`${state} honors GPC even after allow and reload`, async ({ page }) => {
+    await page.addInitScript(() =>
+      Object.defineProperty(Navigator.prototype, "globalPrivacyControl", {
+        get: () => true,
+      }),
+    );
+    await ready(page, `/gpp?region=${state}`);
+    await page.getByRole("button", { name: "Allow sale" }).click();
+    expect(await gpp(page, "getField", `${prefix}.SaleOptOut`)).toBe(1);
+    expect(
+      await gpp(page, "getField", `${prefix}.TargetedAdvertisingOptOut`),
+    ).toBe(1);
+    if (state === "MN" || state === "MD")
+      expect(await gpp(page, "getField", `${prefix}.Gpc`)).toBe(true);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-cc-gpp", "ready");
     expect(await gpp(page, "getField", `${prefix}.SaleOptOut`)).toBe(1);
   });
 }

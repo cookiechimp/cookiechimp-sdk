@@ -140,8 +140,7 @@ privacy laws. Neither is part of the default `@cookiechimp/core` bundle.
   replays queued calls and keeps the GPP string in sync with consent, firing
   `signalStatus`, the section event and `signalStatus` again on every change.
 
-Sections cover the US national string plus the 15 state formats in the current
-published IAB reference implementation:
+Sections cover the US national string plus 20 state formats:
 
 | Section | State | ID |
 |---|---|---:|
@@ -161,12 +160,18 @@ published IAB reference implementation:
 | usnh | New Hampshire | 20 |
 | usnj | New Jersey | 21 |
 | ustn | Tennessee | 22 |
+| usmn | Minnesota | 23 |
+| usmd | Maryland | 24 |
+| usin | Indiana | 25 |
+| usky | Kentucky | 26 |
+| usri | Rhode Island | 27 |
 
 With `approach: "state"` (the default), those states get their own section;
 other US regions use `usnat`. `approach: "national"` always uses `usnat`.
-Outside the US no section applies (`applicableSections: [-1]`). The newer
-MN, MD, IN, KY and RI formats (IDs 23 to 27) are not in the current published
-IAB reference library; those states currently use the national fallback.
+Outside the US no section applies (`applicableSections: [-1]`). Minnesota uses
+the established core/GPC format. Maryland, Indiana, Kentucky and Rhode Island
+include their required section header and separate subsections, following the
+April 2026 specifications. See [conformance and coverage](docs/gpp-conformance.md).
 Determine which string applies to your processing before enabling a section.
 [Section definitions](https://github.com/InteractiveAdvertisingBureau/Global-Privacy-Platform/blob/main/Sections/Section%20Information.md).
 
