@@ -338,3 +338,160 @@ describe("shared dynamic patches", () => {
     ).toEqual(descriptor);
   });
 });
+
+describe("tracking images", () => {
+  it("intercepts detached Image src and restores it once after consent", () => {
+    const setter = vi.spyOn(HTMLImageElement.prototype, "src", "set");
+    const { consent, controller } = install();
+    const pixel = new Image(1, 1);
+    pixel.src = "https://frames.test/pixel";
+    expect(setter).not.toHaveBeenCalled();
+    expect(pixel.hasAttribute("src")).toBe(false);
+    expect(controller.blocked()[0]).toMatchObject({
+      kind: "image",
+      service: "demo",
+    });
+    consent.allow("demo");
+    expect(pixel.src).toBe("https://frames.test/pixel");
+    expect(pixel.dataset.ccBlocked).toBeUndefined();
+    pixel.removeAttribute("src");
+    consent.allow("demo");
+    expect(pixel.hasAttribute("src")).toBe(false);
+  });
+
+  it.each(["src", "srcset"])(
+    "intercepts image setAttribute %s",
+    (attribute) => {
+      const { consent } = install();
+      const image = document.createElement("img");
+      const value =
+        attribute === "srcset"
+          ? "https://other.test/plain 1x, https://frames.test/pixel 2x"
+          : "https://frames.test/pixel";
+      image.setAttribute(attribute.toUpperCase(), value);
+      expect(image.hasAttribute(attribute)).toBe(false);
+      document.body.append(image);
+      consent.allow("demo");
+      expect(image.getAttribute(attribute)).toBe(value);
+    },
+  );
+
+  it("rechecks every responsive candidate instead of only the first service", () => {
+    const consent = runtime();
+    controllers.push(
+      blockDynamic(consent, {
+        config: {
+          categories: ["analytics"],
+          services: [
+            { id: "first", category: "analytics", domains: ["one.test"] },
+            { id: "second", category: "analytics", domains: ["two.test"] },
+          ],
+        },
+      }),
+    );
+    const image = new Image();
+    image.srcset = "https://one.test/p 1x, https://two.test/p 2x";
+    consent.allow("first");
+    expect(image.hasAttribute("srcset")).toBe(false);
+    consent.allow("second");
+    expect(image.srcset).toContain("https://two.test/p");
+  });
+
+  it("does not replay a stale blocked URL after replacement or removal", () => {
+    const { consent } = install();
+    const replaced = new Image();
+    replaced.src = "https://frames.test/stale";
+    replaced.src = "https://other.test/current";
+    const removed = new Image();
+    removed.src = "https://frames.test/removed";
+    removed.removeAttribute("src");
+    consent.allow("demo");
+    expect(replaced.src).toBe("https://other.test/current");
+    expect(removed.hasAttribute("src")).toBe(false);
+  });
+
+  it("releases only the latest denied URL and preserves src when clearing srcset", () => {
+    const { consent } = install();
+    const image = new Image();
+    image.src = "https://frames.test/old";
+    image.src = "https://frames.test/latest";
+    image.srcset = "https://frames.test/responsive 2x";
+    image.removeAttribute("srcset");
+    consent.allow("demo");
+    expect(image.src).toBe("https://frames.test/latest");
+    expect(image.hasAttribute("srcset")).toBe(false);
+  });
+
+  it("leaves nonmatching and non-HTTP images alone", () => {
+    install();
+    const image = new Image();
+    image.src = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
+    expect(image.src).toMatch(/^data:/);
+    image.src = "https://other.test/public.png";
+    expect(image.src).toContain("other.test");
+  });
+
+  it("blocks picture source srcset without intercepting video src", () => {
+    const { consent } = install();
+    const picture = document.createElement("picture");
+    const source = document.createElement("source");
+    source.srcset = "https://frames.test/pixel 1x";
+    picture.append(source, document.createElement("img"));
+    document.body.append(picture);
+    expect(source.hasAttribute("srcset")).toBe(false);
+    const video = document.createElement("source");
+    video.src = "https://frames.test/video.mp4";
+    expect(video.src).toContain("video.mp4");
+    consent.allow("demo");
+    expect(source.srcset).toContain("frames.test/pixel");
+  });
+
+  it("preserves native descriptors and stops retaining pending detached images", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      HTMLImageElement.prototype,
+      "src",
+    );
+    const { controller, consent } = install();
+    const image = new Image();
+    image.src = "https://frames.test/pending";
+    controller.stop();
+    expect(
+      Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src"),
+    ).toEqual(descriptor);
+    consent.allow("demo");
+    expect(image.hasAttribute("src")).toBe(false);
+    image.src = "https://frames.test/native";
+    expect(image.src).toContain("frames.test/native");
+  });
+
+  it("respects every active controller when restoring a detached image", () => {
+    const first = install();
+    const second = install();
+    const image = new Image();
+    image.src = "https://frames.test/pixel";
+    first.consent.allow("demo");
+    expect(image.hasAttribute("src")).toBe(false);
+    second.consent.allow("demo");
+    expect(image.src).toBe("https://frames.test/pixel");
+  });
+});
+
+it("does not replay images whose original matcher failed after accept-all", () => {
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  const { consent } = install();
+  const test = RegExp.prototype.test;
+  const matcher = vi
+    .spyOn(RegExp.prototype, "test")
+    .mockImplementation(function (this: RegExp, value) {
+      if (this.source === "^frames\\.test$") throw new Error("matcher failed");
+      return test.call(this, value);
+    });
+  const pixel = new Image();
+  pixel.src = "https://frames.test/untrusted";
+  matcher.mockRestore();
+  consent.allow("demo");
+  expect(pixel.hasAttribute("src")).toBe(false);
+  expect(warn).toHaveBeenCalledOnce();
+  pixel.src = "https://frames.test/explicit-reassignment";
+  expect(pixel.src).toContain("explicit-reassignment");
+});

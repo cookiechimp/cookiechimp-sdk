@@ -1,5 +1,15 @@
 # Remaining work and launch status (25 Oct 2026)
 
+## SDK follow-ups awaiting review
+
+The image pixel follow-up is implemented on `codex/block-image-pixels` and is
+not merged or published. It covers detached `Image()`, DOM image `src`/`srcset`
+and picture sources, with consent restoration and stale-request cancellation.
+The opt-in dynamic graph measures 2751 B; its proposed budget is 3200 B (was
+2688 B). The default core graph is unchanged. Browser request-count tests and
+41 dynamic component tests pass. Sync marginal-size optimization and the five
+GPP state formats remain the next SDK tasks.
+
 ## Platform category and vendor UI (published in 1.1.0)
 
 - The SDK PR adds an opt-in UI driven by the existing platform JSON, with
