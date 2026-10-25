@@ -1,6 +1,6 @@
-# Remaining work and launch status (24 Oct 2026)
+# Remaining work and launch status (25 Oct 2026)
 
-## Platform category and vendor UI (merged, awaiting 1.1.0 publication)
+## Platform category and vendor UI (merged, 1.1.0 publication in progress)
 
 - The SDK PR adds an opt-in UI driven by the existing platform JSON, with
   vendor controls, privacy links and storage disclosures. The React/Vite
@@ -44,7 +44,10 @@ Platform actions remain Daniel's responsibility; this SDK takeover has made
 no platform changes. All eight 1.0.0 packages were published on 17 Oct 2026.
 Registry inspection on 23 Oct confirms their integrity metadata but no advertised
 provenance attestations. See `release/npm-1.0.0-audit.json`. Version 1.1.0 is being
-prepared from the merged SDK work; it is not published.
+prepared from the merged SDK work. Its publication is partial: only
+`@cookiechimp/tokens@1.1.0` is published, with verified bytes and advertised
+provenance. The remaining seven packages are still at 1.0.0. See the
+[25 October registry audit](../release/npm-1.1.0-partial-audit-2026-10-25.json).
 
 ## Merged
 
@@ -134,11 +137,17 @@ consent delivery and receipt checks reproducible; mocked CI is separate evidence
   import passed validation. Public guides describe the SDK in present tense and
   state package version requirements; internal publication gates remain here and
   in `release/readiness.json`. Mintlify deployment is verified separately.
-- Live test evidence is complete. Recheck trusted publishers, then obtain new
-  explicit approval for 1.1.0 and the `npm-publish` environment. Run the guarded
-  workflow with `approved_version=1.1.0`; preserve integrity and provenance checks.
-  Install from npm, verify signatures/browser behavior, and publish the reviewed
-  GitHub release/tag only after registry verification.
+- Live test evidence is complete. All eight trusted-publisher bindings were
+  rechecked on 25 October. Daniel approved 1.1.0 from `8d68ddb` and release run #6.
+  npm accepted the first token package, but immediate verification hit a temporary
+  404. Recovery exposed npm 12's single-item metadata array, which the publisher
+  did not normalize; npm prevented an overwrite. The publisher fix adds response
+  normalization and bounded propagation polling, preserving integrity/provenance
+  checks and regression coverage. Review the corrected source and its new candidate,
+  confirm the published token tarball matches, then obtain approval for that source
+  before resuming the remaining seven packages. Install from npm, verify signatures
+  and browser behavior, and publish the reviewed GitHub release/tag only after
+  the complete cohort is verified.
 - External skill/Context7 registry publication and benchmark submission require
   review and explicit submission instructions. Files and the manifest are prepared.
 

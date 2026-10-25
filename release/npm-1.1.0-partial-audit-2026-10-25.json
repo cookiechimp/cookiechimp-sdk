@@ -1,0 +1,58 @@
+{
+  "verifiedAt": "2026-10-25T09:01:28.180075+00:00",
+  "sourceCommit": "8d68ddb2786cabcedcca0c0c91aa23b1aa51a2e6",
+  "releaseRun": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40176763055",
+  "complete": false,
+  "packages": [
+    {
+      "package": "@cookiechimp/tokens",
+      "latest": "1.1.0",
+      "version110Published": true,
+      "integrity": "sha512-yCnWKQO1RtXwOFICYI4KPpumq82nS2ED68aurNz5scdKxnvifmYsQ5/8usebkiMgk/EIOPBCn+dv9yeqS58VpA==",
+      "sha256": "0407c5a259a72ee73b1e049ecbc1ab6d8294eed712ff353c02bb6967a08b6c06",
+      "registryTarballVerified": true,
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@cookiechimp%2ftokens@1.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "publishedAt": "2026-10-25T08:55:06.709Z"
+    },
+    {
+      "package": "@cookiechimp/translations",
+      "latest": "1.0.0",
+      "version110Published": false
+    },
+    {
+      "package": "@cookiechimp/core",
+      "latest": "1.0.0",
+      "version110Published": false
+    },
+    {
+      "package": "@cookiechimp/react",
+      "latest": "1.0.0",
+      "version110Published": false
+    },
+    {
+      "package": "@cookiechimp/nextjs",
+      "latest": "1.0.0",
+      "version110Published": false
+    },
+    {
+      "package": "@cookiechimp/scripts",
+      "latest": "1.0.0",
+      "version110Published": false
+    },
+    {
+      "package": "@cookiechimp/devtools",
+      "latest": "1.0.0",
+      "version110Published": false
+    },
+    {
+      "package": "@cookiechimp/cli",
+      "latest": "1.0.0",
+      "version110Published": false
+    }
+  ]
+}

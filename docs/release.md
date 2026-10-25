@@ -5,6 +5,15 @@ The registry snapshot in `release/npm-1.0.0-audit.json`, checked on 23 October,
 records their integrity and lack of advertised provenance attestations. Published
 versions cannot be overwritten. This branch prepares the new 1.1.0 release.
 
+Daniel approved 1.1.0 from `8d68ddb2786cabcedcca0c0c91aa23b1aa51a2e6` on
+25 October and approved release run [#6](https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40176763055).
+That run published `@cookiechimp/tokens@1.1.0` with matching bytes and provenance.
+The other seven packages remain at 1.0.0; see the
+[partial registry audit](../release/npm-1.1.0-partial-audit-2026-10-25.json).
+The workflow checked npm before metadata propagated, then failed to recognize
+npm 12's single-item array response during recovery. npm prevented an overwrite.
+Recovery must use the corrected publisher from a newly reviewed source commit.
+
 ## What changes in 1.1.0
 
 The opt-in platform JSON UI, category/vendor choices, storage disclosures,
@@ -68,9 +77,11 @@ steps read the configured release version instead of assuming 1.0.0.
   22:08-22:09 UTC if unused, so recheck before publication and renew if needed.
   Renewal published no package version and does not prove provenance. Use
   GitHub OIDC and provenance for 1.1.0; do not promote old bootstrap artifacts.
-- Obtain explicit approval for version 1.1.0. The previous approval for 1.0.0
-  does not carry to another version. The `npm-publish` environment must retain
-  Daniel's required review and main-only branch policy.
+- Daniel approved 1.1.0 from `8d68ddb` and its protected deployment on 25 October.
+  The remaining publication now needs the publisher fixes and approval of the
+  new reviewed source commit. Verify the existing token package against the
+  new candidate before resuming; never overwrite or remove it. The `npm-publish`
+  environment must retain Daniel's required review and main-only branch policy.
 - Docs #79 and #81 are merged and deployed, including the connected-backend
   guide and the all-users billing policy. Public guides use present-tense copy
   with SDK version requirements. Verify the public guides against the final
@@ -89,8 +100,12 @@ choose `publish` and enter `1.1.0` as `approved_version`. The workflow verifies
 prerequisites before reaching Daniel's environment review. It confirms the source
 SHA is still main, publishes the exact prepared tarballs with npm OIDC and
 provenance, and verifies registry integrity and attestations for every package.
-A partial rerun skips an existing version only when its bytes and provenance
-match. A mismatched or unattested existing version is rejected.
+A partial rerun normalizes npm's object and single-item array metadata responses
+and skips an existing version only when its bytes and provenance match. A
+mismatched or unattested existing version is rejected. After npm acknowledges a
+new publish, verification polls for up to five minutes for metadata/provenance
+propagation, with each registry command limited to 15 seconds. Integrity
+mismatches and non-404 registry errors fail immediately.
 
 After registry verification, install the published packages in a fresh Next.js
 app, exercise standard and platform consent/persistence in a browser, and run
