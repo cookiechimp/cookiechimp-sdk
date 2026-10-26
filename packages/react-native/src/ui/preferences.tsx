@@ -274,9 +274,9 @@ function Chips({
 /** A mobile SDK's data labels, in the shape of the app store privacy labels. */
 function AppDataDetails({ data, colors }: { data: AppData; colors: Palette }) {
   const packages = [
-    ...data.packages.ios.map((name) => ({ name, platform: "iOS" })),
-    ...data.packages.android.map((name) => ({ name, platform: "Android" })),
-  ];
+    { platform: "iOS", names: data.packages.ios },
+    { platform: "Android", names: data.packages.android },
+  ].filter((group) => group.names.length);
   return (
     <View
       testID="cookiechimp-app-data"
@@ -319,20 +319,21 @@ function AppDataDetails({ data, colors }: { data: AppData; colors: Palette }) {
           <Text style={[styles.factLabel, { color: colors.text }]}>
             SDK packages
           </Text>
-          {packages.map((item) => (
-            <Text
-              key={`${item.platform}:${item.name}`}
-              selectable
-              style={[base.small, { color: colors.text }]}
-            >
-              <Text style={{ color: colors.heading, fontWeight: "600" }}>
-                {item.platform}
+          {packages.map((group) => (
+            <View key={group.platform} style={styles.packages}>
+              <Text style={[styles.platform, { color: colors.heading }]}>
+                {group.platform}
               </Text>
-              {"  "}
-              <Text style={[styles.mono, { color: colors.heading }]}>
-                {item.name}
-              </Text>
-            </Text>
+              {group.names.map((name) => (
+                <Text
+                  key={name}
+                  selectable
+                  style={[styles.package, { color: colors.text }]}
+                >
+                  {name}
+                </Text>
+              ))}
+            </View>
           ))}
         </View>
       ) : null}
@@ -554,7 +555,7 @@ function PreferencesView({
             />
           </View>
           <ScrollView
-            style={[styles.body, (fullscreen || panel) && styles.flex]}
+            style={[styles.body, (fullscreen || panel) && styles.bodyFill]}
             contentContainerStyle={styles.bodyContent}
           >
             <Rich
@@ -764,6 +765,7 @@ const styles = StyleSheet.create({
   },
   subtitle: { fontSize: 16, fontWeight: "700", marginTop: 8 },
   body: { flexGrow: 0, flexShrink: 1 },
+  bodyFill: { flexGrow: 1, flexShrink: 1, flexBasis: 0 },
   bodyContent: { padding: 20, gap: 12 },
   categories: { gap: 10, marginTop: 4 },
   category: { borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: 14 },
@@ -795,13 +797,16 @@ const styles = StyleSheet.create({
     fontFamily: MONO,
   },
   section: { gap: 6 },
+  packages: { gap: 2 },
+  platform: { fontSize: 12, fontWeight: "600" },
+  package: { fontSize: 12, lineHeight: 17, fontFamily: MONO },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   chip: {
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "500",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
     overflow: "hidden",
