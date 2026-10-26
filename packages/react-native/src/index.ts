@@ -20,5 +20,12 @@ export {
 } from "./hooks";
 export { CookieChimpProvider, type CookieChimpProviderProps } from "./provider";
 export type { AsyncKeyValueStorage } from "./storage";
-export { ConsentBanner, ConsentPreferences, type Insets } from "./ui";
+export {
+  type BannerDisplay,
+  bannerDisplay,
+  ConsentBanner,
+  ConsentPreferences,
+  ConsentRecallButton,
+  type Insets,
+} from "./ui";
 export type { VendorCallbacks, VendorInfo } from "./vendors";

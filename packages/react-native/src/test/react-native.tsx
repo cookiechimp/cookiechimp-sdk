@@ -10,12 +10,19 @@ const aria = (props: Props) => ({
   "aria-label": props.accessibilityLabel as string | undefined,
   "aria-disabled": props.disabled ? true : undefined,
   lang: props.accessibilityLanguage as string | undefined,
+  "aria-checked": state(props).checked as boolean | undefined,
+  "aria-expanded": state(props).expanded as boolean | undefined,
 });
+const state = (props: Props) =>
+  (props.accessibilityState ?? {}) as Record<string, unknown>;
 
 export const View = ({ children, ...props }: Props) => (
   <div {...aria(props)}>{children}</div>
 );
 export const ScrollView = View;
+export const Image = (props: Props) => (
+  <img alt="" src={(props.source as { uri?: string })?.uri} />
+);
 export const Text = ({ children, onPress, ...props }: Props) => (
   // biome-ignore lint/a11y/noStaticElementInteractions: mirrors RN Text, whose role comes from accessibilityRole.
   // biome-ignore lint/a11y/useKeyWithClickEvents: test stand-in for a touch target.
@@ -50,8 +57,50 @@ export const Modal = ({ visible, children }: Props) =>
 export const StyleSheet = {
   create: <T,>(styles: T) => styles,
   hairlineWidth: 1,
+  absoluteFillObject: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
 };
-export const Platform = { OS: "ios" as "ios" | "android" };
+export const Platform = {
+  OS: "ios" as "ios" | "android",
+  select: <T,>(options: { ios?: T; android?: T; default?: T }) =>
+    options[Platform.OS] ?? options.default,
+};
+export const useWindowDimensions = () => ({ width: 390, height: 844 });
+export const AccessibilityInfo = {
+  isReduceMotionEnabled: async () => false,
+  addEventListener: () => ({ remove() {} }),
+};
+
+// Animations finish at once so tests see the end state synchronously.
+class AnimatedValue {
+  constructor(public value: number) {}
+  interpolate() {
+    return this;
+  }
+}
+const finish = (value: AnimatedValue, config: { toValue: number }) => ({
+  start(callback?: (result: { finished: boolean }) => void) {
+    value.value = config.toValue;
+    callback?.({ finished: true });
+  },
+  stop() {},
+});
+export const Animated = {
+  View,
+  Value: AnimatedValue,
+  timing: finish,
+  spring: finish,
+};
+export const Easing = {
+  out: (easing: unknown) => easing,
+  in: (easing: unknown) => easing,
+  cubic: (t: number) => t,
+};
 export const Linking = { openURL: async (_url: string) => true };
 export const useColorScheme = () => "light";
 

@@ -1,14 +1,25 @@
 import { type ReactNode, useEffect, useRef } from "react";
 import { CookieChimp, shutdown, store } from "./api";
 import type { CookieChimpOptions } from "./engine";
-import { ConsentBanner, ConsentPreferences, type Insets } from "./ui";
+import {
+  ConsentBanner,
+  ConsentPreferences,
+  ConsentRecallButton,
+  type Insets,
+} from "./ui";
 
 export interface CookieChimpProviderProps extends CookieChimpOptions {
   children?: ReactNode;
   /** Render the built-in banner and preferences. Set false for a custom UI. */
   ui?: boolean;
-  /** Safe-area insets for the banner, for example from react-native-safe-area-context. */
+  /** Safe-area insets for the consent UI, for example from react-native-safe-area-context. */
   insets?: Insets;
+  /**
+   * Show a floating button that reopens the preferences after a decision,
+   * where the dashboard's floating icon settings place it. Off by default:
+   * most apps link to the preferences from their own settings screen.
+   */
+  recallButton?: boolean;
 }
 
 /**
@@ -21,6 +32,7 @@ export function CookieChimpProvider({
   children,
   ui = true,
   insets,
+  recallButton = false,
   ...options
 }: CookieChimpProviderProps) {
   const latest = useRef(options);
@@ -62,8 +74,9 @@ export function CookieChimpProvider({
       {children}
       {ui && (
         <>
+          {recallButton && <ConsentRecallButton insets={insets} />}
           <ConsentBanner insets={insets} />
-          <ConsentPreferences />
+          <ConsentPreferences insets={insets} />
         </>
       )}
     </>

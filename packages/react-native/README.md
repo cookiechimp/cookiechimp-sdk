@@ -104,7 +104,8 @@ language the banner has. Override it with `language="fr"`.
 | `geolocation` | Opt in to asking CookieChimp for the country when `country` is not set. Default `false`. |
 | `syncConsents` | Send consent records to CookieChimp. Default `true`. |
 | `ui` | Render the built-in banner and preferences. Set `false` for your own UI. |
-| `insets` | Safe-area insets for the banner, for example from `react-native-safe-area-context`. |
+| `insets` | Safe-area insets for the consent UI, for example from `react-native-safe-area-context`. |
+| `recallButton` | Show a floating button that reopens the preferences after a decision. Default `false`. |
 | `storage` | An AsyncStorage-compatible store, for example an MMKV adapter. |
 | `debug` | Log SDK activity to the console. |
 | `onFirstConsent` | Called after the first decision on this install. |
@@ -182,10 +183,37 @@ automatic collection in its native configuration so nothing is sent before
 `onStart`. `getVendors()`, `isVendorRunning(name)`, `startVendor(name)`,
 `stopVendor(name)` and `unregisterVendor(name)` are also available.
 
+## Design settings
+
+The built-in screens follow the banner design you set in the dashboard:
+
+| Dashboard setting | In the app |
+| --- | --- |
+| Layout: Box, Cloud, Bar | A floating card, a wider card or an edge-to-edge bar. |
+| Layout: Full Screen (mobile apps) | A full-screen consent page with the buttons pinned at the bottom. |
+| Banner position | Top, middle or bottom of the screen; left and right on tablets. |
+| Button placement | Stacked, inline, or inline wide. |
+| Equal weight buttons, swap buttons | Reject uses the primary style; button order follows the dashboard. |
+| Show accept, reject, preferences and close buttons | Each button is shown or hidden. |
+| Force consent | The app is dimmed and the banner cannot be dismissed. |
+| Colors, dark mode colors, dark mode (auto, light, dark) | Every color, following the device's appearance in auto. |
+| Banner and button corner radius | Corner radius of the cards and buttons (`px`, `rem` and `em`). |
+| Light and dark logo | Shown at the top of the banner and preferences. |
+| Footer content, powered by | Links in the footer and the CookieChimp credit. |
+| Preferences layout: Box or Bar, left or right | A centered card or a full-height panel that slides in from the side. |
+| Consent at category level only, show services | Vendor switches, or vendor details without switches. |
+| Floating preferences icon and position | The `recallButton` position, when you enable it. |
+
+Categories and vendors expand with an animation to show their purpose, the
+company, the privacy policy and every cookie with its type, duration and
+company. Banners and preferences animate in and out, and animations are skipped
+when the device asks for reduced motion.
+
 ## Custom UI
 
 Set `ui={false}` and build your own screens with the hooks, or render
-`<ConsentBanner />` and `<ConsentPreferences />` yourself where you want them.
+`<ConsentBanner />`, `<ConsentPreferences />` and `<ConsentRecallButton />`
+yourself where you want them.
 
 ## Consent records
 

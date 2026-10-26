@@ -125,7 +125,7 @@ describe("CookieChimpProvider", () => {
     expect(banner()).toBeNull();
     expect(preferences()?.textContent).toContain("Cookie Settings");
     const toggles = [
-      ...container.querySelectorAll<HTMLInputElement>('input[role="switch"]'),
+      ...container.querySelectorAll<HTMLButtonElement>('[role="switch"]'),
     ];
     const essential = toggles.find(
       (input) => input.getAttribute("aria-label") === "Essential",
@@ -134,7 +134,7 @@ describe("CookieChimpProvider", () => {
     const analytics = toggles.find(
       (input) => input.getAttribute("aria-label") === "Analytics",
     );
-    expect(analytics?.checked).toBe(false);
+    expect(analytics?.getAttribute("aria-checked")).toBe("false");
     await act(async () => analytics?.click());
     await press("Save Preferences");
     expect(preferences()).toBeNull();
@@ -152,6 +152,37 @@ describe("CookieChimpProvider", () => {
     expect(preferences()).not.toBeNull();
     await press("Close");
     expect(preferences()).toBeNull();
+  });
+
+  it("renders the full screen layout and shows vendor and cookie details", async () => {
+    const fullscreen = structuredClone(bundle) as {
+      banners: Record<string, { gui_options: Record<string, unknown> }>;
+    };
+    for (const banner of Object.values(fullscreen.banners))
+      banner.gui_options.layout = "fullscreen";
+    await render({ config: fullscreen });
+    expect(banner()?.textContent).toContain("We value your privacy");
+    await press("Manage Preferences");
+    await press("Analytics");
+    await press("Google Analytics");
+    const text = preferences()?.textContent ?? "";
+    expect(text).toContain("Google LLC");
+    expect(text).toContain("_ga");
+    expect(text).toContain("2 years");
+    expect(button("Google Analytics")?.getAttribute("aria-expanded")).toBe(
+      "true",
+    );
+  });
+
+  it("shows the recall button after a decision when asked to", async () => {
+    await render({ recallButton: true });
+    const recall = () =>
+      container.querySelector('[data-testid="cookiechimp-recall"]');
+    expect(recall()).toBeNull();
+    await press("Accept All");
+    expect(recall()).not.toBeNull();
+    await press("Cookie Settings");
+    expect(preferences()).not.toBeNull();
   });
 
   it("renders no built-in UI with ui={false}", async () => {
