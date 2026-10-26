@@ -240,7 +240,7 @@ describe("CookieChimpProvider", () => {
     expect(preferences()?.querySelectorAll(credit)).toHaveLength(1);
   });
 
-  it("hides Powered by CookieChimp when the plan hides it", async () => {
+  it("hides Powered by CookieChimp in the banner on paid plans, but keeps it in the preferences", async () => {
     const unbranded = structuredClone(bundle) as {
       banners: Record<string, { footer: Record<string, unknown> }>;
     };
@@ -249,8 +249,9 @@ describe("CookieChimpProvider", () => {
     await render({ config: unbranded });
     const credit = '[data-testid="cookiechimp-powered-by"]';
     expect(banner()?.querySelector(credit)).toBeNull();
+    expect(banner()?.textContent).not.toMatch(/Powered by/);
     await press("Manage Preferences");
-    expect(preferences()?.querySelector(credit)).toBeNull();
+    expect(preferences()?.querySelectorAll(credit)).toHaveLength(1);
   });
 
   it("renders no built-in UI with ui={false}", async () => {

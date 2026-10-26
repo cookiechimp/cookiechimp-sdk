@@ -59,7 +59,10 @@ const BRANDING =
 export const withoutBranding = (value: unknown) =>
   typeof value === "string" ? value.replace(BRANDING, "") : value;
 
-/** Whether the dashboard asks for the "Powered by CookieChimp" line. */
+/**
+ * Whether the banner shows the "Powered by CookieChimp" line. Free plans show
+ * it in the banner; the preferences always show it.
+ */
 export const poweredBy = (banner: Record<string, unknown>) =>
   object(banner.footer).show_powered_by === true;
 

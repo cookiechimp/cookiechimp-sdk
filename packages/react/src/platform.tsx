@@ -602,16 +602,14 @@ export function CookiePreferences({
               </code>
             </div>
           )}
-          {footer.show_powered_by === true && (
-            <a
-              className="cc-platform-branding"
-              href="https://cookiechimp.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Powered by CookieChimp
-            </a>
-          )}
+          <a
+            className="cc-platform-branding"
+            href="https://cookiechimp.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Powered by CookieChimp
+          </a>
         </div>
         <footer className="cc-actions cc-platform-actions">
           {buttons.show_save_preferences_btn !== false && (

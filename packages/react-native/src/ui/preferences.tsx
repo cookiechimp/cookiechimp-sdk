@@ -25,7 +25,7 @@ import {
   PURPOSES,
 } from "../app-data";
 import { useCookieChimp } from "../hooks";
-import { object, type Palette, plain, poweredBy, url } from "../presentation";
+import { object, type Palette, plain, url } from "../presentation";
 import {
   Button,
   styles as base,
@@ -719,11 +719,9 @@ function PreferencesView({
                 onPress={onSave}
               />
             )}
-            {poweredBy(dashboard.banner) && (
-              <View style={styles.branding}>
-                <PoweredBy colors={colors} />
-              </View>
-            )}
+            <View style={styles.branding}>
+              <PoweredBy colors={colors} />
+            </View>
           </View>
         </Animated.View>
       </View>
