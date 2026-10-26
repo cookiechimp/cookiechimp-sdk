@@ -174,15 +174,36 @@ describe("CookieChimpProvider", () => {
     );
   });
 
-  it("shows the recall button after a decision when asked to", async () => {
-    await render({ recallButton: true });
-    const recall = () =>
-      container.querySelector('[data-testid="cookiechimp-recall"]');
-    expect(recall()).toBeNull();
-    await press("Accept All");
-    expect(recall()).not.toBeNull();
-    await press("Cookie Settings");
-    expect(preferences()).not.toBeNull();
+  it("shows Powered by CookieChimp in the banner and preferences once", async () => {
+    const branded = structuredClone(bundle) as {
+      translations: Record<
+        string,
+        Record<string, { consent_modal: Record<string, unknown> }>
+      >;
+    };
+    for (const languages of Object.values(branded.translations))
+      for (const copy of Object.values(languages))
+        copy.consent_modal.footer =
+          "<a href='https://cookiechimp.com' target='_blank'>Powered by CookieChimp</a>";
+    await render({ config: branded });
+    const credit = '[data-testid="cookiechimp-powered-by"]';
+    expect(banner()?.querySelectorAll(credit)).toHaveLength(1);
+    expect(banner()?.textContent?.match(/Powered by/g)).toHaveLength(1);
+    await press("Manage Preferences");
+    expect(preferences()?.querySelectorAll(credit)).toHaveLength(1);
+  });
+
+  it("hides Powered by CookieChimp when the plan hides it", async () => {
+    const unbranded = structuredClone(bundle) as {
+      banners: Record<string, { footer: Record<string, unknown> }>;
+    };
+    for (const banner of Object.values(unbranded.banners))
+      banner.footer.show_powered_by = false;
+    await render({ config: unbranded });
+    const credit = '[data-testid="cookiechimp-powered-by"]';
+    expect(banner()?.querySelector(credit)).toBeNull();
+    await press("Manage Preferences");
+    expect(preferences()?.querySelector(credit)).toBeNull();
   });
 
   it("renders no built-in UI with ui={false}", async () => {

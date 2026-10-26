@@ -105,7 +105,6 @@ language the banner has. Override it with `language="fr"`.
 | `syncConsents` | Send consent records to CookieChimp. Default `true`. |
 | `ui` | Render the built-in banner and preferences. Set `false` for your own UI. |
 | `insets` | Safe-area insets for the consent UI, for example from `react-native-safe-area-context`. |
-| `recallButton` | Show a floating button that reopens the preferences after a decision. Default `false`. |
 | `storage` | An AsyncStorage-compatible store, for example an MMKV adapter. |
 | `debug` | Log SDK activity to the console. |
 | `onFirstConsent` | Called after the first decision on this install. |
@@ -199,10 +198,10 @@ The built-in screens follow the banner design you set in the dashboard:
 | Colors, dark mode colors, dark mode (auto, light, dark) | Every color, following the device's appearance in auto. |
 | Banner and button corner radius | Corner radius of the cards and buttons (`px`, `rem` and `em`). |
 | Light and dark logo | Shown at the top of the banner and preferences. |
-| Footer content, powered by | Links in the footer and the CookieChimp credit. |
-| Preferences layout: Box or Bar, left or right | A centered card or a full-height panel that slides in from the side. |
+| Footer content, powered by | Links in the footer, and a "Powered by CookieChimp" line at the foot of the banner and preferences on plans that show it. |
+| Preferences layout: Box or Bar, left or right | A centered card or a full-height panel that slides in from the side. With the Full Screen banner layout, the preferences open as a full screen page too. |
 | Consent at category level only, show services | Vendor switches, or vendor details without switches. |
-| Floating preferences icon and position | The `recallButton` position, when you enable it. |
+| Floating preferences icon | Not shown in apps. Open the preferences from your own settings screen with `CookieChimp.showPreferences()`. |
 
 Categories and vendors expand with an animation to show their purpose, the
 company, the privacy policy and every cookie with its type, duration and
@@ -212,8 +211,7 @@ when the device asks for reduced motion.
 ## Custom UI
 
 Set `ui={false}` and build your own screens with the hooks, or render
-`<ConsentBanner />`, `<ConsentPreferences />` and `<ConsentRecallButton />`
-yourself where you want them.
+`<ConsentBanner />` and `<ConsentPreferences />` yourself where you want them.
 
 ## Consent records
 

@@ -49,6 +49,20 @@ export function url(value: unknown): string | undefined {
     : undefined;
 }
 
+const BRANDING =
+  /<a\b[^>]*\bhref\s*=\s*["']https?:\/\/(?:www\.)?cookiechimp\.com\/?(?:[?#][^"']*)?["'][^>]*>[\s\S]*?<\/a>/gi;
+
+/**
+ * Footer copy without the "Powered by CookieChimp" link, which the SDK draws
+ * itself so it looks the same in every layout.
+ */
+export const withoutBranding = (value: unknown) =>
+  typeof value === "string" ? value.replace(BRANDING, "") : value;
+
+/** Whether the dashboard asks for the "Powered by CookieChimp" line. */
+export const poweredBy = (banner: Record<string, unknown>) =>
+  object(banner.footer).show_powered_by === true;
+
 export interface Span {
   text: string;
   href?: string;

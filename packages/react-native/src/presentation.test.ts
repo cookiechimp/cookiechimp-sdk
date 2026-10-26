@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alpha, palette, radius, rich } from "./presentation";
+import { alpha, palette, radius, rich, withoutBranding } from "./presentation";
 import { bannerDisplay } from "./ui/banner";
 
 describe("rich", () => {
@@ -74,5 +74,20 @@ describe("bannerDisplay", () => {
       bannerDisplay({ layout: "fullscreen", button_placement: "inline" }),
     ).toMatchObject({ layout: "fullscreen", placement: "inline" });
     expect(bannerDisplay({ layout: "unknown" }).layout).toBe("box");
+  });
+});
+
+describe("withoutBranding", () => {
+  it("drops the CookieChimp credit and keeps other footer links", () => {
+    expect(
+      withoutBranding(
+        '<a href=\'https://example.test/terms\'>Terms</a> <a href="https://www.cookiechimp.com/" target="_blank">Powered by <b>CookieChimp</b></a>',
+      ),
+    ).toBe("<a href='https://example.test/terms'>Terms</a> ");
+    expect(
+      withoutBranding(
+        "<a href='https://cookiechimp.com/privacy.php'>Privacy</a>",
+      ),
+    ).toContain("Privacy");
   });
 });

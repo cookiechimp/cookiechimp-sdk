@@ -263,6 +263,23 @@ export function Chevron({
   );
 }
 
+/** The "Powered by CookieChimp" line shown at the foot of every modal. */
+export function PoweredBy({ colors }: { colors: Palette }) {
+  return (
+    <Text
+      accessibilityRole="link"
+      onPress={() => open("https://cookiechimp.com")}
+      testID="cookiechimp-powered-by"
+      style={[styles.poweredBy, { color: alpha(colors.text, 0.72) }]}
+    >
+      Powered by{" "}
+      <Text style={[styles.poweredByName, { color: colors.text }]}>
+        CookieChimp
+      </Text>
+    </Text>
+  );
+}
+
 /** A simple cookie mark, drawn without images or icon fonts. */
 export function CookieMark({ color, size }: { color: string; size: number }) {
   const dot = Math.max(3, Math.round(size / 9));
@@ -334,6 +351,13 @@ export const styles = StyleSheet.create({
   bold: { fontWeight: "700" },
   italic: { fontStyle: "italic" },
   link: { textDecorationLine: "underline", fontWeight: "500" },
+  poweredBy: {
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: "center",
+    letterSpacing: 0.2,
+  },
+  poweredByName: { fontWeight: "700" },
   logo: { height: 28, width: 140, alignSelf: "flex-start" },
   close: {
     width: 32,

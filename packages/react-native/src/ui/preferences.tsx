@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { store } from "../api";
 import { useCookieChimp } from "../hooks";
-import { object, type Palette, plain, url } from "../presentation";
+import { object, type Palette, plain, poweredBy, url } from "../presentation";
 import {
   Button,
   styles as base,
@@ -26,6 +26,7 @@ import {
   CloseButton,
   Link,
   Logo,
+  PoweredBy,
   Rich,
   Toggle,
 } from "./controls";
@@ -279,11 +280,13 @@ function PreferencesView({
   const bannerCopy = object(dashboard.copy.consent_modal);
   const gui = object(dashboard.banner.preferences_gui_options);
   const buttons = object(dashboard.banner.preferences_buttons);
-  const footer = object(dashboard.banner.footer);
   const vendorControls = gui.control_level !== "category_only";
   const showServices = vendorControls || gui.show_services !== false;
   const privacy = url(dashboard.copy.privacy_policy_url);
-  const panel = gui.layout === "bar";
+  // A full screen banner opens a full screen preferences page to match.
+  const fullscreen =
+    object(dashboard.banner.gui_options).layout === "fullscreen";
+  const panel = !fullscreen && gui.layout === "bar";
   const fromRight = gui.position === "right" ? !rtl : rtl;
   const panelWidth = Math.min(window.width, 460);
   const toggleCategory = (category: PlatformCategory) =>
@@ -329,24 +332,28 @@ function PreferencesView({
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <Animated.View
-        style={[styles.backdrop, { opacity: progress }]}
-        pointerEvents="none"
-      />
+      {!fullscreen && (
+        <Animated.View
+          style={[styles.backdrop, { opacity: progress }]}
+          pointerEvents="none"
+        />
+      )}
       <View
         pointerEvents="box-none"
         style={[
           styles.overlay,
-          panel
-            ? { alignItems: fromRight ? "flex-end" : "flex-start" }
-            : {
-                justifyContent: "center",
-                alignItems: "center",
-                paddingTop: (insets.top ?? 0) + 16,
-                paddingBottom: (insets.bottom ?? 0) + 16,
-                paddingLeft: (insets.left ?? 0) + 12,
-                paddingRight: (insets.right ?? 0) + 12,
-              },
+          fullscreen
+            ? undefined
+            : panel
+              ? { alignItems: fromRight ? "flex-end" : "flex-start" }
+              : {
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingTop: (insets.top ?? 0) + 16,
+                  paddingBottom: (insets.bottom ?? 0) + 16,
+                  paddingLeft: (insets.left ?? 0) + 12,
+                  paddingRight: (insets.right ?? 0) + 12,
+                },
         ]}
       >
         <Animated.View
@@ -360,42 +367,62 @@ function PreferencesView({
               borderColor: colors.border,
               direction: rtl ? "rtl" : "ltr",
             },
-            panel
+            fullscreen
               ? {
-                  width: panelWidth,
-                  height: "100%",
-                  paddingTop: (insets.top ?? 0) + 8,
+                  flex: 1,
+                  borderWidth: 0,
+                  paddingTop: insets.top ?? 0,
                   paddingBottom: insets.bottom ?? 0,
-                  transform: [
-                    {
-                      translateX: progress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [fromRight ? panelWidth : -panelWidth, 0],
-                      }),
-                    },
-                  ],
-                }
-              : {
-                  width: "100%",
-                  maxWidth: 560,
-                  maxHeight: "100%",
-                  borderRadius: colors.cardRadius,
-                  opacity: progress,
+                  paddingLeft: insets.left ?? 0,
+                  paddingRight: insets.right ?? 0,
                   transform: [
                     {
                       translateY: progress.interpolate({
                         inputRange: [0, 1],
-                        outputRange: [24, 0],
-                      }),
-                    },
-                    {
-                      scale: progress.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0.97, 1],
+                        outputRange: [window.height, 0],
                       }),
                     },
                   ],
-                },
+                }
+              : panel
+                ? {
+                    width: panelWidth,
+                    height: "100%",
+                    paddingTop: (insets.top ?? 0) + 8,
+                    paddingBottom: insets.bottom ?? 0,
+                    transform: [
+                      {
+                        translateX: progress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [
+                            fromRight ? panelWidth : -panelWidth,
+                            0,
+                          ],
+                        }),
+                      },
+                    ],
+                  }
+                : {
+                    width: "100%",
+                    maxWidth: 560,
+                    maxHeight: "100%",
+                    borderRadius: colors.cardRadius,
+                    opacity: progress,
+                    transform: [
+                      {
+                        translateY: progress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [24, 0],
+                        }),
+                      },
+                      {
+                        scale: progress.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0.97, 1],
+                        }),
+                      },
+                    ],
+                  },
           ]}
         >
           <View style={[styles.head, { borderColor: colors.border }]}>
@@ -415,7 +442,7 @@ function PreferencesView({
             />
           </View>
           <ScrollView
-            style={styles.body}
+            style={[styles.body, (fullscreen || panel) && styles.flex]}
             contentContainerStyle={styles.bodyContent}
           >
             <Rich
@@ -530,14 +557,6 @@ function PreferencesView({
                 </Text>
               </View>
             ) : null}
-            {footer.enabled !== false && footer.show_powered_by === true && (
-              <Link
-                href="https://cookiechimp.com"
-                label="Powered by CookieChimp"
-                colors={colors}
-                style={styles.branding}
-              />
-            )}
           </ScrollView>
           <View
             style={[
@@ -585,6 +604,11 @@ function PreferencesView({
                 colors={colors}
                 onPress={onSave}
               />
+            )}
+            {poweredBy(dashboard.banner) && (
+              <View style={styles.branding}>
+                <PoweredBy colors={colors} />
+              </View>
             )}
           </View>
         </Animated.View>
@@ -668,7 +692,7 @@ const styles = StyleSheet.create({
   factValue: { fontSize: 13 },
   consentId: { padding: 12, gap: 4, marginTop: 4 },
   mono: { fontSize: 13, fontFamily: MONO },
-  branding: { alignSelf: "center", marginTop: 4, textDecorationLine: "none" },
+  branding: { alignItems: "center", marginTop: 4 },
   actions: {
     gap: 8,
     paddingHorizontal: 20,

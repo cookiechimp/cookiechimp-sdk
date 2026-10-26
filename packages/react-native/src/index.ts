@@ -25,7 +25,6 @@ export {
   bannerDisplay,
   ConsentBanner,
   ConsentPreferences,
-  ConsentRecallButton,
   type Insets,
 } from "./ui";
 export type { VendorCallbacks, VendorInfo } from "./vendors";

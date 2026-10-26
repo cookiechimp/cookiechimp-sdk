@@ -211,6 +211,18 @@ it("preserves rich copy, additional description and custom footer links without 
     ),
   ).toBeNull();
 });
+it("shows Powered by CookieChimp in the banner footer when the plan asks for it", () => {
+  mount((bundle) => {
+    bundle.banners.bnrEU1.footer.show_powered_by = true;
+    bundle.translations.bnrEU1.en.consent_modal.footer =
+      "<a href='https://cookiechimp.com'>Powered by CookieChimp</a>";
+  });
+  const footer = document.querySelector(".cc-platform-footer");
+  expect(footer?.textContent?.match(/Powered by CookieChimp/g)).toHaveLength(1);
+  expect(
+    footer?.querySelector(".cc-platform-powered-by")?.getAttribute("href"),
+  ).toBe("https://cookiechimp.com");
+});
 it("blocks page interaction and Escape dismissal when force_consent is set", () => {
   mount((bundle) => {
     bundle.banners.bnrEU1.force_consent = true;

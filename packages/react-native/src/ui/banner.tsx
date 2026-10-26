@@ -12,7 +12,15 @@ import {
 } from "react-native";
 import { store } from "../api";
 import { useCookieChimp } from "../hooks";
-import { object, type Palette, plain, rich, url } from "../presentation";
+import {
+  object,
+  type Palette,
+  plain,
+  poweredBy,
+  rich,
+  url,
+  withoutBranding,
+} from "../presentation";
 import {
   Button,
   styles as base,
@@ -20,6 +28,7 @@ import {
   CookieMark,
   Link,
   Logo,
+  PoweredBy,
   Rich,
   tint,
 } from "./controls";
@@ -166,7 +175,7 @@ function Copy({
 }) {
   const copy = object(dashboard.copy.consent_modal);
   const footer = object(dashboard.banner.footer);
-  const footerContent = copy.footer ?? footer.content;
+  const footerContent = withoutBranding(copy.footer ?? footer.content);
   const privacy = url(dashboard.copy.privacy_policy_url);
   const bodyStyle = large ? styles.largeBody : undefined;
   return (
@@ -391,6 +400,11 @@ function FloatingBanner({
               />
             </View>
           </View>
+          {poweredBy(dashboard.banner) && (
+            <View style={styles.branding}>
+              <PoweredBy colors={colors} />
+            </View>
+          )}
         </Animated.View>
       </View>
     </Shell>
@@ -473,6 +487,11 @@ function FullScreenBanner({
               }
               colors={colors}
             />
+            {poweredBy(dashboard.banner) && (
+              <View style={styles.branding}>
+                <PoweredBy colors={colors} />
+              </View>
+            )}
           </Animated.View>
         </View>
       </Animated.View>
@@ -544,6 +563,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
+  branding: { marginTop: 14, alignItems: "center" },
   mark: {
     width: 72,
     height: 72,
