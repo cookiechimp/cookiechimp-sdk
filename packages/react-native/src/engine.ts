@@ -29,6 +29,7 @@ import { applyVendors } from "./vendors";
 
 export const DEFAULT_API = "https://cookiechimp.com";
 const REVALIDATE_AFTER = 5 * 60 * 1000;
+const DEFAULT_MAX_AGE_MS = 180 * 86_400_000;
 const COOKIE_NAME = /^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,64}$/;
 
 /** The consent summary passed to callbacks and returned by `getUserPreferences`. */
@@ -199,6 +200,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
   let lastRevalidate = 0;
   let destroyed = false;
   let cookieName = "cc_consent";
+  let maxAgeMs = DEFAULT_MAX_AGE_MS;
 
   const debug = (...args: unknown[]) => {
     if (options.debug) console.log("[CookieChimp]", ...args);
@@ -227,6 +229,10 @@ export function createEngine(options: CookieChimpOptions): Engine {
       COOKIE_NAME.test(dashboard.cookie.name)
         ? dashboard.cookie.name
         : "cc_consent";
+    maxAgeMs =
+      Number.isInteger(days) && days > 0 && days <= 730
+        ? days * 86_400_000
+        : DEFAULT_MAX_AGE_MS;
     // A dashboard re-consent date invalidates decisions made before it.
     const stored = store.getItem(cookieName);
     const previous = stored ? decodeConsentCookie(stored) : null;
@@ -320,6 +326,19 @@ export function createEngine(options: CookieChimpOptions): Engine {
       options.onAccept?.(toUserPreferences(consent.get(), dashboard));
   };
 
+  // Core checks expiry when it reads storage, so a process that stays alive
+  // past the consent duration needs the runtime rebuilt to ask again.
+  const expireStale = () => {
+    const dashboard = snapshot.dashboard;
+    if (!store || !dashboard || !snapshot.decided) return;
+    const stored = store.getItem(cookieName);
+    const state = stored ? decodeConsentCookie(stored) : null;
+    if (state && Date.parse(state.ts) + maxAgeMs > Date.now()) return;
+    debug("stored decision expired");
+    store.removeItem(cookieName);
+    apply(dashboard, snapshot.region);
+  };
+
   const revalidate = (region: Region | null) => {
     if (!sync) return;
     lastRevalidate = Date.now();
@@ -340,7 +359,11 @@ export function createEngine(options: CookieChimpOptions): Engine {
     },
     async start() {
       update({ status: "loading" });
-      store = await mirrorStorage(options.storage ?? AsyncStorage);
+      try {
+        store = await mirrorStorage(options.storage ?? AsyncStorage);
+      } catch (error) {
+        return fail(error instanceof Error ? error.message : "storage failed");
+      }
       if (destroyed) return;
       const region =
         parseRegion(options.country) ??
@@ -354,10 +377,12 @@ export function createEngine(options: CookieChimpOptions): Engine {
       if (destroyed) return;
       const locale = options.language ?? deviceLocale();
       debug("region", regionKey(region) || "none", "locale", locale);
-      // Retry delivery on every foreground; refresh config after five minutes,
-      // or right away while the first config download has not succeeded.
+      // On every foreground: ask again if the decision expired, retry
+      // delivery, and refresh config after five minutes, or right away while
+      // the first config download has not succeeded.
       appState = AppState.addEventListener("change", (next) => {
         if (next !== "active") return;
+        expireStale();
         void log?.retry();
         if (
           !snapshot.dashboard ||

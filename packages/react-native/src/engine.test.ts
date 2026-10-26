@@ -188,6 +188,27 @@ describe("offline mode", () => {
     expect(CookieChimp.acceptedCategory("analytics")).toBe(false);
   });
 
+  it("asks again when the decision expires while the app stays running", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      await start({ config: bundle, country: "DE", fetch: platform().fetch });
+      CookieChimp.acceptCategory("all");
+      expect(CookieChimp.acceptedCategory("analytics")).toBe(true);
+      emitAppState("active");
+      expect(store.getSnapshot()).toMatchObject({ decided: true });
+
+      vi.setSystemTime(Date.now() + 731 * 86_400_000);
+      emitAppState("active");
+      expect(store.getSnapshot()).toMatchObject({
+        decided: false,
+        bannerOpen: true,
+      });
+      expect(CookieChimp.acceptedCategory("analytics")).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("reports an invalid bundle without throwing", async () => {
     const state = await start({ config: { nope: true } });
     expect(state).toMatchObject({ status: "error", error: "invalid config" });
@@ -449,7 +470,7 @@ describe("storage", () => {
     await start({ config: bundle, country: "DE", fetch: platform().fetch });
     CookieChimp.acceptCategory("all");
     await vi.waitFor(async () =>
-      expect(await storage.getAllKeys?.()).toContain(
+      expect(await storage.getAllKeys()).toContain(
         "@cookiechimp:cookiechimp_pref_REDACTED",
       ),
     );
@@ -467,5 +488,19 @@ describe("storage", () => {
     });
     expect(state.bannerOpen).toBe(true);
     expect(() => CookieChimp.acceptCategory("all")).not.toThrow();
+  });
+
+  it("reports a store that cannot list its keys instead of forgetting consent", async () => {
+    const { getAllKeys: _, ...partial } = memoryStorage();
+    const state = await start({
+      config: bundle,
+      country: "DE",
+      storage: partial as unknown as AsyncKeyValueStorage,
+    });
+    expect(state).toMatchObject({
+      status: "error",
+      error: "storage must implement getAllKeys()",
+      bannerOpen: false,
+    });
   });
 });
