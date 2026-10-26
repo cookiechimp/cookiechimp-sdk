@@ -1,4 +1,10 @@
 export { CookieChimp } from "./api";
+export {
+  type AppData,
+  appData,
+  DATA_TYPES,
+  PURPOSES,
+} from "./app-data";
 export type {
   CookieChimpOptions,
   CookieChimpSnapshot,

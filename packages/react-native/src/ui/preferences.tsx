@@ -17,6 +17,13 @@ import {
   View,
 } from "react-native";
 import { store } from "../api";
+import {
+  type AppData,
+  appData,
+  DATA_TYPES,
+  label,
+  PURPOSES,
+} from "../app-data";
 import { useCookieChimp } from "../hooks";
 import { object, type Palette, plain, poweredBy, url } from "../presentation";
 import {
@@ -230,6 +237,109 @@ function StorageItems({
   );
 }
 
+function Chips({
+  title,
+  items,
+  colors,
+}: {
+  title: string;
+  items: string[];
+  colors: Palette;
+}) {
+  if (!items.length) return null;
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.factLabel, { color: colors.text }]}>{title}</Text>
+      <View style={styles.chips}>
+        {items.map((item) => (
+          <Text
+            key={item}
+            style={[
+              styles.chip,
+              {
+                color: colors.heading,
+                borderColor: colors.border,
+                backgroundColor: colors.background,
+              },
+            ]}
+          >
+            {item}
+          </Text>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+/** A mobile SDK's data labels, in the shape of the app store privacy labels. */
+function AppDataDetails({ data, colors }: { data: AppData; colors: Palette }) {
+  const packages = [
+    ...data.packages.ios.map((name) => ({ name, platform: "iOS" })),
+    ...data.packages.android.map((name) => ({ name, platform: "Android" })),
+  ];
+  return (
+    <View
+      testID="cookiechimp-app-data"
+      style={[
+        styles.item,
+        {
+          borderColor: colors.border,
+          backgroundColor: colors.background,
+          borderRadius: Math.min(colors.cardRadius, 12),
+          gap: 12,
+        },
+      ]}
+    >
+      <Chips
+        title="Data collected"
+        items={data.collected.map((key) => label(DATA_TYPES, key))}
+        colors={colors}
+      />
+      <Chips
+        title="Used for"
+        items={data.purposes.map((key) => label(PURPOSES, key))}
+        colors={colors}
+      />
+      {data.tracking !== undefined || data.retention ? (
+        <View style={styles.facts}>
+          {data.tracking !== undefined ? (
+            <Fact
+              label="Tracks you across other apps"
+              value={data.tracking ? "Yes" : "No"}
+              colors={colors}
+            />
+          ) : null}
+          {data.retention ? (
+            <Fact label="Kept for" value={data.retention} colors={colors} />
+          ) : null}
+        </View>
+      ) : null}
+      {packages.length ? (
+        <View style={styles.section}>
+          <Text style={[styles.factLabel, { color: colors.text }]}>
+            SDK packages
+          </Text>
+          {packages.map((item) => (
+            <Text
+              key={`${item.platform}:${item.name}`}
+              selectable
+              style={[base.small, { color: colors.text }]}
+            >
+              <Text style={{ color: colors.heading, fontWeight: "600" }}>
+                {item.platform}
+              </Text>
+              {"  "}
+              <Text style={[styles.mono, { color: colors.heading }]}>
+                {item.name}
+              </Text>
+            </Text>
+          ))}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 function VendorDetails({
   service,
   colors,
@@ -238,12 +348,14 @@ function VendorDetails({
   colors: Palette;
 }) {
   const privacy = url(service.privacy_policy_url);
+  const data = appData(service.app_data);
   return (
     <>
       <Rich value={service.description} colors={colors} style={base.small} />
       {privacy && (
         <Link href={privacy} label="Privacy policy" colors={colors} />
       )}
+      {data && <AppDataDetails data={data} colors={colors} />}
       <StorageItems items={service.storage_items} colors={colors} />
     </>
   );
@@ -498,7 +610,8 @@ function PreferencesView({
                             !!(
                               service.description ||
                               url(service.privacy_policy_url) ||
-                              service.storage_items.length
+                              service.storage_items.length ||
+                              appData(service.app_data)
                             )
                           }
                           toggle={
@@ -680,6 +793,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
     fontFamily: MONO,
+  },
+  section: { gap: 6 },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  chip: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "500",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: "hidden",
   },
   facts: { flexDirection: "row", flexWrap: "wrap", columnGap: 20, rowGap: 6 },
   fact: { gap: 1 },

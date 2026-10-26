@@ -204,9 +204,26 @@ The built-in screens follow the banner design you set in the dashboard:
 | Floating preferences icon | Not shown in apps. Open the preferences from your own settings screen with `CookieChimp.showPreferences()`. |
 
 Categories and vendors expand with an animation to show their purpose, the
-company, the privacy policy and every cookie with its type, duration and
-company. Banners and preferences animate in and out, and animations are skipped
-when the device asks for reduced motion.
+company and the privacy policy. Banners and preferences animate in and out, and
+animations are skipped when the device asks for reduced motion.
+
+### Vendor data labels
+
+Mobile SDKs do not set cookies, so each vendor shows its data labels from the
+dashboard instead, in the same shape as Apple's App Privacy details and Google
+Play's Data safety section:
+
+| Label | Example |
+| --- | --- |
+| Data collected | Device ID, App interactions, Crash data |
+| Used for | Analytics, App functionality |
+| Tracks you across other apps | No |
+| Kept for | 14 months |
+| SDK packages | iOS `FirebaseAnalytics`, Android `com.google.firebase:firebase-analytics` |
+
+SDKs added from the dashboard's library come with these filled in, and you can
+edit them per SDK. For a custom UI, `appData(service.app_data)` validates a
+vendor's labels, and `DATA_TYPES` and `PURPOSES` hold their English names.
 
 ## Custom UI
 

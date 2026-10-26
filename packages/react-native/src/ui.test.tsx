@@ -174,6 +174,53 @@ describe("CookieChimpProvider", () => {
     );
   });
 
+  it("shows a mobile SDK's data labels instead of cookies", async () => {
+    const mobile = structuredClone(bundle) as {
+      categories: {
+        slug: string;
+        services: Record<string, unknown>[];
+      }[];
+    };
+    const vendor = mobile.categories.find(
+      (category) => category.slug === "analytics",
+    )?.services[0] as Record<string, unknown>;
+    vendor.storage_items = [];
+    vendor.app_data = {
+      collected: ["device_id", "product_interaction", "crash_data"],
+      purposes: ["analytics", "app_functionality"],
+      tracking: false,
+      retention: "14 months",
+      packages: {
+        ios: ["FirebaseAnalytics"],
+        android: ["com.google.firebase:firebase-analytics"],
+      },
+    };
+    await render({ config: mobile });
+    await press("Manage Preferences");
+    await press("Analytics");
+    await press("Google Analytics");
+    const details = container.querySelector(
+      '[data-testid="cookiechimp-app-data"]',
+    );
+    const text = details?.textContent ?? "";
+    for (const value of [
+      "Data collected",
+      "Device ID",
+      "App interactions",
+      "Crash data",
+      "Used for",
+      "Analytics",
+      "App functionality",
+      "Tracks you across other apps",
+      "No",
+      "14 months",
+      "FirebaseAnalytics",
+      "com.google.firebase:firebase-analytics",
+    ])
+      expect(text).toContain(value);
+    expect(preferences()?.textContent).not.toContain("_ga");
+  });
+
   it("shows Powered by CookieChimp in the banner and preferences once", async () => {
     const branded = structuredClone(bundle) as {
       translations: Record<
