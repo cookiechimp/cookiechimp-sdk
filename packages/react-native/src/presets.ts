@@ -206,7 +206,11 @@ export const presets = {
       () => mixpanel.optInTracking(),
       () => mixpanel.optOutTracking(),
     ),
-  /** Call `branch.disableTracking(true)` at launch, before consent. */
+  /**
+   * Disable Branch tracking in your native startup code, before the Branch
+   * session starts in `AppDelegate` and `MainApplication`. JavaScript runs
+   * too late to stop the first session.
+   */
   branch: (branch: BranchLike) =>
     preset(
       "Branch",
