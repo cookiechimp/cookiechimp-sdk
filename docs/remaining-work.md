@@ -74,6 +74,31 @@ Remaining before a React Native release:
 3. Align the dashboard React Native setup snippets (platform repository,
    Daniel's review) with the published package name and API.
 
+## React Native P1 follow-ups (in review, not released)
+
+Built and unit tested on branch `claude/project-thread-y2k6lb`, not yet merged
+or published, and not part of the prepared 1.2.0 candidate. The changeset makes
+it a minor release of the fixed package group.
+
+- Vendor presets for Firebase Analytics, Crashlytics and Performance,
+  AppsFlyer, Adjust, Meta, Amplitude, Mixpanel, Branch, Braze and OneSignal,
+  named after the mobile SDK library entries. Verified against fake SDK
+  objects only; the method names follow each SDK's published API.
+- `connectFirebase`: Firebase collection toggles plus Consent Mode v2 signals
+  with the web SDK's category mapping.
+- `requestTrackingAfterConsent`: iOS App Tracking Transparency prompt after
+  the marketing category (or a service) is accepted, with ATT guidance in the
+  `react-native-integrations` docs page.
+- Headless mode hooks: `useConsentText`, `useConsentDraft`, services and data
+  labels in `useCategories`, `richText`/`plainText`.
+- Debug panel shown with `debug`, plus `useDebugEvents`.
+- SDK copy in the 33 web SDK locales (AI-written, not yet native-reviewed)
+  that fills empty dashboard fields and translates data labels; `translations`
+  overrides it. Adds about 95 KB of source strings to the package.
+
+Still to do for these: a device check of the debug panel and ATT prompt on
+iOS, a native-speaker review of the new copy, and the docs import.
+
 ## Next release steps
 
 1. Validate the coordinated 1.2.0 candidate: nine packages, current source,

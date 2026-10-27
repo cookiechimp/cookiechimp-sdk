@@ -31,6 +31,8 @@ own first-party region lookup instead.
 - [React Native](../../react-native/README.md): the native banner,
   preferences, consent records and vendor control for React Native and Expo
   apps (in development, not yet published).
+- [React Native vendor SDKs](react-native-integrations.md): presets for
+  common mobile SDKs, Firebase Consent Mode and App Tracking Transparency.
 - [Banner and vendor preferences](platform-ui.md): shared JSON, appearance,
   consent state and the full variation playground.
 - [Next.js](../../nextjs/README.md) or the [core and React reference](../../../README.md).
