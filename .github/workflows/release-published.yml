@@ -1,0 +1,27 @@
+name: Publish SDK from GitHub release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch:
+    if: github.event.release.draft == false && github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    steps:
+      # npm-publish stays main-only. Dispatch the established OIDC workflow on
+      # main after checking that the released tag identifies this exact commit.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+      - name: Validate the release and start npm publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node --experimental-strip-types release/github-release.ts dispatch

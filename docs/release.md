@@ -25,6 +25,38 @@ native tarballs outside the workspace, type-checks the Expo app and public entry
 and exports both iOS and Android bundles without submitting platform records.
 Both consumer reports are saved with the candidate artifact.
 
+## Publish from a GitHub release
+
+After merging the versioned release candidate and waiting for main CI, create a
+GitHub release with the tag `v1.2.0` targeting the current main commit and click
+**Publish release**. Drafts, prereleases and tag pushes alone do not publish npm
+`latest`. The tag must exactly match `release/readiness.json` and package versions.
+
+`release-published.yml` validates the stable release and dispatches the existing
+`release.yml` workflow on main, passing the exact version, source SHA and tag.
+This preserves npm's existing trusted publisher and the main-only `npm-publish`
+environment. The publication workflow rebuilds, tests and checks packed web and
+native consumers, then waits for Daniel's GitHub environment approval. After
+approval it rechecks main, the released tag, required CI and package readiness,
+then publishes the exact tarballs through GitHub OIDC with provenance.
+
+No npm CLI sign-in or security key is needed for routine OIDC publishes. Each
+new npm package still needs its initial registry setup and trusted-publisher
+binding; `@cookiechimp/react-native` has that one-time setup outstanding. The
+existing eight packages already use trusted publishing. Publishing a GitHub
+release does not bypass a pending readiness check or environment review.
+
+If main or the tag moves before publication, the workflow refuses the changed
+source. Keep main at the release commit until the publish finishes. The Actions
+page shows the initial release trigger and the separate SDK release run; only a
+successful publish job plus registry verification proves npm publication.
+
+Manual `prepare` and approved `publish` dispatches remain available for recovery.
+When rerunning a release-triggered publication, retain its `approved_source` and
+`release_tag` inputs. Check the Actions publish result before announcing the
+release as available on npm, then verify registry bytes/provenance and fresh
+consumers as described below.
+
 ## Previous published release: 1.1.0
 
 All eight `@cookiechimp` packages are published as npm `latest` at **1.1.0** on

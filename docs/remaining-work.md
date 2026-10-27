@@ -81,8 +81,10 @@ Remaining before a React Native release:
    republish 1.1.0. See [the release runbook](release.md).
 2. Complete the required live backend config and record-delivery verification
    for that release. Local mocks and passing fixture tests remain separate proof.
-3. Obtain explicit publication/deployment approval, publish through the protected
-   workflow, and independently verify npm bytes, provenance and fresh consumers.
+3. Publish the stable version tag as a GitHub release to start the protected
+   OIDC workflow, complete GitHub environment review, and independently verify
+   npm bytes, provenance and fresh consumers. Initial npm setup for the new
+   native package remains a one-time prerequisite.
 4. Import the exact clean SDK documentation export into CookieChimp-Docs through
    a reviewed docs PR, then verify Mintlify deployment and live routes/indexes.
 
