@@ -79,6 +79,11 @@ export interface PlatformService {
   privacy_policy_url?: string;
   accepted_by_default?: boolean;
   storage_items: PlatformStorageItem[];
+  /**
+   * Mobile app accounts only: what the SDK collects, in the shape of the app
+   * store privacy labels. Passed through as sent, so validate before use.
+   */
+  app_data?: unknown;
 }
 export interface PlatformCategory {
   slug: string;
@@ -301,6 +306,7 @@ export function adaptPlatformConfig(
           privacy_policy_url: text(service.privacy_policy_url, 2048),
           accepted_by_default: accepted,
           storage_items: storageItems(service.storage_items),
+          app_data: service.app_data,
         }),
       );
       const cookies = array(service.storage_items).flatMap((item) =>

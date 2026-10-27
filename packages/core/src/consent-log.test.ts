@@ -413,6 +413,33 @@ describe("queue", () => {
     expect(make({ storage }).pending()).toBe(0);
   });
 
+  it("leaves the stored queue to its replacement once destroyed", async () => {
+    const storage = memoryStorage();
+    let respond!: (response: Response) => void;
+    const fetch = vi.fn(
+      (_url: RequestInfo | URL, _init?: RequestInit) =>
+        new Promise<Response>((resolve) => (respond = resolve)),
+    );
+    const log = make({ storage, fetch });
+    log.record(consent());
+    const sending = log.flush();
+    log.destroy();
+    const next = make({ storage });
+    next.record(
+      consent({
+        consentId: "newerConsentIdAbcd12",
+        ts: "2026-10-13T12:01:00.000Z",
+      }),
+    );
+    // The first POST succeeds only after the replacement saved a newer record.
+    respond(await okSync()(ENDPOINT, (fetch.mock.calls[0] as Call)[1]));
+    await sending;
+    expect(next.pending()).toBe(2);
+    const stored = JSON.parse(storage.data.values().next().value ?? "[]");
+    expect(stored).toHaveLength(2);
+    next.destroy();
+  });
+
   it("ignores a tampered stored queue", () => {
     for (const raw of [
       "{bad",

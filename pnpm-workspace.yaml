@@ -2,6 +2,7 @@ packages:
   - packages/*
   - fixtures/*
   - examples/*
+  - "!examples/react-native-expo"
   - bench/fixtures/baseline
   - bench/fixtures/cookiechimp
   - bench/fixtures/cookieyes

@@ -15,6 +15,9 @@ const DEFAULT_API = "https://cookiechimp.com";
 const ID = /^[\w-]{1,64}$/;
 const MAX_RESPONSE = 65536;
 
+/** Where the decision was made. Native apps send `ios` or `android`. */
+export type ConsentPlatform = "web" | "ios" | "android";
+
 /**
  * One record in the platform batch format
  * (`POST /api/v1/mobile-sdk/sync/:account_hashid`, `consents[]`).
@@ -26,7 +29,7 @@ export interface PlatformConsent {
   client_id: string;
   /** The random consent id from the `cc_consent` cookie. */
   uuid: string;
-  platform: "web";
+  platform: ConsentPlatform;
   visitor_action: "consent";
   /** Page origin only, never the path or query. */
   url: string;
@@ -54,6 +57,8 @@ export interface ConsentLogOptions extends RecordQueueOptions {
   bannerId?: string;
   /** Service id to category id, used to group services. */
   serviceCategories?: Readonly<Record<string, string>>;
+  /** Defaults to `web`. */
+  platform?: ConsentPlatform;
 }
 
 /** Build the platform record for a consent decision. Exported for tests and docs. */
@@ -64,6 +69,7 @@ export function toPlatformConsent(
     bannerId?: string;
     language?: string;
     serviceCategories?: Readonly<Record<string, string>>;
+    platform?: ConsentPlatform;
   },
 ): PlatformConsent {
   const accepted: string[] = [];
@@ -85,7 +91,10 @@ export function toPlatformConsent(
   const record: PlatformConsent = {
     client_id: `${consent.consentId}:${consent.ts}`,
     uuid: consent.consentId,
-    platform: "web",
+    platform:
+      options.platform === "ios" || options.platform === "android"
+        ? options.platform
+        : "web",
     visitor_action: "consent",
     url: options.url,
     gpc_preference: consent.gpc === true,
@@ -178,6 +187,7 @@ export function createConsentLog(options: ConsentLogOptions): ConsentLog {
         language,
         bannerId: options.bannerId,
         serviceCategories: options.serviceCategories,
+        platform: options.platform,
       }),
     id: (record) => record.client_id,
     ts: (record) => record.created_at,

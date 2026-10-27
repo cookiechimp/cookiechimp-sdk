@@ -43,6 +43,25 @@ describe("platform consent disclosures", () => {
     );
   });
 
+  it("passes a mobile SDK's app store style data labels through as sent", () => {
+    const mobile = structuredClone(bundle);
+    const analytics = mobile.categories.find(
+      (category: { slug: string }) => category.slug === "analytics",
+    );
+    analytics.services[0].app_data = {
+      collected: ["device_id", 4, "crash_data"],
+      purposes: ["analytics"],
+      tracking: "yes",
+      retention: "14 months",
+      packages: { ios: ["FirebaseAnalytics"], android: "nope" },
+    };
+    const dashboard = adaptPlatformConfig(mobile, { region: "DE" });
+    expect(
+      dashboard?.preferences?.find((category) => category.slug === "analytics")
+        ?.services[0]?.app_data,
+    ).toEqual(analytics.services[0].app_data);
+  });
+
   it("keeps every required platform category and its vendors enabled through reject, custom choices and restore", () => {
     const config = {
       categories: [{ id: "essential", required: true }, { id: "analytics" }],

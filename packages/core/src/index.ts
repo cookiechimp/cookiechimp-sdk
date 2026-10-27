@@ -70,9 +70,20 @@ export interface ConsentCookieOptions {
   secure?: boolean;
 }
 
+/**
+ * Synchronous key-value storage for consent outside a browser, for example a
+ * React Native in-memory mirror of AsyncStorage or MMKV.
+ */
+export type ConsentStorage = Pick<Storage, "getItem" | "setItem">;
+
 export interface ConsentConfig extends ConfigInput {
   categories: ConsentCategories;
   cookie?: ConsentCookieOptions;
+  /**
+   * Persist consent here instead of `document.cookie`. The encoded value is
+   * stored under `cookie.name` and treated as expired after `cookie.maxAge`.
+   */
+  storage?: ConsentStorage;
   initial?: ConsentState | null;
   language?: string;
   onConsent?: (record: ConsentRecord) => void;
@@ -111,8 +122,34 @@ export interface ConsentRuntime {
 }
 
 const MAX_COOKIE_VALUE_LENGTH = 3800;
-const encoder = new TextEncoder();
-const decoder = new TextDecoder(undefined, { fatal: true });
+// React Native's Hermes engine may lack TextDecoder (and older versions
+// TextEncoder), so both fall back to URI coding, which also rejects invalid
+// UTF-8 like a fatal decoder.
+const encoder =
+  typeof TextEncoder === "function" ? new TextEncoder() : undefined;
+const decoder =
+  typeof TextDecoder === "function"
+    ? new TextDecoder(undefined, { fatal: true })
+    : undefined;
+
+function encodeUtf8(value: string): Uint8Array {
+  if (encoder) return encoder.encode(value);
+  const escaped = encodeURIComponent(value);
+  const bytes: number[] = [];
+  for (let index = 0; index < escaped.length; index++)
+    if (escaped[index] === "%") {
+      bytes.push(Number.parseInt(escaped.slice(index + 1, index + 3), 16));
+      index += 2;
+    } else bytes.push(escaped.charCodeAt(index));
+  return Uint8Array.from(bytes);
+}
+
+function decodeUtf8(bytes: Uint8Array): string {
+  if (decoder) return decoder.decode(bytes);
+  let escaped = "";
+  for (const byte of bytes) escaped += `%${byte.toString(16).padStart(2, "0")}`;
+  return decodeURIComponent(escaped);
+}
 
 function toBase64Url(bytes: Uint8Array): string {
   let binary = "";
@@ -189,7 +226,7 @@ function validState(value: unknown): ConsentState | null {
 
 /** Encode consent for storage in the versioned first-party cookie. */
 export function encodeConsentCookie(state: ConsentState): string {
-  return `v1.${toBase64Url(encoder.encode(JSON.stringify(state)))}`;
+  return `v1.${toBase64Url(encodeUtf8(JSON.stringify(state)))}`;
 }
 
 /** Decode an unescaped cookie value. Invalid input is ignored without throwing. */
@@ -201,7 +238,7 @@ export function decodeConsentCookie(value: string): ConsentState | null {
   const bytes = fromBase64Url(value.slice(separator + 1));
   if (!bytes || bytes.byteLength > MAX_COOKIE_VALUE_LENGTH) return null;
   try {
-    return validState(JSON.parse(decoder.decode(bytes)));
+    return validState(JSON.parse(decodeUtf8(bytes)));
   } catch {
     return null;
   }
@@ -253,10 +290,16 @@ function categoryDefaults(config: NormalizedConfig): Record<string, boolean> {
 }
 
 function newConsentId(): string {
-  if (typeof globalThis.crypto.randomUUID === "function")
-    return globalThis.crypto.randomUUID();
+  const crypto = globalThis.crypto as Crypto | undefined;
+  if (typeof crypto?.randomUUID === "function") return crypto.randomUUID();
   const bytes = new Uint8Array(16);
-  globalThis.crypto.getRandomValues(bytes);
+  // React Native has no Web Crypto unless the app installs a polyfill. The id
+  // only distinguishes consent records, so Math.random is an acceptable fallback.
+  if (typeof crypto?.getRandomValues === "function")
+    crypto.getRandomValues(bytes);
+  else
+    for (let index = 0; index < bytes.length; index++)
+      bytes[index] = Math.floor(Math.random() * 256);
   bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40;
   bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
   const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0"));
@@ -292,9 +335,24 @@ function validateCookieOptions(options: ConsentCookieOptions): void {
     );
 }
 
-function persist(state: ConsentState, options: ConsentCookieOptions): void {
+const DEFAULT_MAX_AGE = 180 * 24 * 60 * 60;
+
+function persist(
+  state: ConsentState,
+  options: ConsentCookieOptions,
+  storage?: ConsentStorage,
+): void {
+  if (storage) {
+    try {
+      storage.setItem(
+        options.name ?? CONSENT_COOKIE_NAME,
+        encodeConsentCookie(state),
+      );
+    } catch {}
+    return;
+  }
   if (typeof document === "undefined") return;
-  const maxAge = options.maxAge ?? 180 * 24 * 60 * 60;
+  const maxAge = options.maxAge ?? DEFAULT_MAX_AGE;
   const fields = [
     `${options.name ?? CONSENT_COOKIE_NAME}=${encodeURIComponent(encodeConsentCookie(state))}`,
     "Path=/",
@@ -306,6 +364,21 @@ function persist(state: ConsentState, options: ConsentCookieOptions): void {
   if (secure) fields.push("Secure");
   // biome-ignore lint/suspicious/noDocumentCookie: document.cookie is the required broadly supported cookie writer.
   document.cookie = fields.join("; ");
+}
+
+/** Read stored consent, ignoring it once `maxAge` has passed since the decision. */
+function readStored(
+  storage: ConsentStorage,
+  options: ConsentCookieOptions,
+): ConsentState | null {
+  try {
+    const raw = storage.getItem(options.name ?? CONSENT_COOKIE_NAME);
+    const state = raw ? decodeConsentCookie(raw) : null;
+    const maxAge = Math.max(0, options.maxAge ?? DEFAULT_MAX_AGE) * 1000;
+    return state && Date.parse(state.ts) + maxAge > Date.now() ? state : null;
+  } catch {
+    return null;
+  }
 }
 
 export function createConsent(config: ConsentConfig): ConsentRuntime {
@@ -354,8 +427,9 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   const serviceCategories = Object.fromEntries(
     normalized.services.map(({ id, category }) => [id, category]),
   );
-  const browserState =
-    typeof document === "undefined"
+  const browserState = config.storage
+    ? readStored(config.storage, config.cookie ?? {})
+    : typeof document === "undefined"
       ? null
       : readConsentCookie(document.cookie, config.cookie?.name);
   const candidate = validState(config.initial) ?? browserState;
@@ -466,7 +540,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
       gpc,
     };
     decided = true;
-    persist(state, config.cookie ?? {});
+    persist(state, config.cookie ?? {}, config.storage);
     const result = resolvedSnapshot();
     current = result;
     emitter.emit(result);
@@ -476,7 +550,7 @@ export function createConsent(config: ConsentConfig): ConsentRuntime {
   };
 
   if (mustApplyGpc) {
-    persist(state, config.cookie ?? {});
+    persist(state, config.cookie ?? {}, config.storage);
     const { schemaVersion: _, ...record } = current;
     config.onConsent?.(record);
   }

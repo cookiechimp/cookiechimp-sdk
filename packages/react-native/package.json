@@ -1,0 +1,75 @@
+{
+  "name": "@cookiechimp/react-native",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "react-native": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts",
+    "lint": "biome check .",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cookiechimp/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@react-native-async-storage/async-storage": ">=1.17.0",
+    "react": ">=18",
+    "react-native": ">=0.80"
+  },
+  "devDependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.83.10",
+    "tsdown": "0.23.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4"
+  },
+  "description": "CookieChimp consent banner, preferences and consent records for React Native and Expo apps",
+  "keywords": [
+    "react-native",
+    "expo",
+    "consent",
+    "gdpr",
+    "ccpa",
+    "cmp",
+    "cookiechimp"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cookiechimp/cookiechimp-sdk.git",
+    "directory": "packages/react-native"
+  },
+  "homepage": "https://docs.cookiechimp.com/docs/sdk/react-native",
+  "bugs": {
+    "url": "https://github.com/cookiechimp/cookiechimp-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

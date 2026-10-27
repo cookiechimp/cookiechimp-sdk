@@ -20,13 +20,17 @@ built by CookieChimp. MIT licensed.
 
 The SDK never looks up a visitor's location. It makes no geo-IP or external
 location request. Applications pass trusted region context, for example from
-their hosting platform's headers.
+their hosting platform's headers. React Native apps can opt in to CookieChimp's
+own first-party region lookup instead.
 
 ## Where to start
 
 - [Connect to CookieChimp](connected-backend.md): dashboard configuration,
   platform consent delivery and the complete backend-connected example.
 - [Getting started](getting-started.md): install and show a banner.
+- [React Native](../../react-native/README.md): the native banner,
+  preferences, consent records and vendor control for React Native and Expo
+  apps (in development, not yet published).
 - [Banner and vendor preferences](platform-ui.md): shared JSON, appearance,
   consent state and the full variation playground.
 - [Next.js](../../nextjs/README.md) or the [core and React reference](../../../README.md).

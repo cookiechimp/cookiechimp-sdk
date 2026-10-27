@@ -154,6 +154,8 @@ export function CookieBanner() {
   const buttons = object(dashboard.banner.buttons);
   const footer = object(dashboard.banner.footer);
   const privacy = url(dashboard.copy.privacy_policy_url);
+  const footerCopy =
+    footer.enabled === false ? undefined : (copy.footer ?? footer.content);
   const display = bannerDisplay(gui);
   const banner = useBanner();
   const preferences = usePreferences();
@@ -225,15 +227,25 @@ export function CookieBanner() {
               <RichText value={copy.additional_description} />
             </div>
           )}
-          {footer.enabled !== false && (
+          {(footer.enabled !== false || footer.show_powered_by === true) && (
             <div className="cc-platform-footer cc-platform-rich">
-              {plain(copy.footer ?? footer.content) ? (
-                <RichText value={copy.footer ?? footer.content} omitBranding />
-              ) : privacy ? (
+              {plain(footerCopy) ? (
+                <RichText value={footerCopy} omitBranding />
+              ) : footer.enabled !== false && privacy ? (
                 <a href={privacy} target="_blank" rel="noopener noreferrer">
                   Privacy policy
                 </a>
               ) : null}
+              {footer.show_powered_by === true && (
+                <a
+                  className="cc-platform-powered-by"
+                  href="https://cookiechimp.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Powered by CookieChimp
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -590,16 +602,14 @@ export function CookiePreferences({
               </code>
             </div>
           )}
-          {footer.enabled !== false && footer.show_powered_by === true && (
-            <a
-              className="cc-platform-branding"
-              href="https://cookiechimp.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Powered by CookieChimp
-            </a>
-          )}
+          <a
+            className="cc-platform-branding"
+            href="https://cookiechimp.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Powered by CookieChimp
+          </a>
         </div>
         <footer className="cc-actions cc-platform-actions">
           {buttons.show_save_preferences_btn !== false && (

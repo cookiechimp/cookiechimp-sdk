@@ -89,6 +89,13 @@ export const pages: readonly PageSpec[] = [
     source: "packages/docs/content/ai-skills.md",
   },
   {
+    slug: "react-native",
+    title: "React Native",
+    description:
+      "Consent banner, preferences, consent records and vendor control for React Native and Expo apps.",
+    source: "packages/react-native/README.md",
+  },
+  {
     slug: "examples",
     title: "Examples",
     description: "Runnable Next.js and plain React/Vite apps.",
@@ -99,7 +106,7 @@ export const pages: readonly PageSpec[] = [
 export const navigation = {
   dropdown: "Consent SDK",
   icon: "code",
-  description: "React, Next.js and JavaScript consent SDK",
+  description: "React, Next.js, React Native and JavaScript consent SDK",
   groups: [
     {
       group: "Get started",
@@ -111,6 +118,10 @@ export const navigation = {
         "sdk/examples",
         "sdk/release-status",
       ],
+    },
+    {
+      group: "Mobile",
+      pages: ["sdk/react-native"],
     },
     {
       group: "SDK reference",
