@@ -62,14 +62,15 @@ All seven required checks passed on that source. It is not yet published:
 
 Remaining before a React Native release:
 
-1. A device check on iOS and Android with the Expo example.
-2. Live backend config retrieval and consent delivery from a real device build,
-   the same gate as every release.
+1. Device and live delivery checks were confirmed by Daniel on 27 October.
+   See the [user attestation](release-evidence/2026-10-27-native-confirmation.json);
+   Codex has not independently inspected device builds or receipt/dashboard captures.
 3. Complete npm package setup and its trusted-publisher binding. Daniel requested
    publication on 27 October. The 1.2.0 candidate adds the native package to the
    release cohort and fixed version group, removes `private`, consumes changesets
    and validates a separate packed Expo consumer. The publication guard keeps
-   device, live backend and npm setup checks pending until evidence exists.
+   npm setup check pending. The device and delivery checks are backed by
+   Daniel's direct confirmation.
 4. Align the dashboard React Native setup snippets (platform repository,
    Daniel's review) with the published package name and API.
 

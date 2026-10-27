@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-27",
+  "version": "1.2.0",
+  "implementationCommit": "0776dc61b6e67c07fb95f5d37962cf874e32a1fb",
+  "confirmationSource": "Daniel, direct reply in the npm publication chat",
+  "question": "Have you also run the SDK on iOS and Android devices and confirmed consent records reached CookieChimp?",
+  "answer": "Yes, device and delivery checks passed",
+  "iosDeviceChecks": "confirmed by Daniel",
+  "androidDeviceChecks": "confirmed by Daniel",
+  "liveConsentDelivery": "confirmed by Daniel",
+  "verificationBoundary": "User attestation. Device models, build identifiers, test times, account identifiers, payloads, matching receipts and dashboard captures were not supplied and have not been independently inspected by Codex. The confirmation covers the merged React Native implementation; the 1.2.0 preparation changes package versions and release tooling.",
+  "automatedCandidateChecks": {
+    "sourceCommit": "c47a83c4cea0edf6708bf75d193f374985947d73",
+    "requiredCI": "passed",
+    "packedWebConsumer": "passed",
+    "packedNativeConsumer": "passed",
+    "iosAndAndroidHermesExports": "passed"
+  }
+}

@@ -1,16 +1,16 @@
 {
   "version": "1.2.0",
   "manualChecks": {
-    "platformDeployed": false,
+    "platformDeployed": true,
     "publicHistoryReviewed": true,
     "npmOrganizationReady": false,
-    "nativeDevicesVerified": false
+    "nativeDevicesVerified": true
   },
   "notes": {
-    "platformDeployed": "Pending for 1.2.0: verify current config retrieval, accept/reject/custom consent delivery, matching receipts, persistence and retry from the React Native device build, and confirm stored platform records. The 1.1.0 browser evidence is historical and does not validate the new native runtime.",
+    "platformDeployed": "Daniel directly confirmed on 27 October 2026 that React Native device and delivery checks passed and consent records reached CookieChimp. Recorded as user attestation, not independent receipt/dashboard inspection by Codex, in docs/release-evidence/2026-10-27-native-confirmation.json. The merged native implementation is 0776dc61b6e67c07fb95f5d37962cf874e32a1fb; the 1.2.0 candidate changes release packaging and versions.",
     "publicHistoryReviewed": "Daniel authorized public SDK source on 17 Oct 2026 after disclosure of the historical error.log account identifier. A targeted scan of 1315 unique Git blobs found no supported credential patterns. The identifier is not an authentication secret; history was preserved and the SDK repository is now public.",
     "npmOrganizationReady": "The eight existing packages use GitHub OIDC via .github/workflows/release.yml and the protected npm-publish environment. @cookiechimp/react-native is new and absent from npm as checked on 27 October 2026. Complete the initial package setup and trusted-publisher binding for cookiechimp/cookiechimp-sdk, release.yml, npm-publish before publishing the nine-package cohort.",
-    "nativeDevicesVerified": "Pending: run the packed Expo example on iOS and Android devices, including native layouts, preferences, vendor callbacks, persistence, re-consent, offline retry and foreground behavior. Metro exports and DOM stand-in tests are separate build and test evidence."
+    "nativeDevicesVerified": "Daniel directly confirmed successful iOS and Android device checks on 27 October 2026. Evidence: docs/release-evidence/2026-10-27-native-confirmation.json. No device model/build details or captures were supplied. Separately, the exact packed 1.2.0 native/core consumer passed Expo types and iOS/Android Hermes exports at c47a83c4cea0edf6708bf75d193f374985947d73."
   },
   "deferred": {
     "tcf": {

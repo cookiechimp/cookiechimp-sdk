@@ -9,10 +9,10 @@ This candidate is **not published**. Before using the protected publish workflow
 
 - Validate the packed Expo consumer's types and both Metro exports. These are
   packaging checks, not proof of device execution or live consent delivery.
-- Complete iOS and Android device checks and current live backend configuration,
-  consent delivery, receipt, persistence and retry checks from a device build.
-  Record the sanitized results under `docs/release-evidence/` before setting
-  `nativeDevicesVerified` and `platformDeployed` to true in readiness.json.
+- Daniel confirmed iOS/Android device checks and live consent delivery on
+  27 October. The [user attestation](release-evidence/2026-10-27-native-confirmation.json)
+  records exactly what was supplied; no device build details, receipt payloads or
+  dashboard captures have been independently inspected by Codex.
 - Complete initial npm setup for `@cookiechimp/react-native` and confirm its
   trusted-publisher binding to `cookiechimp/cookiechimp-sdk`, `release.yml`,
   environment `npm-publish`, before setting `npmOrganizationReady` true.
