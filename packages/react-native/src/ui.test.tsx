@@ -5,7 +5,12 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CookieChimp, resetCookieChimp } from "./api";
-import { useCategory, useConsent } from "./hooks";
+import {
+  useCategory,
+  useConsent,
+  useConsentDraft,
+  useConsentText,
+} from "./hooks";
 import { CookieChimpProvider } from "./provider";
 import { memoryStorage } from "./storage";
 
@@ -266,5 +271,132 @@ describe("CookieChimpProvider", () => {
     expect(first).toHaveBeenCalledWith(
       expect.objectContaining({ acceptType: "all" }),
     );
+  });
+
+  it("shows the SDK's own copy in the banner language when dashboard copy is missing", async () => {
+    const partial = structuredClone(bundle) as {
+      translations: Record<string, Record<string, Record<string, unknown>>>;
+      categories: { slug: string; services: Record<string, unknown>[] }[];
+    };
+    const german = partial.translations.bnrEU1?.de as Record<
+      string,
+      Record<string, unknown>
+    >;
+    german.consent_modal = { ...german.consent_modal, reject_btn: "" };
+    german.preferences_modal = { ...german.preferences_modal, save_btn: "" };
+    const vendor = partial.categories.find(
+      (category) => category.slug === "analytics",
+    )?.services[0] as Record<string, unknown>;
+    vendor.app_data = { collected: ["device_id"], purposes: ["analytics"] };
+    await render({ config: partial, language: "de" });
+    expect(banner()?.getAttribute("lang")).toBe("de");
+    expect(button("Optionale ablehnen")).toBeDefined();
+    await press("Einstellungen");
+    expect(button("Einstellungen speichern")).toBeDefined();
+    await press("Statistik");
+    await press("Google Analyse");
+    const text = preferences()?.textContent ?? "";
+    expect(text).toContain("Erhobene Daten");
+    expect(text).toContain("Geräte-ID");
+    expect(text).toContain("Bereitgestellt von");
+  });
+
+  it("runs headless with ui={false}: custom screens use the hooks", async () => {
+    function Custom() {
+      const text = useConsentText();
+      const draft = useConsentDraft();
+      if (!text) return null;
+      const analytics = draft.categories.find(
+        (category) => category.id === "analytics",
+      );
+      return (
+        <div data-testid="custom">
+          <h1>{text.banner.title}</h1>
+          <span>
+            {analytics?.label} {String(analytics?.enabled)}{" "}
+            {analytics?.services.map((service) => service.name).join(",")}
+          </span>
+          <button
+            type="button"
+            aria-label="toggle analytics"
+            onClick={() => draft.toggleCategory("analytics")}
+          />
+          <button
+            type="button"
+            aria-label="toggle essential"
+            onClick={() => draft.toggleCategory("essential", false)}
+          />
+          <button type="button" aria-label="save" onClick={draft.save} />
+        </div>
+      );
+    }
+    await act(async () => {
+      root.render(
+        <CookieChimpProvider
+          config={bundle}
+          country="DE"
+          storage={memoryStorage()}
+          fetch={fetch}
+          ui={false}
+        >
+          <Screen />
+          <Custom />
+        </CookieChimpProvider>,
+      );
+    });
+    await act(async () => {
+      await vi.waitFor(() =>
+        expect(container.textContent).toContain("We value your privacy"),
+      );
+    });
+    expect(banner()).toBeNull();
+    const custom = () =>
+      container.querySelector('[data-testid="custom"]')?.textContent ?? "";
+    expect(custom()).toContain(
+      "Analytics false Google Analytics,Microsoft Clarity",
+    );
+    await press("toggle essential");
+    await press("toggle analytics");
+    expect(custom()).toContain("Analytics true");
+    expect(container.textContent).toContain("analytics false");
+    await press("save");
+    expect(container.textContent).toContain("analytics true");
+    expect(CookieChimp.acceptedCategory("essential")).toBe(true);
+    expect(CookieChimp.acceptedService("Microsoft Clarity", "analytics")).toBe(
+      true,
+    );
+  });
+
+  it("shows the debug panel with debug on and acts from it", async () => {
+    await render({ debug: true });
+    const tab = () =>
+      container.querySelector('[data-testid="cookiechimp-debug-tab"]');
+    const panel = () =>
+      container.querySelector('[data-testid="cookiechimp-debug-panel"]');
+    expect(tab()).not.toBeNull();
+    expect(panel()).toBeNull();
+    await press("Open CookieChimp debug panel");
+    const text = panel()?.textContent ?? "";
+    expect(text).toContain("bnrEU1");
+    expect(text).toContain("bundle");
+    expect(text).toContain("gdpr");
+    expect(text).toContain("DE");
+    await press("Accept all");
+    expect(container.textContent).toContain("analytics true");
+    expect(panel()?.textContent).toContain("accept_all");
+    expect(panel()?.textContent).toContain(
+      "all: necessary, essential, analytics, marketing accepted",
+    );
+    await press("Reset consent");
+    expect(container.textContent).toContain("analytics false");
+    await press("Close");
+    expect(panel()).toBeNull();
+  });
+
+  it("hides the debug panel by default", async () => {
+    await render();
+    expect(
+      container.querySelector('[data-testid="cookiechimp-debug-tab"]'),
+    ).toBeNull();
   });
 });

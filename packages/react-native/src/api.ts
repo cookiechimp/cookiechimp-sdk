@@ -7,6 +7,7 @@ import {
   toUserPreferences,
   type UserPreferences,
 } from "./engine";
+import { debugEvents } from "./events";
 import {
   getVendors,
   isVendorRunning,
@@ -176,8 +177,9 @@ export function shutdown() {
   notify();
 }
 
-/** Test helper: stop the active engine and clear listeners. */
+/** Test helper: stop the active engine and clear listeners and events. */
 export function resetCookieChimp() {
   shutdown();
   changeListeners.clear();
+  debugEvents.clear();
 }

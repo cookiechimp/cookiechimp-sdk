@@ -12,15 +12,8 @@ import {
 } from "react-native";
 import { store } from "../api";
 import { useCookieChimp } from "../hooks";
-import {
-  object,
-  type Palette,
-  plain,
-  poweredBy,
-  rich,
-  url,
-  withoutBranding,
-} from "../presentation";
+import { object, type Palette } from "../presentation";
+import type { ConsentText } from "../text";
 import {
   Button,
   styles as base,
@@ -89,9 +82,9 @@ interface Action {
   onPress(): void;
 }
 
-function actionsFor(dashboard: DashboardConfig): Action[] {
+function actionsFor(dashboard: DashboardConfig, text: ConsentText): Action[] {
   const engine = store.engine();
-  const copy = object(dashboard.copy.consent_modal);
+  const copy = text.banner;
   const gui = object(dashboard.banner.gui_options);
   const buttons = object(dashboard.banner.buttons);
   const equal = gui.equal_weight_buttons !== false;
@@ -99,21 +92,21 @@ function actionsFor(dashboard: DashboardConfig): Action[] {
   if (buttons.show_accept_btn !== false)
     actions.push({
       key: "accept",
-      label: plain(copy.accept_btn) || "Accept all",
+      label: copy.acceptAll,
       primary: true,
       onPress: () => engine?.acceptAll(),
     });
   if (buttons.show_accept_necessary_btn !== false)
     actions.push({
       key: "reject",
-      label: plain(copy.reject_btn) || "Reject optional",
+      label: copy.rejectAll,
       primary: equal,
       onPress: () => engine?.rejectAll(),
     });
   if (buttons.show_preferences_btn !== false)
     actions.push({
       key: "preferences",
-      label: plain(copy.preferences_btn) || "Customize",
+      label: copy.customize,
       primary: false,
       onPress: () => engine?.showPreferences(),
     });
@@ -166,38 +159,35 @@ function Actions({
 
 function Copy({
   dashboard,
+  text,
   colors,
   large,
 }: {
   dashboard: DashboardConfig;
+  text: ConsentText;
   colors: Palette;
   large?: boolean;
 }) {
-  const copy = object(dashboard.copy.consent_modal);
-  const footer = object(dashboard.banner.footer);
-  const footerContent = withoutBranding(copy.footer ?? footer.content);
-  const privacy = url(dashboard.copy.privacy_policy_url);
+  const copy = text.banner;
+  const footer = object(dashboard.banner.footer).enabled !== false;
   const bodyStyle = large ? styles.largeBody : undefined;
   return (
     <View style={styles.copy}>
+      <Rich value={copy.description} colors={colors} style={bodyStyle} />
       <Rich
-        value={
-          copy.description ||
-          "We use technologies like cookies and SDKs to run this app. Choose which optional ones may be used."
-        }
+        value={copy.additionalDescription}
         colors={colors}
         style={bodyStyle}
       />
-      <Rich
-        value={copy.additional_description}
-        colors={colors}
-        style={bodyStyle}
-      />
-      {footer.enabled !== false &&
-        (rich(footerContent).length ? (
-          <Rich value={footerContent} colors={colors} style={base.small} />
-        ) : privacy ? (
-          <Link href={privacy} label="Privacy policy" colors={colors} />
+      {footer &&
+        (copy.footer ? (
+          <Rich value={copy.footer} colors={colors} style={base.small} />
+        ) : text.privacyPolicyUrl ? (
+          <Link
+            href={text.privacyPolicyUrl}
+            label={text.messages.ui.privacyPolicy}
+            colors={colors}
+          />
         ) : null)}
     </View>
   );
@@ -205,14 +195,15 @@ function Copy({
 
 /** The first-layer consent banner, styled from the dashboard. */
 export function ConsentBanner({ insets = {} }: { insets?: Insets }) {
-  const { dashboard, bannerOpen, preferencesOpen } = useCookieChimp();
+  const { dashboard, text, bannerOpen, preferencesOpen } = useCookieChimp();
   const visible = !!dashboard && bannerOpen && !preferencesOpen;
   const { mounted, progress } = usePresence(visible);
-  if (!dashboard || !mounted) return null;
+  if (!dashboard || !text || !mounted) return null;
   const display = bannerDisplay(object(dashboard.banner.gui_options));
   return display.layout === "fullscreen" ? (
     <FullScreenBanner
       dashboard={dashboard}
+      text={text}
       display={display}
       insets={insets}
       progress={progress}
@@ -220,6 +211,7 @@ export function ConsentBanner({ insets = {} }: { insets?: Insets }) {
   ) : (
     <FloatingBanner
       dashboard={dashboard}
+      text={text}
       display={display}
       insets={insets}
       progress={progress}
@@ -260,14 +252,15 @@ function Shell({
 
 function Header({
   dashboard,
+  text,
   colors,
   large,
 }: {
   dashboard: DashboardConfig;
+  text: ConsentText;
   colors: Palette;
   large?: boolean;
 }) {
-  const copy = object(dashboard.copy.consent_modal);
   const buttons = object(dashboard.banner.buttons);
   const closable =
     buttons.show_close_btn === true && dashboard.banner.force_consent !== true;
@@ -280,11 +273,11 @@ function Header({
           { color: colors.heading },
         ]}
       >
-        {plain(copy.title) || "Privacy choices"}
+        {text.banner.title}
       </Text>
       {closable && (
         <CloseButton
-          label={plain(copy.close_btn) || "Close"}
+          label={text.banner.close}
           colors={colors}
           onPress={() => store.engine()?.hideBanner()}
         />
@@ -295,16 +288,19 @@ function Header({
 
 function FloatingBanner({
   dashboard,
+  text,
   display,
   insets,
   progress,
 }: {
   dashboard: DashboardConfig;
+  text: ConsentText;
   display: BannerDisplay;
   insets: Insets;
   progress: Animated.Value;
 }) {
-  const { colors, rtl } = useLook(dashboard);
+  const { colors } = useLook(dashboard);
+  const rtl = text.rtl;
   const window = useWindowDimensions();
   const bar = display.layout === "bar";
   const cloud = display.layout === "cloud";
@@ -341,7 +337,7 @@ function FloatingBanner({
       >
         <Animated.View
           accessibilityViewIsModal
-          accessibilityLanguage={dashboard.language || undefined}
+          accessibilityLanguage={text.language || undefined}
           testID="cookiechimp-banner"
           style={[
             styles.card,
@@ -383,26 +379,26 @@ function FloatingBanner({
           <View style={[styles.content, side && styles.contentSide]}>
             <View style={[styles.text, side && styles.flex]}>
               <Logo colors={colors} />
-              <Header dashboard={dashboard} colors={colors} />
+              <Header dashboard={dashboard} text={text} colors={colors} />
               <ScrollView
                 style={styles.scroll}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
               >
-                <Copy dashboard={dashboard} colors={colors} />
+                <Copy dashboard={dashboard} text={text} colors={colors} />
               </ScrollView>
             </View>
             <View style={side ? styles.sideActions : undefined}>
               <Actions
-                actions={actionsFor(dashboard)}
+                actions={actionsFor(dashboard, text)}
                 placement={display.placement}
                 colors={colors}
               />
             </View>
           </View>
-          {poweredBy(dashboard.banner) && (
+          {text.banner.poweredBy && (
             <View style={styles.branding}>
-              <PoweredBy colors={colors} />
+              <PoweredBy label={text.messages.ui.poweredBy} colors={colors} />
             </View>
           )}
         </Animated.View>
@@ -413,16 +409,19 @@ function FloatingBanner({
 
 function FullScreenBanner({
   dashboard,
+  text,
   display,
   insets,
   progress,
 }: {
   dashboard: DashboardConfig;
+  text: ConsentText;
   display: BannerDisplay;
   insets: Insets;
   progress: Animated.Value;
 }) {
-  const { colors, rtl } = useLook(dashboard);
+  const { colors } = useLook(dashboard);
+  const rtl = text.rtl;
   const rise = (distance: number) => ({
     opacity: progress,
     transform: [
@@ -438,7 +437,7 @@ function FullScreenBanner({
     <Shell dashboard={dashboard} progress={progress}>
       <Animated.View
         accessibilityViewIsModal
-        accessibilityLanguage={dashboard.language || undefined}
+        accessibilityLanguage={text.language || undefined}
         testID="cookiechimp-banner"
         style={[
           styles.fullscreen,
@@ -469,8 +468,8 @@ function FullScreenBanner({
                   <CookieMark color={colors.primaryBackground} size={34} />
                 </View>
               )}
-              <Header dashboard={dashboard} colors={colors} large />
-              <Copy dashboard={dashboard} colors={colors} large />
+              <Header dashboard={dashboard} text={text} colors={colors} large />
+              <Copy dashboard={dashboard} text={text} colors={colors} large />
             </Animated.View>
           </ScrollView>
           <Animated.View
@@ -481,15 +480,15 @@ function FullScreenBanner({
             ]}
           >
             <Actions
-              actions={actionsFor(dashboard)}
+              actions={actionsFor(dashboard, text)}
               placement={
                 display.placement === "wide" ? "inline" : display.placement
               }
               colors={colors}
             />
-            {poweredBy(dashboard.banner) && (
+            {text.banner.poweredBy && (
               <View style={styles.branding}>
-                <PoweredBy colors={colors} />
+                <PoweredBy label={text.messages.ui.poweredBy} colors={colors} />
               </View>
             )}
           </Animated.View>
