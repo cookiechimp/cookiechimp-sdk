@@ -218,6 +218,11 @@ export const presets = {
       () => branch.disableTracking(false),
       () => branch.disableTracking(true),
     ),
+  /**
+   * Braze starts natively, before JavaScript runs. Use Braze's delayed
+   * initialization, or disable the SDK in native startup code, so it collects
+   * nothing before consent.
+   */
   braze: (braze: BrazeLike) =>
     preset(
       "Braze",
