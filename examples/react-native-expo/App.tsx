@@ -2,6 +2,8 @@ import {
   CookieChimp,
   CookieChimpProvider,
   connectFirebase,
+  type FirebaseAnalyticsLike,
+  type FirebaseCrashlyticsLike,
   presets,
   requestTrackingAfterConsent,
   richText,
@@ -65,8 +67,8 @@ CookieChimp.registerVendor("Google Analytics", "analytics", {
 CookieChimp.registerVendor(presets.mixpanel(fake("mixpanel")));
 CookieChimp.registerVendor(presets.appsFlyer(fake("appsFlyer")));
 connectFirebase({
-  analytics: fake("analytics()"),
-  crashlytics: fake("crashlytics()"),
+  analytics: fake<FirebaseAnalyticsLike>("analytics()"),
+  crashlytics: fake<FirebaseCrashlyticsLike>("crashlytics()"),
 });
 // With expo-tracking-transparency, pass `requestTrackingPermissionsAsync`.
 requestTrackingAfterConsent({
