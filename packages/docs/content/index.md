@@ -1,6 +1,6 @@
 # CookieChimp Consent SDK
 
-Open-source, lightweight consent SDK for React, Next.js and plain JavaScript,
+Open-source, lightweight consent SDK for React, React Native, Next.js and plain JavaScript,
 built by CookieChimp. MIT licensed.
 
 - **Connected mode.** Load a CookieChimp project's scanner categories,
@@ -30,7 +30,7 @@ own first-party region lookup instead.
 - [Getting started](getting-started.md): install and show a banner.
 - [React Native](../../react-native/README.md): the native banner,
   preferences, consent records and vendor control for React Native and Expo
-  apps (in development, not yet published).
+  apps, available on npm.
 - [Banner and vendor preferences](platform-ui.md): shared JSON, appearance,
   consent state and the full variation playground.
 - [Next.js](../../nextjs/README.md) or the [core and React reference](../../../README.md).
@@ -38,5 +38,5 @@ own first-party region lookup instead.
 - [AI skills](ai-skills.md) for coding agents and the
   [documentation index](https://docs.cookiechimp.com/docs/llms.txt).
 
-Current release: **1.1.0**, available on npm. See [versions and deployment](deployment.md)
+Current release: **1.2.0**, available on npm. See [versions and deployment](deployment.md)
 for installation, upgrading and connected-mode verification.

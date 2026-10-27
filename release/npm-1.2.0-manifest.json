@@ -1,0 +1,78 @@
+{
+  "version": "1.2.0",
+  "sourceCommit": "150b0292be3502b355bf0a0f00118d7c557db340",
+  "packages": [
+    {
+      "name": "@cookiechimp/tokens",
+      "version": "1.2.0",
+      "file": "cookiechimp-tokens-1.2.0.tgz",
+      "sha256": "51331c5707a2d043dea7d7e884f34c3bf9a5049010da0962c0f1ab524da8d704",
+      "integrity": "sha512-0aC+E/qUrRy/h5fsLarZzHdJ3AaFWiWXH4J/yQQgpPYbGbPndKd4m1DGfgQRP63FzvzR8B05bvRYsm+PUbGv8A==",
+      "files": 25
+    },
+    {
+      "name": "@cookiechimp/translations",
+      "version": "1.2.0",
+      "file": "cookiechimp-translations-1.2.0.tgz",
+      "sha256": "245fb49b173c9f2837070eacd37f71c7f98d1f422b5a2f4b9e781608f4e6d1e8",
+      "integrity": "sha512-5Hm/e1zIV0CQqsBrBuo2tNqLDCltQ3eVt2d1INegRkTf13+es8z0yvAX2enA/mkAi9MrVkkyEmkDNfVogG5/ZA==",
+      "files": 625
+    },
+    {
+      "name": "@cookiechimp/core",
+      "version": "1.2.0",
+      "file": "cookiechimp-core-1.2.0.tgz",
+      "sha256": "e71d6c4839aa5247f8632be04341985f544284f4106e9dbc23f9d1d80d7be9e0",
+      "integrity": "sha512-HU+nGCZcBTdHeGN4pksk7eIGyeV4aIPdw2x1dQ8kAspPUu2FI0kj+PylhM3bYnqxAqB9RnUP+gVsPKADd5JHLg==",
+      "files": 157
+    },
+    {
+      "name": "@cookiechimp/react",
+      "version": "1.2.0",
+      "file": "cookiechimp-react-1.2.0.tgz",
+      "sha256": "7a2e7c7cb72d4c317cc0c90578a9c06ebf4dc0f98beb83834f390b5fe1ff3047",
+      "integrity": "sha512-FJ4stumlkuGS356KPACwz85QLxnuPCQMGYeOCd/X79gJuAnm8tKUsAoiojRWWebSHJLOmlirTiDRCFnwxmiCIQ==",
+      "files": 72
+    },
+    {
+      "name": "@cookiechimp/react-native",
+      "version": "1.2.0",
+      "file": "cookiechimp-react-native-1.2.0.tgz",
+      "sha256": "e20c2800fb5d8174c86d4d820d20101e3cfcdf294a70247321a6c4f177a58ca2",
+      "integrity": "sha512-/tQ7xGmOnUwOMXkl3bnWp605xTPq5slZWJyDTTuMBd+nQV8aoF18I1zqzkSHTQDj+FXoRVgVXnzg/IZ/m8ygkg==",
+      "files": 13
+    },
+    {
+      "name": "@cookiechimp/nextjs",
+      "version": "1.2.0",
+      "file": "cookiechimp-nextjs-1.2.0.tgz",
+      "sha256": "6cf9b606836d3b5564dcd6b1203d2e8b8e7635a29935e8eb66baae2ac3c37088",
+      "integrity": "sha512-UZdFju/fBwv8wte0JqycdpR8hLgUyStpGE2moGg9jtn5bTFSbQJPh2uvpRFxLD+29nu8kaiYlX2hjG1ll5DsGg==",
+      "files": 63
+    },
+    {
+      "name": "@cookiechimp/scripts",
+      "version": "1.2.0",
+      "file": "cookiechimp-scripts-1.2.0.tgz",
+      "sha256": "130f0c06999567a5cf075a9cf93713f3761553d7cf5fa4c2b2ba45e704bc48ae",
+      "integrity": "sha512-z2bpAhNnSoi/30l9U8KYML3mqQmP+HR0L+NtXFFeWg06fDdlq299sW+vuh83uGNo/wWypH24tipufL2l8FN7Ww==",
+      "files": 111
+    },
+    {
+      "name": "@cookiechimp/devtools",
+      "version": "1.2.0",
+      "file": "cookiechimp-devtools-1.2.0.tgz",
+      "sha256": "5b6eb169f9b26b95a3756782ba03edde4605253a1a54962a97579647e6a6ee7b",
+      "integrity": "sha512-Hlni8TXxWIA7GBVyRghmErHx6IVSADvH5ZZB5z3TK3HltKp4YW6lb4q8abDCwqFoHmKH/0CHinu7Mq+Sd67hVw==",
+      "files": 24
+    },
+    {
+      "name": "@cookiechimp/cli",
+      "version": "1.2.0",
+      "file": "cookiechimp-cli-1.2.0.tgz",
+      "sha256": "99b2a6011f88ba5f5534f9a9fa98b3ec8c07e80e3060e08a128cf1160a542492",
+      "integrity": "sha512-etMTxzebulILAzekj/XQVpulo/CrYGjquXZA4ulFdS9oRtTUWX+CEHGt5DTrfLwMHZkiMZv5HnXgS5Z3Nsa+jg==",
+      "files": 17
+    }
+  ]
+}
