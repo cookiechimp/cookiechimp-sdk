@@ -5,28 +5,38 @@ belongs to Daniel; this completion sequence changes no platform code or settings
 
 ## Live release
 
-All eight packages are published as npm `latest` **1.1.0**. The protected GitHub
-OIDC release completed with verified tarball integrity, provenance and npm
-signatures. The [GitHub release](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.1.0)
-contains the packages and evidence. Docs #83 merged and Mintlify deployed the
-1.1.0 guides; all 14 pages, Markdown views and both AI indexes passed live checks.
+All nine packages, including `@cookiechimp/react-native`, are published as npm
+`latest` **1.2.0** on 27 October 2026. The protected GitHub OIDC publication
+completed from `150b0292be3502b355bf0a0f00118d7c557db340` in
+[the release run](https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40504134674).
+The [GitHub release](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.2.0)
+contains the exact tarballs and verification evidence.
 
-- [Registry audit](../release/npm-1.1.0-audit.json)
-- [Fresh installed consumer evidence](release-evidence/2026-10-25-registry-consumer.json)
-- [Completed live backend test](release-evidence/2026-10-24-live-backend.json)
-- [Historical launch and merge record](launch-history-2026-10-25.md)
+- [Publication manifest](../release/npm-1.2.0-manifest.json)
+- [Nine-package registry and provenance audit](../release/npm-1.2.0-audit.json)
+- [Fresh npm consumers and signature audits](release-evidence/2026-10-27-registry-consumer.json)
+- [Device and live delivery confirmation](release-evidence/2026-10-27-native-confirmation.json)
+- [Native trusted publisher and completed staging cleanup](../release/npm-react-native-trusted-publisher-2026-10-27.json)
 
-The live backend test verified config retrieval, accept/reject/custom records,
-reload persistence and offline retry. Dashboard inspection confirmed exactly four
-matching stored records and one copy of the retried decision. The installed npm
-consumer verified 116 exports, a production build, CLI and browser behavior.
-The 33 base/TCF locales completed [editorial review](translation-review.md).
+Registry bytes and source-bound provenance match all nine prepared tarballs.
+Fresh npm installations passed 116 web exports, strict declarations, ESM/CJS,
+Next.js production build and browser consent/vendor persistence checks. The native
+consumer passed Expo types and both iOS/Android Hermes exports. Both npm signature
+audits reported no invalid or missing signatures. Physical-device and live record
+delivery checks were confirmed by Daniel; Codex did not independently inspect
+device builds or receipt/dashboard captures. The temporary bootstrap stage was
+rejected after publication and its version was never published.
+
+The previous eight-package 1.1.0 release and its live backend captures remain
+historical evidence. The 33 base/TCF locales completed
+[editorial review](translation-review.md). Hosted Mintlify guides still require
+the separate 1.2.0 documentation import and deployment.
 
 ## Completed SDK implementation
 
 The three follow-ups below are implemented. Daniel authorized merging the stack
-on 25 October after checking comments and current-head CI. They are **not yet
-published** and are not contained in the immutable 1.1.0 release.
+on 25 October after checking comments and current-head CI. They are published in
+**1.2.0** and are not contained in the immutable 1.1.0 release.
 
 | SDK PR | Completed change | Validation and size contract |
 |---|---|---|
@@ -39,14 +49,14 @@ GPP change merged in #66. The review found no actionable
 PR comments. Each merge requires current-head checks and source parity; no review
 or branch-protection bypass is part of this sequence.
 
-## React Native SDK (merged, release candidate)
+## React Native SDK (published in 1.2.0)
 
 Daniel chose on 25 October 2026 to build the React Native SDK as
 `packages/react-native` in this repository on top of `@cookiechimp/core`,
 replacing the unpublished scaffold in IdentitySquare/CookieChimp-ReactNative-SDK.
 
 Merged in SDK #67 on 27 October at `0776dc61b6e67c07fb95f5d37962cf874e32a1fb`.
-All seven required checks passed on that source. It is not yet published:
+All seven required checks passed on that source. The implementation is published in 1.2.0:
 
 - Core runs without a browser: a synchronous `storage` adapter for
   `createConsent`, `platform: "ios" | "android"` consent records,
@@ -60,37 +70,26 @@ All seven required checks passed on that source. It is not yet published:
   pass `country`, or enable `geolocation`; an unknown region uses the GDPR
   fallback. See CONTRIBUTING.md.
 
-Remaining before a React Native release:
+Completed release gates:
 
-1. Device and live delivery checks were confirmed by Daniel on 27 October.
-   See the [user attestation](release-evidence/2026-10-27-native-confirmation.json);
-   Codex has not independently inspected device builds or receipt/dashboard captures.
-2. npm returned successful native trusted-publisher creation on 27 October for
-   `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`. See
-   [setup evidence](../release/npm-react-native-trusted-publisher-2026-10-27.json).
-   The nine-package 1.2.0 candidate and packed Expo consumer are prepared.
-   The unapproved bootstrap stage was removed; first OIDC publish
-   and registry/provenance verification are still pending.
-3. Align the dashboard React Native setup snippets (platform repository,
-   Daniel's review) with the published package name and API.
+1. Daniel confirmed device and live delivery checks on 27 October. See the
+   [user attestation](release-evidence/2026-10-27-native-confirmation.json).
+2. The native trusted publisher completed its first protected OIDC publication.
+   All nine registry packages are 1.2.0, with verified bytes and provenance.
+3. The GitHub release now triggers the protected main-branch OIDC workflow;
+   routine releases require GitHub environment review and no npm security key.
 
-## Next release steps
+## Remaining documentation and platform follow-ups
 
-1. Validate the coordinated 1.2.0 candidate: nine packages, current source,
-   required CI, web consumer and native Expo consumer. Never overwrite or
-   republish 1.1.0. See [the release runbook](release.md).
-2. Complete the required live backend config and record-delivery verification
-   for that release. Local mocks and passing fixture tests remain separate proof.
-3. Publish the stable version tag as a GitHub release to start the protected
-   OIDC workflow, complete GitHub environment review, and independently verify
-   npm bytes, provenance and fresh consumers. The native trusted-publisher
-   setup is configured and the temporary bootstrap stage has been removed.
-4. Import the exact clean SDK documentation export into CookieChimp-Docs through
+1. Import the exact clean SDK documentation export into CookieChimp-Docs through
    a reviewed docs PR, then verify Mintlify deployment and live routes/indexes.
+   The SDK's canonical sources describe 1.2.0; hosted docs are a separate deploy.
+2. Align dashboard React Native setup snippets with the published package name
+   and API. This is platform work requiring Daniel's review and action.
 
-The SDK implementation backlog in this checklist is complete. Future defects and
-scope additions remain normal maintenance. The next release and documentation
-publication remain separate approved actions.
+The SDK implementation and npm publication in this checklist are complete.
+Future defects and scope additions remain normal maintenance. No platform writes
+or hosted documentation deployment were performed in this release sequence.
 
 ## Optional external distribution
 
