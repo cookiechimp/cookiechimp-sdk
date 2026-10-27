@@ -61,3 +61,17 @@ it("rejects mixed versions, substituted paths and incomplete publication cohorts
     expect(() => validateManifest(value, "1.1.0", sourceCommit)).toThrow();
   }
 });
+
+it("includes the native package after its core dependency in the coordinated cohort", () => {
+  expect(packageNames).toHaveLength(9);
+  expect(packageNames.indexOf("react-native")).toBeGreaterThan(
+    packageNames.indexOf("core"),
+  );
+  const missingNative = candidate("1.2.0");
+  missingNative.packages = missingNative.packages.filter(
+    (entry) => entry.name !== "@cookiechimp/react-native",
+  );
+  expect(() => validateManifest(missingNative, "1.2.0", sourceCommit)).toThrow(
+    "Unexpected publication cohort or order",
+  );
+});

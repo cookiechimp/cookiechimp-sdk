@@ -18,7 +18,8 @@
       "@cookiechimp/nextjs",
       "@cookiechimp/scripts",
       "@cookiechimp/devtools",
-      "@cookiechimp/cli"
+      "@cookiechimp/cli",
+      "@cookiechimp/react-native"
     ]
   ]
 }

@@ -5,6 +5,7 @@ export const packageNames = [
   "translations",
   "core",
   "react",
+  "react-native",
   "nextjs",
   "scripts",
   "devtools",

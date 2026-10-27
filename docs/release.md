@@ -1,4 +1,63 @@
-# Coordinated SDK release 1.1.0
+# Coordinated SDK release 1.2.0 candidate
+
+Daniel requested npm publication on 27 October 2026. The candidate adds
+`@cookiechimp/react-native` to the coordinated release, for nine packages at
+1.2.0. It includes the merged native runtime, image blocking, sync size and
+state-format changes since 1.1.0. See [candidate notes](releases/1.2.0.md).
+
+This candidate is **not published**. Before using the protected publish workflow:
+
+- Validate the packed Expo consumer's types and both Metro exports. These are
+  packaging checks, not proof of device execution or live consent delivery.
+- Daniel confirmed iOS/Android device checks and live consent delivery on
+  27 October. The [user attestation](release-evidence/2026-10-27-native-confirmation.json)
+  records exactly what was supplied; no device build details, receipt payloads or
+  dashboard captures have been independently inspected by Codex.
+- Complete initial npm setup for `@cookiechimp/react-native` and confirm its
+  trusted-publisher binding to `cookiechimp/cookiechimp-sdk`, `release.yml`,
+  environment `npm-publish`, before setting `npmOrganizationReady` true.
+- Require all current-head CI checks, packed consumers and Daniel's protected
+  environment review. The existing publish guard remains active.
+
+The workflow prepares source-bound tarballs and checks the browser consumer
+separately from the native consumer. The native consumer installs real core and
+native tarballs outside the workspace, type-checks the Expo app and public entry,
+and exports both iOS and Android bundles without submitting platform records.
+Both consumer reports are saved with the candidate artifact.
+
+## Publish from a GitHub release
+
+After merging the versioned release candidate and waiting for main CI, create a
+GitHub release with the tag `v1.2.0` targeting the current main commit and click
+**Publish release**. Drafts, prereleases and tag pushes alone do not publish npm
+`latest`. The tag must exactly match `release/readiness.json` and package versions.
+
+`release-published.yml` validates the stable release and dispatches the existing
+`release.yml` workflow on main, passing the exact version, source SHA and tag.
+This preserves npm's existing trusted publisher and the main-only `npm-publish`
+environment. The publication workflow rebuilds, tests and checks packed web and
+native consumers, then waits for Daniel's GitHub environment approval. After
+approval it rechecks main, the released tag, required CI and package readiness,
+then publishes the exact tarballs through GitHub OIDC with provenance.
+
+No npm CLI sign-in or security key is needed for routine OIDC publishes. Each
+new npm package still needs its initial registry setup and trusted-publisher
+binding; `@cookiechimp/react-native` has that one-time setup outstanding. The
+existing eight packages already use trusted publishing. Publishing a GitHub
+release does not bypass a pending readiness check or environment review.
+
+If main or the tag moves before publication, the workflow refuses the changed
+source. Keep main at the release commit until the publish finishes. The Actions
+page shows the initial release trigger and the separate SDK release run; only a
+successful publish job plus registry verification proves npm publication.
+
+Manual `prepare` and approved `publish` dispatches remain available for recovery.
+When rerunning a release-triggered publication, retain its `approved_source` and
+`release_tag` inputs. Check the Actions publish result before announcing the
+release as available on npm, then verify registry bytes/provenance and fresh
+consumers as described below.
+
+## Previous published release: 1.1.0
 
 All eight `@cookiechimp` packages are published as npm `latest` at **1.1.0** on
 25 October 2026. The [GitHub release](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.1.0)
@@ -95,8 +154,8 @@ remains a separate [internal TODO](iab-integration-todo.md), not a publication g
 
 ## Future releases and recovery
 
-Do not republish 1.1.0 from a later commit. For a new release, update all eight
-package versions, changelogs and `release/readiness.json`, review current live
+Do not republish 1.1.0 from a later commit. For a new release, update every coordinated
+package version, changelogs and `release/readiness.json`, review current live
 backend evidence, and obtain explicit approval of the new version and source.
 From reviewed main with all seven required checks green, choose `publish` in
 **SDK release** and enter that exact version as `approved_version`.

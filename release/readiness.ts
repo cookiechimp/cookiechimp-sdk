@@ -20,6 +20,7 @@ export function publicationBlockers(state: PublicationState): string[] {
   // Its runtime CMP ID checks remain independent of package publication.
   for (const name of [
     "platformDeployed",
+    "nativeDevicesVerified",
     "publicHistoryReviewed",
     "npmOrganizationReady",
   ])

@@ -7,6 +7,7 @@ const ready: PublicationState = {
   repositoryVisibility: "public",
   manualChecks: {
     platformDeployed: true,
+    nativeDevicesVerified: true,
     publicHistoryReviewed: true,
     npmOrganizationReady: true,
   },
@@ -23,7 +24,7 @@ it("blocks publication until every real prerequisite is satisfied", () => {
       approvedVersion: "",
       manualChecks: {},
     }),
-  ).toHaveLength(5);
+  ).toHaveLength(6);
   expect(publicationBlockers(ready)).toEqual([]);
 });
 it("cannot replace editorial review with a publication approval", () => {
@@ -61,4 +62,13 @@ it("permits SDK publication while optional IAB integration work is deferred", ()
       manualChecks: { ...ready.manualChecks, iabValidated: false },
     }),
   ).toEqual([]);
+});
+
+it("requires native device validation for the React Native release", () => {
+  expect(
+    publicationBlockers({
+      ...ready,
+      manualChecks: { ...ready.manualChecks, nativeDevicesVerified: false },
+    }),
+  ).toEqual(["Manual check required: nativeDevicesVerified"]);
 });

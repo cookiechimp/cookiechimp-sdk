@@ -12,6 +12,14 @@ on:
         description: Enter the exact version from release/readiness.json after approving publication
         type: string
         default: ''
+      approved_source:
+        description: Source SHA supplied by the GitHub release trigger (leave empty for manual runs)
+        type: string
+        default: ''
+      release_tag:
+        description: Stable tag supplied by the GitHub release trigger (leave empty for manual runs)
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -34,6 +42,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24.15.0
+      - name: Verify source requested by the GitHub release
+        env:
+          APPROVED_RELEASE_SOURCE: ${{ inputs.approved_source }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: node --experimental-strip-types release/github-release.ts verify
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
@@ -94,6 +107,11 @@ jobs:
         with:
           name: sdk-candidate-${{ github.sha }}
           path: release/artifacts/
+      - name: Recheck source requested by the GitHub release
+        env:
+          APPROVED_RELEASE_SOURCE: ${{ inputs.approved_source }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: node --experimental-strip-types release/github-release.ts verify
       - name: Confirm the reviewed main SHA and required checks
         env:
           GH_TOKEN: ${{ github.token }}

@@ -1,14 +1,16 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "manualChecks": {
     "platformDeployed": true,
     "publicHistoryReviewed": true,
-    "npmOrganizationReady": true
+    "npmOrganizationReady": false,
+    "nativeDevicesVerified": true
   },
   "notes": {
-    "platformDeployed": "Live backend verification completed: 24 Oct 2026 browser testing on Daniel-selected public account K8ktWD loaded banner KvNnu9 / config 884cc663, obtained matching HTTP 200 receipts for accept/reject/custom/retry, preserved choices and UUID after reload, and drained the retry queue using the same client_id. Authenticated dashboard inspection on 25 Oct at 07:52 UTC found exactly four records with the receipt server IDs, verified saved preferences for each, and confirmed the retry record appears once. Evidence: docs/release-evidence/2026-10-24-live-backend.json. Tested package/example source 6b15623974ee3e75bcc4c448b234cd767e82315e matches reviewed main dc962edff35541b77948ad7367ca9d32556cda02. No platform repository or account settings were changed. Published 1.1.0 runtime source is unchanged from that tested source; the registry consumer also passed standard/platform consent and persistence checks on 25 Oct.",
+    "platformDeployed": "Daniel directly confirmed on 27 October 2026 that React Native device and delivery checks passed and consent records reached CookieChimp. Recorded as user attestation, not independent receipt/dashboard inspection by Codex, in docs/release-evidence/2026-10-27-native-confirmation.json. The merged native implementation is 0776dc61b6e67c07fb95f5d37962cf874e32a1fb; the 1.2.0 candidate changes release packaging and versions.",
     "publicHistoryReviewed": "Daniel authorized public SDK source on 17 Oct 2026 after disclosure of the historical error.log account identifier. A targeted scan of 1315 unique Git blobs found no supported credential patterns. The identifier is not an authentication secret; history was preserved and the SDK repository is now public.",
-    "npmOrganizationReady": "All eight @cookiechimp packages are published as npm latest 1.1.0 on 25 Oct 2026 through the approved GitHub OIDC workflow. Daniel approved the original 8d68ddb run and recovery publication/deployment review from 8e1c037. The recovery run verified and skipped the identical token package, then published the remaining seven. All registry tarballs match release/npm-1.1.0-manifest.json; npm audit signatures passed in a fresh installation. Provenance records the original token source and the recovery source for the remaining packages. All eight trusted-publisher connections have completed a successful publish. GitHub environment review and main-only restrictions remain unchanged. See release/npm-1.1.0-audit.json and docs/release-evidence/2026-10-25-registry-consumer.json. Do not republish 1.1.0 from a later commit; a new release requires a new coordinated version, current live backend evidence and explicit approval."
+    "npmOrganizationReady": "The eight existing packages use GitHub OIDC via .github/workflows/release.yml and the protected npm-publish environment. @cookiechimp/react-native is new and absent from npm as checked on 27 October 2026. Complete the initial package setup and trusted-publisher binding for cookiechimp/cookiechimp-sdk, release.yml, npm-publish before publishing the nine-package cohort.",
+    "nativeDevicesVerified": "Daniel directly confirmed successful iOS and Android device checks on 27 October 2026. Evidence: docs/release-evidence/2026-10-27-native-confirmation.json. No device model/build details or captures were supplied. Separately, the exact packed 1.2.0 native/core consumer passed Expo types and iOS/Android Hermes exports at c47a83c4cea0edf6708bf75d193f374985947d73."
   },
   "deferred": {
     "tcf": {

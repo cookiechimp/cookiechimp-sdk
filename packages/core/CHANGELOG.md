@@ -1,5 +1,19 @@
 # @cookiechimp/core
 
+## 1.2.0
+
+### Minor Changes
+
+- 009f7b3: Implement Minnesota, Maryland, Indiana, Kentucky and Rhode Island GPP state sections with published field layouts, required modern section headers and optional subsections. Route each state to its own CMP section and retain GPC, consent and reload behavior.
+- f265356: Block matching tracking images through the opt-in dynamic controller, including detached Image instances, responsive image candidates and picture sources. Restore deferred URLs after consent without replaying removed or replaced requests.
+- e04a1f8: Run the consent runtime and consent log outside a browser, for the React Native SDK. `createConsent` accepts a synchronous `storage` adapter that replaces `document.cookie` and honors `cookie.maxAge`. `createConsentLog` accepts `platform: "ios" | "android"`, and every consent log gains `retry()` to clear backoff and send now. The runtime no longer requires Web Crypto, `TextDecoder` or DOM events, so it works on Hermes without polyfills.
+
+### Patch Changes
+
+- 63266a4: A destroyed consent log no longer writes its queue to storage when a request finishes, so it can't erase newer records saved by the log that replaced it.
+- 8830300: Pass a mobile SDK vendor's `app_data` (data collected, purposes, tracking, retention and packages) through `adaptPlatformConfig` for native UIs.
+- 52d3c38: Share core configuration code with the connected sync entry and avoid redundant adapter allocations. Enforce the 2.5 KB gzip marginal sync target in CI alongside the existing standalone budget.
+
 ## 1.1.0
 
 ### Minor Changes
