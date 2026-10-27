@@ -37,6 +37,7 @@
     "react-native": ">=0.80"
   },
   "devDependencies": {
+    "@cookiechimp/translations": "workspace:*",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

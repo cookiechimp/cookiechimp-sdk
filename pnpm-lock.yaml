@@ -488,6 +488,9 @@ importers:
         specifier: workspace:*
         version: link:../core
     devDependencies:
+      '@cookiechimp/translations':
+        specifier: workspace:*
+        version: link:../translations
       '@react-native-async-storage/async-storage':
         specifier: 2.2.0
         version: 2.2.0(react-native@0.83.10(@babel/core@7.29.7)(@types/react@19.3.0)(react@19.3.0))
