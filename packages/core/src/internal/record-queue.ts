@@ -209,6 +209,9 @@ export function createRecordQueue<R>(
     } finally {
       clearTimeout(abort);
     }
+    // A replacement queue may own the stored key by now; writing here could
+    // erase its newer records. Unconfirmed ids are safe to resend.
+    if (destroyed) return queue.length;
     queue = queue.filter((item) => !done?.has(id(item)));
     for (const item of due) if (!done?.has(id(item))) backoff(item);
     save();
