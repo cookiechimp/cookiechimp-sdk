@@ -11,3 +11,4 @@ next-env.d.ts
 bench/results/ci.*
 release/artifacts/
 release/consumer/
+release/native-consumer/

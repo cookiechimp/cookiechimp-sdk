@@ -1,6 +1,6 @@
 # Remaining SDK work and release status
 
-Updated 25 October 2026. Scope: `cookiechimp/cookiechimp-sdk`. Platform work
+Updated 27 October 2026. Scope: `cookiechimp/cookiechimp-sdk`. Platform work
 belongs to Daniel; this completion sequence changes no platform code or settings.
 
 ## Live release
@@ -35,22 +35,23 @@ published** and are not contained in the immutable 1.1.0 release.
 | [#66](https://github.com/cookiechimp/cookiechimp-sdk/pull/66) | Own formats for MN/MD/IN/KY/RI, including required modern section headers, sensitive-data/GPC subsections and state routing | Pinned-spec vectors, strict modern decoding, CMP API, consent, GPC and reload coverage. GPP graph 3187 B; GPP-only budget 3680 B, up from 2810 B; combined IAB cap remains 12288 B. See [conformance](gpp-conformance.md). |
 
 Image blocking (#64) and sync (#65) merged into main on 25 October. The final
-GPP change and this checklist ship together in #66. The review found no actionable
+GPP change merged in #66. The review found no actionable
 PR comments. Each merge requires current-head checks and source parity; no review
 or branch-protection bypass is part of this sequence.
 
-## React Native SDK (in progress)
+## React Native SDK (merged, release candidate)
 
 Daniel chose on 25 October 2026 to build the React Native SDK as
 `packages/react-native` in this repository on top of `@cookiechimp/core`,
 replacing the unpublished scaffold in IdentitySquare/CookieChimp-ReactNative-SDK.
 
-Built and tested locally, not yet merged or published:
+Merged in SDK #67 on 27 October at `0776dc61b6e67c07fb95f5d37962cf874e32a1fb`.
+All seven required checks passed on that source. It is not yet published:
 
 - Core runs without a browser: a synchronous `storage` adapter for
   `createConsent`, `platform: "ios" | "android"` consent records,
   `ConsentLog.retry()`, and Hermes fallbacks for Web Crypto and `TextDecoder`.
-- `@cookiechimp/react-native` (marked `private` so it cannot publish by accident):
+- `@cookiechimp/react-native`:
   connected and offline modes, AsyncStorage persistence, dashboard-styled
   native banner and preferences, consent records, re-consent, vendor
   callbacks, the `CookieChimp` API and hooks, a Mintlify guide and an Expo
@@ -64,16 +65,19 @@ Remaining before a React Native release:
 1. A device check on iOS and Android with the Expo example.
 2. Live backend config retrieval and consent delivery from a real device build,
    the same gate as every release.
-3. Add the package to the release cohort (`release/manifest.ts`, changesets,
-   consumer check), remove `private`, and obtain publication approval.
+3. Complete npm package setup and its trusted-publisher binding. Daniel requested
+   publication on 27 October. The 1.2.0 candidate adds the native package to the
+   release cohort and fixed version group, removes `private`, consumes changesets
+   and validates a separate packed Expo consumer. The publication guard keeps
+   device, live backend and npm setup checks pending until evidence exists.
 4. Align the dashboard React Native setup snippets (platform repository,
    Daniel's review) with the published package name and API.
 
 ## Next release steps
 
-1. Prepare a new coordinated package version using the changesets. Never
-   overwrite or republish 1.1.0. Rebuild the clean merged source, run all required
-   checks and verify candidate packages, including the packed consumer.
+1. Validate the coordinated 1.2.0 candidate: nine packages, current source,
+   required CI, web consumer and native Expo consumer. Never overwrite or
+   republish 1.1.0. See [the release runbook](release.md).
 2. Complete the required live backend config and record-delivery verification
    for that release. Local mocks and passing fixture tests remain separate proof.
 3. Obtain explicit publication/deployment approval, publish through the protected

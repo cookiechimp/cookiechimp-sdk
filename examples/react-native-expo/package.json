@@ -12,7 +12,7 @@
     "pack-sdk": "cd ../.. && pnpm --filter @cookiechimp/core --filter @cookiechimp/react-native build && pnpm --filter @cookiechimp/core --filter @cookiechimp/react-native exec pnpm pack --pack-destination ../../examples/react-native-expo/vendor"
   },
   "dependencies": {
-    "@cookiechimp/react-native": "file:vendor/cookiechimp-react-native-1.1.0.tgz",
+    "@cookiechimp/react-native": "file:vendor/cookiechimp-react-native-1.2.0.tgz",
     "@expo/metro-runtime": "~55.0.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~55.0.32",
@@ -28,6 +28,6 @@
     "typescript": "~5.9.2"
   },
   "overrides": {
-    "@cookiechimp/core": "file:vendor/cookiechimp-core-1.1.0.tgz"
+    "@cookiechimp/core": "file:vendor/cookiechimp-core-1.2.0.tgz"
   }
 }

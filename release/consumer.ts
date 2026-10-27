@@ -4,11 +4,15 @@ import { createRequire } from "node:module";
 import { createServer } from "node:net";
 import { join, resolve } from "node:path";
 import { chromium, expect } from "@playwright/test";
-import { releaseVersion, validateManifest } from "./manifest.ts";
+import {
+  type ReleaseManifest,
+  releaseVersion,
+  validateManifest,
+} from "./manifest.ts";
 
 const directory = resolve(import.meta.dirname, "consumer");
 const artifacts = resolve(import.meta.dirname, "artifacts");
-const manifest = JSON.parse(
+const manifest: ReleaseManifest = JSON.parse(
   await readFile(join(artifacts, "manifest.json"), "utf8"),
 );
 validateManifest(
@@ -27,7 +31,10 @@ const dependencies: Record<string, string> = {
   "@types/react": "19.3.0",
   "@types/react-dom": "19.3.0",
 };
-for (const entry of manifest.packages)
+const webPackages = manifest.packages.filter(
+  (entry) => entry.name !== "@cookiechimp/react-native",
+);
+for (const entry of webPackages)
   dependencies[entry.name] = `file:${join(artifacts, entry.file)}`;
 await writeFile(
   join(directory, "package.json"),
@@ -57,7 +64,7 @@ const require = createRequire(join(directory, "package.json"));
 const statements: string[] = [];
 const standaloneStatements: string[] = [];
 let count = 0;
-for (const entry of manifest.packages) {
+for (const entry of webPackages) {
   const folder = join(directory, "node_modules", entry.name);
   if ((await lstat(folder)).isSymbolicLink())
     throw new Error("Consumer resolved a workspace symlink");
@@ -446,7 +453,7 @@ try {
       {
         version: manifest.version,
         sourceCommit: manifest.sourceCommit,
-        packageCount: manifest.packages.length,
+        packageCount: webPackages.length,
         checkedExports: count,
         browser: browser.version(),
         types: "passed",
@@ -465,9 +472,11 @@ try {
     ),
   );
   console.log(
-    `Packed consumer verified ${count} exports, ${manifest.packages.length} packages and the browser flow`,
+    `Packed consumer verified ${count} exports, ${webPackages.length} web packages and the browser flow`,
   );
 } finally {
   await browser.close();
   server.kill("SIGTERM");
 }
+
+await import("./native-consumer.ts");

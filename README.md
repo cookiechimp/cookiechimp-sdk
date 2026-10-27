@@ -1,8 +1,9 @@
 # CookieChimp Consent SDK
 
-Open-source, lightweight consent SDK for React, Next.js and plain JavaScript, built by CookieChimp.
+Open-source, lightweight consent SDK for React, Next.js, React Native and plain JavaScript, built by CookieChimp.
 
 - Works with no account (local mode).
+- React Native and Expo support is included in the 1.2.0 release candidate; npm publication is pending the native device and live backend checks.
 - Connect a CookieChimp project to sync a consent log, scanner categories, dashboard-managed copy, translations, regional rules and styling, plus IAB TCF/GPP and multi-site.
 
 Language negotiation checks each requested locale in preference order. It first

@@ -1,5 +1,5 @@
 /** The current CookieChimp SDK package version. */
-export const VERSION = "1.1.0";
+export const VERSION = "1.2.0";
 
 export const CONSENT_COOKIE_NAME = "cc_consent";
 export const CONSENT_SCHEMA_VERSION = 1 as const;
