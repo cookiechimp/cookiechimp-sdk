@@ -46,8 +46,10 @@ export interface AppsFlyerLike {
   stop(isStopped: boolean, callback?: (result: unknown) => void): unknown;
 }
 
-/** `Adjust` from `react-native-adjust` (v5 `enable`/`disable`, v4 `setEnabled`). */
+/** `Adjust` from `react-native-adjust` (v5 `initSdk`, `enable`/`disable`; v4 `create`, `setEnabled`). */
 export interface AdjustLike {
+  initSdk?(config: unknown): unknown;
+  create?(config: unknown): unknown;
   enable?(): unknown;
   disable?(): unknown;
   setEnabled?(enabled: boolean): unknown;
@@ -138,13 +140,32 @@ export const presets = {
       () => appsFlyer.stop(true, noop),
     );
   },
-  adjust: (adjust: AdjustLike) =>
-    preset(
+  /**
+   * Pass your `AdjustConfig` instead of initializing Adjust yourself: Adjust
+   * sends data as soon as it is initialized, so the preset initializes it on
+   * the first consent. Without a config, Adjust is only enabled and disabled.
+   */
+  adjust(adjust: AdjustLike, config?: unknown) {
+    let initialized = config === undefined;
+    return preset(
       "Adjust",
       "marketing",
-      () => (adjust.enable ? adjust.enable() : adjust.setEnabled?.(true)),
-      () => (adjust.disable ? adjust.disable() : adjust.setEnabled?.(false)),
-    ),
+      () => {
+        if (!initialized) {
+          initialized = true;
+          settle(
+            "Adjust",
+            adjust.initSdk ? adjust.initSdk(config) : adjust.create?.(config),
+          );
+        }
+        return adjust.enable ? adjust.enable() : adjust.setEnabled?.(true);
+      },
+      () => {
+        if (!initialized) return;
+        return adjust.disable ? adjust.disable() : adjust.setEnabled?.(false);
+      },
+    );
+  },
   /**
    * Meta (Facebook) SDK events and advertiser ID collection. Set
    * `FacebookAutoInitEnabled` and `FacebookAutoLogAppEventsEnabled` to false;

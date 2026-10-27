@@ -89,6 +89,23 @@ describe("vendor presets", () => {
     ]);
   });
 
+  it("initializes Adjust on the first consent when given its config", async () => {
+    const adjust = { initSdk: vi.fn(), enable: vi.fn(), disable: vi.fn() };
+    const config = { appToken: "token" };
+    CookieChimp.registerVendor(presets.adjust(adjust, config));
+    await start();
+    CookieChimp.acceptCategory([]);
+    expect(adjust.initSdk).not.toHaveBeenCalled();
+    expect(adjust.disable).not.toHaveBeenCalled();
+    CookieChimp.acceptCategory("all");
+    CookieChimp.acceptCategory([]);
+    CookieChimp.acceptCategory("all");
+    expect(adjust.initSdk).toHaveBeenCalledTimes(1);
+    expect(adjust.initSdk).toHaveBeenCalledWith(config);
+    expect(adjust.enable).toHaveBeenCalledTimes(2);
+    expect(adjust.disable).toHaveBeenCalledTimes(1);
+  });
+
   it("initializes the Meta SDK on the first consent only", async () => {
     const settings = {
       initializeSDK: vi.fn(),
