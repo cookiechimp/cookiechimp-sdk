@@ -13,9 +13,11 @@ This candidate is **not published**. Before using the protected publish workflow
   27 October. The [user attestation](release-evidence/2026-10-27-native-confirmation.json)
   records exactly what was supplied; no device build details, receipt payloads or
   dashboard captures have been independently inspected by Codex.
-- Complete initial npm setup for `@cookiechimp/react-native` and confirm its
-  trusted-publisher binding to `cookiechimp/cookiechimp-sdk`, `release.yml`,
-  environment `npm-publish`, before setting `npmOrganizationReady` true.
+- Native npm setup is configured: npm confirmed the trusted-publisher binding
+  to `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish` on
+  27 October. See [the setup evidence](../release/npm-react-native-trusted-publisher-2026-10-27.json).
+  The unapproved bootstrap stage was removed before the GitHub release.
+  First native OIDC publication and provenance verification remain pending.
 - Require all current-head CI checks, packed consumers and Daniel's protected
   environment review. The existing publish guard remains active.
 
@@ -42,8 +44,8 @@ then publishes the exact tarballs through GitHub OIDC with provenance.
 
 No npm CLI sign-in or security key is needed for routine OIDC publishes. Each
 new npm package still needs its initial registry setup and trusted-publisher
-binding; `@cookiechimp/react-native` has that one-time setup outstanding. The
-existing eight packages already use trusted publishing. Publishing a GitHub
+binding. The native binding was configured on 27 October; the existing eight
+packages already use trusted publishing. Publishing a GitHub
 release does not bypass a pending readiness check or environment review.
 
 If main or the tag moves before publication, the workflow refuses the changed
@@ -95,7 +97,7 @@ pnpm release:pack
 pnpm release:check
 ```
 
-`release/artifacts/` contains eight tarballs and a manifest with the coordinated
+`release/artifacts/` contains nine tarballs and a manifest with the coordinated
 version, source commit, SHA-256 and npm SHA-512 integrity hashes. Packing requires a clean committed checkout and always
 builds current source, checks every export/bin target and release document,
 rejects unintended files and unresolved workspace dependencies, and preserves

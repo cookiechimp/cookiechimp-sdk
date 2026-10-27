@@ -65,13 +65,13 @@ Remaining before a React Native release:
 1. Device and live delivery checks were confirmed by Daniel on 27 October.
    See the [user attestation](release-evidence/2026-10-27-native-confirmation.json);
    Codex has not independently inspected device builds or receipt/dashboard captures.
-3. Complete npm package setup and its trusted-publisher binding. Daniel requested
-   publication on 27 October. The 1.2.0 candidate adds the native package to the
-   release cohort and fixed version group, removes `private`, consumes changesets
-   and validates a separate packed Expo consumer. The publication guard keeps
-   npm setup check pending. The device and delivery checks are backed by
-   Daniel's direct confirmation.
-4. Align the dashboard React Native setup snippets (platform repository,
+2. npm returned successful native trusted-publisher creation on 27 October for
+   `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish`. See
+   [setup evidence](../release/npm-react-native-trusted-publisher-2026-10-27.json).
+   The nine-package 1.2.0 candidate and packed Expo consumer are prepared.
+   The unapproved bootstrap stage was removed; first OIDC publish
+   and registry/provenance verification are still pending.
+3. Align the dashboard React Native setup snippets (platform repository,
    Daniel's review) with the published package name and API.
 
 ## Next release steps
@@ -83,8 +83,8 @@ Remaining before a React Native release:
    for that release. Local mocks and passing fixture tests remain separate proof.
 3. Publish the stable version tag as a GitHub release to start the protected
    OIDC workflow, complete GitHub environment review, and independently verify
-   npm bytes, provenance and fresh consumers. Initial npm setup for the new
-   native package remains a one-time prerequisite.
+   npm bytes, provenance and fresh consumers. The native trusted-publisher
+   setup is configured and the temporary bootstrap stage has been removed.
 4. Import the exact clean SDK documentation export into CookieChimp-Docs through
    a reviewed docs PR, then verify Mintlify deployment and live routes/indexes.
 

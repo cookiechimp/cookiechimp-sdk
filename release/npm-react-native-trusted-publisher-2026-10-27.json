@@ -1,0 +1,22 @@
+{
+  "configuredAt": "2026-10-27",
+  "source": "Authenticated npm CLI returned successful trust creation after npm security-key verification",
+  "package": "@cookiechimp/react-native",
+  "bootstrapStageId": "e0c60612-015d-424b-b093-328f0107fb48",
+  "bootstrapVersion": "1.2.0",
+  "bootstrapTag": "bootstrap",
+  "connection": {
+    "id": "4313ca35-9399-478a-a630-d48bb54ca163",
+    "type": "github",
+    "file": "release.yml",
+    "repository": "cookiechimp/cookiechimp-sdk",
+    "environment": "npm-publish",
+    "permissions": ["publish", "stage publish"]
+  },
+  "firstOidcPublish": "pending",
+  "packageVersionPublished": false,
+  "provenanceVerified": false,
+  "notes": "Initial staging creates the package identity for trust setup. The staged SDK version is not approved for publication. Actual 1.2.0 publication must run through the GitHub release and protected OIDC workflow.",
+  "bootstrapStageStatus": "rejected after trust setup",
+  "bootstrapStageCleanupDate": "2026-10-27"
+}
