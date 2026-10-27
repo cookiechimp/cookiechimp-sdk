@@ -59,6 +59,9 @@ function services(category?: string) {
 function run(options: CookieChimpOptions): Promise<void> {
   detach?.();
   engine?.destroy();
+  // The replacement hydrates from storage, so it waits for the previous
+  // engine's writes; otherwise it could restore an older decision.
+  const saved = engine?.settled();
   const next = createEngine({
     ...options,
     onChange(preferences, categories, servicesChanged) {
@@ -70,7 +73,7 @@ function run(options: CookieChimpOptions): Promise<void> {
   engine = next;
   detach = next.subscribe(notify);
   notify();
-  return next.start().catch((error: unknown) => {
+  return next.start(saved).catch((error: unknown) => {
     console.error("CookieChimp failed to start", error);
   });
 }

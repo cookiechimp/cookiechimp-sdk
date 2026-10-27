@@ -121,8 +121,11 @@ export interface Selection {
 export interface Engine {
   getSnapshot(): CookieChimpSnapshot;
   subscribe(listener: () => void): () => void;
-  start(): Promise<void>;
+  /** Hydrate storage once `after` settles, then load the config and decide. */
+  start(after?: Promise<unknown>): Promise<void>;
   destroy(): void;
+  /** Resolves when every storage write this engine made has been saved. */
+  settled(): Promise<void>;
   runtime(): ConsentRuntime | null;
   acceptAll(): void;
   rejectAll(): void;
@@ -192,6 +195,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
   const listeners = new Set<() => void>();
   let snapshot: CookieChimpSnapshot = IDLE;
   let store: MirroredStorage | undefined;
+  let hydrating: Promise<unknown> = Promise.resolve();
   let sync: SyncClient | undefined;
   let runtime: ConsentRuntime | null = null;
   let log: ConsentLog | undefined;
@@ -357,8 +361,11 @@ export function createEngine(options: CookieChimpOptions): Engine {
       listeners.add(listener);
       return () => listeners.delete(listener);
     },
-    async start() {
+    async start(after) {
       update({ status: "loading" });
+      hydrating = Promise.resolve(after).catch(() => {});
+      await hydrating;
+      if (destroyed) return;
       try {
         store = await mirrorStorage(options.storage ?? AsyncStorage);
       } catch (error) {
@@ -428,6 +435,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
       listeners.clear();
       if (runtime) applyVendors(null);
     },
+    settled: () => (store ? store.settled() : hydrating.then(() => {})),
     runtime: () => runtime,
     acceptAll: () => void runtime?.acceptAll(),
     rejectAll: () => void runtime?.rejectAll(),

@@ -490,6 +490,33 @@ describe("storage", () => {
     expect(() => CookieChimp.acceptCategory("all")).not.toThrow();
   });
 
+  it("restores the latest decision when the configuration is replaced before it is saved", async () => {
+    const backing = memoryStorage();
+    let release: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    storage = {
+      ...backing,
+      setItem: async (key, value) => {
+        await held;
+        await backing.setItem(key, value);
+      },
+    };
+    await start({ config: bundle, country: "DE", fetch: platform().fetch });
+    CookieChimp.acceptCategory("all");
+    CookieChimp.acceptCategory([]);
+    const replaced = start({
+      config: bundle,
+      country: "DE",
+      fetch: platform().fetch,
+    });
+    release();
+    const state = await replaced;
+    expect(state).toMatchObject({ decided: true, bannerOpen: false });
+    expect(CookieChimp.acceptedCategory("analytics")).toBe(false);
+  });
+
   it("reports a store that cannot list its keys instead of forgetting consent", async () => {
     const { getAllKeys: _, ...partial } = memoryStorage();
     const state = await start({
