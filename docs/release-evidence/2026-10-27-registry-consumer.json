@@ -1,0 +1,59 @@
+{
+  "verifiedAt": "2026-10-27T14:03:25.506929+00:00",
+  "version": "1.2.0",
+  "sourceCommit": "150b0292be3502b355bf0a0f00118d7c557db340",
+  "releaseRun": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40504134674",
+  "web": {
+    "version": "1.2.0",
+    "sourceCommit": "150b0292be3502b355bf0a0f00118d7c557db340",
+    "packageCount": 8,
+    "installation": "npm registry",
+    "checkedExports": 116,
+    "browser": "156.0.8078.4",
+    "types": "passed",
+    "esmAndCjs": "passed",
+    "nextjsProductionBuild": "passed",
+    "consentAndPersistence": "passed",
+    "reactReconciliation": "passed",
+    "tcfProvider": "passed",
+    "gvlDisclosures": "passed",
+    "css": "passed",
+    "exportedVersion": "passed",
+    "platformVendorChoicesAndPersistence": "passed"
+  },
+  "native": {
+    "version": "1.2.0",
+    "sourceCommit": "150b0292be3502b355bf0a0f00118d7c557db340",
+    "packageCount": 2,
+    "registryInstallation": "passed",
+    "exampleAndExportTypes": "passed",
+    "iosMetroBundle": "passed",
+    "androidMetroBundle": "passed",
+    "deviceExecution": "pending",
+    "liveBackendDelivery": "pending"
+  },
+  "signatureAudits": {
+    "command": "npm audit signatures --json",
+    "node": "24.15.0",
+    "npm": "12.2.0",
+    "web": {
+      "passed": true,
+      "invalid": [],
+      "missing": []
+    },
+    "native": {
+      "passed": true,
+      "invalid": [],
+      "missing": []
+    }
+  },
+  "nativeDeviceAndDeliveryEvidence": "docs/release-evidence/2026-10-27-native-confirmation.json",
+  "scope": "Fresh isolated npm-registry installations, web browser behavior and native Expo types/Hermes exports. Automated consumers did not execute physical devices or submit new platform records; device and delivery gates were separately confirmed by Daniel.",
+  "temporaryStageCleanup": {
+    "version": "0.0.1-bootstrap.0",
+    "stageId": "79ce38d1-b7ee-4070-90ca-e699043c6197",
+    "status": "rejected",
+    "verifiedRemainingStages": [],
+    "temporaryVersionPublished": false
+  }
+}

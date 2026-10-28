@@ -2,21 +2,47 @@
   "configuredAt": "2026-10-27",
   "source": "Authenticated npm CLI returned successful trust creation after npm security-key verification",
   "package": "@cookiechimp/react-native",
-  "bootstrapStageId": "e0c60612-015d-424b-b093-328f0107fb48",
-  "bootstrapVersion": "1.2.0",
+  "bootstrapStageId": "79ce38d1-b7ee-4070-90ca-e699043c6197",
+  "bootstrapVersion": "0.0.1-bootstrap.0",
   "bootstrapTag": "bootstrap",
   "connection": {
-    "id": "4313ca35-9399-478a-a630-d48bb54ca163",
+    "id": "2fea1bbf-0546-4c2e-b961-591a3ffb649f",
     "type": "github",
     "file": "release.yml",
     "repository": "cookiechimp/cookiechimp-sdk",
     "environment": "npm-publish",
     "permissions": ["publish", "stage publish"]
   },
-  "firstOidcPublish": "pending",
-  "packageVersionPublished": false,
-  "provenanceVerified": false,
-  "notes": "Initial staging creates the package identity for trust setup. The staged SDK version is not approved for publication. Actual 1.2.0 publication must run through the GitHub release and protected OIDC workflow.",
-  "bootstrapStageStatus": "rejected after trust setup",
-  "bootstrapStageCleanupDate": "2026-10-27"
+  "firstOidcPublish": "https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40504134674/attempts/4",
+  "packageVersionPublished": true,
+  "provenanceVerified": true,
+  "notes": "npm returned the current trusted-publisher connection after security-key verification. GitHub OIDC successfully published the exact 1.2.0 tarball; registry bytes and provenance were independently verified. No temporary staging version was approved or published.",
+  "bootstrapStageStatus": "rejected after verified GitHub publication",
+  "bootstrapStageCleanupDate": "2026-10-27",
+  "sourceCommit": "150b0292be3502b355bf0a0f00118d7c557db340",
+  "remainingStagesAfterCleanup": [],
+  "recovery": [
+    {
+      "event": "Initial 1.2.0 stage rejected before first publication",
+      "result": "Unpublished package identity and original connection 4313ca35-9399-478a-a630-d48bb54ca163 were lost; first GitHub attempt failed with ENEEDAUTH for native after publishing four packages."
+    },
+    {
+      "event": "Restaged 1.2.0 and recreated trusted publisher",
+      "stageId": "5e6e274d-f055-4407-8e1b-3c5ea3cbce71",
+      "result": "OIDC authenticated and provenance was created, but npm returned E409 because 1.2.0 already existed as a staged version."
+    },
+    {
+      "event": "Daniel explicitly approved temporary staging recovery",
+      "result": "Created unapproved 0.0.1-bootstrap.0 stage, then rejected conflicting staged 1.2.0 while retaining package identity and current publisher."
+    },
+    {
+      "event": "GitHub publication attempt 4 succeeded",
+      "result": "Existing identical packages were verified and skipped; the remaining packages, including native, published from the same immutable source."
+    },
+    {
+      "event": "Rejected temporary bootstrap stage after publication",
+      "result": "npm stage list returned an empty list; the temporary version is absent from registry versions."
+    }
+  ],
+  "publishedVersion": "1.2.0"
 }

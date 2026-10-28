@@ -1,36 +1,35 @@
-# Coordinated SDK release 1.2.0 candidate
+# Coordinated SDK release 1.2.0
 
-Daniel requested npm publication on 27 October 2026. The candidate adds
-`@cookiechimp/react-native` to the coordinated release, for nine packages at
-1.2.0. It includes the merged native runtime, image blocking, sync size and
-state-format changes since 1.1.0. See [candidate notes](releases/1.2.0.md).
+All nine `@cookiechimp` packages are npm `latest` **1.2.0**, published on
+27 October 2026 from `150b0292be3502b355bf0a0f00118d7c557db340` through
+[the protected GitHub release run](https://github.com/cookiechimp/cookiechimp-sdk/actions/runs/40504134674).
+See [release notes](releases/1.2.0.md), [the manifest](../release/npm-1.2.0-manifest.json)
+and [the registry audit](../release/npm-1.2.0-audit.json).
 
-This candidate is **not published**. Before using the protected publish workflow:
-
-- Validate the packed Expo consumer's types and both Metro exports. These are
-  packaging checks, not proof of device execution or live consent delivery.
-- Daniel confirmed iOS/Android device checks and live consent delivery on
-  27 October. The [user attestation](release-evidence/2026-10-27-native-confirmation.json)
-  records exactly what was supplied; no device build details, receipt payloads or
-  dashboard captures have been independently inspected by Codex.
-- Native npm setup is configured: npm confirmed the trusted-publisher binding
-  to `cookiechimp/cookiechimp-sdk`, `release.yml`, environment `npm-publish` on
-  27 October. See [the setup evidence](../release/npm-react-native-trusted-publisher-2026-10-27.json).
-  The unapproved bootstrap stage was removed before the GitHub release.
-  First native OIDC publication and provenance verification remain pending.
-- Require all current-head CI checks, packed consumers and Daniel's protected
-  environment review. The existing publish guard remains active.
-
-The workflow prepares source-bound tarballs and checks the browser consumer
-separately from the native consumer. The native consumer installs real core and
-native tarballs outside the workspace, type-checks the Expo app and public entry,
-and exports both iOS and Android bundles without submitting platform records.
-Both consumer reports are saved with the candidate artifact.
+- All seven required checks and packed web/native consumers passed before publication.
+- Registry SHA-256/SHA-512 bytes and provenance match the immutable source,
+  expected repository, workflow, main ref and release-run invocation for all nine
+  packages. Recovery verified and skipped the identical first four uploads.
+- [Fresh npm consumers](release-evidence/2026-10-27-registry-consumer.json) passed
+  116 web exports, declarations, ESM/CJS, Next.js production build and browser
+  consent/vendor persistence. The native consumer passed Expo types and both
+  iOS/Android Hermes exports. Both `npm audit signatures` runs passed with no
+  invalid or missing signatures.
+- Daniel confirmed device checks and live consent delivery on 27 October.
+  The [attestation](release-evidence/2026-10-27-native-confirmation.json) records
+  exactly what was supplied. Codex did not inspect device build details or
+  receipt/dashboard captures; automated consumers submitted no platform records.
+- [Native npm setup](../release/npm-react-native-trusted-publisher-2026-10-27.json)
+  is complete. The temporary bootstrap stage was rejected after publication,
+  no stages remain, and the temporary version was never published.
+- Canonical SDK guide sources describe 1.2.0. Importing those sources into
+  CookieChimp-Docs and verifying Mintlify deployment remains separate work.
 
 ## Publish from a GitHub release
 
 After merging the versioned release candidate and waiting for main CI, create a
-GitHub release with the tag `v1.2.0` targeting the current main commit and click
+GitHub release with the next version tag, for example `v1.3.0`, targeting the
+current main commit and click
 **Publish release**. Drafts, prereleases and tag pushes alone do not publish npm
 `latest`. The tag must exactly match `release/readiness.json` and package versions.
 
@@ -61,7 +60,7 @@ consumers as described below.
 
 ## Previous published release: 1.1.0
 
-All eight `@cookiechimp` packages are published as npm `latest` at **1.1.0** on
+The previous eight `@cookiechimp` packages were published at **1.1.0** on
 25 October 2026. The [GitHub release](https://github.com/cookiechimp/cookiechimp-sdk/releases/tag/v1.1.0)
 contains the exact tarballs, manifest, registry audit and fresh-consumer evidence.
 
@@ -156,11 +155,12 @@ remains a separate [internal TODO](iab-integration-todo.md), not a publication g
 
 ## Future releases and recovery
 
-Do not republish 1.1.0 from a later commit. For a new release, update every coordinated
+Do not republish 1.2.0 or an earlier version from a later commit. For a new release, update every coordinated
 package version, changelogs and `release/readiness.json`, review current live
 backend evidence, and obtain explicit approval of the new version and source.
-From reviewed main with all seven required checks green, choose `publish` in
-**SDK release** and enter that exact version as `approved_version`.
+From reviewed main with all seven required checks green, publish the new stable
+GitHub release to dispatch the protected workflow. Manual recovery can choose
+`publish` in **SDK release** with the exact version as `approved_version`.
 
 The workflow requires Daniel's protected-environment review, confirms the source
 SHA is still main and publishes the exact prepared tarballs with GitHub OIDC and
@@ -171,10 +171,28 @@ minutes of metadata/provenance polling, with each registry command limited to
 15 seconds; integrity mismatches and non-404 errors fail immediately.
 
 After publication, verify registry bytes/provenance, install from npm in a fresh
-consumer, run signature auditing and browser checks, and publish the reviewed
-GitHub release/tag with its evidence. Keep the public release-status guide and
+consumer, run signature auditing and browser checks, and attach evidence to the reviewed
+GitHub release/tag. Keep the public release-status guide and
 internal launch record current. External skill/Context7 and benchmark submissions
 remain separately approved work.
 
 Canonical SDK guides belong on the existing CookieChimp Mintlify site. No new
 hosting/domain is required. See [the documentation workflow](documentation.md).
+
+## New-package staging recovery
+
+A new package may need an unapproved staging upload to establish its npm
+identity before trusted publishing can be configured. Use a separate temporary
+version and tag, explicitly approved for this bootstrap purpose; never approve
+or publish that temporary version as an SDK release. Keep it staged until the
+real GitHub OIDC publication succeeds and its registry bytes/provenance are verified.
+
+Staging the actual release version blocks direct OIDC publication with npm E409.
+If this happens, retain a separate temporary stage before rejecting the conflicting
+release-version stage. Removing the only staged version before any real version
+is published can remove the unpublished package identity and its publisher binding.
+Verify the intended trusted publisher and retry the protected workflow with the
+same approved source/tag. After the real publication is verified, reject the
+temporary stage and confirm the stage list is empty. The completed native
+[setup record](../release/npm-react-native-trusted-publisher-2026-10-27.json)
+documents this recovery without credentials.
