@@ -4,7 +4,12 @@ import { track } from "./events";
 export interface VendorCallbacks {
   /** Called when consent allows the vendor, for example to enable collection. */
   onStart?: () => void;
-  /** Called when consent is withdrawn, for example to disable collection. */
+  /**
+   * Called when consent does not allow the vendor, for example to disable
+   * collection: when consent is withdrawn, and once when the vendor registers
+   * without consent, so a setting the SDK kept from an earlier launch is
+   * switched off.
+   */
   onStop?: () => void;
 }
 
@@ -25,7 +30,9 @@ export interface VendorInfo {
 interface Vendor extends VendorCallbacks {
   name: string;
   category: string;
-  running: boolean;
+  // Undefined until the first settle: an SDK can keep its last state from an
+  // earlier launch, so a new vendor counts as neither started nor stopped.
+  running: boolean | undefined;
 }
 
 /** The SDK id of a service name, matching the platform adapter in core. */
@@ -57,13 +64,15 @@ function allowed(vendor: Vendor, runtime: ConsentRuntime): boolean {
 function settle(vendor: Vendor) {
   // Fail closed: nothing starts until a consent runtime exists.
   const allow = current ? allowed(vendor, current) : false;
-  if (allow && !vendor.running) {
+  if (allow && vendor.running !== true) {
     vendor.running = true;
     track("vendor", `${vendor.name} started`);
     call(vendor.onStart, vendor.name);
-  } else if (!allow && vendor.running) {
+  } else if (!allow && vendor.running !== false) {
+    const message =
+      vendor.running === undefined ? "off until consent allows it" : "stopped";
     vendor.running = false;
-    track("vendor", `${vendor.name} stopped`);
+    track("vendor", `${vendor.name} ${message}`);
     call(vendor.onStop, vendor.name);
   }
 }
@@ -75,7 +84,8 @@ export function applyVendors(runtime: ConsentRuntime | null) {
 }
 
 /**
- * Register a vendor SDK by name and category, or a preset. A preset's name
+ * Register a vendor SDK by name and category, or a preset. It starts when
+ * consent allows it; otherwise it is stopped right away. A preset's name
  * and category can be overridden, for example
  * `registerVendor(presets.mixpanel(mixpanel), { category: "marketing" })`.
  */
@@ -109,7 +119,7 @@ export function registerVendor(
     name,
     category,
     ...callbacks,
-    running: previous?.running ?? false,
+    running: previous?.running,
   };
   vendors.set(name, vendor);
   settle(vendor);
@@ -122,7 +132,7 @@ export function unregisterVendor(name: string) {
 /** Start a vendor regardless of consent. Use only for an explicit app decision. */
 export function startVendor(name: string) {
   const vendor = vendors.get(name);
-  if (vendor && !vendor.running) {
+  if (vendor && vendor.running !== true) {
     vendor.running = true;
     track("vendor", `${name} started by the app`);
     call(vendor.onStart, name);
@@ -131,7 +141,7 @@ export function startVendor(name: string) {
 
 export function stopVendor(name: string) {
   const vendor = vendors.get(name);
-  if (vendor?.running) {
+  if (vendor && vendor.running !== false) {
     vendor.running = false;
     track("vendor", `${name} stopped by the app`);
     call(vendor.onStop, name);
@@ -145,7 +155,7 @@ export function getVendors(): Record<string, VendorInfo> {
   return Object.fromEntries(
     [...vendors.values()].map(({ name, category, running }) => [
       name,
-      { category, running },
+      { category, running: running === true },
     ]),
   );
 }

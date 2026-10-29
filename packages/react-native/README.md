@@ -170,7 +170,9 @@ CookieChimp.reset(); // forget the decision and show the banner again
 
 Register each analytics or advertising SDK with the category it belongs to. The
 SDK calls `onStart` when consent allows it and `onStop` when consent is
-withdrawn. Nothing starts before consent where consent is required.
+withdrawn. Nothing starts before consent where consent is required, and a
+vendor that consent does not allow gets `onStop` as soon as it registers,
+because many SDKs keep their last setting from an earlier launch.
 
 ```ts
 import analytics from "@react-native-firebase/analytics";
