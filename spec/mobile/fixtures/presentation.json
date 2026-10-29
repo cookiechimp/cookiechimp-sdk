@@ -1,0 +1,920 @@
+{
+  "specVersion": 1,
+  "description": "Pure helpers the consent screens use. `rich` returns paragraphs of spans; absent span flags are absent. `palette` takes a dashboard theme and the system color scheme.",
+  "cases": [],
+  "plain": [
+    {
+      "value": "Plain text",
+      "expected": "Plain text"
+    },
+    {
+      "value": "<p>One</p><p>Two <b>bold</b> and <i>italic</i></p>",
+      "expected": "One\nTwo bold and italic"
+    },
+    {
+      "value": "Read our <a href='https://example.test/privacy'>privacy policy</a>.",
+      "expected": "Read our privacy policy ."
+    },
+    {
+      "value": "<a href=\"javascript:alert(1)\">bad link</a> <a href='http://ok.test/x?y=1#z'>ok</a>",
+      "expected": "bad link ok"
+    },
+    {
+      "value": "<ul><li>First</li><li>Second <strong>item</strong></li></ul>",
+      "expected": "First\nSecond item"
+    },
+    {
+      "value": "Line<br>break<br/>again",
+      "expected": "Line\nbreak\nagain"
+    },
+    {
+      "value": "&amp; &lt;tag&gt; &quot;q&quot; &#39;s&#39; &#x1F36A; &nbsp;x &bogus; &#0; &#xD800;",
+      "expected": "& <tag> \"q\" 's' 🍪 x &bogus;"
+    },
+    {
+      "value": "  lots   of\n\n spaces  ",
+      "expected": "lots of\nspaces"
+    },
+    {
+      "value": "<div><em>nested <b>both</b></em></div><h2>Heading</h2>",
+      "expected": "nested both\nHeading"
+    },
+    {
+      "value": "<script>alert(1)</script>after",
+      "expected": "alert(1) after"
+    },
+    {
+      "value": "",
+      "expected": ""
+    },
+    {
+      "value": "<b>unclosed bold",
+      "expected": "unclosed bold"
+    },
+    {
+      "value": "</b>stray close",
+      "expected": "stray close"
+    }
+  ],
+  "rich": [
+    {
+      "value": "Plain text",
+      "expected": [
+        [
+          {
+            "text": "Plain text"
+          }
+        ]
+      ]
+    },
+    {
+      "value": "<p>One</p><p>Two <b>bold</b> and <i>italic</i></p>",
+      "expected": [
+        [
+          {
+            "text": "One"
+          }
+        ],
+        [
+          {
+            "text": "Two "
+          },
+          {
+            "text": "bold",
+            "bold": true
+          },
+          {
+            "text": " and "
+          },
+          {
+            "text": "italic",
+            "italic": true
+          }
+        ]
+      ]
+    },
+    {
+      "value": "Read our <a href='https://example.test/privacy'>privacy policy</a>.",
+      "expected": [
+        [
+          {
+            "text": "Read our "
+          },
+          {
+            "text": "privacy policy",
+            "href": "https://example.test/privacy"
+          },
+          {
+            "text": "."
+          }
+        ]
+      ]
+    },
+    {
+      "value": "<a href=\"javascript:alert(1)\">bad link</a> <a href='http://ok.test/x?y=1#z'>ok</a>",
+      "expected": [
+        [
+          {
+            "text": "bad link"
+          },
+          {
+            "text": " "
+          },
+          {
+            "text": "ok",
+            "href": "http://ok.test/x?y=1#z"
+          }
+        ]
+      ]
+    },
+    {
+      "value": "<ul><li>First</li><li>Second <strong>item</strong></li></ul>",
+      "expected": [
+        [
+          {
+            "text": "• "
+          },
+          {
+            "text": "First"
+          }
+        ],
+        [
+          {
+            "text": "• "
+          },
+          {
+            "text": "Second "
+          },
+          {
+            "text": "item",
+            "bold": true
+          }
+        ]
+      ]
+    },
+    {
+      "value": "Line<br>break<br/>again",
+      "expected": [
+        [
+          {
+            "text": "Line"
+          }
+        ],
+        [
+          {
+            "text": "break"
+          }
+        ],
+        [
+          {
+            "text": "again"
+          }
+        ]
+      ]
+    },
+    {
+      "value": "&amp; &lt;tag&gt; &quot;q&quot; &#39;s&#39; &#x1F36A; &nbsp;x &bogus; &#0; &#xD800;",
+      "expected": [
+        [
+          {
+            "text": "& <tag> \"q\" 's' 🍪 x &bogus;"
+          }
+        ]
+      ]
+    },
+    {
+      "value": "  lots   of\n\n spaces  ",
+      "expected": [
+        [
+          {
+            "text": "lots of spaces"
+          }
+        ]
+      ]
+    },
+    {
+      "value": "<div><em>nested <b>both</b></em></div><h2>Heading</h2>",
+      "expected": [
+        [
+          {
+            "text": "nested ",
+            "italic": true
+          },
+          {
+            "text": "both",
+            "bold": true,
+            "italic": true
+          }
+        ],
+        [
+          {
+            "text": "Heading"
+          }
+        ]
+      ]
+    },
+    {
+      "value": "<script>alert(1)</script>after",
+      "expected": [
+        [
+          {
+            "text": "alert(1)"
+          },
+          {
+            "text": "after"
+          }
+        ]
+      ]
+    },
+    {
+      "value": "",
+      "expected": []
+    },
+    {
+      "value": "<b>unclosed bold",
+      "expected": [
+        [
+          {
+            "text": "unclosed bold",
+            "bold": true
+          }
+        ]
+      ]
+    },
+    {
+      "value": "</b>stray close",
+      "expected": [
+        [
+          {
+            "text": "stray close"
+          }
+        ]
+      ]
+    }
+  ],
+  "url": [
+    {
+      "value": "https://example.test",
+      "expected": "https://example.test"
+    },
+    {
+      "value": "http://example.test/path?x=1#y",
+      "expected": "http://example.test/path?x=1#y"
+    },
+    {
+      "value": "  https://example.test/trim  ",
+      "expected": "https://example.test/trim"
+    },
+    {
+      "value": "https://user:pass@example.test",
+      "expected": null
+    },
+    {
+      "value": "javascript:alert(1)",
+      "expected": null
+    },
+    {
+      "value": "ftp://example.test",
+      "expected": null
+    },
+    {
+      "value": "https://",
+      "expected": null
+    },
+    {
+      "value": "https://exa mple.test",
+      "expected": null
+    },
+    {
+      "value": "https://example.test/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": null
+    },
+    {
+      "value": "HTTPS://EXAMPLE.TEST",
+      "expected": "HTTPS://EXAMPLE.TEST"
+    }
+  ],
+  "withoutBranding": [
+    {
+      "value": "<p>Fragen? <a href='https://example.test/help'>Hilfe</a> <a href=\"https://cookiechimp.com\">Powered by CookieChimp</a></p>",
+      "expected": "<p>Fragen? <a href='https://example.test/help'>Hilfe</a> </p>"
+    },
+    {
+      "value": "<a href='https://www.cookiechimp.com/?ref=x'>Powered</a> rest",
+      "expected": " rest"
+    },
+    {
+      "value": "<a href='https://cookiechimp.com/pricing'>Pricing</a>",
+      "expected": "<a href='https://cookiechimp.com/pricing'>Pricing</a>"
+    }
+  ],
+  "poweredBy": [
+    {
+      "banner": {
+        "footer": {
+          "show_powered_by": true
+        }
+      },
+      "expected": true
+    },
+    {
+      "banner": {
+        "footer": {
+          "show_powered_by": "true"
+        }
+      },
+      "expected": false
+    },
+    {
+      "banner": {},
+      "expected": false
+    }
+  ],
+  "alpha": [
+    {
+      "color": "#333",
+      "opacity": 0.16,
+      "expected": "rgba(51,51,51,0.16)"
+    },
+    {
+      "color": "#2B2B2B",
+      "opacity": 0.5,
+      "expected": "rgba(43,43,43,0.5)"
+    },
+    {
+      "color": "red",
+      "opacity": 0.3,
+      "expected": "red"
+    },
+    {
+      "color": "rgba(1,2,3,0.4)",
+      "opacity": 0.2,
+      "expected": "rgba(1,2,3,0.4)"
+    },
+    {
+      "color": "#12345678",
+      "opacity": 0.1,
+      "expected": "#12345678"
+    }
+  ],
+  "radius": [
+    {
+      "value": "8px",
+      "fallback": 6.4,
+      "expected": 8
+    },
+    {
+      "value": "0.5rem",
+      "fallback": 6.4,
+      "expected": 8
+    },
+    {
+      "value": "1em",
+      "fallback": 6.4,
+      "expected": 16
+    },
+    {
+      "value": 12,
+      "fallback": 6.4,
+      "expected": 12
+    },
+    {
+      "value": "12",
+      "fallback": 6.4,
+      "expected": 12
+    },
+    {
+      "value": "-1px",
+      "fallback": 6.4,
+      "expected": 6.4
+    },
+    {
+      "value": "5000px",
+      "fallback": 6.4,
+      "expected": 999
+    },
+    {
+      "value": "big",
+      "fallback": 6.4,
+      "expected": 6.4
+    },
+    {
+      "value": null,
+      "fallback": 8,
+      "expected": 8
+    }
+  ],
+  "palette": [
+    {
+      "name": "default light",
+      "theme": {},
+      "scheme": null,
+      "expected": {
+        "scheme": "light",
+        "background": "#ffffff",
+        "heading": "#000000",
+        "text": "#333333",
+        "link": "#2b2b2b",
+        "primaryBackground": "#2b2b2b",
+        "primaryText": "#ffffff",
+        "secondaryBackground": "#eeeeee",
+        "secondaryText": "#2b2b2b",
+        "border": "rgba(51,51,51,0.16)",
+        "surface": "rgba(51,51,51,0.045)",
+        "track": "rgba(51,51,51,0.28)",
+        "cardRadius": 8,
+        "buttonRadius": 6.4
+      }
+    },
+    {
+      "name": "dark mode on",
+      "theme": {
+        "dark_mode": true
+      },
+      "scheme": "light",
+      "expected": {
+        "scheme": "dark",
+        "background": "#171a1c",
+        "heading": "#ffffff",
+        "text": "#999999",
+        "link": "#bcbcbc",
+        "primaryBackground": "#ffffff",
+        "primaryText": "#333333",
+        "secondaryBackground": "#171a1c",
+        "secondaryText": "#ffffff",
+        "border": "rgba(153,153,153,0.16)",
+        "surface": "rgba(153,153,153,0.08)",
+        "track": "rgba(153,153,153,0.28)",
+        "cardRadius": 8,
+        "buttonRadius": 6.4
+      }
+    },
+    {
+      "name": "dark mode string",
+      "theme": {
+        "dark_mode": "dark"
+      },
+      "scheme": null,
+      "expected": {
+        "scheme": "dark",
+        "background": "#171a1c",
+        "heading": "#ffffff",
+        "text": "#999999",
+        "link": "#bcbcbc",
+        "primaryBackground": "#ffffff",
+        "primaryText": "#333333",
+        "secondaryBackground": "#171a1c",
+        "secondaryText": "#ffffff",
+        "border": "rgba(153,153,153,0.16)",
+        "surface": "rgba(153,153,153,0.08)",
+        "track": "rgba(153,153,153,0.28)",
+        "cardRadius": 8,
+        "buttonRadius": 6.4
+      }
+    },
+    {
+      "name": "auto in dark",
+      "theme": {
+        "dark_mode": "auto"
+      },
+      "scheme": "dark",
+      "expected": {
+        "scheme": "dark",
+        "background": "#171a1c",
+        "heading": "#ffffff",
+        "text": "#999999",
+        "link": "#bcbcbc",
+        "primaryBackground": "#ffffff",
+        "primaryText": "#333333",
+        "secondaryBackground": "#171a1c",
+        "secondaryText": "#ffffff",
+        "border": "rgba(153,153,153,0.16)",
+        "surface": "rgba(153,153,153,0.08)",
+        "track": "rgba(153,153,153,0.28)",
+        "cardRadius": 8,
+        "buttonRadius": 6.4
+      }
+    },
+    {
+      "name": "auto in light",
+      "theme": {
+        "dark_mode": "auto"
+      },
+      "scheme": "light",
+      "expected": {
+        "scheme": "light",
+        "background": "#ffffff",
+        "heading": "#000000",
+        "text": "#333333",
+        "link": "#2b2b2b",
+        "primaryBackground": "#2b2b2b",
+        "primaryText": "#ffffff",
+        "secondaryBackground": "#eeeeee",
+        "secondaryText": "#2b2b2b",
+        "border": "rgba(51,51,51,0.16)",
+        "surface": "rgba(51,51,51,0.045)",
+        "track": "rgba(51,51,51,0.28)",
+        "cardRadius": 8,
+        "buttonRadius": 6.4
+      }
+    },
+    {
+      "name": "main bundle theme",
+      "theme": {
+        "dark_mode": "light",
+        "modal_border_radius": "8px",
+        "btn_border_radius": "4px",
+        "colors": {
+          "bg": "#ffffff",
+          "heading_color": "#000",
+          "text_color": "#333",
+          "link_color": "#2b2b2b",
+          "btn_primary_bg": "#2b2b2b",
+          "btn_primary_color": "#fff",
+          "btn_secondary_bg": "#fff",
+          "btn_secondary_color": "#2b2b2b"
+        },
+        "dark_colors": {
+          "bg": "#171a1c",
+          "heading_color": "#fff",
+          "text_color": "#999",
+          "link_color": "#bcbcbc",
+          "btn_primary_bg": "#fff",
+          "btn_primary_color": "#333",
+          "btn_secondary_bg": "#171a1c",
+          "btn_secondary_color": "#fff"
+        },
+        "logo_url_light": null,
+        "logo_url_dark": null
+      },
+      "scheme": "light",
+      "expected": {
+        "scheme": "light",
+        "background": "#ffffff",
+        "heading": "#000",
+        "text": "#333",
+        "link": "#2b2b2b",
+        "primaryBackground": "#2b2b2b",
+        "primaryText": "#fff",
+        "secondaryBackground": "#fff",
+        "secondaryText": "#2b2b2b",
+        "border": "rgba(51,51,51,0.16)",
+        "surface": "rgba(51,51,51,0.045)",
+        "track": "rgba(51,51,51,0.28)",
+        "cardRadius": 8,
+        "buttonRadius": 4
+      }
+    },
+    {
+      "name": "variant theme light",
+      "theme": {
+        "dark_mode": "auto",
+        "modal_border_radius": "1rem",
+        "btn_border_radius": 10,
+        "colors": {
+          "bg": "#fafafa",
+          "btn_primary_bg": "#0055ff",
+          "text_color": "red"
+        },
+        "dark_colors": {
+          "bg": "#000",
+          "text_color": "#ccc",
+          "btn_primary_bg": "bad;"
+        },
+        "logo_url_light": "https://example.test/logo.png",
+        "logo_url_dark": "javascript:alert(1)"
+      },
+      "scheme": "light",
+      "expected": {
+        "scheme": "light",
+        "background": "#fafafa",
+        "heading": "#000000",
+        "text": "red",
+        "link": "#2b2b2b",
+        "primaryBackground": "#0055ff",
+        "primaryText": "#ffffff",
+        "secondaryBackground": "#eeeeee",
+        "secondaryText": "#2b2b2b",
+        "border": "red",
+        "surface": "red",
+        "track": "red",
+        "cardRadius": 16,
+        "buttonRadius": 10,
+        "logo": "https://example.test/logo.png"
+      }
+    },
+    {
+      "name": "variant theme dark",
+      "theme": {
+        "dark_mode": "auto",
+        "modal_border_radius": "1rem",
+        "btn_border_radius": 10,
+        "colors": {
+          "bg": "#fafafa",
+          "btn_primary_bg": "#0055ff",
+          "text_color": "red"
+        },
+        "dark_colors": {
+          "bg": "#000",
+          "text_color": "#ccc",
+          "btn_primary_bg": "bad;"
+        },
+        "logo_url_light": "https://example.test/logo.png",
+        "logo_url_dark": "javascript:alert(1)"
+      },
+      "scheme": "dark",
+      "expected": {
+        "scheme": "dark",
+        "background": "#000",
+        "heading": "#ffffff",
+        "text": "#ccc",
+        "link": "#bcbcbc",
+        "primaryBackground": "#ffffff",
+        "primaryText": "#333333",
+        "secondaryBackground": "#171a1c",
+        "secondaryText": "#ffffff",
+        "border": "rgba(204,204,204,0.16)",
+        "surface": "rgba(204,204,204,0.08)",
+        "track": "rgba(204,204,204,0.28)",
+        "cardRadius": 16,
+        "buttonRadius": 10,
+        "logo": "https://example.test/logo.png"
+      }
+    },
+    {
+      "name": "radii and invalid colors",
+      "theme": {
+        "modal_border_radius": "12",
+        "btn_border_radius": "0.25em",
+        "colors": {
+          "bg": "rgb(1, 2, 3)",
+          "text_color": "#abc",
+          "link_color": "url(x)"
+        },
+        "logo_url_light": "https://example.test/l.png"
+      },
+      "scheme": "light",
+      "expected": {
+        "scheme": "light",
+        "background": "rgb(1, 2, 3)",
+        "heading": "#000000",
+        "text": "#abc",
+        "link": "#2b2b2b",
+        "primaryBackground": "#2b2b2b",
+        "primaryText": "#ffffff",
+        "secondaryBackground": "#eeeeee",
+        "secondaryText": "#2b2b2b",
+        "border": "rgba(170,187,204,0.16)",
+        "surface": "rgba(170,187,204,0.045)",
+        "track": "rgba(170,187,204,0.28)",
+        "cardRadius": 12,
+        "buttonRadius": 4,
+        "logo": "https://example.test/l.png"
+      }
+    },
+    {
+      "name": "dark logo falls back to light",
+      "theme": {
+        "dark_mode": "dark",
+        "logo_url_light": "https://example.test/l.png"
+      },
+      "scheme": null,
+      "expected": {
+        "scheme": "dark",
+        "background": "#171a1c",
+        "heading": "#ffffff",
+        "text": "#999999",
+        "link": "#bcbcbc",
+        "primaryBackground": "#ffffff",
+        "primaryText": "#333333",
+        "secondaryBackground": "#171a1c",
+        "secondaryText": "#ffffff",
+        "border": "rgba(153,153,153,0.16)",
+        "surface": "rgba(153,153,153,0.08)",
+        "track": "rgba(153,153,153,0.28)",
+        "cardRadius": 8,
+        "buttonRadius": 6.4,
+        "logo": "https://example.test/l.png"
+      }
+    }
+  ],
+  "bannerDisplay": [
+    {
+      "gui": {},
+      "expected": {
+        "layout": "box",
+        "placement": "stacked",
+        "vertical": "bottom",
+        "horizontal": "center"
+      }
+    },
+    {
+      "gui": {
+        "layout": "cloud",
+        "position": "top left",
+        "button_placement": "inline"
+      },
+      "expected": {
+        "layout": "cloud",
+        "placement": "inline",
+        "vertical": "top",
+        "horizontal": "left"
+      }
+    },
+    {
+      "gui": {
+        "layout": "bar",
+        "position": "middle center"
+      },
+      "expected": {
+        "layout": "bar",
+        "placement": "stacked",
+        "vertical": "bottom",
+        "horizontal": "center"
+      }
+    },
+    {
+      "gui": {
+        "layout": "bar",
+        "position": "top",
+        "button_placement": "inline wide"
+      },
+      "expected": {
+        "layout": "bar",
+        "placement": "wide",
+        "vertical": "top",
+        "horizontal": "center"
+      }
+    },
+    {
+      "gui": {
+        "layout": "box",
+        "position": "middle_right",
+        "button_placement": "wide"
+      },
+      "expected": {
+        "layout": "box",
+        "placement": "wide",
+        "vertical": "middle",
+        "horizontal": "right"
+      }
+    },
+    {
+      "gui": {
+        "layout": "fullscreen",
+        "position": "bottom left"
+      },
+      "expected": {
+        "layout": "fullscreen",
+        "placement": "stacked",
+        "vertical": "middle",
+        "horizontal": "center"
+      }
+    },
+    {
+      "gui": {
+        "layout": "popup",
+        "position": "left"
+      },
+      "expected": {
+        "layout": "box",
+        "placement": "stacked",
+        "vertical": "bottom",
+        "horizontal": "center"
+      }
+    }
+  ],
+  "appData": [
+    {
+      "value": null,
+      "expected": null
+    },
+    {
+      "value": null,
+      "expected": null
+    },
+    {
+      "value": {},
+      "expected": null
+    },
+    {
+      "value": {
+        "collected": [
+          "device_id",
+          "crash_data",
+          "device_id",
+          "",
+          7
+        ],
+        "purposes": [
+          "analytics",
+          "made_up_purpose"
+        ],
+        "tracking": false,
+        "retention": "  14 months  ",
+        "packages": {
+          "ios": [
+            "FirebaseAnalytics"
+          ],
+          "android": [
+            "com.google.firebase:firebase-analytics"
+          ]
+        }
+      },
+      "expected": {
+        "collected": [
+          "device_id",
+          "crash_data"
+        ],
+        "purposes": [
+          "analytics",
+          "made_up_purpose"
+        ],
+        "tracking": false,
+        "retention": "14 months",
+        "packages": {
+          "ios": [
+            "FirebaseAnalytics"
+          ],
+          "android": [
+            "com.google.firebase:firebase-analytics"
+          ]
+        }
+      }
+    },
+    {
+      "value": {
+        "tracking": true
+      },
+      "expected": {
+        "collected": [],
+        "purposes": [],
+        "tracking": true,
+        "packages": {
+          "ios": [],
+          "android": []
+        }
+      }
+    },
+    {
+      "value": {
+        "collected": [
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "ok"
+        ],
+        "retention": "   "
+      },
+      "expected": {
+        "collected": [
+          "ok"
+        ],
+        "purposes": [],
+        "packages": {
+          "ios": [],
+          "android": []
+        }
+      }
+    },
+    {
+      "value": {
+        "packages": {
+          "ios": [
+            "a"
+          ],
+          "android": "b"
+        }
+      },
+      "expected": {
+        "collected": [],
+        "purposes": [],
+        "packages": {
+          "ios": [
+            "a"
+          ],
+          "android": []
+        }
+      }
+    },
+    {
+      "value": [
+        1,
+        2
+      ],
+      "expected": null
+    }
+  ],
+  "label": [
+    {
+      "key": "device_id",
+      "expected": "Device ID"
+    },
+    {
+      "key": "made_up-key",
+      "expected": "Made up key"
+    },
+    {
+      "key": "x",
+      "expected": "X"
+    }
+  ]
+}

@@ -1,0 +1,458 @@
+{
+  "specVersion": 1,
+  "description": "SDK copy lookup. `sdkLanguage` resolves a tag to a built-in locale (null when none matches). `messages` cases resolve every ui key and some data and purpose labels with app translations.",
+  "languages": [
+    "ar",
+    "bg",
+    "cs",
+    "da",
+    "de",
+    "el",
+    "en",
+    "es",
+    "et",
+    "fi",
+    "fr",
+    "ga",
+    "he",
+    "hr",
+    "hu",
+    "it",
+    "ja",
+    "ko",
+    "lt",
+    "lv",
+    "mt",
+    "nl",
+    "no",
+    "pl",
+    "pt",
+    "pt-BR",
+    "ro",
+    "sk",
+    "sl",
+    "sv",
+    "tr",
+    "uk",
+    "zh"
+  ],
+  "sdkLanguage": [
+    {
+      "tag": "de",
+      "expected": "de"
+    },
+    {
+      "tag": "de-AT",
+      "expected": "de"
+    },
+    {
+      "tag": "DE_at",
+      "expected": "de"
+    },
+    {
+      "tag": "pt",
+      "expected": "pt"
+    },
+    {
+      "tag": "pt-BR",
+      "expected": "pt-BR"
+    },
+    {
+      "tag": "pt-br",
+      "expected": "pt-BR"
+    },
+    {
+      "tag": "pt-PT",
+      "expected": "pt"
+    },
+    {
+      "tag": "zh-Hant",
+      "expected": "zh"
+    },
+    {
+      "tag": "nb",
+      "expected": "no"
+    },
+    {
+      "tag": "nn-NO",
+      "expected": "no"
+    },
+    {
+      "tag": "no",
+      "expected": "no"
+    },
+    {
+      "tag": "en-US",
+      "expected": "en"
+    },
+    {
+      "tag": "xx",
+      "expected": null
+    },
+    {
+      "tag": "",
+      "expected": null
+    },
+    {
+      "tag": " fr ",
+      "expected": "fr"
+    },
+    {
+      "tag": "he-IL",
+      "expected": "he"
+    }
+  ],
+  "cases": [
+    {
+      "tag": "de-CH",
+      "translations": {},
+      "expected": {
+        "language": "de",
+        "ui": {
+          "title": "Datenschutzeinstellungen",
+          "description": "Wir verwenden Technologien wie Cookies und SDKs, um diese App bereitzustellen. Wählen Sie, welche optionalen davon verwendet werden dürfen.",
+          "acceptAll": "Alle akzeptieren",
+          "rejectAll": "Optionale ablehnen",
+          "customize": "Anpassen",
+          "close": "Schließen",
+          "privacyPolicy": "Datenschutzerklärung",
+          "preferencesTitle": "Datenschutzeinstellungen",
+          "preferencesDescription": "Erteilen Sie Ihre Einwilligung nach Kategorie oder Anbieter. Erweitern Sie einen Eintrag, um Details zu sehen.",
+          "save": "Einstellungen speichern",
+          "consentId": "Ihre Einwilligungs-ID",
+          "poweredBy": "Bereitgestellt von {name}",
+          "dataCollected": "Erhobene Daten",
+          "usedFor": "Verwendet für",
+          "tracking": "Verfolgt Sie über andere Apps hinweg",
+          "retention": "Aufbewahrt für",
+          "packages": "SDK-Pakete",
+          "yes": "Ja",
+          "no": "Nein",
+          "type": "Typ",
+          "duration": "Dauer",
+          "company": "Unternehmen"
+        },
+        "has": {
+          "title": true,
+          "description": true,
+          "acceptAll": true,
+          "rejectAll": true,
+          "customize": true,
+          "close": true,
+          "privacyPolicy": true,
+          "preferencesTitle": true,
+          "preferencesDescription": true,
+          "save": true,
+          "consentId": true,
+          "poweredBy": true,
+          "dataCollected": true,
+          "usedFor": true,
+          "tracking": true,
+          "retention": true,
+          "packages": true,
+          "yes": true,
+          "no": true,
+          "type": true,
+          "duration": true,
+          "company": true
+        },
+        "dataType": {
+          "device_id": "Geräte-ID",
+          "crash_data": "Absturzdaten",
+          "made_up_key": "Made up key",
+          "other-thing": "Other thing"
+        },
+        "purpose": {
+          "analytics": "Analyse",
+          "made_up_purpose": "Made up purpose"
+        }
+      }
+    },
+    {
+      "tag": "fr",
+      "translations": {
+        "fr": {
+          "ui": {
+            "title": "Mon titre"
+          }
+        }
+      },
+      "expected": {
+        "language": "fr",
+        "ui": {
+          "title": "Mon titre",
+          "description": "Nous utilisons des technologies comme les cookies et les SDK pour faire fonctionner cette application. Choisissez celles, facultatives, qui peuvent être utilisées.",
+          "acceptAll": "Tout accepter",
+          "rejectAll": "Refuser les facultatifs",
+          "customize": "Personnaliser",
+          "close": "Fermer",
+          "privacyPolicy": "Politique de confidentialité",
+          "preferencesTitle": "Préférences de confidentialité",
+          "preferencesDescription": "Donnez votre consentement par catégorie ou par fournisseur. Développez un élément pour voir ses détails.",
+          "save": "Enregistrer les préférences",
+          "consentId": "Votre identifiant de consentement",
+          "poweredBy": "Fourni par {name}",
+          "dataCollected": "Données collectées",
+          "usedFor": "Utilisées pour",
+          "tracking": "Vous suit dans d'autres apps",
+          "retention": "Conservées pendant",
+          "packages": "Paquets SDK",
+          "yes": "Oui",
+          "no": "Non",
+          "type": "Type",
+          "duration": "Durée",
+          "company": "Entreprise"
+        },
+        "has": {
+          "title": true,
+          "description": true,
+          "acceptAll": true,
+          "rejectAll": true,
+          "customize": true,
+          "close": true,
+          "privacyPolicy": true,
+          "preferencesTitle": true,
+          "preferencesDescription": true,
+          "save": true,
+          "consentId": true,
+          "poweredBy": true,
+          "dataCollected": true,
+          "usedFor": true,
+          "tracking": true,
+          "retention": true,
+          "packages": true,
+          "yes": true,
+          "no": true,
+          "type": true,
+          "duration": true,
+          "company": true
+        },
+        "dataType": {
+          "device_id": "Identifiant de l'appareil",
+          "crash_data": "Données de plantage",
+          "made_up_key": "Made up key",
+          "other-thing": "Other thing"
+        },
+        "purpose": {
+          "analytics": "Analyse",
+          "made_up_purpose": "Made up purpose"
+        }
+      }
+    },
+    {
+      "tag": "pt-BR",
+      "translations": {
+        "pt": {
+          "ui": {
+            "save": "Guardar"
+          },
+          "data": {
+            "device_id": "ID"
+          }
+        },
+        "pt-BR": {
+          "ui": {
+            "title": "  "
+          }
+        }
+      },
+      "expected": {
+        "language": "pt-BR",
+        "ui": {
+          "title": "Opções de privacidade",
+          "description": "Usamos tecnologias como cookies e SDKs para fazer este app funcionar. Escolha quais das opcionais podem ser usadas.",
+          "acceptAll": "Aceitar tudo",
+          "rejectAll": "Recusar opcionais",
+          "customize": "Personalizar",
+          "close": "Fechar",
+          "privacyPolicy": "Política de privacidade",
+          "preferencesTitle": "Preferências de privacidade",
+          "preferencesDescription": "Escolha o consentimento por categoria ou fornecedor. Expanda um item para ver os detalhes.",
+          "save": "Guardar",
+          "consentId": "Seu ID de consentimento",
+          "poweredBy": "Com tecnologia {name}",
+          "dataCollected": "Dados coletados",
+          "usedFor": "Usados para",
+          "tracking": "Rastreia você em outros apps",
+          "retention": "Mantidos por",
+          "packages": "Pacotes SDK",
+          "yes": "Sim",
+          "no": "Não",
+          "type": "Tipo",
+          "duration": "Duração",
+          "company": "Empresa"
+        },
+        "has": {
+          "title": true,
+          "description": true,
+          "acceptAll": true,
+          "rejectAll": true,
+          "customize": true,
+          "close": true,
+          "privacyPolicy": true,
+          "preferencesTitle": true,
+          "preferencesDescription": true,
+          "save": true,
+          "consentId": true,
+          "poweredBy": true,
+          "dataCollected": true,
+          "usedFor": true,
+          "tracking": true,
+          "retention": true,
+          "packages": true,
+          "yes": true,
+          "no": true,
+          "type": true,
+          "duration": true,
+          "company": true
+        },
+        "dataType": {
+          "device_id": "ID",
+          "crash_data": "Dados de falhas",
+          "made_up_key": "Made up key",
+          "other-thing": "Other thing"
+        },
+        "purpose": {
+          "analytics": "Análise",
+          "made_up_purpose": "Made up purpose"
+        }
+      }
+    },
+    {
+      "tag": "xx",
+      "translations": {
+        "xx": {
+          "ui": {
+            "close": "X"
+          }
+        }
+      },
+      "expected": {
+        "language": null,
+        "ui": {
+          "title": "Privacy choices",
+          "description": "We use technologies like cookies and SDKs to run this app. Choose which optional ones may be used.",
+          "acceptAll": "Accept all",
+          "rejectAll": "Reject optional",
+          "customize": "Customize",
+          "close": "X",
+          "privacyPolicy": "Privacy policy",
+          "preferencesTitle": "Privacy preferences",
+          "preferencesDescription": "Choose consent by category or vendor. Expand an item to see its details.",
+          "save": "Save preferences",
+          "consentId": "Your consent ID",
+          "poweredBy": "Powered by {name}",
+          "dataCollected": "Data collected",
+          "usedFor": "Used for",
+          "tracking": "Tracks you across other apps",
+          "retention": "Kept for",
+          "packages": "SDK packages",
+          "yes": "Yes",
+          "no": "No",
+          "type": "Type",
+          "duration": "Duration",
+          "company": "Company"
+        },
+        "has": {
+          "title": false,
+          "description": false,
+          "acceptAll": false,
+          "rejectAll": false,
+          "customize": false,
+          "close": true,
+          "privacyPolicy": false,
+          "preferencesTitle": false,
+          "preferencesDescription": false,
+          "save": false,
+          "consentId": false,
+          "poweredBy": false,
+          "dataCollected": false,
+          "usedFor": false,
+          "tracking": false,
+          "retention": false,
+          "packages": false,
+          "yes": false,
+          "no": false,
+          "type": false,
+          "duration": false,
+          "company": false
+        },
+        "dataType": {
+          "device_id": "Device ID",
+          "crash_data": "Crash data",
+          "made_up_key": "Made up key",
+          "other-thing": "Other thing"
+        },
+        "purpose": {
+          "analytics": "Analytics",
+          "made_up_purpose": "Made up purpose"
+        }
+      }
+    },
+    {
+      "tag": null,
+      "translations": {},
+      "expected": {
+        "language": null,
+        "ui": {
+          "title": "Privacy choices",
+          "description": "We use technologies like cookies and SDKs to run this app. Choose which optional ones may be used.",
+          "acceptAll": "Accept all",
+          "rejectAll": "Reject optional",
+          "customize": "Customize",
+          "close": "Close",
+          "privacyPolicy": "Privacy policy",
+          "preferencesTitle": "Privacy preferences",
+          "preferencesDescription": "Choose consent by category or vendor. Expand an item to see its details.",
+          "save": "Save preferences",
+          "consentId": "Your consent ID",
+          "poweredBy": "Powered by {name}",
+          "dataCollected": "Data collected",
+          "usedFor": "Used for",
+          "tracking": "Tracks you across other apps",
+          "retention": "Kept for",
+          "packages": "SDK packages",
+          "yes": "Yes",
+          "no": "No",
+          "type": "Type",
+          "duration": "Duration",
+          "company": "Company"
+        },
+        "has": {
+          "title": false,
+          "description": false,
+          "acceptAll": false,
+          "rejectAll": false,
+          "customize": false,
+          "close": false,
+          "privacyPolicy": false,
+          "preferencesTitle": false,
+          "preferencesDescription": false,
+          "save": false,
+          "consentId": false,
+          "poweredBy": false,
+          "dataCollected": false,
+          "usedFor": false,
+          "tracking": false,
+          "retention": false,
+          "packages": false,
+          "yes": false,
+          "no": false,
+          "type": false,
+          "duration": false,
+          "company": false
+        },
+        "dataType": {
+          "device_id": "Device ID",
+          "crash_data": "Crash data",
+          "made_up_key": "Made up key",
+          "other-thing": "Other thing"
+        },
+        "purpose": {
+          "analytics": "Analytics",
+          "made_up_purpose": "Made up purpose"
+        }
+      }
+    }
+  ]
+}

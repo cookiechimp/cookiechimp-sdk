@@ -1,0 +1,166 @@
+{
+  "specVersion": 1,
+  "description": "Firebase Consent Mode v2 signals for category decisions (default mapping, and a custom one), App Tracking Transparency status normalization, and service ids for vendor names.",
+  "defaultMapping": {
+    "analytics": [
+      "analytics_storage"
+    ],
+    "marketing": [
+      "ad_storage",
+      "ad_user_data",
+      "ad_personalization"
+    ],
+    "advertising": [
+      "ad_storage",
+      "ad_user_data",
+      "ad_personalization"
+    ]
+  },
+  "cases": [],
+  "firebase": [
+    {
+      "categories": {},
+      "mapping": null,
+      "expected": {
+        "analytics_storage": false,
+        "ad_storage": false,
+        "ad_user_data": false,
+        "ad_personalization": false
+      }
+    },
+    {
+      "categories": {
+        "analytics": true
+      },
+      "mapping": null,
+      "expected": {
+        "analytics_storage": true,
+        "ad_storage": false,
+        "ad_user_data": false,
+        "ad_personalization": false
+      }
+    },
+    {
+      "categories": {
+        "marketing": true
+      },
+      "mapping": null,
+      "expected": {
+        "analytics_storage": false,
+        "ad_storage": true,
+        "ad_user_data": true,
+        "ad_personalization": true
+      }
+    },
+    {
+      "categories": {
+        "advertising": true,
+        "analytics": false
+      },
+      "mapping": null,
+      "expected": {
+        "analytics_storage": false,
+        "ad_storage": true,
+        "ad_user_data": true,
+        "ad_personalization": true
+      }
+    },
+    {
+      "categories": {
+        "analytics": true,
+        "marketing": true
+      },
+      "mapping": null,
+      "expected": {
+        "analytics_storage": true,
+        "ad_storage": true,
+        "ad_user_data": true,
+        "ad_personalization": true
+      }
+    },
+    {
+      "categories": {
+        "stats": true,
+        "ads": false
+      },
+      "mapping": {
+        "stats": [
+          "analytics_storage",
+          "ad_user_data"
+        ]
+      },
+      "expected": {
+        "analytics_storage": true,
+        "ad_storage": false,
+        "ad_user_data": true,
+        "ad_personalization": false
+      }
+    }
+  ],
+  "tracking": [
+    {
+      "value": "authorized",
+      "expected": "authorized"
+    },
+    {
+      "value": "granted",
+      "expected": "authorized"
+    },
+    {
+      "value": "denied",
+      "expected": "denied"
+    },
+    {
+      "value": "restricted",
+      "expected": "restricted"
+    },
+    {
+      "value": "not-determined",
+      "expected": "not-determined"
+    },
+    {
+      "value": "undetermined",
+      "expected": "not-determined"
+    },
+    {
+      "value": "other",
+      "expected": "unavailable"
+    },
+    {
+      "value": 3,
+      "expected": "unavailable"
+    },
+    {
+      "value": {
+        "status": "granted"
+      },
+      "expected": "authorized"
+    }
+  ],
+  "serviceId": [
+    {
+      "name": "Google Analytics",
+      "expected": "google-analytics"
+    },
+    {
+      "name": "Firebase Crashlytics",
+      "expected": "firebase-crashlytics"
+    },
+    {
+      "name": "Facebook SDK",
+      "expected": "facebook-sdk"
+    },
+    {
+      "name": "  ÜBER--Tracker  ",
+      "expected": "ber--tracker"
+    },
+    {
+      "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "name": "AppsFlyer",
+      "expected": "appsflyer"
+    }
+  ]
+}

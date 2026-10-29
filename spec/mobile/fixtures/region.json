@@ -1,0 +1,115 @@
+{
+  "specVersion": 1,
+  "description": "parseRegion for the `country` option and the geolocation response, and the country_banner_map key for the result.",
+  "cases": [
+    {
+      "value": "DE",
+      "expected": {
+        "country": "DE"
+      },
+      "key": "DE"
+    },
+    {
+      "value": "de",
+      "expected": {
+        "country": "DE"
+      },
+      "key": "DE"
+    },
+    {
+      "value": " us-ca ",
+      "expected": {
+        "country": "US",
+        "region": "CA"
+      },
+      "key": "US-CA"
+    },
+    {
+      "value": "US-CA-X",
+      "expected": {
+        "country": "US",
+        "region": "CA"
+      },
+      "key": "US-CA"
+    },
+    {
+      "value": "XX",
+      "expected": null,
+      "key": ""
+    },
+    {
+      "value": "USA",
+      "expected": null,
+      "key": ""
+    },
+    {
+      "value": "U",
+      "expected": null,
+      "key": ""
+    },
+    {
+      "value": "GB-ENG",
+      "expected": {
+        "country": "GB",
+        "region": "ENG"
+      },
+      "key": "GB-ENG"
+    },
+    {
+      "value": "US-",
+      "expected": {
+        "country": "US"
+      },
+      "key": "US"
+    },
+    {
+      "value": "",
+      "expected": null,
+      "key": ""
+    },
+    {
+      "value": null,
+      "expected": null,
+      "key": ""
+    },
+    {
+      "value": {
+        "country": "us",
+        "region": "US-ny"
+      },
+      "expected": {
+        "country": "US",
+        "region": "NY"
+      },
+      "key": "US-NY"
+    },
+    {
+      "value": {
+        "country": "CA",
+        "region": "QC"
+      },
+      "expected": {
+        "country": "CA",
+        "region": "QC"
+      },
+      "key": "CA-QC"
+    },
+    {
+      "value": {
+        "country": "FR",
+        "region": "toolong"
+      },
+      "expected": {
+        "country": "FR"
+      },
+      "key": "FR"
+    },
+    {
+      "value": {
+        "country": "1A"
+      },
+      "expected": null,
+      "key": ""
+    }
+  ]
+}

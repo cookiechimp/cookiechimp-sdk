@@ -1,0 +1,42 @@
+name: Attach native SDK spec to release
+
+# The native iOS and Android SDKs pin spec/mobile by release. This attaches
+# the generated fixtures to each published release as one zip file.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to attach the spec to, for example v1.3.0
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check the committed spec matches the released code
+        run: pnpm --filter @cookiechimp/core build && pnpm --filter @cookiechimp/react-native exec vitest run --config vitest.config.ts src/conformance.test.ts
+      - name: Package and attach
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          name="cookiechimp-mobile-spec-${TAG}.zip"
+          (cd spec && zip -qr "../${name}" mobile)
+          gh release upload "${TAG}" "${name}" --clobber

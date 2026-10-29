@@ -1,0 +1,1210 @@
+{
+  "specVersion": 1,
+  "description": "The consent runtime (core createConsent with mobile options: explicit regulation, promptOnOptOut true, gpc false, storage instead of a cookie). Config comes from adapting bundles/main.json with the case region and locale `en`. Time starts at `now` and only `advance` moves it; consent ids come from `ids` in order. `state` is the public snapshot, `stored` the decoded stored value.",
+  "now": "2026-10-15T09:30:00.000Z",
+  "ids": [
+    "00000000-0000-4000-8000-000000000001",
+    "00000000-0000-4000-8000-000000000002"
+  ],
+  "cases": [
+    {
+      "name": "GDPR first launch",
+      "setup": {
+        "region": "DE",
+        "regulation": "gdpr"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": true,
+          "stored": null,
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "advance",
+          "ms": 1000
+        },
+        {
+          "op": "acceptAll",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:01.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true
+            },
+            "action": "accept_all",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:01.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            },
+            "action": "accept_all",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": true,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": true,
+            "meta-pixel": true,
+            "microsoft-clarity": true,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "advance",
+          "ms": 1000
+        },
+        {
+          "op": "rejectAll",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:02.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "reject_all",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:02.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            },
+            "action": "reject_all",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "advance",
+          "ms": 1000
+        },
+        {
+          "op": "set",
+          "categories": {
+            "analytics": true
+          },
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:03.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:03.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "set",
+          "services": {
+            "google-analytics": false
+          },
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:03.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:03.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "set",
+          "categories": {
+            "essential": false,
+            "unknown": true,
+            "marketing": "yes"
+          },
+          "services": {
+            "session-management": false,
+            "unknown": true
+          },
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:03.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:03.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "CCPA first launch",
+      "setup": {
+        "region": "US-CA",
+        "regulation": "ccpa"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true
+            },
+            "action": "custom",
+            "region": {
+              "country": "US",
+              "region": "CA"
+            },
+            "regulation": "ccpa",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            }
+          },
+          "needsDecision": true,
+          "stored": null,
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": true,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": true,
+            "meta-pixel": true,
+            "microsoft-clarity": true,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "rejectAll",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "reject_all",
+            "region": {
+              "country": "US",
+              "region": "CA"
+            },
+            "regulation": "ccpa",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            },
+            "action": "reject_all",
+            "region": {
+              "country": "US",
+              "region": "CA"
+            },
+            "regulation": "ccpa",
+            "gpc": false
+          },
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "set",
+          "categories": {
+            "marketing": true
+          },
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": true
+            },
+            "action": "custom",
+            "region": {
+              "country": "US",
+              "region": "CA"
+            },
+            "regulation": "ccpa",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": true
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "US",
+              "region": "CA"
+            },
+            "regulation": "ccpa",
+            "gpc": false
+          },
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": true,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "no region",
+      "setup": {
+        "region": null,
+        "regulation": "gdpr"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": null,
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": true,
+          "stored": null,
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "acceptAll",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true
+            },
+            "action": "accept_all",
+            "region": null,
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            },
+            "action": "accept_all",
+            "region": null,
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": true,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": true,
+            "meta-pixel": true,
+            "microsoft-clarity": true,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "restores a stored decision",
+      "setup": {
+        "region": "DE",
+        "regulation": "gdpr",
+        "stored": "v1.eyJzY2hlbWFWZXJzaW9uIjoxLCJjb25zZW50SWQiOiJzdG9yZWRjb25zZW50MDAwMSIsInRzIjoiMjAyNi0xMC0xNFQwOTozMDowMC4wMDBaIiwiY2F0ZWdvcmllcyI6eyJuZWNlc3NhcnkiOnRydWUsImFuYWx5dGljcyI6dHJ1ZSwibGVnYWN5Ijp0cnVlfSwiYWN0aW9uIjoiY3VzdG9tIiwicmVnaW9uIjp7ImNvdW50cnkiOiJERSJ9LCJyZWd1bGF0aW9uIjoiZ2RwciIsImdwYyI6ZmFsc2UsInNlcnZpY2VzIjp7Imdvb2dsZS1hbmFseXRpY3MiOmZhbHNlLCJyZXRpcmVkIjp0cnVlfX0"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-14T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false,
+              "legacy": true
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": true,
+              "meta-pixel": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-14T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "analytics": true,
+              "legacy": true
+            },
+            "services": {
+              "google-analytics": false,
+              "retired": true
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": true,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "set",
+          "categories": {
+            "marketing": true
+          },
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true,
+              "legacy": true
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true,
+              "legacy": true
+            },
+            "services": {
+              "google-analytics": false,
+              "retired": true
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": true,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": true,
+            "microsoft-clarity": true,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "discards a decision made under another regulation",
+      "setup": {
+        "region": "DE",
+        "regulation": "gdpr",
+        "stored": "v1.eyJzY2hlbWFWZXJzaW9uIjoxLCJjb25zZW50SWQiOiJzdG9yZWRjb25zZW50MDAwMSIsInRzIjoiMjAyNi0xMC0xNFQwOTozMDowMC4wMDBaIiwiY2F0ZWdvcmllcyI6eyJuZWNlc3NhcnkiOnRydWUsImFuYWx5dGljcyI6dHJ1ZSwibWFya2V0aW5nIjpmYWxzZX0sImFjdGlvbiI6ImN1c3RvbSIsInJlZ2lvbiI6eyJjb3VudHJ5IjoiREUifSwicmVndWxhdGlvbiI6ImNjcGEiLCJncGMiOmZhbHNlfQ"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": true,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-14T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "ccpa",
+            "gpc": false
+          },
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "keeps a decision without regulation metadata",
+      "setup": {
+        "region": "DE",
+        "regulation": "gdpr",
+        "stored": "v1.eyJzY2hlbWFWZXJzaW9uIjoxLCJjb25zZW50SWQiOiJzdG9yZWRjb25zZW50MDAwMSIsInRzIjoiMjAyNi0xMC0xNFQwOTozMDowMC4wMDBaIiwiY2F0ZWdvcmllcyI6eyJuZWNlc3NhcnkiOnRydWUsImFuYWx5dGljcyI6dHJ1ZSwibWFya2V0aW5nIjpmYWxzZX0sImFjdGlvbiI6ImN1c3RvbSIsImdwYyI6ZmFsc2V9"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-14T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "action": "custom",
+            "gpc": false,
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-14T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "action": "custom",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": true,
+            "meta-pixel": false,
+            "microsoft-clarity": true,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "ignores an expired decision",
+      "setup": {
+        "region": "DE",
+        "regulation": "gdpr",
+        "stored": "v1.eyJzY2hlbWFWZXJzaW9uIjoxLCJjb25zZW50SWQiOiJzdG9yZWRjb25zZW50MDAwMSIsInRzIjoiMjAyNi0xMC0wNFQwOTozMDowMC4wMDBaIiwiY2F0ZWdvcmllcyI6eyJuZWNlc3NhcnkiOnRydWUsImFuYWx5dGljcyI6dHJ1ZSwibWFya2V0aW5nIjpmYWxzZX0sImFjdGlvbiI6ImN1c3RvbSIsInJlZ2lvbiI6eyJjb3VudHJ5IjoiREUifSwicmVndWxhdGlvbiI6ImdkcHIiLCJncGMiOmZhbHNlfQ",
+        "maxAgeDays": 10
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": true,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "storedconsent0001",
+            "ts": "2026-10-04T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "analytics": true,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "ignores an invalid stored value",
+      "setup": {
+        "region": "DE",
+        "regulation": "gdpr",
+        "stored": "v1.garbage"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "DE"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": true,
+          "stored": null,
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "custom cookie name",
+      "setup": {
+        "region": "FR",
+        "regulation": "gdpr",
+        "cookieName": "my_pref"
+      },
+      "steps": [
+        {
+          "op": "init",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": false,
+              "marketing": false
+            },
+            "action": "custom",
+            "region": {
+              "country": "FR"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": false,
+              "microsoft-clarity": false,
+              "meta-pixel": false
+            }
+          },
+          "needsDecision": true,
+          "stored": null,
+          "has": {
+            "analytics": false,
+            "essential": true,
+            "marketing": false,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": false,
+            "meta-pixel": false,
+            "microsoft-clarity": false,
+            "session-management": true,
+            "unknown": false
+          }
+        },
+        {
+          "op": "acceptAll",
+          "state": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true
+            },
+            "action": "accept_all",
+            "region": {
+              "country": "FR"
+            },
+            "regulation": "gdpr",
+            "gpc": false,
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            }
+          },
+          "needsDecision": false,
+          "stored": {
+            "schemaVersion": 1,
+            "consentId": "00000000-0000-4000-8000-000000000001",
+            "ts": "2026-10-15T09:30:00.000Z",
+            "categories": {
+              "necessary": true,
+              "essential": true,
+              "analytics": true,
+              "marketing": true
+            },
+            "services": {
+              "session-management": true,
+              "google-analytics": true,
+              "microsoft-clarity": true,
+              "meta-pixel": true
+            },
+            "action": "accept_all",
+            "region": {
+              "country": "FR"
+            },
+            "regulation": "gdpr",
+            "gpc": false
+          },
+          "has": {
+            "analytics": true,
+            "essential": true,
+            "marketing": true,
+            "necessary": true,
+            "unknown": false
+          },
+          "hasService": {
+            "google-analytics": true,
+            "meta-pixel": true,
+            "microsoft-clarity": true,
+            "session-management": true,
+            "unknown": false
+          }
+        }
+      ]
+    }
+  ]
+}

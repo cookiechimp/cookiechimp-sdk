@@ -1,0 +1,396 @@
+{
+  "specVersion": 1,
+  "description": "consentText: dashboard copy with SDK fallbacks. `dashboard` adapts `bundle` with `adapt`; `options` are the locale and app translations. `messages` is summarized as its language and resolved ui copy.",
+  "cases": [
+    {
+      "name": "English",
+      "bundle": "main",
+      "adapt": {
+        "region": "DE",
+        "locale": "en"
+      },
+      "options": {
+        "locale": "en-GB"
+      },
+      "expected": {
+        "language": "en",
+        "rtl": false,
+        "banner": {
+          "title": "We value your privacy",
+          "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
+          "additionalDescription": "<p>You can change or withdraw your choices at any time in cookie settings.</p>",
+          "acceptAll": "Accept All",
+          "rejectAll": "Reject All",
+          "customize": "Manage Preferences",
+          "close": "Close",
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>",
+          "poweredBy": true
+        },
+        "preferences": {
+          "title": "Cookie Settings",
+          "description": "<p>You are in control of your data. Essential cookies are always active because the website needs them to work. Choose which optional categories and vendors you allow, and expand each item to see its purpose, provider and cookies. Your choices take effect when you save them.</p>",
+          "acceptAll": "Accept All",
+          "rejectAll": "Reject All",
+          "save": "Save Preferences",
+          "close": "Close",
+          "moreInfoTitle": "About this example",
+          "moreInfo": "<p>This is an illustrative website configuration with real vendor names and example cookie settings. No analytics or advertising tags are loaded in this demo. Cookie durations can vary by site configuration and browser. You can return to these settings at any time using the cookie icon.</p>"
+        },
+        "privacyPolicyUrl": "https://cookiechimp.com/privacy.php",
+        "messages": {
+          "language": "en",
+          "ui": {
+            "title": "Privacy choices",
+            "description": "We use technologies like cookies and SDKs to run this app. Choose which optional ones may be used.",
+            "acceptAll": "Accept all",
+            "rejectAll": "Reject optional",
+            "customize": "Customize",
+            "close": "Close",
+            "privacyPolicy": "Privacy policy",
+            "preferencesTitle": "Privacy preferences",
+            "preferencesDescription": "Choose consent by category or vendor. Expand an item to see its details.",
+            "save": "Save preferences",
+            "consentId": "Your consent ID",
+            "poweredBy": "Powered by {name}",
+            "dataCollected": "Data collected",
+            "usedFor": "Used for",
+            "tracking": "Tracks you across other apps",
+            "retention": "Kept for",
+            "packages": "SDK packages",
+            "yes": "Yes",
+            "no": "No",
+            "type": "Type",
+            "duration": "Duration",
+            "company": "Company"
+          }
+        }
+      }
+    },
+    {
+      "name": "German",
+      "bundle": "main",
+      "adapt": {
+        "region": "DE",
+        "locale": "de"
+      },
+      "options": {
+        "locale": "de-DE"
+      },
+      "expected": {
+        "language": "de",
+        "rtl": false,
+        "banner": {
+          "title": "Wir respektieren Ihre Privatsphäre",
+          "description": "We use cookies to improve your experience.",
+          "additionalDescription": "<p>Sie können Ihre Auswahl jederzeit in den Cookie-Einstellungen ändern.</p>",
+          "acceptAll": "Alle akzeptieren",
+          "rejectAll": "Alle ablehnen",
+          "customize": "Einstellungen",
+          "close": "Close",
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>",
+          "poweredBy": true
+        },
+        "preferences": {
+          "title": "Cookie-Einstellungen",
+          "description": "<p>Sie entscheiden, welche optionalen Kategorien und Anbieter Sie zulassen. Erforderliche Cookies bleiben aktiv. Öffnen Sie einen Eintrag, um Zweck, Anbieter und Cookies zu sehen. Ihre Auswahl wird beim Speichern übernommen.</p>",
+          "acceptAll": "Alle akzeptieren",
+          "rejectAll": "Alle ablehnen",
+          "save": "Speichern",
+          "close": "Close",
+          "moreInfoTitle": "Über dieses Beispiel",
+          "moreInfo": "<p>Beispielkonfiguration mit echten Anbietern. Diese Demo lädt keine Analyse- oder Werbe-Tags. Die Speicherdauer kann je nach Website und Browser abweichen.</p>"
+        },
+        "privacyPolicyUrl": "https://cookiechimp.com/privacy.php",
+        "messages": {
+          "language": "de",
+          "ui": {
+            "title": "Datenschutzeinstellungen",
+            "description": "Wir verwenden Technologien wie Cookies und SDKs, um diese App bereitzustellen. Wählen Sie, welche optionalen davon verwendet werden dürfen.",
+            "acceptAll": "Alle akzeptieren",
+            "rejectAll": "Optionale ablehnen",
+            "customize": "Anpassen",
+            "close": "Schließen",
+            "privacyPolicy": "Datenschutzerklärung",
+            "preferencesTitle": "Datenschutzeinstellungen",
+            "preferencesDescription": "Erteilen Sie Ihre Einwilligung nach Kategorie oder Anbieter. Erweitern Sie einen Eintrag, um Details zu sehen.",
+            "save": "Einstellungen speichern",
+            "consentId": "Ihre Einwilligungs-ID",
+            "poweredBy": "Bereitgestellt von {name}",
+            "dataCollected": "Erhobene Daten",
+            "usedFor": "Verwendet für",
+            "tracking": "Verfolgt Sie über andere Apps hinweg",
+            "retention": "Aufbewahrt für",
+            "packages": "SDK-Pakete",
+            "yes": "Ja",
+            "no": "Nein",
+            "type": "Typ",
+            "duration": "Dauer",
+            "company": "Unternehmen"
+          }
+        }
+      }
+    },
+    {
+      "name": "German copy with SDK fallbacks",
+      "bundle": "variant",
+      "adapt": {
+        "region": "DE",
+        "locale": "de"
+      },
+      "options": {
+        "locale": "de-AT"
+      },
+      "expected": {
+        "language": "de",
+        "rtl": false,
+        "banner": {
+          "title": "Datenschutzeinstellungen",
+          "description": "We use cookies to improve your experience.",
+          "additionalDescription": "<p>Sie können Ihre Auswahl jederzeit in den Cookie-Einstellungen ändern.</p>",
+          "acceptAll": "Alle akzeptieren",
+          "rejectAll": "Alle ablehnen",
+          "customize": "Einstellungen",
+          "close": "Schließen",
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>",
+          "poweredBy": false
+        },
+        "preferences": {
+          "title": "Cookie-Einstellungen",
+          "description": "<p>Sie entscheiden, welche optionalen Kategorien und Anbieter Sie zulassen. Erforderliche Cookies bleiben aktiv. Öffnen Sie einen Eintrag, um Zweck, Anbieter und Cookies zu sehen. Ihre Auswahl wird beim Speichern übernommen.</p>",
+          "acceptAll": "Alle akzeptieren",
+          "rejectAll": "Alle ablehnen",
+          "save": "Speichern",
+          "close": "Close",
+          "moreInfoTitle": "Über dieses Beispiel"
+        },
+        "privacyPolicyUrl": "https://cookiechimp.com/privacy.php",
+        "messages": {
+          "language": "de",
+          "ui": {
+            "title": "Datenschutzeinstellungen",
+            "description": "Wir verwenden Technologien wie Cookies und SDKs, um diese App bereitzustellen. Wählen Sie, welche optionalen davon verwendet werden dürfen.",
+            "acceptAll": "Alle akzeptieren",
+            "rejectAll": "Optionale ablehnen",
+            "customize": "Anpassen",
+            "close": "Schließen",
+            "privacyPolicy": "Datenschutzerklärung",
+            "preferencesTitle": "Datenschutzeinstellungen",
+            "preferencesDescription": "Erteilen Sie Ihre Einwilligung nach Kategorie oder Anbieter. Erweitern Sie einen Eintrag, um Details zu sehen.",
+            "save": "Einstellungen speichern",
+            "consentId": "Ihre Einwilligungs-ID",
+            "poweredBy": "Bereitgestellt von {name}",
+            "dataCollected": "Erhobene Daten",
+            "usedFor": "Verwendet für",
+            "tracking": "Verfolgt Sie über andere Apps hinweg",
+            "retention": "Aufbewahrt für",
+            "packages": "SDK-Pakete",
+            "yes": "Ja",
+            "no": "Nein",
+            "type": "Typ",
+            "duration": "Dauer",
+            "company": "Unternehmen"
+          }
+        }
+      }
+    },
+    {
+      "name": "Arabic, right to left",
+      "bundle": "variant",
+      "adapt": {
+        "region": "DE",
+        "locale": "ar"
+      },
+      "options": {
+        "locale": "ar-EG"
+      },
+      "expected": {
+        "language": "ar",
+        "rtl": true,
+        "banner": {
+          "title": "خصوصيتك",
+          "description": "نستخدم تقنيات مثل ملفات تعريف الارتباط وحزم SDK لتشغيل هذا التطبيق. اختر التقنيات الاختيارية التي يمكن استخدامها.",
+          "acceptAll": "قبول الكل",
+          "rejectAll": "رفض الاختيارية",
+          "customize": "تخصيص",
+          "close": "إغلاق",
+          "footer": "<p>Fragen? <a href='https://example.test/help'>Hilfe</a> </p>",
+          "poweredBy": false
+        },
+        "preferences": {
+          "title": "تفضيلات الخصوصية",
+          "description": "اختر موافقتك حسب الفئة أو المزوّد. وسّع أي عنصر لعرض تفاصيله.",
+          "acceptAll": "قبول الكل",
+          "rejectAll": "رفض الاختيارية",
+          "save": "حفظ التفضيلات",
+          "close": "إغلاق"
+        },
+        "privacyPolicyUrl": "https://cookiechimp.com/privacy.php",
+        "messages": {
+          "language": "ar",
+          "ui": {
+            "title": "خيارات الخصوصية",
+            "description": "نستخدم تقنيات مثل ملفات تعريف الارتباط وحزم SDK لتشغيل هذا التطبيق. اختر التقنيات الاختيارية التي يمكن استخدامها.",
+            "acceptAll": "قبول الكل",
+            "rejectAll": "رفض الاختيارية",
+            "customize": "تخصيص",
+            "close": "إغلاق",
+            "privacyPolicy": "سياسة الخصوصية",
+            "preferencesTitle": "تفضيلات الخصوصية",
+            "preferencesDescription": "اختر موافقتك حسب الفئة أو المزوّد. وسّع أي عنصر لعرض تفاصيله.",
+            "save": "حفظ التفضيلات",
+            "consentId": "معرّف موافقتك",
+            "poweredBy": "مدعوم من {name}",
+            "dataCollected": "البيانات التي تُجمع",
+            "usedFor": "تُستخدم من أجل",
+            "tracking": "يتتبعك عبر تطبيقات أخرى",
+            "retention": "مدة الاحتفاظ",
+            "packages": "حزم SDK",
+            "yes": "نعم",
+            "no": "لا",
+            "type": "النوع",
+            "duration": "المدة",
+            "company": "الشركة"
+          }
+        }
+      }
+    },
+    {
+      "name": "Brazilian Portuguese device on English copy",
+      "bundle": "main",
+      "adapt": {
+        "region": "US",
+        "locale": "pt"
+      },
+      "options": {
+        "locale": "pt-BR"
+      },
+      "expected": {
+        "language": "en",
+        "rtl": false,
+        "banner": {
+          "title": "We value your privacy",
+          "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
+          "additionalDescription": "<p>You can change or withdraw your choices at any time in cookie settings.</p>",
+          "acceptAll": "Accept All",
+          "rejectAll": "Reject",
+          "customize": "Manage Preferences",
+          "close": "Close",
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>",
+          "poweredBy": true
+        },
+        "preferences": {
+          "title": "Cookie Settings",
+          "description": "<p>You are in control of your data. Essential cookies are always active because the website needs them to work. Choose which optional categories and vendors you allow, and expand each item to see its purpose, provider and cookies. Your choices take effect when you save them.</p>",
+          "acceptAll": "Accept All",
+          "rejectAll": "Reject",
+          "save": "Save Preferences",
+          "close": "Close",
+          "moreInfoTitle": "About this example",
+          "moreInfo": "<p>This is an illustrative website configuration with real vendor names and example cookie settings. No analytics or advertising tags are loaded in this demo. Cookie durations can vary by site configuration and browser. You can return to these settings at any time using the cookie icon.</p>"
+        },
+        "privacyPolicyUrl": "https://cookiechimp.com/privacy.php",
+        "messages": {
+          "language": "en",
+          "ui": {
+            "title": "Privacy choices",
+            "description": "We use technologies like cookies and SDKs to run this app. Choose which optional ones may be used.",
+            "acceptAll": "Accept all",
+            "rejectAll": "Reject optional",
+            "customize": "Customize",
+            "close": "Close",
+            "privacyPolicy": "Privacy policy",
+            "preferencesTitle": "Privacy preferences",
+            "preferencesDescription": "Choose consent by category or vendor. Expand an item to see its details.",
+            "save": "Save preferences",
+            "consentId": "Your consent ID",
+            "poweredBy": "Powered by {name}",
+            "dataCollected": "Data collected",
+            "usedFor": "Used for",
+            "tracking": "Tracks you across other apps",
+            "retention": "Kept for",
+            "packages": "SDK packages",
+            "yes": "Yes",
+            "no": "No",
+            "type": "Type",
+            "duration": "Duration",
+            "company": "Company"
+          }
+        }
+      }
+    },
+    {
+      "name": "app translations",
+      "bundle": "variant",
+      "adapt": {
+        "region": "DE",
+        "locale": "ar"
+      },
+      "options": {
+        "locale": "ar",
+        "translations": {
+          "ar": {
+            "ui": {
+              "title": "مخصص",
+              "save": " "
+            }
+          },
+          "ar-EG": {
+            "ui": {
+              "close": "x"
+            }
+          }
+        }
+      },
+      "expected": {
+        "language": "ar",
+        "rtl": true,
+        "banner": {
+          "title": "خصوصيتك",
+          "description": "نستخدم تقنيات مثل ملفات تعريف الارتباط وحزم SDK لتشغيل هذا التطبيق. اختر التقنيات الاختيارية التي يمكن استخدامها.",
+          "acceptAll": "قبول الكل",
+          "rejectAll": "رفض الاختيارية",
+          "customize": "تخصيص",
+          "close": "إغلاق",
+          "footer": "<p>Fragen? <a href='https://example.test/help'>Hilfe</a> </p>",
+          "poweredBy": false
+        },
+        "preferences": {
+          "title": "تفضيلات الخصوصية",
+          "description": "اختر موافقتك حسب الفئة أو المزوّد. وسّع أي عنصر لعرض تفاصيله.",
+          "acceptAll": "قبول الكل",
+          "rejectAll": "رفض الاختيارية",
+          "save": "حفظ التفضيلات",
+          "close": "إغلاق"
+        },
+        "privacyPolicyUrl": "https://cookiechimp.com/privacy.php",
+        "messages": {
+          "language": "ar",
+          "ui": {
+            "title": "مخصص",
+            "description": "نستخدم تقنيات مثل ملفات تعريف الارتباط وحزم SDK لتشغيل هذا التطبيق. اختر التقنيات الاختيارية التي يمكن استخدامها.",
+            "acceptAll": "قبول الكل",
+            "rejectAll": "رفض الاختيارية",
+            "customize": "تخصيص",
+            "close": "إغلاق",
+            "privacyPolicy": "سياسة الخصوصية",
+            "preferencesTitle": "تفضيلات الخصوصية",
+            "preferencesDescription": "اختر موافقتك حسب الفئة أو المزوّد. وسّع أي عنصر لعرض تفاصيله.",
+            "save": "حفظ التفضيلات",
+            "consentId": "معرّف موافقتك",
+            "poweredBy": "مدعوم من {name}",
+            "dataCollected": "البيانات التي تُجمع",
+            "usedFor": "تُستخدم من أجل",
+            "tracking": "يتتبعك عبر تطبيقات أخرى",
+            "retention": "مدة الاحتفاظ",
+            "packages": "حزم SDK",
+            "yes": "نعم",
+            "no": "لا",
+            "type": "النوع",
+            "duration": "المدة",
+            "company": "الشركة"
+          }
+        }
+      }
+    }
+  ]
+}

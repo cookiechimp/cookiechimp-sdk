@@ -10,6 +10,7 @@
     "format": "biome format --write .",
     "lint": "biome check . && turbo run lint",
     "size": "pnpm build && node --experimental-strip-types scripts/size-harness.ts",
+    "spec:mobile": "pnpm --filter @cookiechimp/core build && pnpm --filter @cookiechimp/react-native spec:mobile",
     "test:component": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs --filter @cookiechimp/scripts --filter @cookiechimp/devtools build && vitest run --config vitest.component.config.ts",
     "test:e2e": "pnpm --filter @cookiechimp/tokens --filter @cookiechimp/translations --filter @cookiechimp/core --filter @cookiechimp/react --filter @cookiechimp/nextjs --filter @cookiechimp/scripts --filter @cookiechimp/devtools --filter @cookiechimp/cli build && pnpm --filter @cookiechimp/fixture-nextjs --filter \"./examples/*\" build && playwright test",
     "test:unit": "turbo run test:unit && vitest run scripts bench release",

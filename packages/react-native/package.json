@@ -25,6 +25,7 @@
   "scripts": {
     "build": "tsdown --config-loader native && cp dist/index.d.mts dist/index.d.ts",
     "lint": "biome check .",
+    "spec:mobile": "UPDATE_MOBILE_SPEC=1 vitest run --config vitest.config.ts src/conformance.test.ts",
     "test:unit": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit"
   },
