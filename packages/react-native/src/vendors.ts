@@ -1,10 +1,20 @@
 import type { ConsentRuntime } from "@cookiechimp/core";
+import { track } from "./events";
 
 export interface VendorCallbacks {
   /** Called when consent allows the vendor, for example to enable collection. */
   onStart?: () => void;
   /** Called when consent is withdrawn, for example to disable collection. */
   onStop?: () => void;
+}
+
+/**
+ * A ready-made vendor: its dashboard service name, default category and the
+ * callbacks that switch its SDK on and off. See `presets`.
+ */
+export interface VendorPreset extends Required<VendorCallbacks> {
+  name: string;
+  category: string;
 }
 
 export interface VendorInfo {
@@ -49,9 +59,11 @@ function settle(vendor: Vendor) {
   const allow = current ? allowed(vendor, current) : false;
   if (allow && !vendor.running) {
     vendor.running = true;
+    track("vendor", `${vendor.name} started`);
     call(vendor.onStart, vendor.name);
   } else if (!allow && vendor.running) {
     vendor.running = false;
+    track("vendor", `${vendor.name} stopped`);
     call(vendor.onStop, vendor.name);
   }
 }
@@ -62,11 +74,36 @@ export function applyVendors(runtime: ConsentRuntime | null) {
   for (const vendor of vendors.values()) settle(vendor);
 }
 
+/**
+ * Register a vendor SDK by name and category, or a preset. A preset's name
+ * and category can be overridden, for example
+ * `registerVendor(presets.mixpanel(mixpanel), { category: "marketing" })`.
+ */
+export function registerVendor(
+  preset: VendorPreset,
+  overrides?: { name?: string; category?: string },
+): void;
 export function registerVendor(
   name: string,
   category: string,
-  callbacks: VendorCallbacks = {},
+  callbacks?: VendorCallbacks,
+): void;
+export function registerVendor(
+  nameOrPreset: string | VendorPreset,
+  categoryOrOverrides?: string | { name?: string; category?: string },
+  maybeCallbacks: VendorCallbacks = {},
 ) {
+  const preset = typeof nameOrPreset === "string" ? undefined : nameOrPreset;
+  const overrides =
+    typeof categoryOrOverrides === "object" ? categoryOrOverrides : {};
+  const name = overrides.name ?? preset?.name ?? (nameOrPreset as string);
+  const category =
+    overrides.category ??
+    preset?.category ??
+    (typeof categoryOrOverrides === "string" ? categoryOrOverrides : "");
+  const callbacks: VendorCallbacks = preset
+    ? { onStart: preset.onStart, onStop: preset.onStop }
+    : maybeCallbacks;
   const previous = vendors.get(name);
   const vendor: Vendor = {
     name,
@@ -87,6 +124,7 @@ export function startVendor(name: string) {
   const vendor = vendors.get(name);
   if (vendor && !vendor.running) {
     vendor.running = true;
+    track("vendor", `${name} started by the app`);
     call(vendor.onStart, name);
   }
 }
@@ -95,6 +133,7 @@ export function stopVendor(name: string) {
   const vendor = vendors.get(name);
   if (vendor?.running) {
     vendor.running = false;
+    track("vendor", `${name} stopped by the app`);
     call(vendor.onStop, name);
   }
 }

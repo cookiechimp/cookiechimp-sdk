@@ -1,3 +1,4 @@
+import en from "./locales/en";
 import { object } from "./presentation";
 
 /** What a mobile SDK collects, in the shape of the app store privacy labels. */
@@ -15,56 +16,14 @@ export interface AppData {
 }
 
 /**
- * The data types from Apple's App Privacy details, which map onto Google
- * Play's Data safety types. The dashboard offers the same keys.
+ * English names of the data types from Apple's App Privacy details, which map
+ * onto Google Play's Data safety types. The dashboard offers the same keys.
+ * `messages(language).dataType(key)` returns them in other languages.
  */
-export const DATA_TYPES: Record<string, string> = {
-  name: "Name",
-  email: "Email address",
-  phone: "Phone number",
-  address: "Physical address",
-  other_contact: "Other contact info",
-  health: "Health",
-  fitness: "Fitness",
-  payment_info: "Payment info",
-  credit_info: "Credit info",
-  other_financial: "Other financial info",
-  precise_location: "Precise location",
-  coarse_location: "Approximate location",
-  sensitive_info: "Sensitive info",
-  contacts: "Contacts",
-  messages: "Messages",
-  photos_videos: "Photos or videos",
-  audio: "Audio",
-  gameplay: "Gameplay content",
-  customer_support: "Customer support",
-  other_content: "Other user content",
-  browsing_history: "Browsing history",
-  search_history: "Search history",
-  user_id: "User ID",
-  device_id: "Device ID",
-  advertising_id: "Advertising ID",
-  purchase_history: "Purchase history",
-  product_interaction: "App interactions",
-  advertising_data: "Advertising data",
-  other_usage: "Other usage data",
-  crash_data: "Crash data",
-  performance_data: "Performance data",
-  other_diagnostics: "Other diagnostic data",
-  other_data: "Other data",
-};
+export const DATA_TYPES: Readonly<Record<string, string>> = en.data;
 
-export const PURPOSES: Record<string, string> = {
-  app_functionality: "App functionality",
-  analytics: "Analytics",
-  personalization: "Personalization",
-  developer_advertising: "Our own advertising",
-  third_party_advertising: "Third-party advertising",
-  fraud_prevention: "Fraud prevention and security",
-  account_management: "Account management",
-  developer_communications: "Communications",
-  other_purposes: "Other purposes",
-};
+/** English names of the purposes. See `messages(language).purpose(key)`. */
+export const PURPOSES: Readonly<Record<string, string>> = en.purposes;
 
 const texts = (value: unknown, max = 128) =>
   (Array.isArray(value) ? value : []).filter(

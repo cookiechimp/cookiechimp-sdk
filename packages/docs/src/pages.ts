@@ -96,6 +96,13 @@ export const pages: readonly PageSpec[] = [
     source: "packages/react-native/README.md",
   },
   {
+    slug: "react-native-integrations",
+    title: "React Native vendor SDKs",
+    description:
+      "Presets for common mobile SDKs, Firebase Consent Mode and App Tracking Transparency.",
+    source: "packages/docs/content/react-native-integrations.md",
+  },
+  {
     slug: "examples",
     title: "Examples",
     description: "Runnable Next.js and plain React/Vite apps.",
@@ -121,7 +128,7 @@ export const navigation = {
     },
     {
       group: "Mobile",
-      pages: ["sdk/react-native"],
+      pages: ["sdk/react-native", "sdk/react-native-integrations"],
     },
     {
       group: "SDK reference",

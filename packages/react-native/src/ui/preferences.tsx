@@ -4,7 +4,7 @@ import type {
   PlatformService,
   PlatformStorageItem,
 } from "@cookiechimp/core/sync";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import {
   Animated,
   Modal,
@@ -17,15 +17,11 @@ import {
   View,
 } from "react-native";
 import { store } from "../api";
-import {
-  type AppData,
-  appData,
-  DATA_TYPES,
-  label,
-  PURPOSES,
-} from "../app-data";
-import { useCookieChimp } from "../hooks";
+import { type AppData, appData } from "../app-data";
+import { useConsentDraft, useCookieChimp } from "../hooks";
+import type { Messages } from "../i18n";
 import { object, type Palette, plain, url } from "../presentation";
+import type { ConsentText } from "../text";
 import {
   Button,
   styles as base,
@@ -42,42 +38,57 @@ import { Collapse, usePresence, useProgress } from "./motion";
 
 const MONO = Platform.select({ ios: "Menlo", default: "monospace" });
 
-type Draft = {
+interface Draft {
   categories: Record<string, boolean>;
   services: Record<string, boolean>;
-};
+  toggleCategory(id: string): void;
+  toggleService(id: string): void;
+}
 
 /** The second-layer preferences screen, styled from the dashboard. */
 export function ConsentPreferences({
-  consentIdLabel = "Your consent ID",
+  consentIdLabel,
   insets = {},
 }: {
+  /** Defaults to the translated "Your consent ID". */
   consentIdLabel?: string;
   insets?: Insets;
 }) {
-  const { dashboard, consent, preferencesOpen } = useCookieChimp();
+  const { dashboard, text, consent, preferencesOpen } = useCookieChimp();
   const engine = store.engine();
-  const [draft, setDraft] = useState<Draft>({ categories: {}, services: {} });
+  const draft = useConsentDraft();
+  const { discard } = draft;
+  // Each opening starts from the saved decision.
   useEffect(() => {
-    if (!preferencesOpen || !consent) return;
-    setDraft({
-      categories: { ...consent.categories },
-      services: { ...consent.services },
-    });
-  }, [preferencesOpen, consent]);
+    if (preferencesOpen) discard();
+  }, [preferencesOpen, discard]);
+  const values = useMemo(() => {
+    const categories: Record<string, boolean> = {};
+    const services: Record<string, boolean> = {};
+    for (const category of draft.categories) {
+      categories[category.id] = category.enabled;
+      for (const service of category.services)
+        services[service.id] = service.enabled;
+    }
+    return { categories, services };
+  }, [draft.categories]);
   const { mounted, progress } = usePresence(!!dashboard && preferencesOpen);
-  if (!dashboard || !mounted) return null;
+  if (!dashboard || !text || !mounted) return null;
   return (
     <PreferencesView
       dashboard={dashboard}
+      text={text}
       progress={progress}
       insets={insets}
-      draft={draft}
-      setDraft={setDraft}
+      draft={{
+        ...values,
+        toggleCategory: draft.toggleCategory,
+        toggleService: draft.toggleService,
+      }}
       consentId={consent?.consentId}
-      consentIdLabel={consentIdLabel}
+      consentIdLabel={consentIdLabel ?? text.messages.ui.consentId}
       onClose={() => engine?.hidePreferences()}
-      onSave={() => engine?.save(draft)}
+      onSave={draft.save}
       onAcceptAll={() => engine?.acceptAll()}
       onRejectAll={() => engine?.rejectAll()}
     />
@@ -181,9 +192,11 @@ function Fact({
 function StorageItems({
   items,
   colors,
+  messages,
 }: {
   items: PlatformStorageItem[];
   colors: Palette;
+  messages: Messages;
 }) {
   if (!items.length) return null;
   return (
@@ -211,21 +224,21 @@ function StorageItems({
           <View style={styles.facts}>
             {item.type ? (
               <Fact
-                label="Type"
+                label={messages.ui.type}
                 value={item.type.replaceAll("_", " ")}
                 colors={colors}
               />
             ) : null}
             {item.duration ? (
               <Fact
-                label="Duration"
+                label={messages.ui.duration}
                 value={plain(item.duration)}
                 colors={colors}
               />
             ) : null}
             {item.company ? (
               <Fact
-                label="Company"
+                label={messages.ui.company}
                 value={plain(item.company)}
                 colors={colors}
               />
@@ -272,7 +285,15 @@ function Chips({
 }
 
 /** A mobile SDK's data labels, in the shape of the app store privacy labels. */
-function AppDataDetails({ data, colors }: { data: AppData; colors: Palette }) {
+function AppDataDetails({
+  data,
+  colors,
+  messages,
+}: {
+  data: AppData;
+  colors: Palette;
+  messages: Messages;
+}) {
   const packages = [
     { platform: "iOS", names: data.packages.ios },
     { platform: "Android", names: data.packages.android },
@@ -291,33 +312,37 @@ function AppDataDetails({ data, colors }: { data: AppData; colors: Palette }) {
       ]}
     >
       <Chips
-        title="Data collected"
-        items={data.collected.map((key) => label(DATA_TYPES, key))}
+        title={messages.ui.dataCollected}
+        items={data.collected.map(messages.dataType)}
         colors={colors}
       />
       <Chips
-        title="Used for"
-        items={data.purposes.map((key) => label(PURPOSES, key))}
+        title={messages.ui.usedFor}
+        items={data.purposes.map(messages.purpose)}
         colors={colors}
       />
       {data.tracking !== undefined || data.retention ? (
         <View style={styles.facts}>
           {data.tracking !== undefined ? (
             <Fact
-              label="Tracks you across other apps"
-              value={data.tracking ? "Yes" : "No"}
+              label={messages.ui.tracking}
+              value={data.tracking ? messages.ui.yes : messages.ui.no}
               colors={colors}
             />
           ) : null}
           {data.retention ? (
-            <Fact label="Kept for" value={data.retention} colors={colors} />
+            <Fact
+              label={messages.ui.retention}
+              value={data.retention}
+              colors={colors}
+            />
           ) : null}
         </View>
       ) : null}
       {packages.length ? (
         <View style={styles.section}>
           <Text style={[styles.factLabel, { color: colors.text }]}>
-            SDK packages
+            {messages.ui.packages}
           </Text>
           {packages.map((group) => (
             <View key={group.platform} style={styles.packages}>
@@ -344,9 +369,11 @@ function AppDataDetails({ data, colors }: { data: AppData; colors: Palette }) {
 function VendorDetails({
   service,
   colors,
+  messages,
 }: {
   service: PlatformService;
   colors: Palette;
+  messages: Messages;
 }) {
   const privacy = url(service.privacy_policy_url);
   const data = appData(service.app_data);
@@ -354,20 +381,30 @@ function VendorDetails({
     <>
       <Rich value={service.description} colors={colors} style={base.small} />
       {privacy && (
-        <Link href={privacy} label="Privacy policy" colors={colors} />
+        <Link
+          href={privacy}
+          label={messages.ui.privacyPolicy}
+          colors={colors}
+        />
       )}
-      {data && <AppDataDetails data={data} colors={colors} />}
-      <StorageItems items={service.storage_items} colors={colors} />
+      {data && (
+        <AppDataDetails data={data} colors={colors} messages={messages} />
+      )}
+      <StorageItems
+        items={service.storage_items}
+        colors={colors}
+        messages={messages}
+      />
     </>
   );
 }
 
 function PreferencesView({
   dashboard,
+  text,
   progress,
   insets,
   draft,
-  setDraft,
   consentId,
   consentIdLabel,
   onClose,
@@ -376,10 +413,10 @@ function PreferencesView({
   onRejectAll,
 }: {
   dashboard: DashboardConfig;
+  text: ConsentText;
   progress: Animated.Value;
   insets: Insets;
   draft: Draft;
-  setDraft: (update: (previous: Draft) => Draft) => void;
   consentId?: string;
   consentIdLabel: string;
   onClose(): void;
@@ -387,15 +424,16 @@ function PreferencesView({
   onAcceptAll(): void;
   onRejectAll(): void;
 }) {
-  const { colors, rtl } = useLook(dashboard);
+  const { colors } = useLook(dashboard);
+  const rtl = text.rtl;
+  const messages = text.messages;
   const window = useWindowDimensions();
-  const copy = object(dashboard.copy.preferences_modal);
-  const bannerCopy = object(dashboard.copy.consent_modal);
+  const copy = text.preferences;
   const gui = object(dashboard.banner.preferences_gui_options);
   const buttons = object(dashboard.banner.preferences_buttons);
   const vendorControls = gui.control_level !== "category_only";
   const showServices = vendorControls || gui.show_services !== false;
-  const privacy = url(dashboard.copy.privacy_policy_url);
+  const privacy = text.privacyPolicyUrl;
   // A full screen banner opens a full screen preferences page to match.
   const fullscreen =
     object(dashboard.banner.gui_options).layout === "fullscreen";
@@ -403,37 +441,9 @@ function PreferencesView({
   const fromRight = gui.position === "right" ? !rtl : rtl;
   const panelWidth = Math.min(window.width, 460);
   const toggleCategory = (category: PlatformCategory) =>
-    setDraft((previous) => {
-      const enabled = !previous.categories[category.slug];
-      return {
-        categories: { ...previous.categories, [category.slug]: enabled },
-        services: {
-          ...previous.services,
-          ...Object.fromEntries(
-            category.services.map((service) => [service.consent_key, enabled]),
-          ),
-        },
-      };
-    });
-  const toggleService = (
-    category: PlatformCategory,
-    service: PlatformService,
-  ) =>
-    setDraft((previous) => {
-      const services = {
-        ...previous.services,
-        [service.consent_key]: !previous.services[service.consent_key],
-      };
-      return {
-        services,
-        categories: {
-          ...previous.categories,
-          [category.slug]: category.services.some(
-            (vendor) => services[vendor.consent_key],
-          ),
-        },
-      };
-    });
+    draft.toggleCategory(category.slug);
+  const toggleService = (_: PlatformCategory, service: PlatformService) =>
+    draft.toggleService(service.consent_key);
   const equal = gui.equal_weight_buttons !== false;
   const showAccept = buttons.show_accept_btn !== false;
   const showReject = buttons.show_accept_necessary_btn !== false;
@@ -472,7 +482,7 @@ function PreferencesView({
         <Animated.View
           testID="cookiechimp-preferences"
           accessibilityViewIsModal
-          accessibilityLanguage={dashboard.language || undefined}
+          accessibilityLanguage={text.language || undefined}
           style={[
             styles.sheet,
             {
@@ -545,28 +555,22 @@ function PreferencesView({
                 accessibilityRole="header"
                 style={[styles.title, { color: colors.heading }]}
               >
-                {plain(copy.title) || "Privacy preferences"}
+                {copy.title}
               </Text>
             </View>
-            <CloseButton
-              label={plain(copy.close_btn) || "Close"}
-              colors={colors}
-              onPress={onClose}
-            />
+            <CloseButton label={copy.close} colors={colors} onPress={onClose} />
           </View>
           <ScrollView
             style={[styles.body, (fullscreen || panel) && styles.bodyFill]}
             contentContainerStyle={styles.bodyContent}
           >
-            <Rich
-              value={
-                copy.description ||
-                "Choose consent by category or vendor. Expand an item to see its details."
-              }
-              colors={colors}
-            />
+            <Rich value={copy.description} colors={colors} />
             {privacy && (
-              <Link href={privacy} label="Privacy policy" colors={colors} />
+              <Link
+                href={privacy}
+                label={messages.ui.privacyPolicy}
+                colors={colors}
+              />
             )}
             <View style={styles.categories}>
               {(dashboard.preferences ?? []).map((category) => (
@@ -632,24 +636,29 @@ function PreferencesView({
                             ) : undefined
                           }
                         >
-                          <VendorDetails service={service} colors={colors} />
+                          <VendorDetails
+                            service={service}
+                            colors={colors}
+                            messages={messages}
+                          />
                         </Disclosure>
                       ))}
                       <StorageItems
                         items={category.storage_items}
                         colors={colors}
+                        messages={messages}
                       />
                     </View>
                   )}
                 </Disclosure>
               ))}
             </View>
-            {plain(copy.more_info_title) ? (
+            {copy.moreInfoTitle ? (
               <Text style={[styles.subtitle, { color: colors.heading }]}>
-                {plain(copy.more_info_title)}
+                {copy.moreInfoTitle}
               </Text>
             ) : null}
-            <Rich value={copy.more_info} colors={colors} />
+            <Rich value={copy.moreInfo} colors={colors} />
             {consentId ? (
               <View
                 style={[
@@ -685,11 +694,7 @@ function PreferencesView({
               <View style={styles.row}>
                 {showReject && (
                   <Button
-                    label={
-                      plain(copy.reject_btn) ||
-                      plain(bannerCopy.reject_btn) ||
-                      "Reject optional"
-                    }
+                    label={copy.rejectAll}
                     primary={equal}
                     colors={colors}
                     onPress={onRejectAll}
@@ -698,11 +703,7 @@ function PreferencesView({
                 )}
                 {showAccept && (
                   <Button
-                    label={
-                      plain(copy.accept_btn) ||
-                      plain(bannerCopy.accept_btn) ||
-                      "Accept all"
-                    }
+                    label={copy.acceptAll}
                     primary
                     colors={colors}
                     onPress={onAcceptAll}
@@ -713,14 +714,14 @@ function PreferencesView({
             )}
             {buttons.show_save_preferences_btn !== false && (
               <Button
-                label={plain(copy.save_btn) || "Save preferences"}
+                label={copy.save}
                 primary={false}
                 colors={colors}
                 onPress={onSave}
               />
             )}
             <View style={styles.branding}>
-              <PoweredBy colors={colors} />
+              <PoweredBy label={messages.ui.poweredBy} colors={colors} />
             </View>
           </View>
         </Animated.View>

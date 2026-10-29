@@ -79,6 +79,31 @@ Completed release gates:
 3. The GitHub release now triggers the protected main-branch OIDC workflow;
    routine releases require GitHub environment review and no npm security key.
 
+## React Native P1 follow-ups (in review, not released)
+
+Built and unit tested on branch `claude/project-thread-y2k6lb`, not yet merged
+or published, and not part of the published 1.2.0. The changeset makes it a
+minor release (1.3.0) of the fixed package group.
+
+- Vendor presets for Firebase Analytics, Crashlytics and Performance,
+  AppsFlyer, Adjust, Meta, Amplitude, Mixpanel, Branch, Braze and OneSignal,
+  named after the mobile SDK library entries. Verified against fake SDK
+  objects only; the method names follow each SDK's published API.
+- `connectFirebase`: Firebase collection toggles plus Consent Mode v2 signals
+  with the web SDK's category mapping.
+- `requestTrackingAfterConsent`: iOS App Tracking Transparency prompt after
+  the marketing category (or a service) is accepted, with ATT guidance in the
+  `react-native-integrations` docs page.
+- Headless mode hooks: `useConsentText`, `useConsentDraft`, services and data
+  labels in `useCategories`, `richText`/`plainText`.
+- Debug panel shown with `debug`, plus `useDebugEvents`.
+- SDK copy in the 33 web SDK locales (AI-written, not yet native-reviewed)
+  that fills empty dashboard fields and translates data labels; `translations`
+  overrides it. Adds about 95 KB of source strings to the package.
+
+Still to do for these: a device check of the debug panel and ATT prompt on
+iOS, a native-speaker review of the new copy, and the docs import.
+
 ## Remaining documentation and platform follow-ups
 
 1. Import the exact clean SDK documentation export into CookieChimp-Docs through

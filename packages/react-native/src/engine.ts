@@ -19,12 +19,15 @@ import {
 } from "@cookiechimp/core/sync";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppState, type NativeEventSubscription, Platform } from "react-native";
+import { track } from "./events";
+import type { Translations } from "./i18n";
 import { fetchRegion, parseRegion, regionKey } from "./region";
 import {
   type AsyncKeyValueStorage,
   type MirroredStorage,
   mirrorStorage,
 } from "./storage";
+import { type ConsentText, consentText } from "./text";
 import { applyVendors } from "./vendors";
 
 export const DEFAULT_API = "https://cookiechimp.com";
@@ -71,8 +74,16 @@ export interface CookieChimpOptions {
   apiBase?: string;
   /** Storage for consent, the config cache and queued records. Defaults to AsyncStorage. */
   storage?: AsyncKeyValueStorage;
-  /** Log SDK activity to the console. */
+  /**
+   * Log SDK activity to the console and show the debug panel. Turn it off in
+   * release builds, for example with `debug={__DEV__}`.
+   */
   debug?: boolean;
+  /**
+   * Your own copy for the SDK's interface text and data labels, by language.
+   * Dashboard copy still wins; these replace the SDK's built-in fallbacks.
+   */
+  translations?: Translations;
   /** After every decision, and on launch when a valid decision is stored. */
   onAccept?: (preferences: UserPreferences) => void;
   /** After the first decision on this install. */
@@ -97,6 +108,12 @@ export interface CookieChimpSnapshot {
   region: Region | null;
   regulation: Regulation | null;
   language: string;
+  /** The requested locale: the `language` option or the device language. */
+  locale: string;
+  /** Where the config came from: the bundled file, the device cache or the network. */
+  source: "bundle" | "cache" | "network" | null;
+  /** The consent copy with fallbacks applied, once the config is loaded. */
+  text: ConsentText | null;
   bannerOpen: boolean;
   preferencesOpen: boolean;
 }
@@ -109,6 +126,9 @@ export const IDLE: CookieChimpSnapshot = Object.freeze({
   region: null,
   regulation: null,
   language: "en",
+  locale: "en",
+  source: null,
+  text: null,
   bannerOpen: false,
   preferencesOpen: false,
 });
@@ -137,6 +157,8 @@ export interface Engine {
   reset(): void;
   /** Send queued consent records now. Resolves with the number still queued. */
   flush(): Promise<number>;
+  /** Number of consent records waiting to be sent. */
+  pending(): number;
 }
 
 /** Summarize a consent state for callbacks and `getUserPreferences`. */
@@ -205,9 +227,16 @@ export function createEngine(options: CookieChimpOptions): Engine {
   let destroyed = false;
   let cookieName = "cc_consent";
   let maxAgeMs = DEFAULT_MAX_AGE_MS;
+  let locale = "en";
+  let source: CookieChimpSnapshot["source"] = null;
 
   const debug = (...args: unknown[]) => {
     if (options.debug) console.log("[CookieChimp]", ...args);
+  };
+  const event = (kind: Parameters<typeof track>[0], message: string) => {
+    if (destroyed) return;
+    track(kind, message);
+    debug(message);
   };
   const update = (patch: Partial<CookieChimpSnapshot>) => {
     if (destroyed) return;
@@ -215,7 +244,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
     for (const listener of listeners) listener();
   };
   const fail = (error: string) => {
-    debug("error:", error);
+    event("error", error);
     update({ status: "error", error });
   };
 
@@ -242,7 +271,10 @@ export function createEngine(options: CookieChimpOptions): Engine {
     const previous = stored ? decodeConsentCookie(stored) : null;
     const reconsent = Date.parse(dashboard.reconsentRequiredAt ?? "");
     if (previous && Date.parse(previous.ts) < reconsent) {
-      debug("re-consent required since", dashboard.reconsentRequiredAt);
+      event(
+        "consent",
+        `re-consent required since ${dashboard.reconsentRequiredAt}`,
+      );
       store.removeItem(cookieName);
     }
     try {
@@ -290,7 +322,11 @@ export function createEngine(options: CookieChimpOptions): Engine {
       const before = snapshot.consent;
       const first = !snapshot.decided;
       const preferences = toUserPreferences(state, dashboard);
-      debug("consent", preferences);
+      event(
+        "consent",
+        `${preferences.acceptType}: ${preferences.acceptedCategories.join(", ") || "none"} accepted`,
+      );
+      if (log) event("records", `record queued (${log.pending()} waiting)`);
       update({
         consent: state,
         decided: true,
@@ -310,8 +346,9 @@ export function createEngine(options: CookieChimpOptions): Engine {
       stopLog?.();
     };
     const decided = !consent.needsDecision;
-    debug(
-      `banner ${dashboard.bannerId} (${dashboard.language}), regulation ${consent.regulation}, decided ${decided}`,
+    event(
+      "config",
+      `banner ${dashboard.bannerId} (${dashboard.language || "no copy"}), regulation ${consent.regulation}, decided ${decided}`,
     );
     update({
       status: "ready",
@@ -322,6 +359,12 @@ export function createEngine(options: CookieChimpOptions): Engine {
       region,
       regulation: consent.regulation,
       language: dashboard.language,
+      locale,
+      source,
+      text: consentText(dashboard, {
+        locale,
+        translations: options.translations,
+      }),
       bannerOpen: !decided,
       preferencesOpen: false,
     });
@@ -338,7 +381,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
     const stored = store.getItem(cookieName);
     const state = stored ? decodeConsentCookie(stored) : null;
     if (state && Date.parse(state.ts) + maxAgeMs > Date.now()) return;
-    debug("stored decision expired");
+    event("consent", "stored decision expired");
     store.removeItem(cookieName);
     apply(dashboard, snapshot.region);
   };
@@ -349,7 +392,8 @@ export function createEngine(options: CookieChimpOptions): Engine {
     void sync.revalidate().then((state) => {
       const next = state.dashboard;
       if (next && next.configVersion !== snapshot.dashboard?.configVersion) {
-        debug("config updated to", next.configVersion);
+        event("config", `config updated to ${next.configVersion}`);
+        source = "network";
         apply(next, region);
       }
     });
@@ -382,15 +426,21 @@ export function createEngine(options: CookieChimpOptions): Engine {
             })
           : null);
       if (destroyed) return;
-      const locale = options.language ?? deviceLocale();
-      debug("region", regionKey(region) || "none", "locale", locale);
+      locale = options.language ?? deviceLocale();
+      event(
+        "sdk",
+        `region ${regionKey(region) || "none"}, locale ${locale}${options.geolocation ? ", geolocation on" : ""}`,
+      );
       // On every foreground: ask again if the decision expired, retry
       // delivery, and refresh config after five minutes, or right away while
       // the first config download has not succeeded.
       appState = AppState.addEventListener("change", (next) => {
         if (next !== "active") return;
         expireStale();
-        void log?.retry();
+        if (log?.pending())
+          void log.retry().then((left) => {
+            event("records", `retried, ${left} still waiting`);
+          });
         if (
           !snapshot.dashboard ||
           Date.now() - lastRevalidate > REVALIDATE_AFTER
@@ -405,6 +455,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
           ...(options.accountId ? { projectId: options.accountId } : {}),
         });
         if (!dashboard) return fail("invalid config");
+        source = "bundle";
       } else if (options.accountId) {
         sync = createSync({
           projectId: options.accountId,
@@ -416,12 +467,15 @@ export function createEngine(options: CookieChimpOptions): Engine {
           ...(options.fetch ? { fetch: options.fetch } : {}),
         });
         dashboard = sync.get().dashboard;
-        if (dashboard) revalidate(region);
-        else {
+        if (dashboard) {
+          source = "cache";
+          revalidate(region);
+        } else {
           lastRevalidate = Date.now();
           const state = await sync.revalidate();
           dashboard = state.dashboard;
           if (!dashboard) return fail(state.error ?? "config unavailable");
+          source = "network";
         }
       } else return fail("accountId or config is required");
       apply(dashboard, region);
@@ -460,6 +514,7 @@ export function createEngine(options: CookieChimpOptions): Engine {
       apply(dashboard, snapshot.region);
     },
     flush: () => log?.retry() ?? Promise.resolve(0),
+    pending: () => log?.pending() ?? 0,
   };
   return engine;
 }

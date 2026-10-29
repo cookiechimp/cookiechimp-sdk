@@ -264,7 +264,17 @@ export function Chevron({
 }
 
 /** The "Powered by CookieChimp" line shown at the foot of every modal. */
-export function PoweredBy({ colors }: { colors: Palette }) {
+export function PoweredBy({
+  colors,
+  label = "Powered by {name}",
+}: {
+  colors: Palette;
+  /** Translated text with `{name}` where "CookieChimp" goes. */
+  label?: string;
+}) {
+  const [before = "", after = ""] = label.includes("{name}")
+    ? label.split("{name}")
+    : [`${label} `];
   return (
     <Text
       accessibilityRole="link"
@@ -272,10 +282,11 @@ export function PoweredBy({ colors }: { colors: Palette }) {
       testID="cookiechimp-powered-by"
       style={[styles.poweredBy, { color: alpha(colors.text, 0.72) }]}
     >
-      Powered by{" "}
+      {before}
       <Text style={[styles.poweredByName, { color: colors.text }]}>
         CookieChimp
       </Text>
+      {after}
     </Text>
   );
 }

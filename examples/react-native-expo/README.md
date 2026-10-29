@@ -2,7 +2,17 @@
 
 A runnable Expo app for `@cookiechimp/react-native`. It shows the dashboard
 banner and preferences, the current consent state and a log of vendor start and
-stop callbacks.
+stop callbacks, and how to:
+
+- Switch to **headless mode** ("Custom UI"), where the app draws its own banner
+  and preferences from `useConsentText()` and `useConsentDraft()`.
+- Switch the banner **language** to see the translated SDK copy (data labels,
+  "Powered by", fallbacks for empty dashboard fields).
+- Open the **debug panel** from the "CC debug" tab (development builds only).
+- Use **vendor presets**, `connectFirebase` (Consent Mode signals) and
+  `requestTrackingAfterConsent` (App Tracking Transparency). Stand-in SDK
+  objects log every call, so the example runs in Expo Go without Firebase,
+  Mixpanel or AppsFlyer installed. Swap them for the real SDKs in your app.
 
 This example is not part of the pnpm workspace, so CI does not install Expo.
 Until the package is published, pack the local SDK into `vendor/` and install

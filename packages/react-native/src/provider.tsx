@@ -1,12 +1,23 @@
 import { type ReactNode, useEffect, useRef } from "react";
 import { CookieChimp, shutdown, store } from "./api";
 import type { CookieChimpOptions } from "./engine";
-import { ConsentBanner, ConsentPreferences, type Insets } from "./ui";
+import {
+  ConsentBanner,
+  ConsentPreferences,
+  DebugPanel,
+  type Insets,
+} from "./ui";
 
 export interface CookieChimpProviderProps extends CookieChimpOptions {
   children?: ReactNode;
-  /** Render the built-in banner and preferences. Set false for a custom UI. */
+  /**
+   * Render the built-in banner and preferences. Set false for headless mode:
+   * the SDK still loads config, stores decisions, syncs records and controls
+   * vendors, and your own screens use the hooks.
+   */
   ui?: boolean;
+  /** Show the debug panel tab. Defaults to the `debug` option. */
+  debugPanel?: boolean;
   /** Safe-area insets for the consent UI, for example from react-native-safe-area-context. */
   insets?: Insets;
 }
@@ -21,6 +32,7 @@ export function CookieChimpProvider({
   children,
   ui = true,
   insets,
+  debugPanel,
   ...options
 }: CookieChimpProviderProps) {
   const latest = useRef(options);
@@ -56,6 +68,7 @@ export function CookieChimpProvider({
     options.storage,
     options.debug,
     options.fetch,
+    options.translations,
   ]);
   return (
     <>
@@ -66,6 +79,7 @@ export function CookieChimpProvider({
           <ConsentPreferences insets={insets} />
         </>
       )}
+      {(debugPanel ?? options.debug === true) && <DebugPanel insets={insets} />}
     </>
   );
 }
