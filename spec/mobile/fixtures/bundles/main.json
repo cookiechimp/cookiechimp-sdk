@@ -1,0 +1,484 @@
+{
+  "version": 4,
+  "account_hashid": "acctREDACTED",
+  "cache_version": "a1b2c3d4",
+  "generated_at": "2026-10-01T12:00:00Z",
+  "country_banner_map": {
+    "US": "bnrUS1",
+    "US-CA": "bnrUS1",
+    "DE": "bnrEU1",
+    "FR": "bnrEU1",
+    "IE": "bnrEU1"
+  },
+  "default_banner": "bnrUS1",
+  "banners": {
+    "bnrUS1": {
+      "hashid": "bnrUS1",
+      "name": "US Default",
+      "consent_mode": "opt-out",
+      "consent_duration_days": 182,
+      "revision": 3,
+      "force_consent": false,
+      "enable_tcf": false,
+      "target_type": "worldwide",
+      "target_countries": [],
+      "target_us_states": [],
+      "target_canadian_regions": [],
+      "gui_options": {
+        "layout": "box",
+        "position": "bottom right",
+        "button_placement": "inline",
+        "equal_weight_buttons": false,
+        "swap_buttons": false
+      },
+      "theme": {
+        "dark_mode": "light",
+        "modal_border_radius": "8px",
+        "btn_border_radius": "4px",
+        "colors": {
+          "bg": "#ffffff",
+          "heading_color": "#000",
+          "text_color": "#333",
+          "link_color": "#2b2b2b",
+          "btn_primary_bg": "#2b2b2b",
+          "btn_primary_color": "#fff",
+          "btn_secondary_bg": "#fff",
+          "btn_secondary_color": "#2b2b2b"
+        },
+        "dark_colors": {
+          "bg": "#171a1c",
+          "heading_color": "#fff",
+          "text_color": "#999",
+          "link_color": "#bcbcbc",
+          "btn_primary_bg": "#fff",
+          "btn_primary_color": "#333",
+          "btn_secondary_bg": "#171a1c",
+          "btn_secondary_color": "#fff"
+        },
+        "logo_url_light": null,
+        "logo_url_dark": null
+      },
+      "buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_preferences_btn": true,
+        "show_close_btn": false
+      },
+      "preferences_buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_save_preferences_btn": true
+      },
+      "preferences_gui_options": {
+        "layout": "box",
+        "position": "left",
+        "equal_weight_buttons": false,
+        "control_level": "category_and_services",
+        "show_services": true,
+        "show_floating_icon": true,
+        "floating_icon_position": "bottom_left"
+      },
+      "footer": {
+        "enabled": true,
+        "content": "<a href='https://example.test/privacy'>Privacy Policy</a>",
+        "show_powered_by": true
+      },
+      "available_languages": [
+        "en"
+      ],
+      "language_autodetect": "document"
+    },
+    "bnrEU1": {
+      "hashid": "bnrEU1",
+      "name": "EU GDPR",
+      "consent_mode": "opt-in",
+      "consent_duration_days": 182,
+      "revision": 3,
+      "force_consent": false,
+      "enable_tcf": false,
+      "target_type": "selected_countries",
+      "target_countries": [
+        "DE",
+        "FR",
+        "IE"
+      ],
+      "target_us_states": [],
+      "target_canadian_regions": [],
+      "gui_options": {
+        "layout": "box",
+        "position": "bottom right",
+        "button_placement": "inline",
+        "equal_weight_buttons": false,
+        "swap_buttons": false
+      },
+      "theme": {
+        "dark_mode": "light",
+        "modal_border_radius": "8px",
+        "btn_border_radius": "4px",
+        "colors": {
+          "bg": "#ffffff",
+          "heading_color": "#000",
+          "text_color": "#333",
+          "link_color": "#2b2b2b",
+          "btn_primary_bg": "#2b2b2b",
+          "btn_primary_color": "#fff",
+          "btn_secondary_bg": "#fff",
+          "btn_secondary_color": "#2b2b2b"
+        },
+        "dark_colors": {
+          "bg": "#171a1c",
+          "heading_color": "#fff",
+          "text_color": "#999",
+          "link_color": "#bcbcbc",
+          "btn_primary_bg": "#fff",
+          "btn_primary_color": "#333",
+          "btn_secondary_bg": "#171a1c",
+          "btn_secondary_color": "#fff"
+        },
+        "logo_url_light": null,
+        "logo_url_dark": null
+      },
+      "buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_preferences_btn": true,
+        "show_close_btn": false
+      },
+      "preferences_buttons": {
+        "show_accept_btn": true,
+        "show_accept_necessary_btn": true,
+        "show_save_preferences_btn": true
+      },
+      "preferences_gui_options": {
+        "layout": "box",
+        "position": "left",
+        "equal_weight_buttons": false,
+        "control_level": "category_and_services",
+        "show_services": true,
+        "show_floating_icon": true,
+        "floating_icon_position": "bottom_left"
+      },
+      "footer": {
+        "enabled": true,
+        "content": "<a href='https://example.test/privacy'>Privacy Policy</a>",
+        "show_powered_by": true
+      },
+      "available_languages": [
+        "en",
+        "de"
+      ],
+      "language_autodetect": "document"
+    }
+  },
+  "translations": {
+    "bnrUS1": {
+      "en": {
+        "consent_modal": {
+          "title": "We value your privacy",
+          "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
+          "additional_description": "<p>You can change or withdraw your choices at any time in cookie settings.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject",
+          "preferences_btn": "Manage Preferences",
+          "close_btn": "Close",
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>"
+        },
+        "preferences_modal": {
+          "title": "Cookie Settings",
+          "description": "<p>You are in control of your data. Essential cookies are always active because the website needs them to work. Choose which optional categories and vendors you allow, and expand each item to see its purpose, provider and cookies. Your choices take effect when you save them.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject",
+          "save_btn": "Save Preferences",
+          "close_btn": "Close",
+          "more_info_title": "About this example",
+          "more_info": "<p>This is an illustrative website configuration with real vendor names and example cookie settings. No analytics or advertising tags are loaded in this demo. Cookie durations can vary by site configuration and browser. You can return to these settings at any time using the cookie icon.</p>"
+        },
+        "privacy_policy_url": "https://cookiechimp.com/privacy.php"
+      }
+    },
+    "bnrEU1": {
+      "en": {
+        "consent_modal": {
+          "title": "We value your privacy",
+          "description": "We use essential cookies to keep this website working. With your permission, we also use analytics to improve the experience and marketing cookies to measure campaigns. You can accept all, reject optional cookies, or choose by category and vendor.",
+          "additional_description": "<p>You can change or withdraw your choices at any time in cookie settings.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject All",
+          "preferences_btn": "Manage Preferences",
+          "close_btn": "Close",
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>"
+        },
+        "preferences_modal": {
+          "title": "Cookie Settings",
+          "description": "<p>You are in control of your data. Essential cookies are always active because the website needs them to work. Choose which optional categories and vendors you allow, and expand each item to see its purpose, provider and cookies. Your choices take effect when you save them.</p>",
+          "accept_btn": "Accept All",
+          "reject_btn": "Reject All",
+          "save_btn": "Save Preferences",
+          "close_btn": "Close",
+          "more_info_title": "About this example",
+          "more_info": "<p>This is an illustrative website configuration with real vendor names and example cookie settings. No analytics or advertising tags are loaded in this demo. Cookie durations can vary by site configuration and browser. You can return to these settings at any time using the cookie icon.</p>"
+        },
+        "privacy_policy_url": "https://cookiechimp.com/privacy.php"
+      },
+      "de": {
+        "consent_modal": {
+          "title": "Wir respektieren Ihre Privatsphäre",
+          "description": "We use cookies to improve your experience.",
+          "additional_description": "<p>Sie können Ihre Auswahl jederzeit in den Cookie-Einstellungen ändern.</p>",
+          "accept_btn": "Alle akzeptieren",
+          "reject_btn": "Alle ablehnen",
+          "preferences_btn": "Einstellungen",
+          "close_btn": "Close",
+          "footer": "<a href=\"https://cookiechimp.com/privacy.php\">Privacy Policy</a>"
+        },
+        "preferences_modal": {
+          "title": "Cookie-Einstellungen",
+          "description": "<p>Sie entscheiden, welche optionalen Kategorien und Anbieter Sie zulassen. Erforderliche Cookies bleiben aktiv. Öffnen Sie einen Eintrag, um Zweck, Anbieter und Cookies zu sehen. Ihre Auswahl wird beim Speichern übernommen.</p>",
+          "accept_btn": "Alle akzeptieren",
+          "reject_btn": "Alle ablehnen",
+          "save_btn": "Speichern",
+          "close_btn": "Close",
+          "more_info_title": "Über dieses Beispiel",
+          "more_info": "<p>Beispielkonfiguration mit echten Anbietern. Diese Demo lädt keine Analyse- oder Werbe-Tags. Die Speicherdauer kann je nach Website und Browser abweichen.</p>"
+        },
+        "privacy_policy_url": "https://cookiechimp.com/privacy.php"
+      }
+    }
+  },
+  "categories": [
+    {
+      "slug": "essential",
+      "name": "Essential",
+      "description": "These cookies keep the website secure, maintain your session and remember your privacy choices. They are necessary for core features and cannot be switched off here.",
+      "required": true,
+      "translations": {
+        "en": {
+          "name": "Essential",
+          "description": "These cookies keep the website secure, maintain your session and remember your privacy choices. They are necessary for core features and cannot be switched off here."
+        },
+        "de": {
+          "name": "Essenziell",
+          "description": "Required for the site to function"
+        }
+      },
+      "services": [
+        {
+          "id": "svcSESS1",
+          "name": "Session Management",
+          "description": "Keeps your signed-in session available as you move between pages and supports core website features. This first-party example service is always enabled.",
+          "company": "Website operator",
+          "privacy_policy_url": "https://cookiechimp.com/privacy.php",
+          "accepted_by_default": true,
+          "translations": {
+            "en": {
+              "name": "Session Management",
+              "description": "Keeps your signed-in session available as you move between pages and supports core website features. This first-party example service is always enabled."
+            }
+          },
+          "storage_items": [
+            {
+              "name": "session_id",
+              "type": "cookie",
+              "description": "Links requests to your current session so the website can keep you signed in until the session ends.",
+              "duration": "Session",
+              "company": "Website operator",
+              "translations": {
+                "en": {
+                  "name": "session_id",
+                  "description": "Links requests to your current session so the website can keep you signed in until the session ends."
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "storage_items": [
+        {
+          "name": "cc_platform_demo",
+          "type": "cookie",
+          "description": "Remembers the category and vendor choices you make in this demo so you are not asked again on every page load.",
+          "duration": "1 hour",
+          "company": "CookieChimp"
+        }
+      ]
+    },
+    {
+      "slug": "analytics",
+      "name": "Analytics",
+      "description": "These optional services help us understand which pages people visit and how they interact with the website, so we can improve navigation, content and performance. You can allow individual analytics vendors below.",
+      "required": false,
+      "translations": {
+        "en": {
+          "name": "Analytics",
+          "description": "These optional services help us understand which pages people visit and how they interact with the website, so we can improve navigation, content and performance. You can allow individual analytics vendors below."
+        },
+        "de": {
+          "name": "Statistik",
+          "description": "Helps us understand usage"
+        }
+      },
+      "services": [
+        {
+          "id": "svcGA4",
+          "name": "Google Analytics",
+          "description": "Measures visits, page views and interactions to help us understand which content is useful and where people encounter problems. Google Analytics uses identifiers to distinguish visitors and group activity into sessions.",
+          "company": "Google LLC",
+          "privacy_policy_url": "https://policies.google.com/privacy",
+          "accepted_by_default": false,
+          "translations": {
+            "en": {
+              "name": "Google Analytics",
+              "description": "Measures visits, page views and interactions to help us understand which content is useful and where people encounter problems. Google Analytics uses identifiers to distinguish visitors and group activity into sessions."
+            },
+            "de": {
+              "name": "Google Analyse",
+              "description": "Usage statistics"
+            }
+          },
+          "storage_items": [
+            {
+              "name": "_ga",
+              "type": "cookie",
+              "description": "Distinguishes visitors for website usage measurement.",
+              "duration": "2 years",
+              "company": "Google LLC"
+            },
+            {
+              "name": "_ga_<container-id>",
+              "type": "cookie",
+              "description": "Maintains session state for a Google Analytics 4 property. The suffix identifies the configured property.",
+              "duration": "2 years",
+              "company": "Google LLC"
+            }
+          ]
+        },
+        {
+          "id": "svcCLARITY",
+          "name": "Microsoft Clarity",
+          "description": "Creates heatmaps and session recordings to show how visitors navigate the website, where they click and where they may get stuck. This helps us identify usability issues and improve the experience.",
+          "company": "Microsoft Corporation",
+          "privacy_policy_url": "https://www.microsoft.com/en-us/privacy/privacystatement",
+          "accepted_by_default": false,
+          "storage_items": [
+            {
+              "name": "_clck",
+              "type": "cookie",
+              "description": "Remembers the Clarity visitor identifier and preferences for this website across visits.",
+              "duration": "1 year",
+              "company": "Microsoft Corporation"
+            },
+            {
+              "name": "_clsk",
+              "type": "cookie",
+              "description": "Connects page views from the same visit into a single Clarity session recording.",
+              "duration": "1 day",
+              "company": "Microsoft Corporation"
+            }
+          ]
+        }
+      ],
+      "storage_items": []
+    },
+    {
+      "slug": "marketing",
+      "name": "Marketing",
+      "description": "These optional services measure advertising campaigns and help show more relevant ads. They may connect activity on this website with activity on other websites. You can choose each marketing vendor separately.",
+      "required": false,
+      "translations": {
+        "en": {
+          "name": "Marketing",
+          "description": "These optional services measure advertising campaigns and help show more relevant ads. They may connect activity on this website with activity on other websites. You can choose each marketing vendor separately."
+        },
+        "de": {
+          "name": "Marketing",
+          "description": "Personalised advertising"
+        }
+      },
+      "services": [
+        {
+          "id": "svcMETA1",
+          "name": "Meta Pixel",
+          "description": "Measures the effectiveness of campaigns on Facebook and Instagram by connecting website actions with advertising interactions. It can also support audiences and more relevant advertising across Meta services.",
+          "company": "Meta Platforms, Inc.",
+          "privacy_policy_url": "https://www.facebook.com/privacy/policy/",
+          "accepted_by_default": false,
+          "translations": {
+            "en": {
+              "name": "Meta Pixel",
+              "description": "Measures the effectiveness of campaigns on Facebook and Instagram by connecting website actions with advertising interactions. It can also support audiences and more relevant advertising across Meta services."
+            }
+          },
+          "storage_items": [
+            {
+              "name": "_fbp",
+              "type": "cookie",
+              "description": "Identifies a browser to help measure advertising performance and deliver relevant advertising.",
+              "duration": "3 months",
+              "company": "Meta Platforms, Inc.",
+              "translations": {
+                "en": {
+                  "name": "_fbp",
+                  "description": "Identifies a browser to help measure advertising performance and deliver relevant advertising."
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "storage_items": []
+    }
+  ],
+  "services_index": {
+    "Session Management": {
+      "category": "essential",
+      "id": "svcSESS1"
+    },
+    "Google Analytics": {
+      "category": "analytics",
+      "id": "svcGA4"
+    },
+    "Meta Pixel": {
+      "category": "marketing",
+      "id": "svcMETA1"
+    },
+    "Microsoft Clarity": {
+      "category": "analytics",
+      "id": "svcCLARITY"
+    }
+  },
+  "default_services": {},
+  "integrations": {
+    "google_consent_mode": {
+      "enabled": true,
+      "default_state": {
+        "analytics_storage": "denied",
+        "ad_storage": "denied",
+        "ad_user_data": "denied",
+        "ad_personalization": "denied"
+      },
+      "url_passthrough": false,
+      "ads_data_redaction": true
+    },
+    "global_privacy_control": {
+      "enabled": true
+    }
+  },
+  "rtl_languages": [
+    "ar",
+    "dv",
+    "fa",
+    "ha",
+    "he",
+    "ks",
+    "ku",
+    "ps",
+    "ur",
+    "yi"
+  ],
+  "cookie_settings": {
+    "name": "cookiechimp_pref_REDACTED",
+    "expires_days": 182
+  },
+  "updated_at": "2026-10-01T12:00:00Z",
+  "reconsent_required_at": "2026-06-01T00:00:00Z"
+}

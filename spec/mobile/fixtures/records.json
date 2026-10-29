@@ -1,0 +1,359 @@
+{
+  "specVersion": 1,
+  "description": "The callback summary (toUserPreferences) and the platform record (toPlatformConsent) for consent states. Services missing from the dashboard group under `other` in records. The native url is always empty, like React Native.",
+  "dashboard": {
+    "bundle": "main",
+    "region": "DE",
+    "locale": "en"
+  },
+  "cases": [
+    {
+      "state": {
+        "schemaVersion": 1,
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "ts": "2026-10-15T09:30:00.000Z",
+        "categories": {
+          "necessary": true,
+          "essential": true,
+          "analytics": true,
+          "marketing": true
+        },
+        "action": "accept_all",
+        "region": {
+          "country": "DE"
+        },
+        "regulation": "gdpr",
+        "gpc": false,
+        "services": {
+          "session-management": true,
+          "google-analytics": true,
+          "microsoft-clarity": true,
+          "meta-pixel": true
+        }
+      },
+      "userPreferences": {
+        "acceptType": "all",
+        "acceptedCategories": [
+          "necessary",
+          "essential",
+          "analytics",
+          "marketing"
+        ],
+        "rejectedCategories": [],
+        "acceptedServices": {
+          "essential": [
+            "session-management"
+          ],
+          "analytics": [
+            "google-analytics",
+            "microsoft-clarity"
+          ],
+          "marketing": [
+            "meta-pixel"
+          ]
+        },
+        "rejectedServices": {},
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "consentTimestamp": "2026-10-15T09:30:00.000Z"
+      },
+      "record": {
+        "client_id": "00000000-0000-4000-8000-000000000001:2026-10-15T09:30:00.000Z",
+        "uuid": "00000000-0000-4000-8000-000000000001",
+        "platform": "ios",
+        "visitor_action": "consent",
+        "url": "",
+        "gpc_preference": false,
+        "created_at": "2026-10-15T09:30:00.000Z",
+        "user_preferences": {
+          "acceptType": "all",
+          "action": "accept_all",
+          "acceptedCategories": [
+            "necessary",
+            "essential",
+            "analytics",
+            "marketing"
+          ],
+          "rejectedCategories": [],
+          "acceptedServices": {
+            "essential": [
+              "session-management"
+            ],
+            "analytics": [
+              "google-analytics",
+              "microsoft-clarity"
+            ],
+            "marketing": [
+              "meta-pixel"
+            ]
+          },
+          "rejectedServices": {},
+          "regulation": "gdpr"
+        },
+        "language_code": "en",
+        "consent_banner_hashid": "bnrEU1"
+      }
+    },
+    {
+      "state": {
+        "schemaVersion": 1,
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "ts": "2026-10-15T09:30:00.000Z",
+        "categories": {
+          "necessary": true,
+          "essential": true,
+          "analytics": false,
+          "marketing": false
+        },
+        "action": "reject_all",
+        "region": {
+          "country": "DE"
+        },
+        "regulation": "gdpr",
+        "gpc": false,
+        "services": {
+          "session-management": true,
+          "google-analytics": false,
+          "microsoft-clarity": false,
+          "meta-pixel": false
+        }
+      },
+      "userPreferences": {
+        "acceptType": "necessary",
+        "acceptedCategories": [
+          "necessary",
+          "essential"
+        ],
+        "rejectedCategories": [
+          "analytics",
+          "marketing"
+        ],
+        "acceptedServices": {
+          "essential": [
+            "session-management"
+          ]
+        },
+        "rejectedServices": {
+          "analytics": [
+            "google-analytics",
+            "microsoft-clarity"
+          ],
+          "marketing": [
+            "meta-pixel"
+          ]
+        },
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "consentTimestamp": "2026-10-15T09:30:00.000Z"
+      },
+      "record": {
+        "client_id": "00000000-0000-4000-8000-000000000001:2026-10-15T09:30:00.000Z",
+        "uuid": "00000000-0000-4000-8000-000000000001",
+        "platform": "ios",
+        "visitor_action": "consent",
+        "url": "",
+        "gpc_preference": false,
+        "created_at": "2026-10-15T09:30:00.000Z",
+        "user_preferences": {
+          "acceptType": "necessary",
+          "action": "reject_all",
+          "acceptedCategories": [
+            "necessary",
+            "essential"
+          ],
+          "rejectedCategories": [
+            "analytics",
+            "marketing"
+          ],
+          "acceptedServices": {
+            "essential": [
+              "session-management"
+            ]
+          },
+          "rejectedServices": {
+            "analytics": [
+              "google-analytics",
+              "microsoft-clarity"
+            ],
+            "marketing": [
+              "meta-pixel"
+            ]
+          },
+          "regulation": "gdpr"
+        },
+        "language_code": "en",
+        "consent_banner_hashid": "bnrEU1"
+      }
+    },
+    {
+      "state": {
+        "schemaVersion": 1,
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "ts": "2026-10-15T09:30:00.000Z",
+        "categories": {
+          "necessary": true,
+          "essential": true,
+          "analytics": true,
+          "marketing": false
+        },
+        "action": "custom",
+        "region": {
+          "country": "DE"
+        },
+        "regulation": "gdpr",
+        "gpc": false,
+        "services": {
+          "session-management": true,
+          "google-analytics": false,
+          "microsoft-clarity": false,
+          "meta-pixel": false
+        }
+      },
+      "userPreferences": {
+        "acceptType": "custom",
+        "acceptedCategories": [
+          "necessary",
+          "essential",
+          "analytics"
+        ],
+        "rejectedCategories": [
+          "marketing"
+        ],
+        "acceptedServices": {
+          "essential": [
+            "session-management"
+          ]
+        },
+        "rejectedServices": {
+          "analytics": [
+            "google-analytics",
+            "microsoft-clarity"
+          ],
+          "marketing": [
+            "meta-pixel"
+          ]
+        },
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "consentTimestamp": "2026-10-15T09:30:00.000Z"
+      },
+      "record": {
+        "client_id": "00000000-0000-4000-8000-000000000001:2026-10-15T09:30:00.000Z",
+        "uuid": "00000000-0000-4000-8000-000000000001",
+        "platform": "ios",
+        "visitor_action": "consent",
+        "url": "",
+        "gpc_preference": false,
+        "created_at": "2026-10-15T09:30:00.000Z",
+        "user_preferences": {
+          "acceptType": "custom",
+          "action": "custom",
+          "acceptedCategories": [
+            "necessary",
+            "essential",
+            "analytics"
+          ],
+          "rejectedCategories": [
+            "marketing"
+          ],
+          "acceptedServices": {
+            "essential": [
+              "session-management"
+            ]
+          },
+          "rejectedServices": {
+            "analytics": [
+              "google-analytics",
+              "microsoft-clarity"
+            ],
+            "marketing": [
+              "meta-pixel"
+            ]
+          },
+          "regulation": "gdpr"
+        },
+        "language_code": "en",
+        "consent_banner_hashid": "bnrEU1"
+      }
+    },
+    {
+      "state": {
+        "schemaVersion": 1,
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "ts": "2026-10-15T09:30:00.000Z",
+        "categories": {
+          "necessary": true,
+          "essential": true,
+          "analytics": true,
+          "marketing": true
+        },
+        "action": "accept_all",
+        "region": {
+          "country": "DE"
+        },
+        "gpc": false,
+        "services": {
+          "google-analytics": true,
+          "retired": false
+        }
+      },
+      "userPreferences": {
+        "acceptType": "all",
+        "acceptedCategories": [
+          "necessary",
+          "essential",
+          "analytics",
+          "marketing"
+        ],
+        "rejectedCategories": [],
+        "acceptedServices": {
+          "analytics": [
+            "google-analytics"
+          ]
+        },
+        "rejectedServices": {
+          "essential": [
+            "session-management"
+          ],
+          "analytics": [
+            "microsoft-clarity"
+          ],
+          "marketing": [
+            "meta-pixel"
+          ]
+        },
+        "consentId": "00000000-0000-4000-8000-000000000001",
+        "consentTimestamp": "2026-10-15T09:30:00.000Z"
+      },
+      "record": {
+        "client_id": "00000000-0000-4000-8000-000000000001:2026-10-15T09:30:00.000Z",
+        "uuid": "00000000-0000-4000-8000-000000000001",
+        "platform": "ios",
+        "visitor_action": "consent",
+        "url": "",
+        "gpc_preference": false,
+        "created_at": "2026-10-15T09:30:00.000Z",
+        "user_preferences": {
+          "acceptType": "all",
+          "action": "accept_all",
+          "acceptedCategories": [
+            "necessary",
+            "essential",
+            "analytics",
+            "marketing"
+          ],
+          "rejectedCategories": [],
+          "acceptedServices": {
+            "analytics": [
+              "google-analytics"
+            ]
+          },
+          "rejectedServices": {
+            "other": [
+              "retired"
+            ]
+          }
+        },
+        "language_code": "en",
+        "consent_banner_hashid": "bnrEU1"
+      }
+    }
+  ]
+}

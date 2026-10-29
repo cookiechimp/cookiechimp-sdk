@@ -1,6 +1,6 @@
 # Remaining SDK work and release status
 
-Updated 27 October 2026. Scope: `cookiechimp/cookiechimp-sdk`. Platform work
+Updated 29 October 2026. Scope: `cookiechimp/cookiechimp-sdk`. Platform work
 belongs to Daniel; this completion sequence changes no platform code or settings.
 
 ## Live release
@@ -79,11 +79,11 @@ Completed release gates:
 3. The GitHub release now triggers the protected main-branch OIDC workflow;
    routine releases require GitHub environment review and no npm security key.
 
-## React Native P1 follow-ups (in review, not released)
+## React Native P1 follow-ups (merged, not released)
 
-Built and unit tested on branch `claude/project-thread-y2k6lb`, not yet merged
-or published, and not part of the published 1.2.0. The changeset makes it a
-minor release (1.3.0) of the fixed package group.
+Merged into main in [#70](https://github.com/cookiechimp/cookiechimp-sdk/pull/70)
+at `165dc2c`. Not yet published and not part of the published 1.2.0. The
+changeset makes it a minor release (1.3.0) of the fixed package group.
 
 - Vendor presets for Firebase Analytics, Crashlytics and Performance,
   AppsFlyer, Adjust, Meta, Amplitude, Mixpanel, Branch, Braze and OneSignal,
@@ -103,6 +103,21 @@ minor release (1.3.0) of the fixed package group.
 
 Still to do for these: a device check of the debug panel and ATT prompt on
 iOS, a native-speaker review of the new copy, and the docs import.
+
+## Native iOS and Android SDKs (in progress, not released)
+
+Daniel chose on 28 October 2026 to build fully native Swift and Kotlin SDKs in
+`cookiechimp/cookiechimp-ios` and `cookiechimp/cookiechimp-android`, kept in
+step with this repository by [`spec/mobile`](../spec/mobile/README.md).
+
+- `spec/mobile` holds the native behavior rules and conformance fixtures
+  generated from the React Native SDK (`pnpm spec:mobile`). `pnpm test:unit`
+  fails when a fixture is stale. Each published release attaches
+  `cookiechimp-mobile-spec-<tag>.zip` for the native repositories to pin.
+- The native SDKs are distributed as closed-source binaries: an XCFramework
+  through a public Swift Package repository and AARs on Maven Central under
+  `com.cookiechimp`. Neither is published yet; the public package repository,
+  Maven Central namespace, signing keys and licence need Daniel.
 
 ## Remaining documentation and platform follow-ups
 
