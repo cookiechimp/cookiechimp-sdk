@@ -11,7 +11,9 @@ dashboard, the user's choice for that service applies; otherwise the
 category's choice applies. `onStart` runs when consent allows the vendor and
 `onStop` when consent is withdrawn. Nothing starts before the SDK has loaded
 the stored decision, and nothing starts before a decision where the banner
-asks for opt-in consent.
+asks for opt-in consent. A vendor that consent does not allow also gets
+`onStop` as soon as it registers, because many SDKs, Firebase among them, keep
+their last setting from an earlier launch.
 
 Turn off each vendor SDK's automatic collection in its own setup (native
 config, `Info.plist`, `AndroidManifest.xml` or its init options) so it collects

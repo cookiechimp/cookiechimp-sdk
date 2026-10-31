@@ -235,7 +235,9 @@ Native screens follow the React Native screens in
 
 - Vendors register by dashboard service name and category. A vendor runs
   while its service is allowed (or its category when the service is unknown)
-  and nothing runs before consent is loaded.
+  and nothing runs before consent is loaded. A new vendor is neither started
+  nor stopped: the first evaluation that does not allow it calls its stop
+  callback once, because vendor SDKs keep their last setting across launches.
 - Firebase: Analytics, Crashlytics and Performance collection follow their
   services, and Analytics receives Consent Mode v2 signals on launch and after
   every decision (`integrations.json`).

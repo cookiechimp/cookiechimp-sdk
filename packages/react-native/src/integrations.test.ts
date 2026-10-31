@@ -48,6 +48,8 @@ describe("vendor presets", () => {
   it("registers a preset under its dashboard name and follows consent", async () => {
     const mixpanel = { optInTracking: vi.fn(), optOutTracking: vi.fn() };
     CookieChimp.registerVendor(presets.mixpanel(mixpanel));
+    // Mixpanel keeps its opt-in across launches, so it opts out until consent.
+    expect(mixpanel.optOutTracking).toHaveBeenCalledTimes(1);
     await start();
     expect(CookieChimp.getVendors()).toEqual({
       Mixpanel: { category: "analytics", running: false },
@@ -55,9 +57,13 @@ describe("vendor presets", () => {
     CookieChimp.acceptCategory(["analytics"]);
     expect(mixpanel.optInTracking).toHaveBeenCalledTimes(1);
     CookieChimp.acceptCategory([]);
-    expect(mixpanel.optOutTracking).toHaveBeenCalledTimes(1);
+    expect(mixpanel.optOutTracking).toHaveBeenCalledTimes(2);
     expect(debugEvents.get().map((event) => event.message)).toEqual(
-      expect.arrayContaining(["Mixpanel started", "Mixpanel stopped"]),
+      expect.arrayContaining([
+        "Mixpanel off until consent allows it",
+        "Mixpanel started",
+        "Mixpanel stopped",
+      ]),
     );
   });
 
@@ -68,9 +74,9 @@ describe("vendor presets", () => {
     });
     await start();
     CookieChimp.acceptCategory(["analytics"]);
-    expect(amplitude.setOptOut).not.toHaveBeenCalled();
+    expect(amplitude.setOptOut.mock.calls).toEqual([[true]]);
     CookieChimp.acceptCategory(["marketing"]);
-    expect(amplitude.setOptOut).toHaveBeenCalledWith(false);
+    expect(amplitude.setOptOut).toHaveBeenLastCalledWith(false);
     expect(CookieChimp.getVendors().Amplitude?.category).toBe("marketing");
   });
 
@@ -83,6 +89,7 @@ describe("vendor presets", () => {
     CookieChimp.acceptCategory("all");
     expect(appsFlyer.startSdk).toHaveBeenCalledTimes(1);
     expect(appsFlyer.stop.mock.calls.map(([stopped]) => stopped)).toEqual([
+      true,
       false,
       true,
       false,
@@ -119,6 +126,7 @@ describe("vendor presets", () => {
     CookieChimp.acceptCategory("all");
     expect(settings.initializeSDK).toHaveBeenCalledTimes(1);
     expect(settings.setAutoLogAppEventsEnabled.mock.calls).toEqual([
+      [false],
       [true],
       [false],
       [true],
@@ -160,10 +168,18 @@ describe("vendor presets", () => {
     await start();
     CookieChimp.acceptCategory(["marketing"]);
     CookieChimp.acceptCategory([]);
-    expect(branch.disableTracking.mock.calls).toEqual([[false], [true]]);
+    expect(branch.disableTracking.mock.calls).toEqual([
+      [true],
+      [false],
+      [true],
+    ]);
     expect(braze.enableSDK).toHaveBeenCalledTimes(1);
-    expect(braze.disableSDK).toHaveBeenCalledTimes(1);
-    expect(oneSignal.setConsentGiven.mock.calls).toEqual([[true], [false]]);
+    expect(braze.disableSDK).toHaveBeenCalledTimes(2);
+    expect(oneSignal.setConsentGiven.mock.calls).toEqual([
+      [false],
+      [true],
+      [false],
+    ]);
   });
 });
 
@@ -209,7 +225,11 @@ describe("connectFirebase", () => {
     expect(crashlytics.setCrashlyticsCollectionEnabled).toHaveBeenCalledWith(
       true,
     );
-    expect(analytics.setAnalyticsCollectionEnabled).not.toHaveBeenCalled();
+    // Firebase keeps the collection setting across launches, so it is
+    // switched off until consent allows it.
+    expect(analytics.setAnalyticsCollectionEnabled.mock.calls).toEqual([
+      [false],
+    ]);
     CookieChimp.acceptCategory(["analytics"]);
     expect(analytics.setConsent).toHaveBeenLastCalledWith({
       analytics_storage: true,
@@ -247,7 +267,9 @@ describe("connectFirebase", () => {
     });
     await start();
     expect(analytics.setConsent).not.toHaveBeenCalled();
-    expect(crashlytics.setCrashlyticsCollectionEnabled).not.toHaveBeenCalled();
+    expect(crashlytics.setCrashlyticsCollectionEnabled.mock.calls).toEqual([
+      [false],
+    ]);
     disconnect();
     expect(CookieChimp.getVendors()).toEqual({});
   });

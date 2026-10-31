@@ -420,9 +420,14 @@ describe("vendors", () => {
     CookieChimp.registerVendor("Meta Pixel", "marketing", pixel);
     // Not a dashboard service: follows its category.
     CookieChimp.registerVendor("Crash Reporter", "analytics", crash);
+    // An SDK can keep collection on from an earlier launch, so registering
+    // before consent switches it off.
+    for (const vendor of [analytics, pixel, crash])
+      expect(vendor.onStop).toHaveBeenCalledTimes(1);
     await start({ config: bundle, country: "DE", fetch: platform().fetch });
     // GDPR: nothing runs before a decision.
     expect(analytics.onStart).not.toHaveBeenCalled();
+    expect(analytics.onStop).toHaveBeenCalledTimes(1);
     expect(CookieChimp.isVendorRunning("Google Analytics")).toBe(false);
 
     CookieChimp.acceptCategory(["analytics"]);
@@ -436,11 +441,11 @@ describe("vendors", () => {
     });
 
     CookieChimp.acceptService(["Microsoft Clarity"], "analytics");
-    expect(analytics.onStop).toHaveBeenCalledTimes(1);
-    expect(crash.onStop).not.toHaveBeenCalled();
+    expect(analytics.onStop).toHaveBeenCalledTimes(2);
+    expect(crash.onStop).toHaveBeenCalledTimes(1);
 
     CookieChimp.acceptCategory([]);
-    expect(crash.onStop).toHaveBeenCalledTimes(1);
+    expect(crash.onStop).toHaveBeenCalledTimes(2);
   });
 
   it("starts a vendor registered after consent was given", async () => {
